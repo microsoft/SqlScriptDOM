@@ -1,13 +1,13 @@
----
-
----
-
 # Contributing
 
-Welcome and thank you for your interest
-in contributing to **Sql Script DOM**! Before contributing to this
+Welcome and thank you for your interest in contributing to **Sql Script DOM**! Before contributing to this
 project, please review this document for policies and procedures which
-will ease the contribution and review process for everyone. 
+will ease the contribution and review process for everyone.
+
+
+This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/).
+For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or
+contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
 
 ## Issues and Feature Requests
 
@@ -16,6 +16,17 @@ Before filing an issue, please make sure that the issue has not been submitted b
 To report a new issue please add the **bug** tag and use the **enhancement** tag for new feature proposals.
 
 Please create an issue per bug and include the version of Sql Script DOM where you are experiencing the issue, the steps to repro the bug, include error messages if applicable, and add a description of the expected result versus the actual result.
+
+
+## Contributor License Agreement
+
+This project welcomes contributions and suggestions.  Most contributions require you to agree to a
+Contributor License Agreement (CLA) declaring that you have the right to, and actually do, grant us
+the rights to use your contribution. For details, visit https://cla.opensource.microsoft.com.
+
+When you submit a pull request, a CLA bot will automatically determine whether you need to provide
+a CLA and decorate the PR appropriately (e.g. status check, comment). Simply follow the instructions
+provided by the bot. You will only need to do this once across all repos using our CLA.
 
 ## Pull Request Process
 
