@@ -5,6 +5,8 @@
 //------------------------------------------------------------------------------
 
 
+using System.Text.RegularExpressions;
+
 namespace Microsoft.SqlServer.TransactSql.ScriptDom
 {
     internal class BulkInsertStringOptionsHelper : OptionsHelper<BulkInsertOptionKind>
@@ -30,5 +32,12 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         }
 
         internal static readonly BulkInsertStringOptionsHelper Instance = new BulkInsertStringOptionsHelper();
+
+        internal static string Trim(Literal option)
+        {
+            // Remove all the whitespaces (tabs, newlines as well)
+            //
+            return Regex.Replace(option.Value.ToUpperInvariant(), @"\s*", "");
+        }
     }
 }
