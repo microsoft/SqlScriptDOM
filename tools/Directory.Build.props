@@ -17,9 +17,6 @@
     -->
     <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
 
-    <!-- Don't enable localization for ancillary tools only needed during the build -->
-    <EnableLocalization>False</EnableLocalization>
-
     <!-- Don't generate XML DOC for ancillary tools only needed during the build -->
     <GenerateDocumentationFile>False</GenerateDocumentationFile>
 

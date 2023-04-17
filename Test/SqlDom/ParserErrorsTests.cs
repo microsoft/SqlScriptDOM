@@ -5809,6 +5809,9 @@ WITH (
             ParserTestUtils.ErrorTest150("SELECT * FROM OPENROWSET (BULK 'f1', FORMAT = 'CSV') WITH ([region] COLLATE Latin1_General_BIN2) AS a;", new ParserErrorInfo(68, "SQL46010", "COLLATE"));
             ParserTestUtils.ErrorTest150("SELECT * FROM OPENROWSET (BULK 'f1', FORMAT = 'PARQUET', PARSER_VERSION = '1.0') AS a;", new ParserErrorInfo(31, "SQL46142"));
             ParserTestUtils.ErrorTest150("SELECT * FROM OPENROWSET (BULK 'f1', FORMAT = 'PARQUET', ROWSET_OPTIONS = '{\"READ_OPTIONS\":[\"ALLOW_INCONSISTENT_READS\"]}')) AS a;", new ParserErrorInfo(31, "SQL46142"));
+            ParserTestUtils.ErrorTest150("SELECT * FROM OPENROWSET (BULK 'f1', FORMAT = 'PARQUET', ROWSET_OPTIONS = '')) AS a;", new ParserErrorInfo(74, "SQL46010", "''"));
+            ParserTestUtils.ErrorTest150("SELECT * FROM OPENROWSET (BULK 'f1', FORMAT = 'PARQUET', ROWSET_OPTIONS = 'READ_OPTIONS = ALLOW_INCONSISTENT_READS')) AS a;", new ParserErrorInfo(74, "SQL46010", "'READ_OPTIONS = ALLOW_INCONSISTENT_READS'"));
+            ParserTestUtils.ErrorTest150("SELECT * FROM OPENROWSET (BULK 'f1', FORMAT = 'PARQUET', ROWSET_OPTIONS = '\"READ_OPTIONS\" : allow_INCONSISTENT_READS')) AS x;", new ParserErrorInfo(74, "SQL46010", "'\"READ_OPTIONS\" : allow_INCONSISTENT_READS'"));
         }
 
         [TestMethod]

@@ -6152,6 +6152,7 @@ simpleBulkInsertOptionWithValue returns [LiteralBulkInsertOption vResult = Fragm
 {
     Literal vValue;
     Identifier iValue;
+   StringLiteral jsonOption;
 }
     : tOption:Identifier EqualsSign
         ( vValue = integerOrNumeric
@@ -6178,7 +6179,18 @@ simpleBulkInsertOptionWithValue returns [LiteralBulkInsertOption vResult = Fragm
                 else if (vResult.OptionKind == BulkInsertOptionKind.DataCompression)
                     MatchString(vValue, CodeGenerationSupporter.Gzip);
                 else if (vResult.OptionKind == BulkInsertOptionKind.RowsetOptions)
-                    MatchString(vValue, CodeGenerationSupporter.ReadOptions);
+                {
+                    jsonOption = new StringLiteral { Value = BulkInsertStringOptionsHelper.Trim(vValue) };
+
+                    if (TryMatch(jsonOption, CodeGenerationSupporter.ReadOptions))
+                    {
+                        vValue = jsonOption;
+                    }
+                    else
+                    {
+                        MatchString(vValue, CodeGenerationSupporter.ReadOptions);
+                    }
+                }
                 vResult.Value = vValue;
             }
         | iValue = identifier
@@ -28637,6 +28649,7 @@ inlineIndexColumnDefinition returns [IndexDefinition vResult = FragmentFactory.C
     Identifier vIndexIdentifier;
     FileGroupOrPartitionScheme vFileGroupOrPartitionScheme;
     IndexType vIndexType = null;
+    bool vHasColumnList = false;
     BooleanExpression vExpression;
 }
     :
@@ -28685,7 +28698,13 @@ inlineIndexColumnDefinition returns [IndexDefinition vResult = FragmentFactory.C
             tRParen:RightParenthesis
             {
                 UpdateTokenInfo(vResult,tRParen);
+                vHasColumnList=true;
             }
+        )?
+        (
+            {NextTokenMatches(CodeGenerationSupporter.Include)}?
+            tInclude:Identifier
+            identifierColumnList[vResult, vResult.IncludeColumns]
         )?
         (vExpression = filterClause [
             vIndexType == null ?

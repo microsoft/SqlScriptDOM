@@ -1,11 +1,6 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <!-- Import this props file for signing properties -->
   <PropertyGroup>
-    <!-- By default we delay sign our assemblies, so they are ready tof real signing at a later stage. -->
-    <!-- Individual project (like the ancillary tools that we use during the build which do no ship) typically override these values so they can run normally during the build, without having to disbale SNV. -->
-    <DelaySign>true</DelaySign>
-    <SignAssembly>true</SignAssembly>
-    <!-- This SNK file is used to sign almost all DacFx binaries (SQLDOM uses a different one) -->
     <LinkKeyFile>$(EnlistmentRoot)\Externals\VS12\VS10_FinalPublicKey.snk</LinkKeyFile>
     <AssemblyOriginatorKeyFile>$(EnlistmentRoot)\Externals\VS12\VS10_FinalPublicKey.snk</AssemblyOriginatorKeyFile>
     <ShippingScope>External</ShippingScope>
