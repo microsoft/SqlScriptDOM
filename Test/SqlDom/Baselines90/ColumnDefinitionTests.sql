@@ -1,0 +1,54 @@
+CREATE TABLE [database].A_Schema.A_TABLE (
+    A0          VARCHAR (10),
+    A1          INT          IDENTITY (5, 10),
+    A12         INT          IDENTITY (+100000, -2),
+    A13         INT          IDENTITY (1., 1.),
+    A2          INT          IDENTITY (1, 3) NOT FOR REPLICATION,
+    A21         INT          IDENTITY NOT FOR REPLICATION,
+    [no action] INT          IDENTITY (100, 10000) NOT FOR REPLICATION ROWGUIDCOL,
+    A3          AS           -A1,
+    A4          AS           (+-(A2)) UNIQUE,
+    A5          AS           A0 CONSTRAINT PK_KEY PRIMARY KEY,
+    A6          INT          DEFAULT 200 CONSTRAINT PK_KEY PRIMARY KEY CONSTRAINT CkConstraint CHECK (A6 < A5),
+    A7          FLOAT        DEFAULT 23.54,
+    A8          FLOAT        CONSTRAINT DefCons DEFAULT 3.14,
+    A9          INT          CONSTRAINT [book_ratings_title_id] FOREIGN KEY REFERENCES [titles] ([title_id]) ON DELETE CASCADE ON UPDATE CASCADE,
+    UNIQUE CLUSTERED (A1 ASC, A2 DESC) WITH (FILLFACTOR = 25) ON [DEFAULT],
+    PRIMARY KEY CLUSTERED (A1 ASC, A2 DESC) WITH (FILLFACTOR = 25) ON [ThisGroup],
+    CONSTRAINT C1 FOREIGN KEY REFERENCES DB.Sch.T1 (C1) ON DELETE CASCADE ON UPDATE NO ACTION NOT FOR REPLICATION,
+    CONSTRAINT C2 FOREIGN KEY (A1) REFERENCES DB.Sch.T1 (C1) ON DELETE CASCADE ON UPDATE NO ACTION
+);
+
+
+GO
+CREATE TABLE g2 (
+    timestamp NOT NULL PRIMARY KEY,
+    CHECK (1 < 2)
+) TEXTIMAGE_ON [default];
+
+
+GO
+CREATE TABLE g2 (
+    c1 TIMESTAMP NOT NULL PRIMARY KEY,
+    CHECK (1 < 2)
+) ON [fg];
+
+
+GO
+CREATE TABLE g2 (
+    timestamp INT NOT NULL PRIMARY KEY,
+    CHECK (1 < 2)
+) ON [fg] TEXTIMAGE_ON [default];
+
+
+GO
+CREATE TABLE foo (
+    id   INT           NOT NULL,
+    name VARCHAR (100) CONSTRAINT PK_CR PRIMARY KEY NONCLUSTERED (id ASC)
+) TEXTIMAGE_ON [default];
+
+
+GO
+CREATE TABLE t1 (
+    c1 TEXT NOT NULL
+) ON 'default' TEXTIMAGE_ON 'default';

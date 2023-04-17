@@ -1,0 +1,7 @@
+<Project Sdk="Microsoft.Build.Traversal">
+  <ItemGroup>
+    <ProjectReference Include="AstGen\astgen.csproj" />
+    <ProjectReference Include="ScriptGenSettingsGenerator\ScriptGenSettingsGenerator.csproj" />
+    <ProjectReference Include="TokenListGenerator\TokenListGenerator.csproj" />
+  </ItemGroup>
+</Project>

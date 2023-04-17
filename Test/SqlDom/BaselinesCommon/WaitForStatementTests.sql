@@ -1,0 +1,12 @@
+WAITFOR DELAY 'time';
+
+WAITFOR DELAY N'time';
+
+WAITFOR DELAY @timeVar;
+
+WAITFOR TIME 'time';
+
+WAITFOR TIME N'time';
+
+WAITFOR TIME @timeVar;
+

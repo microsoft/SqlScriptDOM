@@ -1,0 +1,76 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="GenerateFiles.props" />
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <SQLDOM>true</SQLDOM>
+    <CsGenIntermediateOutputPath Condition=" '$(CsGenIntermediateOutputPath)' =='' ">$(BaseIntermediateOutputPath)AnyCPU\$(Configuration)\$(TargetFramework)\$(MSBuildProjectFile)\</CsGenIntermediateOutputPath>
+    <OutputErrorInLexerParserCompile>false</OutputErrorInLexerParserCompile>
+    <SQLSCRIPTDOM Condition="'$(SQLSCRIPTDOM)' == ''">$(MsBuildThisFileDirectory.TrimEnd('\'))</SQLSCRIPTDOM>
+  </PropertyGroup>
+  <PropertyGroup>
+    <NoWarn>1701;1702;1591</NoWarn>
+  </PropertyGroup>
+
+  <!-- These project references make sure tools are built first.
+       The SetTargetFramework tells msbuild to only build to build
+       those projects for the one and only flavor we need, i.e. $(NetfxVersion).
+   -->
+  <ItemGroup>
+    <ProjectReference Include="..\tools\AstGen\astgen.csproj">
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <SetTargetFramework>TargetFramework=$(NetfxVersion)</SetTargetFramework>
+    </ProjectReference>
+    <ProjectReference Include="..\tools\ScriptGenSettingsGenerator\ScriptGenSettingsGenerator.csproj">
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <SetTargetFramework>TargetFramework=$(NetfxVersion)</SetTargetFramework>
+    </ProjectReference>
+    <ProjectReference Include="..\tools\TokenListGenerator\TokenListGenerator.csproj">
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <SetTargetFramework>TargetFramework=$(NetfxVersion)</SetTargetFramework>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="SqlStudio.Tests.UTSqlScriptDom" Key="002400000480000094000000060200000024000052534131000400000100010007d1fa57c4aed9f0a32e84aa0faefd0de9e8fd6aec8f87fb03766c834c99921eb23be79ad9d5dcc1dd9ad236132102900b723cf980957fc4e177108fc607774f29e8320e92ea05ece4e821c0a5efe8f1645c4c0c93c1ab99285d622caa652c1dfad63d745d6f2de5f17e5eaf0fc4963d261c8a12436518206dc093344d5ad293"/>
+  </ItemGroup>
+  <ItemGroup>
+    <!-- DEVNOTE(MatteoT): these folders don't even exist: can we just delete these lines? -->
+    <Compile Remove="Build\*.cs" />
+    <Compile Remove="ScriptDom\SqlServer\ScriptGenerator\TokenLayoutTable.cs" />
+    <Compile Remove="ScriptDom\SqlServer\ScriptGenerator\SqlScriptGeneratorVisitor.UnpivotedTableSource.cs" />
+    <None Remove="$(Antlr2Exe)" />
+    <Content Include="$(Antlr2Exe)">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CustomToolNamespace>antlr</CustomToolNamespace>
+    </Content>
+    <Compile Update="TSqlParserResource.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>TSqlParserResource.resx</DependentUpon>
+    </Compile>
+    <Compile Update="SqlScriptGeneratorResource.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>SqlScriptGeneratorResource.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Update="TSqlParserResource.resx">
+      <SubType>Designer</SubType>
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>TSqlParserResource.Designer.cs</LastGenOutput>
+      <CustomToolNamespace>Microsoft.SqlServer.TransactSql.ScriptDom</CustomToolNamespace>
+      <LogicalName>$(RootNamespace).TSqlParserResource.resources</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Update="SqlScriptGeneratorResource.resx">
+      <SubType>Designer</SubType>
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>SqlScriptGeneratorResource.Designer.cs</LastGenOutput>
+      <CustomToolNamespace>Microsoft.SqlServer.TransactSql.ScriptDom</CustomToolNamespace>
+      <LogicalName>$(RootNamespace).SqlScriptGeneratorResource.resources</LogicalName>
+    </EmbeddedResource>
+  </ItemGroup>
+
+</Project>

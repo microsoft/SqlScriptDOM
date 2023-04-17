@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project>
+  <!-- Intentionally skipping one Directory.Build.props used for shipping binaries and going to the root directly -->
+  <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" />
+
+  <!-- These props are a bit of a duplication on what we have for the shipping binaries -->
+  <PropertyGroup>
+    <TargetFolder Condition="'$(TargetFolder)'==''">out</TargetFolder>
+    <BaseOutputPath Condition="'$(BaseOutputPath)'==''">$(EnlistmentRoot)\$(TargetFolder)</BaseOutputPath>
+    <OutputPath>$(BaseOutputPath)\tools</OutputPath>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <!--
+      $(MSBuildAllProjects) is a list of files that determine if a project is up-to-date or not.  By including this
+      file in the list, it ensures that all projects will be rebuilt if it changes.
+    -->
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+
+    <!-- Don't enable localization for ancillary tools only needed during the build -->
+    <EnableLocalization>False</EnableLocalization>
+
+    <!-- Don't generate XML DOC for ancillary tools only needed during the build -->
+    <GenerateDocumentationFile>False</GenerateDocumentationFile>
+
+    <!-- Tools are always .exe -->
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+
+</Project>

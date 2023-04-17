@@ -1,0 +1,127 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<!--
+ <copyright file="ScriptGeneratorSettings.xml" company="Microsoft">
+         Copyright (c) Microsoft Corporation.  All rights reserved.
+ </copyright>
+-->
+<Settings>
+  <SettingGroup name="Common">
+    <Setting name="KeywordCasing" type="KeywordCasing" default="KeywordCasing.Uppercase">
+      <Title>KeywordCasing_Title</Title>
+      <Description>KeywordCasing_Description</Description>
+      <Option value="KeywordCasing.Lowercase">KeywordCasing_LowerCase</Option>
+      <Option value="KeywordCasing.Uppercase">KeywordCasing_UpperCase</Option>
+      <Option value="KeywordCasing.PascalCase">KeywordCasing_PascalCase</Option>
+      <Summary>Gets or sets the keyword casing option to use during script generation</Summary>
+    </Setting>
+    <Setting name="SqlVersion" type="SqlVersion" default="SqlVersion.Sql90" browsable="false">
+      <Summary>Gets or sets the Sql version to generate script for</Summary>
+    </Setting>
+    <Setting name="SqlEngineType" type="SqlEngineType" default="SqlEngineType.All" browsable="false">
+      <Summary>Gets or sets the Sql engine type (All|Engine|Azure) to generate script for</Summary>
+    </Setting>
+    <Setting name="IndentationSize" type="int" default="4" min="0" browsable="false">
+      <Summary>Gets or sets the number of spaces to use when indenting text</Summary>
+    </Setting>
+    <Setting name="IncludeSemicolons" type="bool" default="false">
+      <Title>IncludeSemicolons_Title</Title>
+      <Description>IncludeSemiColons_Description</Description>
+      <Summary>Gets or sets a boolean indicating if a semi colon should be included after each statement</Summary>
+    </Setting>
+  </SettingGroup>
+  <SettingGroup name="CREATE TABLE">
+    <Setting name="AlignColumnDefinitionFields" type="bool" default="true">
+      <Summary>Gets or sets a boolean indicating if column definition fields (column name, data type, constraints) should be aligned into alignment columns.</Summary>
+    </Setting>
+  </SettingGroup>
+  <SettingGroup name="Clauses">
+    <Setting name="NewLineBeforeFromClause" type="bool" default="true">
+      <Summary>Gets or sets a boolean indicating if there should be a newline before the FROM clause in a SELECT statement</Summary>
+    </Setting>
+    <Setting name="NewLineBeforeWhereClause" type="bool" default="true">
+      <Summary>Gets or sets a boolean indicating if there should be a newline before the WHERE clause in a SELECT statement</Summary>
+    </Setting>
+    <Setting name="NewLineBeforeGroupByClause" type="bool" default="true">
+      <Summary>Gets or sets a boolean indicating if there should be a newline before the GROUP BY clause in a SELECT statement</Summary>
+    </Setting>
+    <Setting name="NewLineBeforeOrderByClause" type="bool" default="true">
+      <Summary>Gets or sets a boolean indicating if there should be a newline before the ORDER BY clause in a SELECT statement</Summary>
+    </Setting>
+    <Setting name="NewLineBeforeHavingClause" type="bool" default="true">
+      <Summary>Gets or sets a boolean indicating if there should be a newline before the HAVING clause in a SELECT statement</Summary>
+    </Setting>
+    <Setting name="NewLineBeforeWindowClause" type="bool" default="true">
+      <Summary>Gets or sets a boolean indicating if there should be a newline before the WINDOW clause in a SELECT statement</Summary>
+    </Setting>
+    <Setting name="NewLineBeforeJoinClause" type="bool" default="true">
+      <Summary>Gets or sets a boolean indicating if there should be a newline before the JOIN clause in a SELECT statement</Summary>
+    </Setting>
+    <Setting name="NewLineBeforeOffsetClause" type="bool" default="true">
+      <Summary>Gets or sets a boolean indicating if there should be a newline before the OFFSET clause</Summary>
+    </Setting>
+    <Setting name="NewLineBeforeOutputClause" type="bool" default="true">
+      <Summary>Gets or sets a boolean indicating if there should be a newline before the OUTPUT clause</Summary>
+    </Setting>
+  </SettingGroup>
+  <SettingGroup name="Alignment">
+    <Setting name="AlignClauseBodies" type="bool" default="true">
+      <Summary>Gets or sets a boolean indicating if the bodies of FROM, WHERE, GROUP BY, etc. clauses should be aligned</Summary>
+    </Setting>
+  </SettingGroup>
+  <SettingGroup name="SELECT">
+    <Setting name="MultilineSelectElementsList" type="bool" default="true">
+      <Summary>Gets or sets a boolean indicating if select elements should be listed as a multi-line list</Summary>
+    </Setting>
+    <Setting name="MultilineWherePredicatesList" type="bool" default="true">
+      <Summary>Gets or sets a boolean indicating if WHERE predicates (expressions separated by AND, and OR) should be written on multiple lines</Summary>
+    </Setting>
+  </SettingGroup>
+  <SettingGroup name="CREATE/ALTER VIEW">
+    <Setting name="IndentViewBody" type="bool" default="false">
+      <Summary>Gets or sets a boolean indicating if the view statement body should be indented.</Summary>
+    </Setting>
+    <Setting name="MultilineViewColumnsList" type="bool" default="true">
+      <Summary>Gets or sets a boolean indicating if view statement columns should be listed as a multi-line list</Summary>
+    </Setting>
+    <Setting name="AsKeywordOnOwnLine" type="bool" default="true">
+      <Summary>Gets or sets a boolean indicating if the AS keyword should be written on its own line</Summary>
+    </Setting>
+  </SettingGroup>
+  <SettingGroup name="UPDATE">
+    <Setting name="IndentSetClause" type="bool" default="false">
+      <Summary>Gets or sets a boolean indicating if the SET clause for an UPDATE statement should be indented</Summary>
+    </Setting>
+    <Setting name="AlignSetClauseItem" type="bool" default="true">
+      <Summary>Gets or sets a boolean indicating if SET clause items in an UPDATE statement should be aligned</Summary>
+    </Setting>
+    <Setting name="MultilineSetClauseItems" type="bool" default="true">
+      <Summary>Gets or sets a boolean indicating if SET clause items should be listed on multiple lines</Summary>
+    </Setting>
+  </SettingGroup>
+  <SettingGroup name="INSERT">
+    <Setting name="MultilineInsertTargetsList" type="bool" default="true">
+      <Summary>Gets or sets a boolean indicating if the INSERT column targets list should be spread across multiple lines</Summary>
+    </Setting>
+    <Setting name="MultilineInsertSourcesList" type="bool" default="true">
+      <Summary>Gets or sets a boolean indicating if the INSERT column sources list should be spread across multiple lines</Summary>
+    </Setting>
+  </SettingGroup>
+  <SettingGroup name="Parenthesis">
+    <Setting name="NewLineBeforeOpenParenthesisInMultilineList" type="bool" default="false">
+      <Summary>Gets or sets a boolean indicating if a newline should be placed before an open parenthesis when writing a multi-line list in parenthesis</Summary>
+    </Setting>
+    <Setting name="NewLineBeforeCloseParenthesisInMultilineList" type="bool" default="true">
+      <Summary>Gets or sets a boolean indicating if a newline should be placed before an close parenthesis when writing a multi-line list in parenthesis</Summary>
+    </Setting>
+  </SettingGroup>
+  <SettingGroup name="External Libraries">
+    <Setting name="AllowExternalLibraryPaths" type="bool" default="true">
+      <Summary>Gets or sets a boolean indicating if file paths can be used for external library content</Summary>
+    </Setting>
+  </SettingGroup>
+  <SettingGroup name="External Languages">
+    <Setting name="AllowExternalLanguagePaths" type="bool" default="true">
+      <Summary>Gets or sets a boolean indicating if file paths can be used for external language content</Summary>
+    </Setting>
+  </SettingGroup>
+</Settings>

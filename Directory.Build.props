@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  This root MSBuild file is automatically imported for all projects in the tree by MSBuild 15.0.
+  You can have a hierarchy of imports but make sure that this file is still imported.
+-->
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Label="Global locations">
+    <!--
+      $(MSBuildAllProjects) is a list of files that determine if a project is up-to-date or not.  By including this
+      file in the list, it ensures that all projects will be rebuilt if it changes.
+    -->
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+
+    <!-- By default we build the XMLDOC files -->
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    
+    <!--
+      Enlistment root is based off of wherever this file is.  Be sure not to set this property anywhere else.
+    -->
+    <EnlistmentRoot>$(MSBuildThisFileDirectory.TrimEnd('\\'))</EnlistmentRoot>
+    <!-- .build folder path, which can also be used for other purpose in future, this path is used to import the props file-->
+    <BuildPropsDir>$(EnlistmentRoot)\.build</BuildPropsDir>
+
+    <!-- This is the location where we restore/install the nuget packages -->
+    <RestorePackagesPath>$(EnlistmentRoot)\.packages</RestorePackagesPath>
+
+    <!-- This is the default target framework for all the projects. 
+         Individual projects may specify additional target frameworks -->
+    <NetfxVersion>net462</NetfxVersion>
+    <NetStandardVersion>netstandard2.1</NetStandardVersion>
+    <NetCoreVersion>net6.0</NetCoreVersion>
+
+    <TargetFrameworks>$(NetStandardVersion);$(NetfxVersion);$(NetCoreVersion)</TargetFrameworks>
+    <PreviewRelease Condition="'$(PreviewRelease)' == ''">false</PreviewRelease>
+    <VersionProductName>Microsoft SQL Script DOM</VersionProductName>
+
+    <!-- Use this property for convenience to build a path starting from the root of the repository. -->
+
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+
+    <TargetFolder Condition="'$(TargetFolder)'==''">out</TargetFolder>
+    <BaseOutputPath Condition="'$(BaseOutputPath)'==''">$(EnlistmentRoot)\$(TargetFolder)</BaseOutputPath>
+    <OutputPath>$(BaseOutputPath)\$(Configuration)</OutputPath>
+
+    <!-- Path for tools output files, .exe executable generated files for tools can be found here  -->
+    <BuildToolsPath>$(BaseOutputPath)\tools\$(NetfxVersion)</BuildToolsPath>
+
+    <!-- put obj files in a mirror tree off the root to keep the src folder tree cleaner -->
+    <BaseIntermediateOutputPath Condition=" '$(BaseIntermediateOutputPath)' == '' ">$(EnlistmentRoot)\obj\$([MSBuild]::MakeRelative('$(EnlistmentRoot)\', $(MSBuildProjectDirectory)))</BaseIntermediateOutputPath>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <NoWarn>1591</NoWarn>
+  </PropertyGroup>
+
+  <Import Project="$(BuildPropsDir)\AssemblyInfo.props" />
+  <Import Project="$(BuildPropsDir)\Signing.props" />
+</Project>

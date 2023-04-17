@@ -1,0 +1,21 @@
+CREATE TYPE tableType1 AS TABLE (
+    c1 INT PRIMARY KEY)
+    WITH (MEMORY_OPTIMIZED = ON);
+
+
+GO
+CREATE TYPE tableType2 AS TABLE (
+    c1 INT,
+    c2 AS  c1 PERSISTED,
+    UNIQUE (c1, c2))
+    WITH (MEMORY_OPTIMIZED = OFF);
+
+
+GO
+CREATE TYPE [dbo].[tableType41] AS TABLE (
+    [c1] INT     NOT NULL,
+    [c2] FLOAT   NOT NULL,
+    [c3] DECIMAL NOT NULL INDEX [range_index],
+    PRIMARY KEY NONCLUSTERED ([c1] ASC),
+    INDEX [hash_index] NONCLUSTERED HASH ([c2]) WITH (BUCKET_COUNT = 1024))
+    WITH (MEMORY_OPTIMIZED = ON);

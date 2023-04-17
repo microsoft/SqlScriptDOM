@@ -1,0 +1,30 @@
+CREATE TABLE t1 (
+    c1 INT SPARSE                       ,
+    c2 NCHAR (10) SPARSE                ,
+    c3 XML SPARSE                       ,
+    c4 XML( SomeSchemaCollection) SPARSE,
+    c6 VARBINARY (MAX) SPARSE           ,
+    c7 VARBINARY (MAX) SPARSE FILESTREAM,
+    c8 VARBINARY (MAX) SPARSE FILESTREAM
+);
+
+
+GO
+ALTER TABLE t1
+    ADD c5 VARBINARY (MAX) FILESTREAM;
+
+
+GO
+ALTER TABLE t1
+    ADD c9 XML SPARSE;
+
+
+GO
+ALTER TABLE t1
+    ADD c10 XML COLUMN_SET FOR ALL_SPARSE_COLUMNS;
+
+
+GO
+DECLARE @v1 AS TABLE (
+    c0 INT SPARSE                           ,
+    c1 XML COLUMN_SET FOR ALL_SPARSE_COLUMNS);

@@ -1,0 +1,144 @@
+SELECT *
+FROM schema1.table2;
+
+
+GO
+SELECT 1,
+       *,
+       2
+FROM table1;
+
+
+GO
+SELECT *
+FROM table1;
+
+
+GO
+SELECT *,
+       *
+FROM table1 AS table2, table3 AS table4, table5;
+
+
+GO
+SELECT ALL c1 AS [column 1],
+           c2 AS [column 2]
+FROM t1;
+
+SELECT DISTINCT c1 AS [column 1],
+                c2 AS [column 2]
+FROM t1;
+
+
+GO
+SELECT TOP 10000 c1
+FROM t1;
+
+SELECT TOP 20.12 PERCENT WITH TIES c1
+FROM t1;
+
+SELECT ALL TOP 80 PERCENT WITH TIES c1
+FROM t1;
+
+
+GO
+SELECT c1
+INTO t2
+FROM t1;
+
+SELECT ALL c1
+INTO myDb..t2
+FROM t1;
+
+(SELECT c1
+ INTO t2
+ FROM t1);
+
+((SELECT c1
+  INTO t2
+  FROM t1));
+
+SELECT c1
+INTO t2
+FROM t1
+UNION
+SELECT c1
+FROM t2;
+
+(SELECT c1
+ INTO t2
+ FROM t1)
+UNION
+SELECT c1
+FROM t2;
+
+
+GO
+SELECT Tab1.name,
+       Tab2.id
+FROM Tab1, Tab2
+WHERE Tab1.id = 1;
+
+SELECT *
+FROM table1 AS t1
+WHERE t1.c1 > 100;
+
+
+GO
+SELECT *
+FROM t1
+GROUP BY c1;
+
+SELECT *
+FROM t1
+GROUP BY ALL c1;
+
+SELECT *
+FROM t1
+GROUP BY c1, c2, c3;
+
+SELECT *
+FROM t1
+GROUP BY c1, c2 WITH ROLLUP;
+
+SELECT *
+FROM t1
+GROUP BY c1, c2 WITH CUBE;
+
+
+GO
+SELECT *
+FROM t1
+HAVING t1.c1 > 100;
+
+SELECT t1.c1,
+       t2.c1 AS [t2.c1]
+FROM t1, t10 AS t2
+WHERE t2.c1 < 100
+GROUP BY ALL t1.c1
+HAVING t1.c1 + 10 > 1000;
+
+SELECT *
+FROM t1
+ORDER BY c1, c2 ASC, c3 DESC;
+
+SELECT *
+FROM t1
+WHERE c1 > 1000
+ORDER BY c1, c2 ASC, c3 DESC;
+
+SELECT c1,
+       c2
+FROM t1 CROSS JOIN t2
+UNION
+SELECT *
+FROM t2
+ORDER BY 1 ASC;
+
+
+GO
+SELECT { GUID '34501789-D036-DD11-8F91-F6311CA728A5' } AS myguid;
+
+
+GO
+SELECT { GUID N'34501789-D036-DD11-8F91-F6311CA728A5' } AS myguid;

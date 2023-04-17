@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.Build.Traversal">
+  <ItemGroup>
+    <!-- Do not reference tools\dirs.proj: let those codegen tools be
+         build as they are referenced by Microsoft.SqlServer.TransactSql.ScriptDom.csproj
+    -->
+    <ProjectReference Include="SqlScriptDom\Microsoft.SqlServer.TransactSql.ScriptDom.csproj" />
+    <ProjectReference Include="Test\SqlDom\UTSqlScriptDom.csproj" />
+    <ProjectReference Include="Test\GenerateRunSettings\GenerateRunSettings.proj" />
+  </ItemGroup>
+</Project>

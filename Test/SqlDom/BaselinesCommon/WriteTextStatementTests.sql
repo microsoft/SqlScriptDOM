@@ -1,0 +1,14 @@
+WRITETEXT t1.c1 0xABAA10 @str;
+
+WRITETEXT BULK t1.c1 @var 'hi';
+
+WRITETEXT t1.c1 @var
+    WITH LOG NULL;
+
+WRITETEXT t1.c1 100 'hello';
+
+WRITETEXT t1.c1 10
+    WITH LOG N'hello';
+
+WRITETEXT t1.c1 @var 0xFF;
+

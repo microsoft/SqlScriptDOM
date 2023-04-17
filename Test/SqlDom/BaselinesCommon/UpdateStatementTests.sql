@@ -1,0 +1,47 @@
+UPDATE t1
+SET @a = 23;
+
+UPDATE t1
+SET @a = a.b = 23;
+
+UPDATE t1
+SET @a = a.b = DEFAULT;
+
+UPDATE t1
+SET @a = a.b = NULL;
+
+UPDATE t1
+SET a.b = 23 + 23;
+
+UPDATE t1
+SET a.b = DEFAULT;
+
+UPDATE t1
+SET a.b = NULL;
+
+UPDATE dbo.f1()
+SET @a = a.b = 23;
+
+UPDATE t1
+SET t1.c1 = 23 + 10
+FROM t1;
+
+UPDATE t1
+SET c1 = 23 + 10
+WHERE c1 > 10;
+
+UPDATE t1
+SET c1 = 23 + 10;
+
+UPDATE t1
+SET c1 = 23 + 10
+OPTION (ORDER GROUP);
+
+UPDATE t1
+SET t1.c1 = 23 + 10
+FROM t1
+WHERE c1 > 10
+OPTION (ORDER GROUP);
+
+UPDATE dbo.tvf(-1, 2, DEFAULT)
+SET c1 = 2;

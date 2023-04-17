@@ -1,0 +1,33 @@
+DROP DATABASE publishing;
+
+DROP DATABASE pubs, newpubs;
+
+DROP INDEX authors.au_id_ind;
+
+DROP INDEX authors.au_id_ind, authors.au_id_ind2;
+
+DROP TABLE pubs.dbo.authors2;
+
+DROP STATISTICS authors.anames, titles.tnames;
+
+DROP STATISTICS ..T1.S1;
+
+DROP PROCEDURE p1;
+
+DROP FUNCTION f1;
+
+DROP VIEW v1;
+
+DROP DEFAULT d1;
+
+DROP RULE [r1];
+
+DROP TRIGGER t1;
+
+DROP PROCEDURE p1;
+
+DROP DATABASE SCOPED;
+
+DROP DATABASE [SCOPED CREDENTIAL];
+
+DROP DATABASE SCOPED, CREDENTIAL;
