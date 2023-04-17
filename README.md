@@ -24,11 +24,7 @@ Script DOM is used by DacFX and as an standalone library for client applications
     ```cmd 
     dotnet tool install --global Microsoft.VisualStudio.SlnGen.Tool
     ```
-4. Install antlr-2.7.5.exe from https://www.antlr2.org/download.html
-
-5. Create environment variable named Antlr2Exe pointing to the installation path.
-
-6. Clone the repository
+4. Clone the repository
     ```
         git clone https://github.com/microsoft/SqlScriptDOM
     ```
@@ -100,7 +96,6 @@ dotnet test --filter Priority=0
 
 ## Built With
 * https://www.antlr.org/
-* https://www.gnu.org/software/sed/manual/sed.html
 
 ## Contributing
 
