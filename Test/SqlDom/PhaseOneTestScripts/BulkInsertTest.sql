@@ -1,0 +1,1 @@
+bulk insert db1.t1 from 

@@ -1,0 +1,14 @@
+﻿SELECT LEFT_SHIFT(12345, 5);
+
+SELECT RIGHT_SHIFT(12345, 5);
+
+SELECT BIT_COUNT(0xabcdef) AS Count;
+
+SELECT BIT_COUNT(17) AS Count;
+
+SELECT GET_BIT(0xabcdef, 2) AS Get_2nd_Bit,
+       GET_BIT(0xabcdef, 4) AS Get_4th_Bit;
+
+SELECT SET_BIT(0x00, 2) AS VARBIN1;
+
+SELECT SET_BIT(0xabcdef, 0, 0) AS VARBIN2;

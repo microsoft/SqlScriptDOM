@@ -1,0 +1,25 @@
+<!-- This repo relies on the CentralPackageVersions SDK
+     See https://github.com/Microsoft/MSBuildSdks/tree/main/src/CentralPackageVersions
+     This file lists every nuget PackageReference dependency and its required version. 
+     Do not put Version attributes on PackageReference tags in individual projects.
+-->
+<Project>
+  <PropertyGroup>
+      <DotNetPackagesVersion>4.7.0</DotNetPackagesVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Update="System.Buffers" Version="4.5.1" />
+    <PackageReference Update="System.Diagnostics.DiagnosticSource" Version="5.0.0" />
+    <PackageReference Update="System.Drawing.Common" Version="6.0.0" />
+    <PackageReference Update="System.Runtime.CompilerServices.Unsafe" Version="5.0.0" />
+    <PackageReference Update="System.Text.Encodings.Web" Version="5.0.1" />
+    <PackageReference Update="System.Threading.Tasks.Dataflow" Version="4.9.0" />
+    <PackageReference Update="System.Threading.Tasks.Extensions" Version="4.5.4" />
+    <PackageReference Update="System.ValueTuple" Version="4.5.0" />
+
+    <!-- Test -->
+    <PackageReference Update="Microsoft.NET.Test.Sdk" Version="17.3.0" />
+    <PackageReference Update="MSTest.TestAdapter" Version="2.2.10" />
+    <PackageReference Update="MSTest.TestFramework" Version="2.2.10" />
+  </ItemGroup>
+</Project>

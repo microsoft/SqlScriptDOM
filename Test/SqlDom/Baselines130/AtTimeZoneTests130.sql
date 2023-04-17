@@ -1,0 +1,36 @@
+﻿SELECT dtColX AT TIME ZONE tziColX
+FROM T;
+
+SELECT datepart(hour, dtColX AT TIME ZONE tziColX)
+FROM T;
+
+SELECT CASE tziColX WHEN NULL THEN dtColX AT TIME ZONE 'UTC' ELSE dtColX AT TIME ZONE tziColX END
+FROM T;
+
+SELECT CAST ('1212-12-12 12:12:12' AS DATETIME2) AT TIME ZONE @tziVarX;
+
+SELECT dtColX AT TIME ZONE tziColX AT TIME ZONE tziColY
+FROM T;
+
+
+GO
+SELECT *
+FROM T
+WHERE dtColX AT TIME ZONE tzi1ColX AT TIME ZONE tzi2ColX < @criticalTime;
+
+SELECT *
+FROM T
+WHERE colX < 5
+      AND @criticalTime < dtColX AT TIME ZONE tzi1ColX AT TIME ZONE tzi2ColX
+      OR colY > 2;
+
+
+GO
+DECLARE @t TABLE (
+    colX INT           ,
+    colY DATETIMEOFFSET DEFAULT @dtVarX AT TIME ZONE @tziVarX AT TIME ZONE @tziVarY NOT NULL);
+
+DECLARE @t TABLE (
+    colX INT,
+    colY AS  colX AT TIME ZONE @tziVarX AT TIME ZONE @tziVarY);
+

@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.Build.NoTargets">
+  <!-- This project sets environment variables needed for test as a runsettings file. -->
+  <PropertyGroup>
+    <!-- Need to specify this again as the target framework doesn't flow through for the NoTargets SDK -->
+    <TargetFramework>$(NetfxVersion)</TargetFramework>
+    <NetCoreOutputPath>$(BaseOutputPath)\$(Configuration)\$(NetCoreVersion)</NetCoreOutputPath>
+  </PropertyGroup>
+  <Target Name="GenerateAndCopyRunSettings" BeforeTargets="AfterBuild">
+    <!-- Sets the paths in test.runsettings.template then copies it to OutputPath -->
+    <Exec Command="powershell -Command &quot;(gc '$(MSBuildThisFileDirectory)\test.runsettings.template') -replace '##ENLISTMENT_ROOT##', '$(EnlistmentRoot)' -replace '##OUTPUT_PATH##', '$(OutputPath)' | sc '$(OutputPath)\test.runsettings' &quot;" />
+    <Exec Command="powershell -Command &quot;(gc '$(MSBuildThisFileDirectory)\test.runsettings.template') -replace '##ENLISTMENT_ROOT##', '$(EnlistmentRoot)' -replace '##OUTPUT_PATH##', '$(NetCoreOutputPath)' | sc '$(NetCoreOutputPath)\test.runsettings' &quot;" />
+  </Target>
+</Project>

@@ -1,0 +1,45 @@
+SELECT c1
+INTO t2
+ON fg
+FROM t1;
+
+SELECT c1
+INTO t2
+ON [default]
+FROM t1;
+
+SELECT c1
+INTO t2
+ON [fg]
+FROM t1;
+
+SELECT ALL c1
+INTO myDb..t2
+ON fg
+FROM t1;
+
+(SELECT c1
+ INTO t2
+ ON fg
+ FROM t1);
+
+((SELECT c1
+  INTO t2
+  ON fg
+  FROM t1));
+
+SELECT c1
+INTO t2
+ON fg
+FROM t1
+UNION
+SELECT c1
+FROM t2;
+
+(SELECT c1
+ INTO t2
+ ON fg
+ FROM t1)
+UNION
+SELECT c1
+FROM t2;

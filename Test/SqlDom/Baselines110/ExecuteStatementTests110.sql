@@ -1,0 +1,38 @@
+DECLARE @SQL AS NVARCHAR (MAX);
+
+SET @SQL = N'SELECT a FROM t1 WHERE 1 = 1';
+
+EXECUTE (@SQL)
+    WITH RESULT SETS (
+        (Dobidoo BIGINT NOT NULL)
+                     );
+
+
+GO
+EXECUTE p1 
+    WITH RESULT SETS NONE;
+
+
+GO
+EXECUTE p1 
+    WITH RESULT SETS UNDEFINED;
+
+
+GO
+EXECUTE p1 
+    WITH RESULT SETS (
+         AS OBJECT server1.db.dbo.t1,
+        (c1 INT NULL),
+         AS FOR XML,
+         AS TYPE dbo.type1
+                     );
+
+
+GO
+EXECUTE p1 
+    WITH RESULT SETS NONE, RECOMPILE;
+
+
+GO
+EXECUTE p1 
+    WITH RECOMPILE, RESULT SETS UNDEFINED;

@@ -1,0 +1,15 @@
+CREATE SERVER ROLE r1;
+
+CREATE SERVER ROLE [r1]
+    AUTHORIZATION [dbo];
+
+
+GO
+ALTER SERVER ROLE r1 WITH NAME = newName;
+
+ALTER SERVER ROLE r1 ADD MEMBER role_member;
+
+ALTER SERVER ROLE r1 DROP MEMBER role_member;
+
+GRANT alter
+    ON SERVER ROLE::serverRole1 TO serverRole2;

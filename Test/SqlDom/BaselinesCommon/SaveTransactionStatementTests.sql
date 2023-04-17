@@ -1,0 +1,14 @@
+SAVE TRANSACTION myTransaction;
+
+SAVE TRANSACTION @tranVariable;
+
+SAVE TRANSACTION 5:a.b;
+
+SAVE TRANSACTION -5:a.b;
+
+SAVE TRANSACTION -100:a.b;
+
+SAVE TRANSACTION -100:[a	].[b
+		
+		];
+

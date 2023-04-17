@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project>
+  <PropertyGroup>
+    <Description>
+    SQL Script DOM is a .NET library that provides formatting and parsing capabilities to analyze SQL Scripts. It can be used by Powershell and C#.
+    </Description>
+    <Authors>Microsoft</Authors>
+    <Company>Microsoft Corporation</Company>
+    <BaseProduct>Microsoft Sql Server</BaseProduct>
+    <Copyright>© Microsoft Corporation. All rights reserved.</Copyright>
+  </PropertyGroup>
+</Project>

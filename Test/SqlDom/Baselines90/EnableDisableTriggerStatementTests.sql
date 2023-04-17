@@ -1,0 +1,37 @@
+ENABLE TRIGGER  ALL
+    ON b.c.t1;
+
+
+GO
+ENABLE TRIGGER a.b.c, d.e, f, a.b
+    ON t1;
+
+
+GO
+ENABLE TRIGGER a
+    ON ALL SERVER;
+
+
+GO
+ENABLE TRIGGER a, b, c
+    ON DATABASE;
+
+
+GO
+DISABLE TRIGGER  ALL
+    ON b.c.t1;
+
+
+GO
+DISABLE TRIGGER a.b.c, d.e, f, a.b
+    ON t1;
+
+
+GO
+DISABLE TRIGGER a
+    ON ALL SERVER;
+
+
+GO
+DISABLE TRIGGER a, b, c
+    ON DATABASE;

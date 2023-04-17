@@ -1,0 +1,59 @@
+SELECT Tab1.name,
+       Tab2.id
+FROM Tab1, Tab2
+WHERE Tab1.id *= Tab2.id;
+
+
+GO
+SELECT Tab1.name,
+       Tab2.id
+FROM Tab1, Tab2
+WHERE Tab1.id =* Tab2.id;
+
+
+GO
+IF c1 *= c2
+    SELECT *
+    FROM t1;
+
+
+GO
+IF c1 =* c2
+    SELECT *
+    FROM t1;
+
+
+GO
+SELECT c1
+FROM t1
+COMPUTE AVG(c1);
+
+SELECT c1
+FROM t1
+COMPUTE AVG(c1), COUNT(c1), MAX(c1), MIN(c1), STDEV(c1), STDEVP(c1), SUM(c1), VAR(c1), VARP(c1), COUNT_BIG(c1), CHECKSUM_AGG(c1);
+
+SELECT c1
+FROM t1
+COMPUTE AVG(c1), COUNT(c1), MAX(c1)
+COMPUTE MIN(c1), STDEV(c1), STDEVP(c1)
+COMPUTE SUM(c1), VAR(c1), VARP(c1), COUNT_BIG(c1), CHECKSUM_AGG(c1);
+
+SELECT c1
+FROM t1
+ORDER BY c1
+COMPUTE AVG(c1) BY c1;
+
+SELECT c1,
+       c2
+FROM t1
+ORDER BY c1, c2
+COMPUTE SUM(c1) BY c1, c2
+COMPUTE AVG(c1) BY c1;
+
+SELECT c1,
+       c2
+FROM t1
+ORDER BY c1, c2
+COMPUTE SUM(c1), AVG(c1) BY c1, c2
+COMPUTE AVG(c1) BY c1
+COMPUTE AVG(c1), VARP(c2) BY c1, c2;

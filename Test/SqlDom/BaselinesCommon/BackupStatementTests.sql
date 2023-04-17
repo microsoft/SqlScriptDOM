@@ -1,0 +1,75 @@
+BACKUP DATABASE d1
+    TO someDevice;
+
+BACKUP DATABASE d1
+    TO @deviceName, DISK = 'c:', TAPE = @tapeName;
+
+BACKUP LOG d1
+    TO someDevice;
+
+BACKUP LOG @Var2
+    TO someDevice;
+
+BACKUP DATABASE d1
+    FILE = 'f1', FILE = @var3, FILE = ('f2', @var4)
+    TO TAPE = '\\.\tape1';
+
+BACKUP DATABASE d1
+    FILEGROUP = 'f1'
+    TO TAPE = '\\.\tape1';
+
+BACKUP DATABASE d1
+    FILEGROUP = (@var5, @var6)
+    TO TAPE = '\\.\tape1';
+
+BACKUP DATABASE d1
+    FILEGROUP = 'fg1', FILEGROUP = 'fg2', FILE = 'f3'
+    TO DISK = 'd:';
+
+BACKUP DATABASE d1
+    TO DISK = 'd:'
+    WITH BLOCKSIZE = 10, BUFFERCOUNT = @count, CHECKSUM;
+
+BACKUP DATABASE d1
+    TO DISK = 'd:'
+    WITH NO_CHECKSUM, CONTINUE_AFTER_ERROR, DESCRIPTION = 'd1';
+
+BACKUP DATABASE d1
+    TO DISK = 'd:'
+    WITH STOP_ON_ERROR, DIFFERENTIAL, EXPIREDATE = @today;
+
+BACKUP DATABASE d1
+    TO DISK = 'd:'
+    WITH MEDIANAME = 'someMedia', MEDIADESCRIPTION = 'md1';
+
+BACKUP DATABASE d1
+    TO DISK = 'd:'
+    WITH RETAINDAYS = 10, FORMAT;
+
+BACKUP DATABASE d1
+    TO DISK = 'd:'
+    WITH NOFORMAT, INIT, SKIP, REWIND, UNLOAD, STATS;
+
+BACKUP DATABASE d1
+    TO DISK = 'd:'
+    WITH NOINIT, NOSKIP, NOREWIND, NOUNLOAD, RESTART, COPY_ONLY;
+
+BACKUP DATABASE d1
+    TO DISK = 'd:'
+    WITH STATS = 10, NAME = 'someName', MAXTRANSFERSIZE = @size;
+
+BACKUP DATABASE d1
+    TO DISK = 'd:'
+    WITH NO_TRUNCATE, NORECOVERY;
+
+BACKUP DATABASE d1
+    TO DISK = 'd:'
+    WITH STANDBY = 'undo_file_name';
+
+BACKUP DATABASE d1
+    TO someDevice
+    WITH NO_LOG;
+
+BACKUP DATABASE d1
+    TO someDevice
+    WITH TRUNCATE_ONLY;

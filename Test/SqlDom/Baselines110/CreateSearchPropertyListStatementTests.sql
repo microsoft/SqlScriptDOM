@@ -1,0 +1,8 @@
+CREATE SEARCH PROPERTY LIST new_list;
+
+CREATE SEARCH PROPERTY LIST new_list
+FROM db1.source_list;
+
+CREATE SEARCH PROPERTY LIST new_list
+FROM source_list
+    AUTHORIZATION MyOwner;

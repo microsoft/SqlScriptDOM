@@ -348,3 +348,12 @@ MigrationBackup/
 
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
+
+# Project solution
+*.sln
+
+# Project output folder
+out/
+
+# Project packages folder
+.packages/

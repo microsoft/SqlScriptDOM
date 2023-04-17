@@ -1,0 +1,9 @@
+CREATE ROLE r1;
+
+CREATE ROLE [r1]
+    AUTHORIZATION [dbo];
+
+
+GO
+ALTER ROLE r1 WITH NAME = newName;
+

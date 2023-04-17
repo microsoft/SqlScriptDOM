@@ -1,0 +1,45 @@
+CREATE FUNCTION [dbo].[test_udf2]
+( )
+RETURNS INT
+WITH INLINE = ON
+AS
+BEGIN
+    DECLARE @v AS INT = 10;
+    RETURN @v * @v;
+END
+
+
+GO
+CREATE FUNCTION [dbo].[test_udf1]
+( )
+RETURNS INT
+WITH INLINE = OFF
+AS
+BEGIN
+    DECLARE @v AS INT = 10;
+    RETURN @v * @v;
+END
+
+
+GO
+ALTER FUNCTION [dbo].[test_udf1]
+( )
+RETURNS INT
+WITH INLINE = ON, ENCRYPTION
+AS
+BEGIN
+    DECLARE @v AS INT = 10;
+    RETURN @v * @v;
+END
+
+
+GO
+CREATE OR ALTER FUNCTION [dbo].[test_udf1]
+( )
+RETURNS INT
+WITH INLINE = ON
+AS
+BEGIN
+    DECLARE @v AS INT = 10;
+    RETURN @v * @v;
+END

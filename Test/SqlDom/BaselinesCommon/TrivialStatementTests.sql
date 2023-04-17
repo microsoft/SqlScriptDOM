@@ -1,0 +1,57 @@
+USE master;
+
+USE [master];
+
+
+GO
+KILL 12;
+
+KILL -12
+    WITH STATUSONLY;
+
+KILL 'one';
+
+KILL N'one'
+    WITH STATUSONLY;
+
+
+GO
+CHECKPOINT;
+
+
+GO
+RECONFIGURE;
+
+RECONFIGURE
+    WITH OVERRIDE;
+
+
+GO
+SHUTDOWN;
+
+SHUTDOWN
+    WITH NOWAIT;
+
+
+GO
+SETUSER;
+
+SETUSER @user1;
+
+SETUSER 'user'
+    WITH NORESET;
+
+SETUSER N'user';
+
+
+GO
+TRUNCATE TABLE ..[t1];
+
+TRUNCATE TABLE dbo.[t1];
+
+TRUNCATE TABLE [t1];
+
+
+GO
+LINENO 42;
+

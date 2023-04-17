@@ -1,0 +1,11 @@
+CREATE TABLE t1 (
+    c1 INT
+);
+
+
+GO
+CREATE PROCEDURE p1
+AS
+BEGIN
+    RETURN 0;
+END

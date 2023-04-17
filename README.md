@@ -1,33 +1,113 @@
-# Project
+---
+ArtifactType: nupkg
+Documentation: URL
+Language: csharp, powershell
+Platform: dotnet
+Stackoverflow: URL
+Tags: ScriptDOM, SqlDOM
+---
 
-> This repo has been populated by an initial template to help get you started. Please
-> make sure to update the content to build a great experience for community-building.
+# SQL ScriptDOM
 
-As the maintainer of this project, please make a few updates:
+SQL Script DOM is a .NET library that provides formatting and parsing capabilities to analyze SQL Scripts. It can be used by Powershell and C#.
 
-- Improving this README.MD file to provide a great experience
-- Updating SUPPORT.MD with content about this project's support experience
-- Understanding the security reporting process in SECURITY.MD
-- Remove this section from the README
+Script DOM is used by DacFX and as an standalone library for client applications. 
+
+## Getting Started
+
+1. Install Visual Studio 2022 or newer.
+
+2. Download .NET SDKS from https://dotnet.microsoft.com/download/visual-studio-sdks 
+    - .NET Framework SDK (4.6.2 or higher)
+    - .NET 6 SDK (see [global.json](./global.json) for latest version)
+3.  Install the [SlnGen](https://microsoft.github.io/slngen/) tool.
+    ```cmd 
+    dotnet tool install --global Microsoft.VisualStudio.SlnGen.Tool
+    ```
+4. Install antlr-2.7.5.exe from https://www.antlr2.org/download.html
+
+5. Create environment variable named Antlr2Exe pointing to the installation path.
+
+6. Clone the repository
+    ```
+        git clone https://github.com/microsoft/SqlScriptDOM
+    ```
+    
+### Building
+
+Navigate to the root of the source code:
+```cmd
+cd C:\SqlScriptDOM\
+```
+Open Visual Studio solution
+```cmd
+slngen
+```
+
+Restore project dependencies:
+```cmd
+msbuild /t:Restore
+```
+
+To build:
+```cmd
+msbuild
+```
+## Contributing
+Notes for SQLDOM extensions:
+
+1. Make the changes in
+     For changing the DOM classes, modify the XML file (the C# code is generated based on this during the build process)
+     $(EnlistmentRoot)\Source\SqlDom\SqlScriptDom\Parser\TSql\Ast.xml
+	 Change Ast.xml to put the class pieces on their appropriate statements
+	 
+	 Note for above:
+		 1. The build process is defined in ```$(EnlistmentRoot)\Source\SqlDom\SqlScriptDom\SqlScriptDom.props``` (Target Name="CreateAST")
+		 2. The generated files are dropped in ```$(EnlistmentRoot)\obj\<x64|x86>\<Debug|Release>\SqlScriptDom.csproj\```
+   
+     For changing the parser, modify the .g file here:
+```$(EnlistmentRoot)\Source\SqlDom\SqlScriptDom\Parser\TSql\TSql<#>.g``` where # is the version (ie - 100, 120, 130). This will usually be the latest number if adding new grammar.
+	 Change the Tsql(xxx).g file to parse the new syntax.
+	 
+	 Note for above:
+		 1. The build process is defined in ```$(EnlistmentRoot)\Source\SqlDom\SqlScriptDom\SqlScriptDom.props``` (Target Name="CreateAST")
+		 2. The generated files are dropped in ```$(EnlistmentRoot)\obj\x86|x64\Debug|Release\sqlscriptdom.csproj\```
+   
+     For changing the ScriptGenerator, modify the appropriate file 
+     (i.e. Visitor that accepts the modified DOM class) in here
+     ```$(EnlistmentRoot)\Source\SqlDom\SqlScriptDom\ScriptDom\SqlServer\ScriptGenerator```
+	 To add a new ScriptGenerator, you need to add the file to ```$(EnlistmentRoot)\Source\SqlDom\SqlScriptDom\SqlScriptDom.props```
+	 Change The visitors SqlScriptGenerator.X to use the new piece from AST.XML
+	 If you're adding syntax that's Azure-only or Standalone-only, implement appropriate Versioning Visitor for your constructs.
+
+2. When adding/removing new files please add/remove an entry to/from ```$(EnlistmentRoot)\Source\SqlDom\SqlScriptDom\SqlScriptDom.csproj``` 
+
+3. To extend the tests do the following:
+     a. Baselines# needs to be updated or added with the appropriate .sql file as expected results.
+     b. The Only#SyntaxTests.cs needs to be extended or added to specify the appropriate TestScripts script.
+	 c. Positive tests go in Only#SyntaxTests.cs if adding new grammar.
+     d. Create a \TestScripts script that is the input for the test. (This is what is run and is checked against the .sql files in Baselines#)
+	 e. Negative tests go in ParserErrorsTests.cs.
+
+## Running the tests
+
+You can run tests directly in Visual Studio Text Explorer or by using the ```dotnet test``` command.
+
+Example: To run all priority 0 tests
+```cmd
+dotnet test --filter Priority=0
+```
+
+## Built With
+* https://www.antlr.org/
+* https://www.gnu.org/software/sed/manual/sed.html
 
 ## Contributing
 
-This project welcomes contributions and suggestions.  Most contributions require you to agree to a
-Contributor License Agreement (CLA) declaring that you have the right to, and actually do, grant us
-the rights to use your contribution. For details, visit https://cla.opensource.microsoft.com.
+Please read our [CONTRIBUTING.md](CONTRIBUTING.md) which outlines all of our policies, procedures, and requirements for contributing to this project.
 
-When you submit a pull request, a CLA bot will automatically determine whether you need to provide
-a CLA and decorate the PR appropriately (e.g., status check, comment). Simply follow the instructions
-provided by the bot. You will only need to do this once across all repos using our CLA.
+## License
 
-This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/).
-For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or
-contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
+Copyright (c) Microsoft Corporation. All rights reserved.
 
-## Trademarks
-
-This project may contain trademarks or logos for projects, products, or services. Authorized use of Microsoft 
-trademarks or logos is subject to and must follow 
-[Microsoft's Trademark & Brand Guidelines](https://www.microsoft.com/en-us/legal/intellectualproperty/trademarks/usage/general).
-Use of Microsoft trademarks or logos in modified versions of this project must not cause confusion or imply Microsoft sponsorship.
-Any use of third-party trademarks or logos are subject to those third-party's policies.
+Licensed under the [Source MIT](LICENSE).

@@ -1,0 +1,634 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="SQL46001Message" xml:space="preserve">
+    <value>An internal parser error occurred.</value>
+    <comment>This error occurs when something unexpected happens.</comment>
+  </data>
+  <data name="SQL46002Message" xml:space="preserve">
+    <value>{0} data type cannot have both National and Varying keywords.</value>
+    <comment>If National and Varying keywords are both used the data type has to be char.</comment>
+  </data>
+  <data name="SQL46003Message" xml:space="preserve">
+    <value>{0} data type cannot have the National keyword.</value>
+    <comment>National keyword can only be defined with char or text data types.</comment>
+  </data>
+  <data name="SQL46004Message" xml:space="preserve">
+    <value>{0} data type cannot have the Varying keyword.</value>
+    <comment>Varying keyword can only be defined with binary or char data types.</comment>
+  </data>
+  <data name="SQL46005Message" xml:space="preserve">
+    <value>Expected {0} but encountered {1} instead.</value>
+    <comment>This error occurs when the parser is expecting a certain type of token but receives some other token instead.</comment>
+  </data>
+  <data name="SQL46006Message" xml:space="preserve">
+    <value>{0} is not a WITH option for a procedure.</value>
+    <comment>The options for procedure are encryption, recompile and execute as clause.</comment>
+  </data>
+  <data name="SQL46007Message" xml:space="preserve">
+    <value>{0} is not a WITH option for a trigger.</value>
+    <comment>The options for procedure is encryption and execute as clause.</comment>
+  </data>
+  <data name="SQL46008Message" xml:space="preserve">
+    <value>{0} data type cannot have exactly one parameter.</value>
+    <comment>The data types that can have one parameter: user defined data type, char, varchar, nchar, nvarchar, decimal, float, numeric, binary, varbinary.</comment>
+  </data>
+  <data name="SQL46009Message" xml:space="preserve">
+    <value>{0} data type cannot have two parameters.</value>
+    <comment>The data types that can have two parameters: user defined data type, decimal, numeric.</comment>
+  </data>
+  <data name="SQL46010Message" xml:space="preserve">
+    <value>Incorrect syntax near {0}.</value>
+  </data>
+  <data name="SQL46011Message" xml:space="preserve">
+    <value>Only Unique or Primary Key constraints can be created on computed columns, while Check, Foreign Key, and Not Null constraints require that computed columns be persisted.</value>
+    <comment>Only Unique or Primary Key constraints can be created on computed columns, while Check, Foreign Key, and Not Null constraints require that computed columns be persisted.</comment>
+  </data>
+  <data name="SQL46012Message" xml:space="preserve">
+    <value>More than one Default constraint is defined.</value>
+    <comment>There can at most be one Default constraint per column.</comment>
+  </data>
+  <data name="SQL46013Message" xml:space="preserve">
+    <value>WITH VALUES can only be defined in an ALTER TABLE statement for a Default constraint.</value>
+  </data>
+  <data name="SQL46014Message" xml:space="preserve">
+    <value>A Default constraint can exist only at the column level in a CREATE or ALTER TABLE statement.</value>
+  </data>
+  <data name="SQL46015Message" xml:space="preserve">
+    <value>{0} is not a valid option for an index that has the backward compatible syntax.</value>
+    <comment>The options for index are pad_index, fillfactor, ignore_dup_key, drop_existing, statistics_norecopute, sort_in_tempdb.</comment>
+  </data>
+  <data name="SQL46016Message" xml:space="preserve">
+    <value>The column name is not valid. No table name was specified.</value>
+  </data>
+  <data name="SQL46017Message" xml:space="preserve">
+    <value>Count of column names cannot exceed 1024.</value>
+  </data>
+  <data name="SQL46018Message" xml:space="preserve">
+    <value>{0} is not a valid option for CREATE STATISTICS.</value>
+    <comment>The valid options for create statistics are fullscan, sample, and norecompute.</comment>
+  </data>
+  <data name="SQL46019Message" xml:space="preserve">
+    <value>{0} is not a valid option for SAMPLE.</value>
+    <comment>The valid options for sample are percent and rows.</comment>
+  </data>
+  <data name="SQL46020Message" xml:space="preserve">
+    <value>{0} is not a valid option for UPDATE STATISTICS.</value>
+    <comment>The valid options for update statistics are fullscan, sample, resample, all, columns, index and norecompute.</comment>
+  </data>
+  <data name="SQL46021Message" xml:space="preserve">
+    <value>{0} does not allow a database name to be specified.</value>
+  </data>
+  <data name="SQL46022Message" xml:space="preserve">
+    <value>{0} is not a recognized table or a view hint.</value>
+    <comment>The recognized table and view hints are: Index, FastFirstRow, HoldLock, NoLock, PagLock, ReadCommitted,  ReadPast, ReadUncommitted, RepeatableRead, RowLock, Serializable, TabLock, TabLockX, UpdLock, XLock, NoExpand.</comment>
+  </data>
+  <data name="SQL46023Message" xml:space="preserve">
+    <value>{0} is not a recognized GROUP BY option.</value>
+    <comment>The recognized options for group by are Cube and Rollup.</comment>
+  </data>
+  <data name="SQL46024Message" xml:space="preserve">
+    <value>{0} is not a recognized COMPUTE function.</value>
+    <comment>The recognized options for group by are avg, count, max, min, stdev, stedvp, sum, var, varp, count_big and checksum_agg.</comment>
+  </data>
+  <data name="SQL46025Message" xml:space="preserve">
+    <value>{0} is not a WITH option for a view.</value>
+    <comment>The options for view are encryption, schemabinding and view_metadata.</comment>
+  </data>
+  <data name="SQL46026Message" xml:space="preserve">
+    <value>{0} is not a WITH option for a CREATE FUNCTION or ALTER FUNCTION statement.</value>
+    <comment>The options for create and alter function statements are encryption, schemabinding and native_compilation.</comment>
+  </data>
+  <data name="SQL46027Message" xml:space="preserve">
+    <value>Exactly two part names are required in a DROP INDEX statement.</value>
+    <comment>Only exactly two part names are allowed in DROP INDEX statement</comment>
+  </data>
+  <data name="SQL46028Message" xml:space="preserve">
+    <value>No more than four parts can be specified for this element name.</value>
+    <comment>uereviewed</comment>
+  </data>
+  <data name="SQL46029Message" xml:space="preserve">
+    <value>Unexpected end of file occurred.</value>
+    <comment>Used when the parser was expecting a token but got to the end of file instead.</comment>
+  </data>
+  <data name="SQL46030Message" xml:space="preserve">
+    <value>Expected but did not find a closing quotation mark after the character string {0}.</value>
+    <comment>uereviewed</comment>
+  </data>
+  <data name="SQL46031Message" xml:space="preserve">
+    <value>Expected but did not find a closing square bracket after the identifier {0}.</value>
+    <comment>uereviewed</comment>
+  </data>
+  <data name="SQL46032Message" xml:space="preserve">
+    <value>Expected but did not find an end comment mark '*/'.</value>
+    <comment>uereviewed</comment>
+  </data>
+  <data name="SQL46033Message" xml:space="preserve">
+    <value>Expected but did not find a closing parenthesis after the identifier {0}.</value>
+    <comment>uereviewed</comment>
+  </data>
+  <data name="SQL46034Message" xml:space="preserve">
+    <value>Only one EXECUTE AS clause is allowed in this statement.</value>
+    <comment>Used when parser encounters second EXECUTE AS clause in CREATE or ALTER FUNCTION statement</comment>
+  </data>
+  <data name="SQL46035Message" xml:space="preserve">
+    <value>An ODBC join clause must encapsulate a qualified join or another ODBC join clause.</value>
+    <comment>For example unqualified join, or any join that is surrounded with paranthesis can not appear here.</comment>
+  </data>
+  <data name="SQL46036Message" xml:space="preserve">
+    <value>This usage of an ODBC clause is not supported. You must use curly brackets as delimiters.</value>
+    <comment>uereviewed</comment>
+  </data>
+  <data name="SQL46037Message" xml:space="preserve">
+    <value>The script contains syntax that is not supported by the version of SQL Server that is associated with the database project.</value>
+    <comment>Issued when SQL 2005 syntax used in SQL 2000 project (or vice versa).</comment>
+  </data>
+  <data name="SQL46038Message" xml:space="preserve">
+    <value>For DROP STATISTICS, you must provide both the object (table or view) name and the statistics name, in the form "objectName.statisticsName".</value>
+    <comment>uereviewed</comment>
+  </data>
+  <data name="SQL46039Message" xml:space="preserve">
+    <value>You cannot use the OUTPUT option in a CREATE FUNCTION statement.</value>
+    <comment>uereviewed</comment>
+  </data>
+  <data name="SQL46040Message" xml:space="preserve">
+    <value>An action of type 'INSERT' is not allowed in 'WHEN SOURCE NOT MATCHED' or 'MATCHED' clauses of a MERGE statement.</value>
+    <comment>uereviewed</comment>
+  </data>
+  <data name="SQL46041Message" xml:space="preserve">
+    <value>An action of type '{0}' is not allowed in the 'WHEN NOT MATCHED' clause of a MERGE statement.</value>
+    <comment>uereviewed</comment>
+  </data>
+  <data name="SQL46042Message" xml:space="preserve">
+    <value>More than one column ROWGUIDCOL constraint is specified.</value>
+    <comment>uereviewed</comment>
+  </data>
+  <data name="SQL46043Message" xml:space="preserve">
+    <value>More than one column IDENTITY constraint is specified.</value>
+    <comment>uereviewed</comment>
+  </data>
+  <data name="SQL46044Message" xml:space="preserve">
+    <value>Cannot have a logon trigger with a scope that is anything other than 'ALL SERVER'.</value>
+    <comment>Used when parser encounters a logon trigger with scope anything other than 'ALL SERVER'</comment>
+  </data>
+  <data name="SQL46045Message" xml:space="preserve">
+    <value>The integer value {0} is out of range.</value>
+    <comment>Used when parser encounters an invalid range for the parameters.</comment>
+  </data>
+  <data name="SQL46047Message" xml:space="preserve">
+    <value>The ORDER BY clause is not valid in views, inline functions, derived tables, sub-queries, and common table expressions, unless TOP or FOR XML or OFFSET is also specified.</value>
+    <comment>uereviewed</comment>
+  </data>
+  <data name="SQL46048Message" xml:space="preserve">
+    <value>The TOP N WITH TIES clause is not allowed without a corresponding ORDER BY clause.</value>
+    <comment>uereviewed</comment>
+  </data>
+  <data name="SQL46049Message" xml:space="preserve">
+    <value>Option {0} is specified more than once.</value>
+    <comment>Used when parser encounters a duplicate option in CREATE/ALTER WORKLOAD GROUP statements</comment>
+  </data>
+  <data name="SQL46050Message" xml:space="preserve">
+    <value>The ALTER DATABASE change tracking option '{0}' was specified more than once. Each option can be specified only once.</value>
+    <comment>uereviewed</comment>
+  </data>
+  <data name="SQL46051Message" xml:space="preserve">
+    <value>FILESTREAM can only be declared for VARBINARY(MAX) columns.</value>
+    <comment>uereviewed</comment>
+  </data>
+  <data name="SQL46052Message" xml:space="preserve">
+    <value>The following string is not defined as a language alias in syslanguages: {0}</value>
+    <comment>Used when parser encounters a language term (string) other than the one defined in syslanguages</comment>
+  </data>
+  <data name="SQL46053Message" xml:space="preserve">
+    <value>The specified locale ID is not valid. Verify that the locale ID is correct and that a corresponding language resource has been installed.</value>
+    <comment>Used when parser encounters a language term (integer) other than the one defined in syslanguages</comment>
+  </data>
+  <data name="SQL46054Message" xml:space="preserve">
+    <value>The specified maximum size limit is greater than the maximum value allowed. The maximum size limit must be less than 16777215 TB.</value>
+    <comment>uereviewed</comment>
+  </data>
+  <data name="SQL46055Message" xml:space="preserve">
+    <value>Conversion failed when converting from a character string to uniqueidentifier.</value>
+    <comment>uereviewed</comment>
+  </data>
+  <data name="SQL46056Message" xml:space="preserve">
+    <value>The FILEPATH option must be specified for FILE audit target in a CREATE SERVER AUDIT statement.</value>
+    <comment>uereviewed</comment>
+  </data>
+  <data name="SQL46057Message" xml:space="preserve">
+    <value>Option '{0}' is not a valid index option in '{1}' statement.</value>
+    <comment>uereviewed</comment>
+  </data>
+  <data name="SQL46058Message" xml:space="preserve">
+    <value>The same large data placement option '{0}' has been specified twice.</value>
+    <comment>uereviewed</comment>
+  </data>
+  <data name="SQL46059Message" xml:space="preserve">
+    <value>There is an incorrect expression in the WHERE clause.</value>
+    <comment>uereviewed</comment>
+  </data>
+  <data name="SQL46060Message" xml:space="preserve">
+    <value>Fill factor {0} is not a valid percentage; fill factor must be between 1 and 100.</value>
+    <comment>uereviewed</comment>
+  </data>
+  <data name="SQL46061Message" xml:space="preserve">
+    <value>In an ALTER TABLE REBUILD or ALTER INDEX REBUILD statement, when a partition is specified in a DATA_COMPRESSION or XML_COMPRESSION clause, same PARTITION must be specified.</value>
+    <comment>uereviewed</comment>
+  </data>
+  <data name="SQL46062Message" xml:space="preserve">
+    <value>The NEWNAME option is allowed only with ALTER DATABASE MODIFY FILE syntax.</value>
+    <comment>uereviewed</comment>
+  </data>
+  <data name="SQL46063Message" xml:space="preserve">
+    <value>An empty string is not allowed here.</value>
+    <comment>uereviewed</comment>
+  </data>
+  <data name="SQL46065Message" xml:space="preserve">
+    <value>The file option FILENAME is required in this CREATE/ALTER DATABASE statement.</value>
+    <comment>uereviewed</comment>
+  </data>
+  <data name="SQL46066Message" xml:space="preserve">
+    <value>For the {0} option, four parameters must be specified.</value>
+    <comment>uereviewed</comment>
+  </data>
+  <data name="SQL46067Message" xml:space="preserve">
+    <value>Bounding-box coordinates apply only within a USING GEOMETRY_GRID clause.</value>
+    <comment>uereviewed</comment>
+  </data>
+  <data name="SQL46069Message" xml:space="preserve">
+    <value>All three options (PROCEDURE_NAME, EXECUTE AS, MAX_QUEUE_READERS) must be specified.</value>
+    <comment>uereviewed</comment>
+  </data>
+  <data name="SQL46070Message" xml:space="preserve">
+    <value>The use of the option {0} in the DROP INDEX statement is not valid.</value>
+    <comment>uereviewed</comment>
+  </data>
+  <data name="SQL46071Message" xml:space="preserve">
+    <value>Conflicting CREATE/UPDATE STATISTICS options "SAMPLE" and "FULLSCAN"</value>
+    <comment>uereviewed</comment>
+  </data>
+  <data name="SQL46072Message" xml:space="preserve">
+    <value>The CHANGE_TRACKING_CONTEXT WITH clause cannot be used with a SELECT statement.</value>
+    <comment>uereviewed</comment>
+  </data>
+  <data name="SQL46073Message" xml:space="preserve">
+    <value>The value for the CELLS_PER_OBJECT spatial index option should be between 1 and 8192.</value>
+    <comment>uereviewed</comment>
+  </data>
+  <data name="SQL46074Message" xml:space="preserve">
+    <value>Index hints are only allowed in a FROM or OPTION clause.</value>
+    <comment>uereviewed</comment>
+  </data>
+  <data name="SQL46075Message" xml:space="preserve">
+    <value>A nested INSERT, UPDATE, DELETE, or MERGE statement is not allowed inside another nested INSERT, UPDATE, DELETE, or MERGE statement.</value>
+    <comment>uereviewed</comment>
+  </data>
+  <data name="SQL46076Message" xml:space="preserve">
+    <value>A nested INSERT, UPDATE, DELETE, or MERGE statement is not allowed in a SELECT statement that is not the immediate source of rows for an INSERT statement.</value>
+    <comment>uereviewed</comment>
+  </data>
+  <data name="SQL46077Message" xml:space="preserve">
+    <value>A nested INSERT, UPDATE, DELETE, or MERGE statement is not allowed in the FROM clause of an UPDATE or DELETE statement.</value>
+    <comment>uereviewed</comment>
+  </data>
+  <data name="SQL46078Message" xml:space="preserve">
+    <value>A nested INSERT, UPDATE, DELETE, or MERGE statement is not allowed in the USING clause of a MERGE statement.</value>
+    <comment>uereviewed</comment>
+  </data>
+  <data name="SQL46079Message" xml:space="preserve">
+    <value>A nested INSERT, UPDATE, DELETE, or MERGE statement must have an OUTPUT clause.</value>
+    <comment>uereviewed</comment>
+  </data>
+  <data name="SQL46080Message" xml:space="preserve">
+    <value>The required parameter ROLE was not specified.</value>
+    <comment>uereviewed</comment>
+  </data>
+  <data name="SQL46081Message" xml:space="preserve">
+    <value>The index option {0} in the CREATE SPATIAL INDEX statement must appear before the general index options.</value>
+    <comment>uereviewed</comment>
+  </data>
+  <data name="SQL46082Message" xml:space="preserve">
+    <value>Either a format file or one of the three options (SINGLE_BLOB, SINGLE_CLOB, or SINGLE_NCLOB) must be specified.</value>
+    <comment>uereviewed</comment>
+  </data>
+  <data name="SQL46083Message" xml:space="preserve">
+    <value>The WHERE CURRENT OF clause is not allowed in a nested INSERT, UPDATE, DELETE, or MERGE statement.</value>
+    <comment>uereviewed</comment>
+  </data>
+  <data name="SQL46084Message" xml:space="preserve">
+    <value>The CUBE, ROLLUP, and GROUPING SETS constructs are not allowed in a GROUP BY ALL clause.</value>
+    <comment>uereviewed</comment>
+  </data>
+  <data name="SQL46085Message" xml:space="preserve">
+    <value>The WITH CUBE and WITH ROLLUP options are not permitted with a ROLLUP, CUBE, or GROUPING SETS specification.</value>
+    <comment>uereviewed</comment>
+  </data>
+  <data name="SQL46086Message" xml:space="preserve">
+    <value>DISTINCT is not allowed for windowed aggregate functions.</value>
+    <comment>uereviewed</comment>
+  </data>
+  <data name="SQL46087Message" xml:space="preserve">
+    <value>The integer value {0} for "LISTENER_PORT" is out of range. The value should be between 1024 and 32767.</value>
+    <comment>uereviewed</comment>
+  </data>
+  <data name="SQL46088Message" xml:space="preserve">
+    <value>Cannot use the OUTPUT option when passing a constant to a stored procedure.</value>
+  </data>
+  <data name="SQL46089Message" xml:space="preserve">
+    <value>Must pass parameter number {0} and subsequent parameters as '@name = value'. After the form '@name = value' has been used, all subsequent parameters must be passed in the form '@name = value'.</value>
+  </data>
+  <data name="SQL46090Message" xml:space="preserve">
+    <value>Syntax error: Duplicate specification of the action "{0}" in the trigger declaration</value>
+  </data>
+  <data name="SQL46091Message" xml:space="preserve">
+    <value>The value {0} for index option 'maxdop' is out of range. It should be between 0 and 32767.</value>
+  </data>
+  <data name="SQL46092Message" xml:space="preserve">
+    <value>"{0}": Temporary views are not allowed.</value>
+  </data>
+  <data name="SQL46093Message" xml:space="preserve">
+    <value>"{0}": Temporary functions are not allowed.</value>
+  </data>
+  <data name="SQL46094Message" xml:space="preserve">
+    <value>Percent values must be between 0 and 100.</value>
+  </data>
+  <data name="SQL46095Message" xml:space="preserve">
+    <value>The Identifier that starts with '{0}' is too long.  Maximum length is 128.</value>
+  </data>
+  <data name="SQL46096Message" xml:space="preserve">
+    <value>The parameter {0} cannot be provided for users that cannot authenticate in a database.</value>
+  </data>
+  <data name="SQL46097Message" xml:space="preserve">
+    <value>A {0} statement must be terminated by a semi-colon (;)</value>
+  </data>
+  <data name="SQL46098Message" xml:space="preserve">
+    <value>Subqueries are not allowed in this context. Only scalar expressions are allowed.</value>
+  </data>
+  <data name="SQL46099Message" xml:space="preserve">
+    <value>RANGE in OVER clause is only supported with UNBOUNDED and CURRENT ROW frame delimiters.</value>
+  </data>
+  <data name="SQL46100Message" xml:space="preserve">
+    <value>OVER clause has illegal window frame specification.</value>
+  </data>
+  <data name="SQL46101Message" xml:space="preserve">
+    <value>The time value {0} for MAX_DURATION is out of range. It should be between 0 and 71582.</value>
+  </data>
+  <data name="SQL46102Message" xml:space="preserve">
+    <value>The time value {0} for MAX_DURATION is not allowed for ABORT_AFTER_WAIT = {1}.</value>
+  </data>
+  <data name="SQL46103Message" xml:space="preserve">
+    <value>Temporal tables require the lower boundary column name in SYSTEM_TIME PERIOD definition to match the GENERATED ALWAYS AS ROW START column name.</value>
+  </data>
+  <data name="SQL46104Message" xml:space="preserve">
+    <value>Temporal tables require the upper boundary column name in SYSTEM_TIME PERIOD definition to match the GENERATED ALWAYS AS ROW END column name.</value>
+  </data>
+  <data name="SQL46105Message" xml:space="preserve">
+    <value>GENERATED ALWAYS AS ROW START column must be defined for Temporal tables.</value>
+  </data>
+  <data name="SQL46106Message" xml:space="preserve">
+    <value>GENERATED ALWAYS AS ROW END column must be defined for Temporal tables.</value>
+  </data>
+  <data name="SQL46107Message" xml:space="preserve">
+    <value>Filtered indexes are not supported on memory optimized tables.</value>
+  </data>
+  <data name="SQL46108Message" xml:space="preserve">
+    <value>Nonclustered column store indexes are not supported on memory optimized tables.</value>
+  </data>
+  <data name="SQL46109Message" xml:space="preserve">
+    <value>GENERATED ALWAYS AS USER ID START column must be unique.</value>
+  </data>
+  <data name="SQL46110Message" xml:space="preserve">
+    <value>GENERATED ALWAYS AS USER ID END column must be unique.</value>
+  </data>
+  <data name="SQL46111Message" xml:space="preserve">
+    <value>GENERATED ALWAYS AS USER NAME START column must be unique.</value>
+  </data>
+  <data name="SQL46112Message" xml:space="preserve">
+    <value>GENERATED ALWAYS AS USER NAME END column must be unique.</value>
+  </data>
+  <data name="SQL46113Message" xml:space="preserve">
+    <value>Cannot create GENERATED ALWAYS column when SYSTEM_TIME period is not defined</value>
+  </data>
+  <data name="SQL46114Message" xml:space="preserve">
+    <value>The specified COMPRESSION_DELAY option value {0} is invalid. The valid range for disk-based table is AUTO or between (0, 10080) minutes and for memory-optimized table is AUTO, 0 or between (60, 10080) minutes.</value>
+  </data>
+  <data name="SQL46115Message" xml:space="preserve">
+    <value>Cannot set configuration option to PRIMARY when FOR SECONDARY is not specified.</value>
+  </data>
+  <data name="SQL46116Message" xml:space="preserve">
+    <value>{0} is not a valid value for system versioning history retention period. The value must be a positive number larger than 0.</value>
+  </data>
+  <data name="SQL46117Message" xml:space="preserve">
+    <value>The script contains clause {0} which is not supported by the targeted version of SQL Server.</value>
+  </data>
+  <data name="SQL46118Message" xml:space="preserve">
+    <value>CSV format option is supported for char and widechar datafiletype options.</value>
+  </data>
+  <data name="SQL46119Message" xml:space="preserve">
+    <value>Format option cannot be specified together with SINGLE_BLOB, SINGLE_CLOB or SINGLE_NCLOB option.</value>
+  </data>
+  <data name="SQL46120Message" xml:space="preserve">
+    <value>{0} option is not supported for this type of login.</value>
+  </data>
+  <data name="SQL46121Message" xml:space="preserve">
+    <value>SID and type options are both required for this type of login.</value>
+  </data>
+  <data name="SQL46122Message" xml:space="preserve">
+    <value>RANK value cannot be provided as text</value>
+    <comment>Sensitivity rank value cannot provided as text</comment>
+  </data>
+  <data name="SQL46123Message" xml:space="preserve">
+    <value>{0} value must be provided as text</value>
+    <comment>Sensitivity option Label, Label_Id, Information_Type or Information_Type_Id must be provided as text</comment>
+  </data>
+  <data name="SQL46124Message" xml:space="preserve">
+    <value>Illegal sensitivity rank value provided</value>
+    <comment>Illegal sensitivity rank value provided</comment>
+  </data>
+  <data name="SQL46125Message" xml:space="preserve">
+    <value>Illegal sensitivity option {0} recognized. Legal options are: LABEL, LABEL_ID, INFORMATION_TYPE, INFORMATION_TYPE_ID, RANK</value>
+    <comment>Invalid sensitivity option recognized</comment>
+  </data>
+  <data name="SQL46126Message" xml:space="preserve">
+    <value>The PATH option must be specified for URL audit target in a CREATE SERVER AUDIT statement.</value>
+    <comment>uereviewed</comment>
+  </data>
+  <data name="SQL46127Message" xml:space="preserve">
+    <value>The CTAS statement requires a distribution option.</value>
+  </data>
+  <data name="SQL46128Message" xml:space="preserve">
+    <value>REJECTED_ROW_LOCATION cannot be specified in a CREATE EXTERNAL TABLE AS SELECT statement.</value>
+  </data>
+  <data name="SQL46129Message" xml:space="preserve">
+    <value>The GROUP BY clause can only contain a single DISTRIBUTED_AGG query hint.</value>
+  </data>
+  <data name="SQL46130Message" xml:space="preserve">
+    <value>COPY statement failed because the value for option {0} is invalid.</value>
+  </data>
+  <data name="SQL46131Message" xml:space="preserve">
+    <value>COPY statement failed because {0} contains invalid number of characters.</value>
+  </data>
+  <data name="SQL46132Message" xml:space="preserve">
+    <value>Copy Command SAS Key is invalid</value>
+  </data>
+  <data name="UserDefined" xml:space="preserve">
+    <value>User-defined</value>
+    <comment>Used in SQL46002-4 messages in case of user defined type with wrong national/varying prefixes</comment>
+  </data>
+  <data name="SQL46133Message" xml:space="preserve">
+    <value>{0} must be a multiple of 0.25.</value>
+    <comment>workload parser error.</comment>
+  </data>
+  <data name="SQL46134Message" xml:space="preserve">
+    <value>Time input should be in HH:MM format</value>
+  </data>
+  <data name="SQL46135Message" xml:space="preserve">
+    <value>FILTER_COLUMN is {0}</value>
+    <comment>Data Retention requires one of the columns in the table to be a filter column.</comment>
+  </data>
+  <data name="SQL46136Message" xml:space="preserve">
+    <value>GENERATED ALWAYS AS TRANSACTION ID START column must be unique.</value>
+  </data>
+  <data name="SQL46137Message" xml:space="preserve">
+    <value>GENERATED ALWAYS AS TRANSACTION ID END column must be unique.</value>
+  </data>
+  <data name="SQL46138Message" xml:space="preserve">
+    <value>GENERATED ALWAYS AS SEQUENCE NUMBER START column must be unique.</value>
+  </data>
+  <data name="SQL46139Message" xml:space="preserve">
+    <value>GENERATED ALWAYS AS SEQUENCE NUMBER END column must be unique.</value>
+  </data>
+  <data name="SQL46140Message" xml:space="preserve">
+    <value>Ledger tables are not supported in the targeted version.</value>
+    <comment>Ledger tables are supported only in versions sql160 or above.</comment>
+  </data>
+  <data name="SQL46141Message" xml:space="preserve">
+    <value>Ledger tables are not supported in the targeted version.</value>
+    <comment>Ledger tables are supported only in versions sql160 or above.</comment>
+  </data>
+  <data name="SQL46142Message" xml:space="preserve">
+    <value>One of the provided options cannot be used with PARQUET format.</value>
+  </data>
+  <data name="SQL46143Message" xml:space="preserve">
+    <value>CREDENTIAL and SERVER_CREDENTIAL parameters cannot be specified at the same time.</value>
+  </data>
+  <data name="SQL46144Message" xml:space="preserve">
+    <value>Required parameter {0} must be provided.</value>
+  </data>
+</root>
