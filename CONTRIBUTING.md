@@ -95,38 +95,28 @@ Before sending a Pull Request, please do the following:
 
 ### Helpful notes for SQLDOM extensions
 
-1. Make the changes in
-     For changing the DOM classes, modify the XML file (the C# code is generated based on this during the build process)
-     $(EnlistmentRoot)\Source\SqlDom\SqlScriptDom\Parser\TSql\Ast.xml
-	 Change Ast.xml to put the class pieces on their appropriate statements
-	 
-	 Note for above:
-		 1. The build process is defined in ```$(EnlistmentRoot)\Source\SqlDom\SqlScriptDom\SqlScriptDom.props``` (Target Name="CreateAST")
-		 2. The generated files are dropped in ```$(EnlistmentRoot)\obj\<x64|x86>\<Debug|Release>\SqlScriptDom.csproj\```
+1. For changing the DOM classes, modify the XML file (the C# code is generated based on this during the build process) `$(EnlistmentRoot)\Source\SqlDom\SqlScriptDom\Parser\TSql\Ast.xml`. Change Ast.xml to put the class pieces on their appropriate statements.
+    1. The build process is defined in `$(EnlistmentRoot)\Source\SqlDom\SqlScriptDom\SqlScriptDom.props` (Target Name="CreateAST")
+    2. The generated files are dropped in `$(EnlistmentRoot)\obj\<x64|x86>\<Debug|Release>\SqlScriptDom.csproj\`
    
-     For changing the parser, modify the .g file here:
-```$(EnlistmentRoot)\Source\SqlDom\SqlScriptDom\Parser\TSql\TSql<#>.g``` where # is the version (ie - 100, 120, 130). This will usually be the latest number if adding new grammar.
-	 Change the Tsql(xxx).g file to parse the new syntax.
-	 
-	 Note for above:
-		 1. The build process is defined in ```$(EnlistmentRoot)\Source\SqlDom\SqlScriptDom\SqlScriptDom.props``` (Target Name="CreateAST")
-		 2. The generated files are dropped in ```$(EnlistmentRoot)\obj\x86|x64\Debug|Release\sqlscriptdom.csproj\```
-   
-     For changing the ScriptGenerator, modify the appropriate file 
-     (i.e. Visitor that accepts the modified DOM class) in here
-     ```$(EnlistmentRoot)\Source\SqlDom\SqlScriptDom\ScriptDom\SqlServer\ScriptGenerator```
-	 To add a new ScriptGenerator, you need to add the file to ```$(EnlistmentRoot)\Source\SqlDom\SqlScriptDom\SqlScriptDom.props```
-	 Change The visitors SqlScriptGenerator.X to use the new piece from AST.XML
-	 If you're adding syntax that's Azure-only or Standalone-only, implement appropriate Versioning Visitor for your constructs.
+2. For changing the parser, modify the .g file here:
+`$(EnlistmentRoot)\Source\SqlDom\SqlScriptDom\Parser\TSql\TSql<#>.g` where # is the version (ie - 100, 120, 130). This will usually be the latest number if adding new grammar. Change the Tsql(xxx).g file to parse the new syntax.
+    1. The build process is defined in `$(EnlistmentRoot)\Source\SqlDom\SqlScriptDom\SqlScriptDom.props` (Target Name="CreateAST")
+    2. The generated files are dropped in `$(EnlistmentRoot)\obj\x86|x64\Debug|Release\sqlscriptdom.csproj\`
 
-2. When adding/removing new files please add/remove an entry to/from ```$(EnlistmentRoot)\Source\SqlDom\SqlScriptDom\SqlScriptDom.csproj``` 
+3. For changing the ScriptGenerator, modify the appropriate file (i.e. Visitor that accepts the modified DOM class) in here: `$(EnlistmentRoot)\Source\SqlDom\SqlScriptDom\ScriptDom\SqlServer\ScriptGenerator`.
+    1. To add a new ScriptGenerator, you need to add the file to `$(EnlistmentRoot)\Source\SqlDom\SqlScriptDom\SqlScriptDom.props`
+    1. Change The visitors SqlScriptGenerator.X to use the new piece from AST.XML
+    1. If you're adding syntax that's Azure-only or Standalone-only, implement appropriate Versioning Visitor for your constructs.
 
-3. To extend the tests do the following:
-     a. Baselines# needs to be updated or added with the appropriate .sql file as expected results.
-     b. The Only#SyntaxTests.cs needs to be extended or added to specify the appropriate TestScripts script.
-	 c. Positive tests go in Only#SyntaxTests.cs if adding new grammar.
-     d. Create a \TestScripts script that is the input for the test. (This is what is run and is checked against the .sql files in Baselines#)
-	 e. Negative tests go in ParserErrorsTests.cs.
+4. When adding/removing new files please add/remove an entry to/from `$(EnlistmentRoot)\Source\SqlDom\SqlScriptDom\SqlScriptDom.csproj` 
+
+5. To extend the tests do the following:
+    1. Baselines# needs to be updated or added with the appropriate .sql file as expected results.
+    1. The Only#SyntaxTests.cs needs to be extended or added to specify the appropriate TestScripts script.
+    1. Positive tests go in Only#SyntaxTests.cs if adding new grammar.
+    1. Create a \TestScripts script that is the input for the test. (This is what is run and is checked against the .sql files in Baselines#)
+    1. Negative tests go in ParserErrorsTests.cs.
 
 ## License Information
 Copyright (c) Microsoft Corporation. All rights reserved.
