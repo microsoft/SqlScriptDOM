@@ -36,7 +36,7 @@ provided by the bot. You will only need to do this once across all repos using o
 
 ### Getting Started
 
-1. Install Visual Studio 2022 or newer.
+1. Install [Visual Studio 2022 or newer](https://visualstudio.microsoft.com/vs/community/).
 
 2. Download .NET SDKS from https://dotnet.microsoft.com/download/visual-studio-sdks 
     - .NET Framework SDK (4.6.2 or higher)
