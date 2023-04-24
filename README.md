@@ -21,7 +21,6 @@ Script DOM is used by DacFX and as an standalone library for client applications
 
 ## Built With
 * https://www.antlr.org/
-* https://www.gnu.org/software/sed/manual/sed.html
 
 ## Contributing
 
