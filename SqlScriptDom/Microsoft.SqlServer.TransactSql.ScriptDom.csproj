@@ -14,6 +14,17 @@
     <NoWarn>1701;1702;1591</NoWarn>
   </PropertyGroup>
 
+  <!-- These target makes sure to download Antlr once instead of 
+       downloading it for each of the frameworks.
+   -->
+  <Target Name="InstallAntlr" Condition="!Exists($(AntlrLocation))" BeforeTargets="DispatchToInnerBuilds">
+    <DownloadFile
+        SourceUrl= "$(AntlrSourceUrl)"
+        DestinationFolder="$([System.IO.Path]::GetDirectoryName($(AntlrLocation)))">
+      <Output TaskParameter="DownloadedFile" ItemName="Content" />
+    </DownloadFile>
+  </Target>
+
   <!-- These project references make sure tools are built first.
        The SetTargetFramework tells msbuild to only build to build
        those projects for the one and only flavor we need, i.e. $(NetfxVersion).

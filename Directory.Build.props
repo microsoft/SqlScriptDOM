@@ -50,20 +50,12 @@
     <BaseIntermediateOutputPath Condition=" '$(BaseIntermediateOutputPath)' == '' ">$(EnlistmentRoot)\obj\$([MSBuild]::MakeRelative('$(EnlistmentRoot)\', $(MSBuildProjectDirectory)))</BaseIntermediateOutputPath>
     
     <AntlrSourceUrl>https://www.antlr2.org/download/antlr-2.7.5.exe</AntlrSourceUrl>
-    <AntlrLocation>$(EnlistmentRoot)\obj\antlr-2.7.5.exe</AntlrLocation>
+    <AntlrLocation>$(BaseIntermediateOutputPath)\antlr-2.7.5.exe</AntlrLocation>
   </PropertyGroup>
 
   <PropertyGroup>
     <NoWarn>1591</NoWarn>
   </PropertyGroup>
-
-  <Target Name="InstallAntlr" BeforeTargets="Build" Condition="!Exists($(AntlrLocation))">
-    <DownloadFile
-        SourceUrl= "$(AntlrSourceUrl)"
-        DestinationFolder="$([System.IO.Path]::GetDirectoryName($(AntlrLocation)))">
-      <Output TaskParameter="DownloadedFile" ItemName="Content" />
-    </DownloadFile>
-  </Target>
 
   <Import Project="$(BuildPropsDir)\AssemblyInfo.props" />
   <Import Project="$(BuildPropsDir)\Signing.props" />
