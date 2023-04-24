@@ -117,8 +117,3 @@ Before sending a Pull Request, please do the following:
     1. Positive tests go in Only#SyntaxTests.cs if adding new grammar.
     1. Create a \TestScripts script that is the input for the test. (This is what is run and is checked against the .sql files in Baselines#)
     1. Negative tests go in ParserErrorsTests.cs.
-
-## License Information
-Copyright (c) Microsoft Corporation. All rights reserved.
-
-Licensed under the [Source MIT](LICENSE).

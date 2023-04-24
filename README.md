@@ -31,4 +31,4 @@ Please read our [CONTRIBUTING.md](CONTRIBUTING.md) which provides helpful inform
 
 Copyright (c) Microsoft Corporation. All rights reserved.
 
-Licensed under the [Source MIT](LICENSE).
+Licensed under the [MIT License](LICENSE).
