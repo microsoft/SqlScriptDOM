@@ -36,20 +36,16 @@ provided by the bot. You will only need to do this once across all repos using o
 
 ### Getting Started
 
-1. Install [Visual Studio 2022 or newer](https://visualstudio.microsoft.com/vs/community/).
-
-2. Download .NET SDKS from https://dotnet.microsoft.com/download/visual-studio-sdks 
+1. Download .NET SDKS from https://dotnet.microsoft.com/download/visual-studio-sdks 
     - .NET Framework SDK (4.6.2 or higher)
     - .NET 6 SDK (see [global.json](./global.json) for latest version)
-3.  Install the [SlnGen](https://microsoft.github.io/slngen/) tool.
+2. Install [Visual Studio 2022 or newer](https://visualstudio.microsoft.com/vs/community/). (Optional)
+
+3.  Install the [SlnGen](https://microsoft.github.io/slngen/) tool. (Optional Visual Studio generator)
     ```cmd 
     dotnet tool install --global Microsoft.VisualStudio.SlnGen.Tool
     ```
-4. Install antlr-2.7.5.exe from https://www.antlr2.org/download.html
-
-5. Create environment variable named Antlr2Exe pointing to the installation path.
-
-6. Clone the repository
+4. Clone the repository
     ```
         git clone https://github.com/microsoft/SqlScriptDOM
     ```
@@ -60,19 +56,19 @@ Navigate to the root of the source code:
 ```cmd
 cd C:\SqlScriptDOM\
 ```
-Open Visual Studio solution
+Generate and open Visual Studio solution. This is an optional step for developers using Visual Studio
 ```cmd
 slngen
 ```
 
 Restore project dependencies:
 ```cmd
-msbuild /t:Restore
+dotnet restore
 ```
 
 To build:
 ```cmd
-msbuild
+dotnet build
 ```
 
 ### Running the tests
