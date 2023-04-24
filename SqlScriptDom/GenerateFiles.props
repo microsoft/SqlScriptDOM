@@ -15,6 +15,16 @@
   <Target Name="CreateCsGenIntermediateOutputPath" AfterTargets="BuildGenerateSources" BeforeTargets="CoreCompile">
     <MakeDir Directories="$(CsGenIntermediateOutputPath)" Condition="!Exists('$(CsGenIntermediateOutputPath)')" />
   </Target>
+  <!-- These target makes sure to download Antlr once instead of 
+       downloading it for each of the frameworks.
+   -->
+  <Target Name="InstallAntlr" Condition="!Exists($(AntlrLocation))" BeforeTargets="DispatchToInnerBuilds">
+    <DownloadFile
+        SourceUrl= "$(AntlrSourceUrl)"
+        DestinationFolder="$([System.IO.Path]::GetDirectoryName($(AntlrLocation)))">
+      <Output TaskParameter="DownloadedFile" ItemName="Content" />
+    </DownloadFile>
+  </Target>
   <Target Name="GSqlTokenTypesCompile" Condition="'@(GSqlTokenTypesCompile)'!=''" DependsOnTargets="CreateCsGenIntermediateOutputPath;InstallAntlr" BeforeTargets="CoreCompile" Inputs="@(GSqlTokenTypesCompile)" Outputs="@(GSqlTokenTypesCompile->'$(CsGenIntermediateOutputPath)%(filename)_final.cs')">
     <Exec Command="&quot;$(AntlrLocation)&quot; -o &quot;$(CsGenIntermediateOutputPath.TrimEnd('\'))&quot; &quot;%(GSqlTokenTypesCompile.Identity)&quot;" />
     <Exec Command="powershell -NonInteractive -Executionpolicy Unrestricted .\TSqlTokenTypes.ps1 &quot;$(CsGenIntermediateOutputPath)%(GSqlTokenTypesCompile.Filename).cs&quot; &quot;$(CsGenIntermediateOutputPath)%(GSqlTokenTypesCompile.Filename)_final.cs&quot;" />
