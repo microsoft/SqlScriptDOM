@@ -15,15 +15,8 @@
   <Target Name="CreateCsGenIntermediateOutputPath" AfterTargets="BuildGenerateSources" BeforeTargets="CoreCompile">
     <MakeDir Directories="$(CsGenIntermediateOutputPath)" Condition="!Exists('$(CsGenIntermediateOutputPath)')" />
   </Target>
-  <Target Name="InstallAntlr" BeforeTargets="CoreCompile">
-    <DownloadFile
-        SourceUrl="https://www.antlr2.org/download/antlr-2.7.5.exe"
-        DestinationFolder="$(BaseOutputPath)tools">
-      <Output TaskParameter="DownloadedFile" ItemName="Content" />
-    </DownloadFile>
-  </Target>
   <Target Name="GSqlTokenTypesCompile" Condition="'@(GSqlTokenTypesCompile)'!=''" DependsOnTargets="CreateCsGenIntermediateOutputPath" BeforeTargets="CoreCompile" Inputs="@(GSqlTokenTypesCompile)" Outputs="@(GSqlTokenTypesCompile->'$(CsGenIntermediateOutputPath)%(filename)_final.cs')">
-    <Exec Command="&quot;$(BaseOutputPath)tools\antlr-2.7.5.exe&quot; -o &quot;$(CsGenIntermediateOutputPath.TrimEnd('\'))&quot; &quot;%(GSqlTokenTypesCompile.Identity)&quot;" />
+    <Exec Command="&quot;$(AntlrLocation)&quot; -o &quot;$(CsGenIntermediateOutputPath.TrimEnd('\'))&quot; &quot;%(GSqlTokenTypesCompile.Identity)&quot;" />
     <Exec Command="powershell -NonInteractive -Executionpolicy Unrestricted .\TSqlTokenTypes.ps1 &quot;$(CsGenIntermediateOutputPath)%(GSqlTokenTypesCompile.Filename).cs&quot; &quot;$(CsGenIntermediateOutputPath)%(GSqlTokenTypesCompile.Filename)_final.cs&quot;" />
     <ItemGroup>
       <Compile Condition="'$(SqlDomNuget)'!='true'" Include="$(CsGenIntermediateOutputPath)%(GSqlTokenTypesCompile.Filename)_final.cs" />
@@ -31,8 +24,8 @@
   </Target>
   <Target Name="GLexerParserCompile" Condition="'@(GLexerParserCompile)'!=''" DependsOnTargets="CreateCsGenIntermediateOutputPath" BeforeTargets="CoreCompile" Inputs="@(GLexerParserCompile)" Outputs="@(GLexerParserCompile->'$(CsGenIntermediateOutputPath)%(filename)ParserInternal_final.cs');@(GLexerParserCompile->'$(CsGenIntermediateOutputPath)%(filename)LexerInternal_final.cs')">
     <!--Based on property we either run antlr with all warnings and errors supressed or not-->
-    <Exec Command="&quot;$(BaseOutputPath)tools\antlr-2.7.5.exe&quot; -o &quot;$(CsGenIntermediateOutputPath.TrimEnd('\'))&quot; &quot;%(GLexerParserCompile.Identity)&quot; &gt; NUL 2&gt;&amp;1" Condition="'$(OutputErrorInLexerParserCompile)' == 'false'" />
-    <Exec Command="&quot;$(BaseOutputPath)tools\antlr-2.7.5.exe&quot; -o &quot;$(CsGenIntermediateOutputPath.TrimEnd('\'))&quot; &quot;%(GLexerParserCompile.Identity)&quot; " Condition="'$(OutputErrorInLexerParserCompile)' == 'true'" />
+    <Exec Command="&quot;$(AntlrLocation)&quot; -o &quot;$(CsGenIntermediateOutputPath.TrimEnd('\'))&quot; &quot;%(GLexerParserCompile.Identity)&quot; &gt; NUL 2&gt;&amp;1" Condition="'$(OutputErrorInLexerParserCompile)' == 'false'" />
+    <Exec Command="&quot;$(AntlrLocation)&quot; -o &quot;$(CsGenIntermediateOutputPath.TrimEnd('\'))&quot; &quot;%(GLexerParserCompile.Identity)&quot; " Condition="'$(OutputErrorInLexerParserCompile)' == 'true'" />
 
     <Exec Command="powershell -NonInteractive -Executionpolicy Unrestricted .\LexerPostProcessing.ps1 &quot;$(CsGenIntermediateOutputPath)%(GLexerParserCompile.Filename)LexerInternal.cs&quot; &quot;$(CsGenIntermediateOutputPath)%(GLexerParserCompile.Filename)LexerInternal_final.cs&quot;" />
     <Exec Command="powershell -NonInteractive -Executionpolicy Unrestricted .\ParserPostProcessing.ps1 &quot;$(CsGenIntermediateOutputPath)%(GLexerParserCompile.Filename)ParserInternal.cs&quot; &quot;$(CsGenIntermediateOutputPath)%(GLexerParserCompile.Filename)ParserInternal_final.cs&quot;" />

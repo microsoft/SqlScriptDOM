@@ -42,7 +42,9 @@
     <TargetFolder Condition="'$(TargetFolder)'==''">out</TargetFolder>
     <BaseOutputPath Condition="'$(BaseOutputPath)'==''">$(EnlistmentRoot)\$(TargetFolder)</BaseOutputPath>
     <OutputPath>$(BaseOutputPath)\$(Configuration)</OutputPath>
-
+    <AntlrSourceUrl>https://www.antlr2.org/download/antlr-2.7.5.exe</AntlrSourceUrl>
+    <AntlrLocation>$(BaseOutputPath)\antlr-2.7.5.exe</AntlrLocation>
+    
     <!-- Path for tools output files, .exe executable generated files for tools can be found here  -->
     <BuildToolsPath>$(BaseOutputPath)\tools\$(NetfxVersion)</BuildToolsPath>
 
@@ -53,6 +55,14 @@
   <PropertyGroup>
     <NoWarn>1591</NoWarn>
   </PropertyGroup>
+
+  <Target Name="InstallAntlr" BeforeTargets="Build" Condition="!Exists($(AntlrLocation))">
+    <DownloadFile
+        SourceUrl= "$(AntlrSourceUrl)"
+        DestinationFolder="$(BaseOutputPath)">
+      <Output TaskParameter="DownloadedFile" ItemName="Content" />
+    </DownloadFile>
+  </Target>
 
   <Import Project="$(BuildPropsDir)\AssemblyInfo.props" />
   <Import Project="$(BuildPropsDir)\Signing.props" />

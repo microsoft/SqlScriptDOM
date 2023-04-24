@@ -4,7 +4,6 @@
     <OutputType>Library</OutputType>
     <RootNamespace>SqlStudio.Tests.UTSqlScriptDom</RootNamespace>
     <AssemblyName>SqlStudio.Tests.UTSqlScriptDom</AssemblyName>
-    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" />
