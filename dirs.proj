@@ -5,6 +5,5 @@
     -->
     <ProjectReference Include="SqlScriptDom\Microsoft.SqlServer.TransactSql.ScriptDom.csproj" />
     <ProjectReference Include="Test\SqlDom\UTSqlScriptDom.csproj" />
-    <ProjectReference Include="Test\GenerateRunSettings\GenerateRunSettings.proj" />
   </ItemGroup>
 </Project>
