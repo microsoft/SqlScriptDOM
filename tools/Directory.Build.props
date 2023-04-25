@@ -22,6 +22,6 @@
 
     <!-- Tools are always .exe -->
     <OutputType>Exe</OutputType>
+    <DelaySign>false</DelaySign>
   </PropertyGroup>
-  <DelaySign>false</DelaySign>
 </Project>
