@@ -47,4 +47,5 @@
     <DebugType>full</DebugType>
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
+  <Import Project="$(EnlistmentRoot)\.build\Signing.props" />
 </Project>

@@ -58,5 +58,4 @@
   </PropertyGroup>
 
   <Import Project="$(BuildPropsDir)\AssemblyInfo.props" />
-  <Import Project="$(BuildPropsDir)\Signing.props" />
 </Project>
