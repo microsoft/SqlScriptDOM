@@ -17,6 +17,7 @@ Script DOM is used by DacFX and as an standalone library for client applications
 - 📦 NuGet package: https://www.nuget.org/packages/Microsoft.SqlServer.TransactSql.ScriptDom
 - 📚 API docs: https://learn.microsoft.com/dotnet/api/microsoft.sqlserver.transactsql.scriptdom
 - 🛠️ Contributor's guide: [CONTRIBUTING.md](./CONTRIBUTING.md)
+- 💬 Discussions: [DacFx discussions](https://github.com/microsoft/DacFx/discussions)
 
 
 ## Built With
