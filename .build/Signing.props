@@ -3,8 +3,8 @@
   <PropertyGroup>
     <!-- By default we delay sign our assemblies, so they are ready tof real signing at a later stage. -->
     <!-- Individual project (like the ancillary tools that we use during the build which do no ship) typically override these values so they can run normally during the build, without having to disbale SNV. -->
-    <!-- <DelaySign>true</DelaySign>
-    <SignAssembly>true</SignAssembly>-->
+    <!-- <DelaySign>true</DelaySign>-->
+    <SignAssembly>true</SignAssembly>
     <LinkKeyFile>$(EnlistmentRoot)\Externals\VS12\VS10_FinalPublicKey.snk</LinkKeyFile> 
     <AssemblyOriginatorKeyFile>$(EnlistmentRoot)\Externals\VS12\VS10_FinalPublicKey.snk</AssemblyOriginatorKeyFile>
     <!-- <ShippingScope>External</ShippingScope> -->
