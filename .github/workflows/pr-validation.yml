@@ -13,11 +13,9 @@ jobs:
     - uses: actions/setup-dotnet@v2
       with:
         global-json-file: global.json
-
-    # Build project
+    - name: Install dependencies
+      run: dotnet restore
     - name: Build
       run: dotnet build dirs.proj
-
-    # Execute all unit tests
-    - name: Execute unit tests
+    - name: Test with the dotnet CLI
       run: dotnet test
