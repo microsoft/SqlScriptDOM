@@ -59,4 +59,10 @@
 
   <Import Project="$(BuildPropsDir)\AssemblyInfo.props" />
   <Import Project="$(BuildPropsDir)\Signing.props" />
+
+  <configuration>  
+    <runtime>  
+      <bypassTrustedAppStrongNames enabled="false" />  
+    </runtime>  
+  </configuration>  
 </Project>
