@@ -46,6 +46,6 @@
   <PropertyGroup Condition="'$(Configuration)|$(TargetGroup)'=='Debug|netfx'">
     <DebugType>full</DebugType>
     <DebugSymbols>true</DebugSymbols>
-    <DelaySign>false</DelaySign>
   </PropertyGroup>
+  <DelaySign>false</DelaySign>
 </Project>
