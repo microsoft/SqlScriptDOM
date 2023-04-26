@@ -1,0 +1,19 @@
+name: pr-validation
+
+on:
+  pull_request:
+    branches:
+    - main
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-dotnet@v2
+      with:
+        global-json-file: global.json
+    - name: Install dependencies
+      run: dotnet restore
+    - name: Build
+      run: dotnet build dirs.proj
