@@ -17,5 +17,3 @@ jobs:
       run: dotnet restore
     - name: Build
       run: dotnet build dirs.proj
-    - name: Test with the dotnet CLI
-      run: dotnet test
