@@ -21,6 +21,7 @@ jobs:
     runs-on: windows-latest
     needs: build
     steps:
+      - uses: actions/checkout@v2
       - name: Disable strong name validation
         shell: pwsh
         run: |
