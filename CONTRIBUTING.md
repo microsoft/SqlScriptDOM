@@ -45,7 +45,7 @@ provided by the bot. You will only need to do this once across all repos using o
     ```cmd 
     dotnet tool install --global Microsoft.VisualStudio.SlnGen.Tool
     ```
-4. Download DisableStrongName script from Sql Management Objects repository: https://github.com/microsoft/sqlmanagementobjects/blob/main/SmoBuild/DisableStrongName.ps1 and run as administrator. This step only needs to be done once.
+4. Run DisableStrongName script as administrator: [disableStrongName.ps1](./disableStrongName.ps1) This step only needs to be done once.
 
 5. Clone the repository
     ```
