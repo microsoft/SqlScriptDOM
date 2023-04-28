@@ -45,7 +45,9 @@ provided by the bot. You will only need to do this once across all repos using o
     ```cmd 
     dotnet tool install --global Microsoft.VisualStudio.SlnGen.Tool
     ```
-4. Clone the repository
+4. Run DisableStrongName script as administrator: [disableStrongName.ps1](./disableStrongName.ps1) This step only needs to be done once.
+
+5. Clone the repository
     ```
         git clone https://github.com/microsoft/SqlScriptDOM
     ```

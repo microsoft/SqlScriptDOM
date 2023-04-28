@@ -17,3 +17,15 @@ jobs:
       run: dotnet restore
     - name: Build
       run: dotnet build dirs.proj
+  test: 
+    runs-on: windows-latest
+    needs: build
+    steps:
+      - uses: actions/checkout@v2
+      - name: Disable strong name validation
+        shell: pwsh
+        run: |
+          .\disableStrongName.ps1
+
+      - name: Run tests
+        run: dotnet test
