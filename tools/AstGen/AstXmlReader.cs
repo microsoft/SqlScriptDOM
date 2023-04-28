@@ -82,6 +82,7 @@ namespace Microsoft.VisualStudio.TeamSystem.Data.AstGen
                             curMember = new TypeMemberDescription(reader.GetAttribute("Name"), reader.GetAttribute("Type"));
                             curMember.Summary = reader.GetAttribute("Summary");
                             curMember.IsCollection = Convert.ToBoolean(reader.GetAttribute("Collection") == null ? "false" : reader.GetAttribute("Collection"));
+                            curMember.IsCollectionFirstItem = Convert.ToBoolean(reader.GetAttribute("CollectionFirstItem") == null ? "false" : reader.GetAttribute("CollectionFirstItem"));
                             curMember.SetGenerateUpdatePositionInfoCall(reader.GetAttribute("GenerateUpdatePositionInfoCall"));
                             curMember.SetCustomImplementation(reader.GetAttribute("CustomImplementation"));
                         }

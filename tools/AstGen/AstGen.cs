@@ -225,6 +225,7 @@ namespace Microsoft.VisualStudio.TeamSystem.Data.AstGen
         {
             member.type = m.type;
             member.IsCollection = m.IsCollection;
+            member.IsCollectionFirstItem = m.IsCollectionFirstItem;
             member.SetCustomImplementation(m.CustomImplementation == true ? "true" : "false");
             member.SetGenerateUpdatePositionInfoCall(m.GenerateUpdatePositionInfoCall == true ? "true" : "false");
         }
