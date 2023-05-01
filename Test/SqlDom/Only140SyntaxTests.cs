@@ -18,7 +18,7 @@ namespace SqlStudio.Tests.UTSqlScriptDom
             new ParserTest140("AlterIndexStatementTests140.sql", 2, 20, 20, 20, 20, 20),
             new ParserTest140("AlterDatabaseOptionsTests140.sql", 18, 18, 18, 18, 18, 18),
             new ParserTest140("CreateIndexStatementTests140.sql", 18, 14, 14, 14, 14, 14),
-            new ParserTest140("CreateTableTests140.sql", 13, 11, 11, 11, 11, 11),
+            new ParserTest140("CreateTableTests140.sql", 17, 15, 15, 15, 15, 11),
             new ParserTest140("OptimizerHintsTests140.sql", 6, 6, 6, 6, 6, 0),
             new ParserTest140("WithinGroupTests140.sql", 4, 4, 4, 2, 2, 0),
             new ParserTest140("TrimBuiltInTest140.sql", 10, 2, 10, 10, 10, 10),

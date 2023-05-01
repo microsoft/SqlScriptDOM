@@ -13,7 +13,12 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
         {
             GenerateIdentifier(CodeGenerationSupporter.Hash);
             GenerateSymbol(TSqlTokenType.LeftParenthesis);
-            GenerateFragmentIfNotNull(node.DistributionColumn);
+
+            if (node.DistributionColumns?.Count > 0)
+            {
+                GenerateCommaSeparatedList(node.DistributionColumns);
+            }
+
             GenerateSymbol(TSqlTokenType.RightParenthesis);
         }
     }

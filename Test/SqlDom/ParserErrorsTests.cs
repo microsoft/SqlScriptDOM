@@ -75,6 +75,10 @@ namespace SqlStudio.Tests.UTSqlScriptDom
             ParserTestUtils.ErrorTest130("CREATE TABLE t (COL0 INT NOT NULL, COL1 VARCHAR (20), COL2 VARCHAR (6)) WITH (DISTRIBUTION = HASH())",
                 new ParserErrorInfo(98, "SQL46010", ")", "Incorrect syntax near "));
 
+            //Incorrect number of parameters for the Distribution Hash table - Multiple Column Distribution option
+            ParserTestUtils.ErrorTest130("CREATE TABLE t (COL0 INT NOT NULL, COL1 VARCHAR (20), COL2 VARCHAR (6)) WITH (DISTRIBUTION = HASH(COL1,,COL2))",
+                new ParserErrorInfo(103, "SQL46010", ",", "Incorrect syntax near "));
+
             //Incorrect number of parameters for the Partition table option
             ParserTestUtils.ErrorTest130("CREATE TABLE t (COL0 INT NOT NULL, COL1 VARCHAR (20), COL2 VARCHAR (6)) WITH (PARTITION(RANGE RIGHT FOR VALUES (10, 20)))",
                new ParserErrorInfo(94, "SQL46010", "RIGHT", "Incorrect syntax near RIGHT.>."));

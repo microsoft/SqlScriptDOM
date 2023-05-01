@@ -22,7 +22,7 @@ namespace SqlStudio.Tests.UTSqlScriptDom
             new ParserTest160("CreateIndexStatementTests160.sql", nErrors80: 12, nErrors90: 16, nErrors100: 14, nErrors110: 14, nErrors120: 14, nErrors130: 14, nErrors140: 14, nErrors150: 14),
             new ParserTest160("MergeStatementTests160.sql", nErrors80: 1, nErrors90: 5, nErrors100: 5, nErrors110: 5, nErrors120: 5, nErrors130: 5, nErrors140: 5, nErrors150: 5),
             new ParserTest160("SelectStatementTests160.sql", nErrors80: 5, nErrors90: 5, nErrors100: 5, nErrors110: 5, nErrors120: 5, nErrors130: 5, nErrors140: 5, nErrors150: 5),
-            new ParserTest160("CreateTableTests160.sql", nErrors80: 7, nErrors90: 7, nErrors100: 7, nErrors110: 7, nErrors120: 7, nErrors130: 7, nErrors140: 7, nErrors150: 7),
+            new ParserTest160("CreateTableTests160.sql", nErrors80: 11, nErrors90: 11, nErrors100: 11, nErrors110: 11, nErrors120: 11, nErrors130: 7, nErrors140: 7, nErrors150: 7),
             new ParserTest160("OpenRowsetStatementTests160.sql", nErrors80: 9, nErrors90: 9, nErrors100: 9, nErrors110: 9, nErrors120: 9, nErrors130: 9, nErrors140: 9, nErrors150: 3),
             new ParserTest160("WithinGroupTests160.sql", nErrors80: 2, nErrors90: 2, nErrors100: 2, nErrors110: 2, nErrors120: 2, nErrors130: 0, nErrors140: 0, nErrors150: 0),
             // Built-in functions with valid opening and closing parantheses are recognized by default for all parser versions

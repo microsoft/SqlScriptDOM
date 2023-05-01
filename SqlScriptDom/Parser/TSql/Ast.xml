@@ -2697,7 +2697,8 @@
   </Class>
   <Class Name="TableHashDistributionPolicy" Base="TableDistributionPolicy" Summary="Representation of the HASH option for an table distribution policy.">
     <InheritedClass Name="TableDistributionPolicy"/>
-    <Member Name="DistributionColumn" Type="Identifier" GenerateUpdatePositionInfoCall="false" Summary="The column reference in the HASH option for a table distribution policy."/>
+    <Member Name="DistributionColumn" Type="Identifier" CollectionFirstItem="true" GenerateUpdatePositionInfoCall="false" Summary="The columns reference in the HASH option for a table distribution policy."/>
+    <Member Name="DistributionColumns" Type="Identifier" Collection="true" GenerateUpdatePositionInfoCall="false" Summary="The column reference in the HASH option for a table distribution policy."/>
   </Class>
 
   <Class Name="TableIndexOption" Base="TableOption" Summary="Represents the table INDEX option for SQL DW tables.">

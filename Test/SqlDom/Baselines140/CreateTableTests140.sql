@@ -129,3 +129,37 @@ CREATE TABLE tab_with_hidden_and_filestream (
     [SerialNumber] INT                               UNIQUE,
     [Chart]        VARBINARY (MAX) FILESTREAM HIDDEN NULL
 );
+
+CREATE TABLE myTable1_HASH_MCD (
+    id       INT          NOT NULL,
+    lastName VARCHAR (20),
+    zipCode  VARCHAR (6) 
+)
+WITH (DISTRIBUTION = HASH(id, lastName));
+
+
+GO
+CREATE TABLE myTable2_HEAP_HASH_MCD (
+    id       INT          NOT NULL,
+    lastName VARCHAR (20),
+    zipCode  VARCHAR (6) 
+)
+WITH (DISTRIBUTION = HASH(id, lastName, zipCode), HEAP);
+
+
+GO
+CREATE TABLE myTable3_CI_HASH_MCD (
+    id       INT          NOT NULL,
+    lastName VARCHAR (20),
+    zipCode  VARCHAR (6) 
+)
+WITH (DISTRIBUTION = HASH(id, lastName), CLUSTERED INDEX(zipCode));
+
+
+GO
+CREATE TABLE myTable4_CCI_HASH_MCD (
+    [id]       INT          NOT NULL,
+    [lastName] VARCHAR (20) NULL,
+    [zipCode]  VARCHAR (6)  NULL
+)
+WITH (CLUSTERED COLUMNSTORE INDEX, DISTRIBUTION = HASH([id], [lastName], [zipCode]));

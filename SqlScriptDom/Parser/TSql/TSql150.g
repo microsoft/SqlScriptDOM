@@ -26572,12 +26572,20 @@ tableHashDistributionPolicy returns [TableHashDistributionPolicy vResult = Fragm
     Identifier vIdentifier;
 }
     :
-        tHash:Identifier LeftParenthesis vIdentifier = identifier
+        tHash:Identifier
         {
             Match(tHash, CodeGenerationSupporter.Hash);
-            vResult.DistributionColumn = vIdentifier;
             UpdateTokenInfo(vResult, tHash);
         }
+        LeftParenthesis vIdentifier = identifier
+        {
+            AddAndUpdateTokenInfo(vResult, vResult.DistributionColumns, vIdentifier);
+        }
+        (Comma vIdentifier = identifier
+            {
+                AddAndUpdateTokenInfo(vResult, vResult.DistributionColumns, vIdentifier);
+            }
+        )*
         tRParen:RightParenthesis
         {
             UpdateTokenInfo(vResult, tRParen);

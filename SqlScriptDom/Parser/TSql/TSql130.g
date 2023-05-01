@@ -25173,16 +25173,24 @@ tableHashDistributionPolicy returns [TableHashDistributionPolicy vResult = Fragm
 	Identifier vIdentifier;
 }
 	:
-		tHash:Identifier LeftParenthesis vIdentifier = identifier
-		{
-			Match(tHash, CodeGenerationSupporter.Hash);
-			vResult.DistributionColumn = vIdentifier;
-			UpdateTokenInfo(vResult, tHash);
-		}
-		tRParen:RightParenthesis
-		{
-			UpdateTokenInfo(vResult, tRParen);
-		}
+		tHash:Identifier
+        {
+            Match(tHash, CodeGenerationSupporter.Hash);
+            UpdateTokenInfo(vResult, tHash);
+        }
+        LeftParenthesis vIdentifier = identifier
+        {
+            AddAndUpdateTokenInfo(vResult, vResult.DistributionColumns, vIdentifier);
+        }
+        (Comma vIdentifier = identifier
+            {
+                AddAndUpdateTokenInfo(vResult, vResult.DistributionColumns, vIdentifier);
+            }
+        )*
+        tRParen:RightParenthesis
+        {
+            UpdateTokenInfo(vResult, tRParen);
+        }
 	;
 
 tableReplicateDistributionPolicy returns [TableReplicateDistributionPolicy vResult = FragmentFactory.CreateFragment<TableReplicateDistributionPolicy>()]
