@@ -5163,6 +5163,15 @@ select 1",
             // Create external file format with incorrect encoding value
             //
             ParserTestUtils.ErrorTest130("CREATE EXTERNAL FILE FORMAT eff1 WITH (FORMAT_TYPE = DELIMITEDTEXT, FORMAT_OPTIONS (ENCODING = 16))", new ParserErrorInfo(84, "SQL46010", "ENCODING"));
+            // Create external file format with two instances of parser version option
+            //
+            ParserTestUtils.ErrorTest160("CREATE EXTERNAL FILE FORMAT eff1 WITH (FORMAT_TYPE = DELIMITEDTEXT, FORMAT_OPTIONS (PARSER_VERSION = '1.0', PARSER_VERSION = '2.0'))", new ParserErrorInfo(125, "SQL46049", "'2.0'"));
+            // Create external file format with PARSER_VERSION misspelled as PARSR_VERSION
+            //
+            ParserTestUtils.ErrorTest160("CREATE EXTERNAL FILE FORMAT eff1 WITH (FORMAT_TYPE = DELIMITEDTEXT, FORMAT_OPTIONS (PARSR_VERSION = '2.0'))", new ParserErrorInfo(84, "SQL46010", "PARSR_VERSION"));
+            // Create external file format with incorrect parser version value
+            //
+            ParserTestUtils.ErrorTest160("CREATE EXTERNAL FILE FORMAT eff1 WITH (FORMAT_TYPE = DELIMITEDTEXT, FORMAT_OPTIONS (PARSER_VERSION = 16))", new ParserErrorInfo(84, "SQL46010", "PARSER_VERSION"));
         }
 
 

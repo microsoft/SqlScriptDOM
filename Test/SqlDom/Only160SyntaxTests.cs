@@ -35,7 +35,7 @@ namespace SqlStudio.Tests.UTSqlScriptDom
             // OPENROWSET BULK statements specific to SQL Serverless Pools
             new ParserTest160(scriptFilename: "OpenRowsetBulkStatementTests160.sql", nErrors80: 8, nErrors90: 8, nErrors100: 8, nErrors110: 8, nErrors120: 8, nErrors130: 8, nErrors140: 8, nErrors150: 8),
             new ParserTest160(scriptFilename: "CreateStatisticsStatementTests160.sql", nErrors80: 4, nErrors90: 4, nErrors100: 4, nErrors110: 4, nErrors120: 4, nErrors130: 4, nErrors140: 4, nErrors150: 4),
-            new ParserTest160(scriptFilename: "CreateExternalFileFormatStatementTests160.sql", nErrors80: 2, nErrors90: 2, nErrors100: 2, nErrors110: 2, nErrors120: 2, nErrors130: 1, nErrors140: 1, nErrors150: 1),
+            new ParserTest160(scriptFilename: "CreateExternalFileFormatStatementTests160.sql", nErrors80: 2, nErrors90: 2, nErrors100: 2, nErrors110: 2, nErrors120: 2, nErrors130: 2, nErrors140: 2, nErrors150: 2),
             new ParserTest160("StringConcatOperatorTests160.sql", nErrors80: 11, nErrors90: 11, nErrors100: 11, nErrors110: 11, nErrors120: 11, nErrors130: 11, nErrors140: 11, nErrors150: 11),
             new ParserTest160("InlineIndexColumnWithINCLUDEtest.sql", nErrors80: 3, nErrors90: 3, nErrors100: 3, nErrors110: 3, nErrors120: 2, nErrors130: 2, nErrors140: 2, nErrors150: 2)
         };

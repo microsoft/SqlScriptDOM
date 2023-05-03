@@ -24075,7 +24075,8 @@ externalDataFormatLiteralOption returns [ExternalFileFormatLiteralOption vResult
                 if (vResult.OptionKind != ExternalFileFormatOptionKind.FieldTerminator &&
                     vResult.OptionKind != ExternalFileFormatOptionKind.StringDelimiter &&
                     vResult.OptionKind != ExternalFileFormatOptionKind.DateFormat &&
-                    vResult.OptionKind != ExternalFileFormatOptionKind.Encoding)
+                    vResult.OptionKind != ExternalFileFormatOptionKind.Encoding &&
+                    vResult.OptionKind != ExternalFileFormatOptionKind.ParserVersion)
                 {
                     throw GetUnexpectedTokenErrorException(tOption);
                 }

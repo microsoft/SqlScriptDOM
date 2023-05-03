@@ -21,7 +21,8 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         UseTypeDefault = 5,
         DataCompression = 6,
         FirstRow = 7,
-        Encoding = 8
+        Encoding = 8,
+        ParserVersion = 9
     }
 
 #pragma warning restore 1591
