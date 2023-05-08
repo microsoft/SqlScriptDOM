@@ -179,6 +179,10 @@ WITH (MEMORY_OPTIMIZED = ON);";
                     Assert.IsTrue(fragment.Batches[0].Statements[0] is DeclareCursorStatement);
 
                     var declCursorStmt = fragment.Batches[0].Statements[0] as DeclareCursorStatement;
+
+                    Assert.AreEqual(3, declCursorStmt.CursorDefinition.Select.StartLine);
+                    Assert.AreEqual(9, declCursorStmt.CursorDefinition.Select.StartColumn);
+
                     Assert.AreEqual(2, declCursorStmt.CursorDefinition.Options[0].StartLine);
                     Assert.AreEqual(26, declCursorStmt.CursorDefinition.Options[0].StartColumn);
                 }
