@@ -6300,6 +6300,7 @@ WHEN NOT MATCHED BY SOURCE THEN DELETE OUTPUT inserted.*, deleted.*;";
             var invalidMaterializedView14 = "CREATE MATERIALIZED VIEW View1 WITH (DISTRIBUTION = HSH(Col5), FOR_APPEND) AS SELECT Col1, Col2 FROM dbo.Table1 GROUP BY Col1, Col2";
             var invalidMaterializedView15 = "CREATE MATERIALIZED VIEW View1 WITH (DISTRIBUTION = HASH(Col4), DISTRIBUTION = HASH(Col5)) AS SELECT Col1, Col2 FROM dbo.Table1 GROUP BY Col1, Col2";
             var invalidMaterializedView16 = "CREATE MATERIALIZED VIEW View1 WITH (DISTRIBUTION = HASH(Col1), ENCRYPTION) AS SELECT Col1, Col2 FROM dbo.Table1 GROUP BY Col1, Col2";
+            var invalidMaterializedView17 = "CREATE MATERIALIZED VIEW View1 WITH (DISTRIBUTION = HASH(Col3, Col4,, Col5)) AS SELECT Col3, Col4, Col5 FROM dbo.Table1 GROUP BY Col3, Col4, Col5;";
 
             ParserTestUtils.ErrorTest130(invalidMaterializedView, new ParserErrorInfo(7, "SQL46010", "MATERIALIZED"));
             ParserTestUtils.ErrorTest140(invalidMaterializedView, new ParserErrorInfo(7, "SQL46010", "MATERIALIZED"));
@@ -6372,6 +6373,11 @@ WHEN NOT MATCHED BY SOURCE THEN DELETE OUTPUT inserted.*, deleted.*;";
             ParserTestUtils.ErrorTest130(invalidMaterializedView16, new ParserErrorInfo(64, "SQL46010", "ENCRYPTION"));
             ParserTestUtils.ErrorTest140(invalidMaterializedView16, new ParserErrorInfo(64, "SQL46010", "ENCRYPTION"));
             ParserTestUtils.ErrorTest150(invalidMaterializedView16, new ParserErrorInfo(64, "SQL46010", "ENCRYPTION"));
+
+            ParserTestUtils.ErrorTest130(invalidMaterializedView17, new ParserErrorInfo(68, "SQL46010", ","));
+            ParserTestUtils.ErrorTest140(invalidMaterializedView17, new ParserErrorInfo(68, "SQL46010", ","));
+            ParserTestUtils.ErrorTest150(invalidMaterializedView17, new ParserErrorInfo(68, "SQL46010", ","));
+            ParserTestUtils.ErrorTest160(invalidMaterializedView17, new ParserErrorInfo(68, "SQL46010", ","));
         }
 
         [TestMethod]
