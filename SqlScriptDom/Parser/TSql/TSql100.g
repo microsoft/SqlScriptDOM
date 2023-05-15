@@ -11988,6 +11988,7 @@ cursorOption returns [CursorOption vResult = FragmentFactory.CreateFragment<Curs
     : tOption:Identifier
         {
             vResult.OptionKind=CursorOptionsHelper.Instance.ParseOption(tOption);
+            UpdateTokenInfo(vResult, tOption);
         }
     ;
     
