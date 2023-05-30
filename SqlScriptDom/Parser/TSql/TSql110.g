@@ -3855,11 +3855,7 @@ deviceInfo returns [DeviceInfo vResult = FragmentFactory.CreateFragment<DeviceIn
         (
             tDevType:Identifier 
             {
-                vResult.DeviceType = DeviceTypesHelper.Instance.ParseOption(tDevType);                
-            }
-        |   Disk
-            {
-                vResult.DeviceType = DeviceType.Disk;
+                vResult.DeviceType = DeviceTypesHelper.Instance.ParseOption(tDevType, SqlVersionFlags.TSql110);
             }
         )
         EqualsSign vPhysicalDevice = stringOrVariable
