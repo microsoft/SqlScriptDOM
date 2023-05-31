@@ -174,7 +174,9 @@ WITH (MEMORY_OPTIMIZED = ON);";
 
                 using (var scriptReader = new StringReader(script))
                 {
-                    var fragment = Parse(scriptReader) as TSqlScript;
+                    var fragment = parser.Parse(scriptReader, out IList<ParseError> errors) as TSqlScript;
+                    Assert.AreEqual(0, errors.Count);
+
                     Assert.IsTrue(fragment is TSqlScript);
                     Assert.IsTrue(fragment.Batches[0].Statements[0] is DeclareCursorStatement);
 
