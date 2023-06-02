@@ -34,6 +34,8 @@ namespace Microsoft.VisualStudio.TeamSystem.Data.AstGen
 
         public String type;
 
+        public  bool IsCollectionFirstItem { get; set; }
+
         public bool IsInheritedMember { get; set; }
 
         public bool IsInheritedClass { get; set; }
@@ -161,7 +163,7 @@ namespace Microsoft.VisualStudio.TeamSystem.Data.AstGen
             else
             {
                 // Backing field
-                if (!isInterfaceMember)
+                if (!isInterfaceMember && !IsCollectionFirstItem)
                     sb.AppendFormat("\t\tprivate {0} _{1};\r\n\r\n", type, lowCaseName);
 
                 // Property
@@ -172,6 +174,24 @@ namespace Microsoft.VisualStudio.TeamSystem.Data.AstGen
                 if (isInterfaceMember)
                 {
                     sb.AppendFormat("\t\t\tget; set; \r\n", lowCaseName);
+                }
+                else if (IsCollectionFirstItem)
+                {
+                    sb.AppendFormat("\t\t\tget {{ return {0}s.Count > 0 ? {0}s[0] : null; }}\r\n", Name);
+                    sb.AppendLine("\t\t\tset");
+                    sb.AppendLine("\t\t\t{");
+                    sb.AppendFormat("\t\t\t\tif ({0}s.Count == 0)", Name);
+                    sb.AppendLine();
+                    sb.AppendLine("\t\t\t\t{");
+                    sb.AppendFormat("\t\t\t\t\t{0}s.Add(value);", Name);
+                    sb.AppendLine();
+                    sb.AppendLine("\t\t\t\t}");
+                    sb.AppendLine("\t\t\t\telse");
+                    sb.AppendLine("\t\t\t\t{");
+                    sb.AppendFormat("\t\t\t\t\t{0}s[0] = value;", Name);
+                    sb.AppendLine();
+                    sb.AppendLine("\t\t\t\t}");
+                    sb.AppendLine("\t\t\t}");
                 }
                 else if (generateTestDLL)
                 {
@@ -296,6 +316,7 @@ namespace Microsoft.VisualStudio.TeamSystem.Data.AstGen
             retVal.isInterfaceMember = isInterfaceMember;
             retVal.IsInheritedClass = IsInheritedClass;
             retVal.IsInheritedMember = IsInheritedMember;
+            retVal.IsCollectionFirstItem = IsCollectionFirstItem;
             retVal.generateUpdatePositionInfoCall = GenerateUpdatePositionInfoCall;
             retVal.Summary = Summary;
             return retVal;

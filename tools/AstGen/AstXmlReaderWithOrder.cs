@@ -138,6 +138,7 @@ namespace Microsoft.VisualStudio.TeamSystem.Data.AstGen
                 member.IsInheritedClass = false;
                 member.IsInheritedMember = false;
                 member.IsCollection = Convert.ToBoolean(xm.Attribute("Collection") == null ? "false" : xm.Attribute("Collection").Value);
+                member.IsCollectionFirstItem = Convert.ToBoolean(xm.Attribute("CollectionFirstItem") == null ? "false" : xm.Attribute("CollectionFirstItem").Value);
             }
             else if (xm.Name == "InheritedMember")
             {

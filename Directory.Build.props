@@ -28,9 +28,10 @@
          Individual projects may specify additional target frameworks -->
     <NetfxVersion>net462</NetfxVersion>
     <NetStandardVersion>netstandard2.1</NetStandardVersion>
+    <NetStandardVersion20>netstandard2.0</NetStandardVersion20>
     <NetCoreVersion>net6.0</NetCoreVersion>
 
-    <TargetFrameworks>$(NetStandardVersion);$(NetfxVersion);$(NetCoreVersion)</TargetFrameworks>
+    <TargetFrameworks>$(NetStandardVersion);$(NetfxVersion);$(NetCoreVersion);$(NetStandardVersion20)</TargetFrameworks>
     <PreviewRelease Condition="'$(PreviewRelease)' == ''">false</PreviewRelease>
     <VersionProductName>Microsoft SQL Script DOM</VersionProductName>
 

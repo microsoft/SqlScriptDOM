@@ -33,3 +33,37 @@ CREATE TABLE T2 (
     C3 INT NULL,
     INDEX idx (C1) INCLUDE (C2, C3)
 );
+
+CREATE TABLE myTable1_HASH_MCD (
+    id       INT          NOT NULL,
+    lastName VARCHAR (20),
+    zipCode  VARCHAR (6) 
+)
+WITH (DISTRIBUTION = HASH(id, lastName));
+
+
+GO
+CREATE TABLE myTable2_HEAP_HASH_MCD (
+    id       INT          NOT NULL,
+    lastName VARCHAR (20),
+    zipCode  VARCHAR (6) 
+)
+WITH (DISTRIBUTION = HASH(id, lastName, zipCode), HEAP);
+
+
+GO
+CREATE TABLE myTable3_CI_HASH_MCD (
+    id       INT          NOT NULL,
+    lastName VARCHAR (20),
+    zipCode  VARCHAR (6) 
+)
+WITH (DISTRIBUTION = HASH(id, lastName), CLUSTERED INDEX(zipCode));
+
+
+GO
+CREATE TABLE myTable4_CCI_HASH_MCD (
+    [id]       INT          NOT NULL,
+    [lastName] VARCHAR (20) NULL,
+    [zipCode]  VARCHAR (6)  NULL
+)
+WITH (CLUSTERED COLUMNSTORE INDEX, DISTRIBUTION = HASH([id], [lastName], [zipCode]));

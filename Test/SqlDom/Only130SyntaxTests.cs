@@ -14,7 +14,7 @@ namespace SqlStudio.Tests.UTSqlScriptDom
         // Note: These filenames are case sensitive, make sure they match the checked-in file exactly
         private static readonly ParserTest[] Only130TestInfos =
         {
-            new ParserTest130("AlterDatabaseOptionsTests130.sql", 23, 23, 23, 23, 23),  
+            new ParserTest130("AlterDatabaseOptionsTests130.sql", 23, 23, 23, 23, 23),
             new ParserTest130("AlterDatabaseScopedConfigurationTests130.sql", 24, 24, 24, 24, 24),
             new ParserTest130("AlterDatabaseStatementTests130.sql", 4, 4, 4, 4, 4),
             new ParserTest130("EventSessionDbScopeStatementTests.sql", 10, 64, 32, 32, 32),
@@ -26,7 +26,7 @@ namespace SqlStudio.Tests.UTSqlScriptDom
             new ParserTest130("AlterTableDropTableElementStatementTests130.sql", 1, 1, 1, 1, 1),
             new ParserTest130("ColumnStoreInlineIndex130.sql", 10, 10, 10, 10, 10),
             new ParserTest130("CreateIndexStatementTests130.sql", 6, 6, 6, 6, 6),
-            new ParserTest130("CreateTableTests130.sql", 58, 58, 58, 58, 58),
+            new ParserTest130("CreateTableTests130.sql", 62, 62, 62, 62, 62),
             new ParserTest130("CreateAlterSecurityPolicyStatementTests130.sql", 2, 33, 33, 33, 33),
             new ParserTest130("JsonForClauseTests130.sql", 14, 14, 14, 14, 14),
             new ParserTest130("DropStatementsTests130.sql", 10, 10, 9, 9, 9),
