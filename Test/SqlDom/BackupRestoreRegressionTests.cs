@@ -1,15 +1,19 @@
-﻿using System.Collections.Generic;
+﻿//------------------------------------------------------------------------------
+// <copyright file="BackupRestoreRegressionTests.cs" company="Microsoft">
+//   Copyright (c) Microsoft Corporation.  All rights reserved.
+// </copyright>
+//------------------------------------------------------------------------------
+
 using Microsoft.SqlServer.TransactSql.ScriptDom;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SqlStudio.Tests.AssemblyTools.TestCategory;
+using System.Collections.Generic;
+using System.IO;
 
 namespace SqlStudio.Tests.UTSqlScriptDom
 {
-    using System;
-    using System.IO;
-
     public partial class SqlDomTests
-	{
+    {
         /// <summary>
         /// Test for RESTORE ... FROM URL ... syntax
         /// Also tests the related BACKUP ... TO URL ... syntax
@@ -152,5 +156,5 @@ RESTORE DATABASE MyDB FROM VIRTUAL_DEVICE='{A9FD7855-A978-4931-8027-F0EFB1D4F4EA
                 }
             }, true);
         }
-	}
+    }
 }
