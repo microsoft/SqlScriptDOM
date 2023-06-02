@@ -1259,7 +1259,7 @@ deviceInfo returns [DeviceInfo vResult = FragmentFactory.CreateFragment<DeviceIn
         (
             tDevType:Identifier 
             {
-                vResult.DeviceType = DeviceTypesHelper.Instance.ParseOption(tDevType);                
+                vResult.DeviceType = DeviceTypesHelper.Instance.ParseOption(tDevType, SqlVersionFlags.TSql80);
             }
         |   Disk
             {

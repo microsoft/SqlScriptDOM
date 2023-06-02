@@ -14,8 +14,9 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         {
             AddOptionMapping(DeviceType.Disk, CodeGenerationSupporter.Disk);
             AddOptionMapping(DeviceType.Tape, CodeGenerationSupporter.Tape);
-            AddOptionMapping(DeviceType.VirtualDevice, CodeGenerationSupporter.VirtualDevice);
-            AddOptionMapping(DeviceType.DatabaseSnapshot, CodeGenerationSupporter.DatabaseSnapshot);
+            AddOptionMapping(DeviceType.VirtualDevice, CodeGenerationSupporter.VirtualDevice, SqlVersionFlags.TSql90AndAbove);
+            AddOptionMapping(DeviceType.DatabaseSnapshot, CodeGenerationSupporter.DatabaseSnapshot, SqlVersionFlags.TSql90AndAbove);
+            AddOptionMapping(DeviceType.Url, CodeGenerationSupporter.Url, SqlVersionFlags.TSql110AndAbove);
         }
 
         internal static readonly DeviceTypesHelper Instance = new DeviceTypesHelper();

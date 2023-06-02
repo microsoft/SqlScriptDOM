@@ -17,6 +17,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
             {DeviceType.Disk,  new KeywordGenerator(TSqlTokenType.Disk)},
             {DeviceType.Tape, new IdentifierGenerator(CodeGenerationSupporter.Tape)},
             {DeviceType.VirtualDevice, new IdentifierGenerator(CodeGenerationSupporter.VirtualDevice)},
+            {DeviceType.Url, new IdentifierGenerator(CodeGenerationSupporter.Url)},
         };
 
         public override void ExplicitVisit(DeviceInfo node)

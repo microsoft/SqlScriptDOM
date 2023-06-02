@@ -18,7 +18,8 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         Disk = 1,
         Tape = 2,
         VirtualDevice = 3,
-        DatabaseSnapshot = 4
+        DatabaseSnapshot = 4,
+        Url = 5
     }
 
 #pragma warning restore 1591
