@@ -25,7 +25,7 @@ namespace SqlStudio.Tests.UTSqlScriptDom
             new ParserTest140("AlterTableAlterColumnStatementTests140.sql", 14, 14, 14, 14, 14, 12),
             new ParserTest140("BulkInsertStatementTests140.sql", 12, 12, 12, 12, 12, 12),
             new ParserTest140("OpenRowsetBulkStatementTests140.sql", 9, 9, 9, 9, 9, 9),
-            new ParserTest140("GraphDbSyntaxTests140.sql", 28, 28, 28, 28, 28, 28),
+            new ParserTest140("GraphDbSyntaxTests140.sql", nErrors80: 30, nErrors90: 30, nErrors100: 30, nErrors110: 30, nErrors120: 30, nErrors130: 30),
             new ParserTest140("AlterDatabaseScopedGenericConfigurationTests140.sql", 33, 33, 33, 33, 33, 11),
             new ParserTest140("AlterTableDropTableElementStatementTests140.sql", 1, 5, 5, 5, 5, 5),
             new ParserTest140("DropIndexStatementTests140.sql", 4, 4, 4, 4, 4, 4),

@@ -16821,6 +16821,15 @@ createColumnStoreIndexStatement [IToken tUnique, bool? isClustered] returns [Cre
             tOrder:Order
             (
                 identifierColumnList[vResult, vResult.OrderedColumns]
+                {
+					foreach (var col in vResult.OrderedColumns)
+					{
+						if (col.ColumnType == ColumnType.PseudoColumnGraphNodeId || col.ColumnType == ColumnType.PseudoColumnGraphEdgeId || col.ColumnType == ColumnType.PseudoColumnGraphFromId || col.ColumnType == ColumnType.PseudoColumnGraphToId)
+						{
+							ThrowIncorrectSyntaxErrorException(col);
+						}
+					}
+                }
             )
         )?
     {
@@ -18776,16 +18785,30 @@ columnListWithParenthesis [TSqlFragment vParent, IList<ColumnReferenceExpression
 
 identifierColumnList [TSqlFragment vParent, IList<ColumnReferenceExpression> columns]
 {
-    ColumnReferenceExpression vColumn;
+    ColumnReferenceExpression vColumn = FragmentFactory.CreateFragment<ColumnReferenceExpression>();
 }
-    : LeftParenthesis vColumn = identifierColumnReferenceExpression
+    : LeftParenthesis (vColumn = identifierColumnReferenceExpression
         {
             AddAndUpdateTokenInfo(vParent, columns, vColumn);
         }
-        (Comma vColumn = identifierColumnReferenceExpression
+        | graphPseudoColumn[vColumn]
+        {
+            AddAndUpdateTokenInfo(vParent, columns, vColumn);
+        }
+        )
+        (Comma
+        {
+            vColumn = FragmentFactory.CreateFragment<ColumnReferenceExpression>();
+        }
+        (vColumn = identifierColumnReferenceExpression
             {
                 AddAndUpdateTokenInfo(vParent, columns, vColumn);
             }
+        | graphPseudoColumn[vColumn]
+        {
+            AddAndUpdateTokenInfo(vParent, columns, vColumn);
+        }
+        )
         )*
         tRParen:RightParenthesis
         {
@@ -20794,7 +20817,7 @@ literalTableHint returns [LiteralTableHint vResult = FragmentFactory.CreateFragm
 forceSeekTableHint [bool indexHintAllowed] returns [ForceSeekTableHint vResult = FragmentFactory.CreateFragment<ForceSeekTableHint>()]
 {
     IdentifierOrValueExpression vIndexValue;
-    ColumnReferenceExpression vColumnValue;
+    ColumnReferenceExpression vColumnValue = FragmentFactory.CreateFragment<ColumnReferenceExpression>();
 }
 :   tForceSeek:Identifier
         {
@@ -20815,7 +20838,11 @@ forceSeekTableHint [bool indexHintAllowed] returns [ForceSeekTableHint vResult =
                 AddAndUpdateTokenInfo(vResult, vResult.ColumnValues, vColumnValue);
             }
             (
-                Comma vColumnValue = identifierColumnReferenceExpression
+                Comma
+                {
+                    vColumnValue = FragmentFactory.CreateFragment<ColumnReferenceExpression>();
+                }
+                vColumnValue = identifierColumnReferenceExpression
                 {
                     AddAndUpdateTokenInfo(vResult, vResult.ColumnValues, vColumnValue);
                 }

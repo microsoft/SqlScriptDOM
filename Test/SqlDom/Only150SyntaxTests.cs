@@ -23,7 +23,7 @@ namespace SqlStudio.Tests.UTSqlScriptDom
             new ParserTest150("CreateIndexStatementTests150.sql",  9, 9, 9, 9, 9, 9, 9),
             new ParserTest150("CreateTableTests150.sql", 5, 5, 5, 5, 5, 5, 5),
             new ParserTest150("ScalarUDFInlineTests150.sql", 4, 5, 5, 5, 5, 4, 4),
-            new ParserTest150("GraphDbSyntaxTests150.sql", 5, 5, 5, 5, 5, 5, 5),
+            new ParserTest150("GraphDbSyntaxTests150.sql", 6, 6, 6, 6, 6, 6, 6),
             new ParserTest150("BulkInsertStatementTests150.sql", 6, 6, 6, 6, 6, 6, 6),
             new ParserTest150("OpenRowsetBulkStatementTests150.sql", 12, 12, 12, 12, 12, 12, 12),
             /* When a batch is being parsed via a rule and the rule consumes all the tokens it can then it expects
