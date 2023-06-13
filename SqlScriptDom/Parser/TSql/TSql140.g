@@ -16154,10 +16154,10 @@ createColumnStoreIndexStatement [IToken tUnique, bool? isClustered] returns [Cre
                 {
 					foreach (var col in vResult.OrderedColumns)
 					{
-						if (col.ColumnType == ColumnType.PseudoColumnGraphNodeId || col.ColumnType == ColumnType.PseudoColumnGraphEdgeId || col.ColumnType == ColumnType.PseudoColumnGraphFromId || col.ColumnType == ColumnType.PseudoColumnGraphToId)
+						if (PseudoColumnHelper.IsGraphPseudoColumn(col))
 						{
-							ThrowIncorrectSyntaxErrorException(col);
-						}
+                            ThrowIncorrectSyntaxErrorException(col);
+                        }
 					}
                 }
             )
