@@ -5238,6 +5238,10 @@ select 1",
             ParserTestUtils.ErrorTest130("CREATE EXTERNAL TABLE t1 (c1 INT) WITH (DATA_SOURCE = eds1, DISTRIBUTION = REPLICATED, SCHEMA_NAME = 'sys', OBJ_NAME = 'tables')", new ParserErrorInfo(108, "SQL46010", "OBJ_NAME"));
             ParserTestUtils.ErrorTest130("CREATE EXTERNAL TABLE t1 (c1 INT) WITH (DATA_SOURCE = eds1, DISTRIBUTION = SHARDED(c1), SCHEMA_NAME 'sys')", new ParserErrorInfo(88, "SQL46010", "SCHEMA_NAME"));
             ParserTestUtils.ErrorTest130("CREATE EXTERNAL TABLE t1 (c1 INT) WITH (DATA_SOURCE = eds1, DISTRIBUTION = REPLICATED, SCHEMA_NAME = 'sys', OBJECT_NAME 'tables')", new ParserErrorInfo(108, "SQL46010", "OBJECT_NAME"));
+            ParserTestUtils.ErrorTest160("CREATE EXTERNAL TABLE t1 (c1 INT) WITH (LOCATION = '/test/test.txt', DATA_SOURCE = eds1 TABLE_OPTIONS = N'{\"READ_OPTIONS\":[\"ALLOW_INCONSISTENT_READS\"]}')", new ParserErrorInfo(88, "SQL46010", "TABLE_OPTIONS"));
+            ParserTestUtils.ErrorTest160("CREATE EXTERNAL TABLE t1 (c1 INT) WITH (LOCATION = '/test/test.txt', DATA_SOURCE = eds1, TBL_OPTIONS = N'{\"READ_OPTIONS\":[\"ALLOW_INCONSISTENT_READS\"]}')", new ParserErrorInfo(89, "SQL46010", "TBL_OPTIONS"));
+            ParserTestUtils.ErrorTest160("CREATE EXTERNAL TABLE t1 (c1 INT) WITH (LOCATION = '/test/test.txt', DATA_SOURCE = eds1, TABLE_OPTIONS N'{\"READ_OPTIONS\":[\"ALLOW_INCONSISTENT_READS\"]}')", new ParserErrorInfo(89, "SQL46010", "TABLE_OPTIONS"));
+            ParserTestUtils.ErrorTest160("CREATE EXTERNAL TABLE t1 (c1 INT) WITH (LOCATION = '/test/test.txt', DATA_SOURCE = eds1, TABLE_OPTIONS = N'{\"READ_OPTIONS\":[\"ALLOW_INCONSISTENT_READS\"]}'", new ParserErrorInfo(153, "SQL46029"));
 
             // Missing required properties
             //
@@ -5275,9 +5279,12 @@ select 1",
             ParserTestUtils.ErrorTest130("CREATE EXTERNAL TABLE t1 (c1 INT) WITH (DATA_SOURCE = eds1, DISTRIBUTION = SHARDED(c1), SCHEMA_NAME = 'sys', OBJECT_NAME = tables')", new ParserErrorInfo(129, "SQL46030", "')"));
             ParserTestUtils.ErrorTest130("CREATE EXTERNAL TABLE t1 (c1 INT) WITH (DATA_SOURCE = eds1, DISTRIBUTION = SHARDED(c1), SCHEMA_NAME = sys)", new ParserErrorInfo(88, "SQL46010", "SCHEMA_NAME"));
             ParserTestUtils.ErrorTest130("CREATE EXTERNAL TABLE t1 (c1 INT) WITH (DATA_SOURCE = eds1, DISTRIBUTION = SHARDED(c1), SCHEMA_NAME = 'sys', OBJECT_NAME = tables)", new ParserErrorInfo(109, "SQL46010", "OBJECT_NAME"));
+
+            // Create external table with unsupported TABLE_OPTIONS for SQL 150
+            ParserTestUtils.ErrorTest150("CREATE EXTERNAL TABLE t1 (c1 INT) WITH (LOCATION = '/test/test.txt', DATA_SOURCE = eds1, TABLE_OPTIONS =  N'{\"READ_OPTIONS\":[\"ALLOW_INCONSISTENT_READS\"]}')", new ParserErrorInfo(89, "SQL46010", "TABLE_OPTIONS"));
         }
 
-                /// <summary>
+        /// <summary>
         /// Tests Sql DW REJECTED_ROW_LOCATION
         /// </summary>
         [TestMethod]
