@@ -1,3 +1,5 @@
+create table [dbo].[node_5] (c1 int, index idx (c1) include ($node_id)) As Node;
+
 ALTER TABLE edge add constraint myConstraint CONNECTION (node3 TO node4);
 
 ALTER TABLE edge2

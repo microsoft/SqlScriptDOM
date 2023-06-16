@@ -23,5 +23,15 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         }
 
         internal static readonly PseudoColumnHelper Instance = new PseudoColumnHelper();
+
+        internal static bool IsGraphPseudoColumn(ColumnReferenceExpression col)
+        {
+            if (col.ColumnType == ColumnType.PseudoColumnGraphNodeId || col.ColumnType == ColumnType.PseudoColumnGraphEdgeId || col.ColumnType == ColumnType.PseudoColumnGraphFromId || col.ColumnType == ColumnType.PseudoColumnGraphToId)
+            {
+                return true;
+            }
+
+            return false;
+        }
     }
 }

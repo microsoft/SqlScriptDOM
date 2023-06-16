@@ -104,6 +104,8 @@ CREATE TABLE [dbo].[node_3] (c1 int, index idx nonclustered columnstore($node_id
 
 CREATE TABLE [dbo].[node_4] (c1 int, index idx nonclustered columnstore(c1, $node_id)) AS NODE;
 
+create index NC_node_4	ON node_4 (c1) INCLUDE ($node_id);
+
 -- Inline indexes require another column element, so inline indexes don't work on edge tables
 -- without a column.
 --
@@ -116,3 +118,5 @@ CREATE TABLE [dbo].[edge_3] (c1 int, index idx nonclustered ($to_id, $from_id, $
 CREATE TABLE [dbo].[edge_4] (c1 int, index idx nonclustered columnstore ($edge_id, c1)) AS EDGE;
 
 CREATE TABLE [dbo].[edge_5] (c1 int, index idx nonclustered columnstore ($from_id, $to_id, $edge_id, c1)) AS EDGE;
+
+create statistics stat2 on n1(c1, $node_id, c2)
