@@ -126,6 +126,10 @@ CREATE TABLE [dbo].[node_4] (
     INDEX idx NONCLUSTERED COLUMNSTORE (c1, $NODE_ID)
 ) AS NODE;
 
+CREATE INDEX NC_node_4
+    ON node_4(c1)
+    INCLUDE($NODE_ID);
+
 CREATE TABLE [dbo].[edge_1] (
     c1 INT,
     INDEX idx NONCLUSTERED ($EDGE_ID)
@@ -151,3 +155,5 @@ CREATE TABLE [dbo].[edge_5] (
     INDEX idx NONCLUSTERED COLUMNSTORE ($FROM_ID, $TO_ID, $EDGE_ID, c1)
 ) AS EDGE;
 
+CREATE STATISTICS stat2
+    ON n1(c1, $NODE_ID, c2);
