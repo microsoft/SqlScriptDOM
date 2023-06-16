@@ -66,7 +66,7 @@ namespace SqlStudio.Tests.UTSqlScriptDom
             new ParserTest130("ExternalTableCtasStatementTests.sql", 8, 2, 2, 2, 2),
             new ParserTest130("GroupByClauseTests130.sql", 4, 4, 2, 2, 2),
             new ParserTest130("WithinGroupTests130.sql", 5, 5, 5, 3, 3),
-            new ParserTest130("MaterializedViewTests130.sql", 19, 10, 10, 10, 10),
+            new ParserTest130("MaterializedViewTests130.sql", 19, 13, 13, 13, 13),
             new ParserTest130("CreateColumnStoreIndexTestsDw.sql", 1, 1, 1, 1, 1),
             new ParserTest130("CreateTriggerStatementTests130.sql", 1, 1, 0, 0, 0),
             new ParserTest130("CopyCommandTestsDw.sql", 1, 1, 1, 1, 1),

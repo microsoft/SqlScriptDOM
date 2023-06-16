@@ -23,6 +23,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
             AddOptionMapping(ExternalFileFormatOptionKind.DataCompression, CodeGenerationSupporter.DataCompression);
             AddOptionMapping(ExternalFileFormatOptionKind.FirstRow, CodeGenerationSupporter.FirstRow2);
             AddOptionMapping(ExternalFileFormatOptionKind.Encoding, CodeGenerationSupporter.Encoding);
+            AddOptionMapping(ExternalFileFormatOptionKind.ParserVersion, CodeGenerationSupporter.ParserVersion);
         }
 
         internal static readonly ExternalFileFormatOptionHelper Instance = new ExternalFileFormatOptionHelper();

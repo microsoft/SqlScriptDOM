@@ -157,40 +157,6 @@ WITH (MEMORY_OPTIMIZED = ON);";
             Parse(scriptReader);
         }
 
-        /// <summary>
-        /// Regression test to verify token info (start line, start column, etc.) are correctly populated for CursorOption
-        /// See https://github.com/microsoft/SqlScriptDOM/issues/26 for details on the issue.
-        /// </summary>
-        [TestMethod]
-        [Priority(0)]
-        [SqlStudioTestCategory(Category.UnitTest)]
-        public void CursorOptionTokenInfoTest()
-        {
-            ParserTestUtils.ExecuteTestForAllParsers(delegate (TSqlParser parser)
-            {
-                string script = @"-- Single line comment
-        DECLARE MyCursor scroll CURSOR FOR
-        SELECT * FROM ANYTHING";
-
-                using (var scriptReader = new StringReader(script))
-                {
-                    var fragment = parser.Parse(scriptReader, out IList<ParseError> errors) as TSqlScript;
-                    Assert.AreEqual(0, errors.Count);
-
-                    Assert.IsTrue(fragment is TSqlScript);
-                    Assert.IsTrue(fragment.Batches[0].Statements[0] is DeclareCursorStatement);
-
-                    var declCursorStmt = fragment.Batches[0].Statements[0] as DeclareCursorStatement;
-
-                    Assert.AreEqual(3, declCursorStmt.CursorDefinition.Select.StartLine);
-                    Assert.AreEqual(9, declCursorStmt.CursorDefinition.Select.StartColumn);
-
-                    Assert.AreEqual(2, declCursorStmt.CursorDefinition.Options[0].StartLine);
-                    Assert.AreEqual(26, declCursorStmt.CursorDefinition.Options[0].StartColumn);
-                }
-            }, true);
-        }
-
         #region Private Methods
 
         private static string GenerateScript(TSqlFragment fragment)

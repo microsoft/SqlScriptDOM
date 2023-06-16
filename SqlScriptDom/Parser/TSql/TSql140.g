@@ -16025,7 +16025,6 @@ cursorOption returns [CursorOption vResult = FragmentFactory.CreateFragment<Curs
     : tOption:Identifier
         {
             vResult.OptionKind=CursorOptionsHelper.Instance.ParseOption(tOption);
-            UpdateTokenInfo(vResult, tOption);
         }
     ;
 
@@ -23687,12 +23686,20 @@ viewHashDistributionPolicy returns [ViewHashDistributionPolicy vResult = Fragmen
     Identifier vIdentifier;
 }
     :
-        tHash:Identifier LeftParenthesis vIdentifier = identifier
+        tHash:Identifier
         {
             Match(tHash, CodeGenerationSupporter.Hash);
-            vResult.DistributionColumn = vIdentifier;
             UpdateTokenInfo(vResult, tHash);
         }
+        LeftParenthesis vIdentifier = identifier
+        {
+            AddAndUpdateTokenInfo(vResult, vResult.DistributionColumns, vIdentifier);
+        }
+        (Comma vIdentifier = identifier
+            {
+                AddAndUpdateTokenInfo(vResult, vResult.DistributionColumns, vIdentifier);
+            }
+        )*
         tRParen:RightParenthesis
         {
             UpdateTokenInfo(vResult, tRParen);

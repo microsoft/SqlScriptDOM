@@ -49,9 +49,26 @@
 
     <!-- put obj files in a mirror tree off the root to keep the src folder tree cleaner -->
     <BaseIntermediateOutputPath Condition=" '$(BaseIntermediateOutputPath)' == '' ">$(EnlistmentRoot)\obj\$([MSBuild]::MakeRelative('$(EnlistmentRoot)\', $(MSBuildProjectDirectory)))</BaseIntermediateOutputPath>
-    
+
     <AntlrSourceUrl>https://www.antlr2.org/download/antlr-2.7.5.exe</AntlrSourceUrl>
     <AntlrLocation>$(BaseIntermediateOutputPath)\antlr-2.7.5.exe</AntlrLocation>
+  </PropertyGroup>
+
+    <!-- Don't enable localization when we are inside VS -->
+  <PropertyGroup Condition="'$(BuildingInsideVisualStudio)'=='true'">
+    <EnableLocalization>false</EnableLocalization>
+  </PropertyGroup>
+
+  <!-- Localization is not enabled by default. Pass /p:EnableLocalization=true to override that.
+       For some details, see: https://ceapex.visualstudio.com/CEINTL/_wiki/wikis/CEINTL.wiki/341/Localization-in-MSBuild-Retail
+   -->
+  <PropertyGroup>
+    <EnableLocalization Condition="'$(EnableLocalization)' == ''">false</EnableLocalization>
+    <PostBuildLocalization>$(EnableLocalization)</PostBuildLocalization>
+    <!-- This corresponds to the APEX13 languages: Tier1 + CSY/TRK/PLK
+         For language sets details, see: https://ceapex.visualstudio.com/CEINTL/_git/SoftwareLocalization?path=%2Fsrc%2FOneBranchPackages%2FLocalization.Languages%2FLocalization.Languages.props&_a=contents&version=GBmain
+    -->
+    <LanguageSet Condition="'$(EnableLocalization)' == 'true'">VS_Main_Languages</LanguageSet>
   </PropertyGroup>
 
   <PropertyGroup>

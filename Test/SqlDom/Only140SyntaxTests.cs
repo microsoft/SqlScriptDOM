@@ -37,6 +37,7 @@ namespace SqlStudio.Tests.UTSqlScriptDom
             new ParserTest140("AlterExternalLibrary140.sql", 2, 2, 2, 2, 2, 3),
             new ParserTest140("CreateExternalLibrary140.sql", 2, 2, 2, 2, 2, 3),
             new ParserTest140("DropExternalLibrary140.sql", 2, 2, 2, 2, 2, 2),
+            new ParserTest140("MaterializedViewTests140.sql", 6, 3, 3, 3, 3, 0),
         };
 
         private static readonly ParserTest[] SqlAzure_TestInfos = 

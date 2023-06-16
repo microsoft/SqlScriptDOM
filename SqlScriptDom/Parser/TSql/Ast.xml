@@ -107,7 +107,8 @@
   </Class>
   <Class Name="ViewHashDistributionPolicy" Base="ViewDistributionPolicy" Summary="Representation of the HASH option for a materialized view distribution policy.">
     <InheritedClass Name="ViewDistributionPolicy"/>
-    <Member Name="DistributionColumn" Type="Identifier" GenerateUpdatePositionInfoCall="false" Summary="The column reference in the HASH option for a view distribution policy."/>
+    <Member Name="DistributionColumn" Type="Identifier" CollectionFirstItem="true" GenerateUpdatePositionInfoCall="false" Summary="The column reference in the HASH option for a view distribution policy."/>
+    <Member Name="DistributionColumns" Type="Identifier" Collection="true" GenerateUpdatePositionInfoCall="false" Summary="The columns reference in the HASH option for a view distribution policy."/>
   </Class>
   <Class Name="TriggerObject" Summary="Information on what trigger is being created/altered" >
     <Member Name="Name" Type="SchemaObjectName" Summary="The object to create the trigger on."/>
