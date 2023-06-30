@@ -994,6 +994,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         internal const string T = "T";
         internal const string Tab = "\t";
         internal const string Table = "Table";
+        internal const string TableOptions = "TABLE_OPTIONS";
         internal const string TableResults = "TABLERESULTS";
         internal const string TableSample = "TABLESAMPLE";
         internal const string TabLock = "TABLOCK";

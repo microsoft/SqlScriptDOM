@@ -27655,7 +27655,8 @@ externalTableLiteralOrIdentifierOption returns [ExternalTableLiteralOrIdentifier
                 if (vResult.OptionKind != ExternalTableOptionKind.Location &&
                     vResult.OptionKind != ExternalTableOptionKind.SchemaName &&
                     vResult.OptionKind != ExternalTableOptionKind.ObjectName &&
-                    vResult.OptionKind != ExternalTableOptionKind.RejectedRowLocation)
+                    vResult.OptionKind != ExternalTableOptionKind.RejectedRowLocation &&
+                    vResult.OptionKind != ExternalTableOptionKind.TableOptions)
                 {
                     throw GetUnexpectedTokenErrorException(tOption);
                 }

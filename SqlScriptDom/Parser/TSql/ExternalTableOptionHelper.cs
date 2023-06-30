@@ -23,6 +23,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
             AddOptionMapping(ExternalTableOptionKind.RejectedRowLocation, CodeGenerationSupporter.RejectedRowLocation);
             AddOptionMapping(ExternalTableOptionKind.SchemaName, CodeGenerationSupporter.SchemaName);
             AddOptionMapping(ExternalTableOptionKind.ObjectName, CodeGenerationSupporter.ObjectName);
+            AddOptionMapping(ExternalTableOptionKind.TableOptions, CodeGenerationSupporter.TableOptions, SqlVersionFlags.TSql160AndAbove);
         }
 
         internal static readonly ExternalTableOptionHelper Instance = new ExternalTableOptionHelper();

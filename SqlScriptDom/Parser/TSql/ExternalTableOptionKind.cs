@@ -85,7 +85,12 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         /// Specific to Hadoop based external tables.
         /// </remarks>
         RejectedRowLocation = 8,
-}
+
+        /// <summary>
+        /// Specifies the set of options that describe how to read the underlying files.
+        /// </summary>
+        TableOptions = 9,
+    }
 
 #pragma warning restore 1591
 }
