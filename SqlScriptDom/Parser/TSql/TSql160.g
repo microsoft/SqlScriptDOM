@@ -29845,6 +29845,21 @@ foreignKeyConstraintCommonEnd[IndexAffectingStatement statementType, ForeignKeyC
                 }
             )?
         )?
+        (
+            tNot:Not tEnforced:Identifier
+            {
+                if (TryMatch(tEnforced, CodeGenerationSupporter.Enforced))
+                {
+                    UpdateTokenInfo(vParent, tEnforced);
+                    vParent.IsEnforced = false;
+                }
+                else
+                {
+                    ThrowParseErrorException("SQL46010", tEnforced,
+                        TSqlParserResource.SQL46010Message, tEnforced.getText());
+                }
+            }
+        )?
         vNotForReplication = replicationClauseOpt[statementType, vParent]
         {
             vParent.NotForReplication = vNotForReplication;

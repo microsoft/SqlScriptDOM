@@ -70,8 +70,8 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                     prettyPrintedLines.Length,
                     string.Format
                     (
-                        "Number of lines of baseline \"{0}\" and generated script does not match!. Expected: {1}",
-                        testScriptName, prettyPrinted
+                        "Number of lines of baseline \"{0}\" and generated script does not match!. Expected: <{1}>. Actual: <{2}>.",
+                        testScriptName, baseline, prettyPrinted
                     )
                 );
 
