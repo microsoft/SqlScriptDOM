@@ -49,6 +49,12 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
                 GenerateDeleteUpdateAction(node.UpdateAction);
             }
 
+            if (node.IsEnforced == false)
+            {
+                GenerateSpaceAndKeyword(TSqlTokenType.Not);
+                GenerateSpaceAndIdentifier(CodeGenerationSupporter.Enforced);
+            }
+
             if (node.NotForReplication)
             {
                 GenerateSpace();

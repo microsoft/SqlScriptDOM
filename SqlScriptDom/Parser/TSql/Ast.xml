@@ -2806,6 +2806,7 @@
     <Member Name="DeleteAction" Type="DeleteUpdateAction" GenerateUpdatePositionInfoCall="false" Summary="Represents the action to be taken at delete."/>
     <Member Name="UpdateAction" Type="DeleteUpdateAction" GenerateUpdatePositionInfoCall="false" Summary="Represents the action to be taken at update."/>
     <Member Name="NotForReplication" Type="bool" Summary="True if not for replication was defined."/>
+    <Member Name="IsEnforced" Type="bool?" Summary="Represents if the constraint is an enforced constraint."/>
   </Class>
   <Class Name="NullableConstraintDefinition" Base="ConstraintDefinition" Summary="Represents the nullable constraint.">
     <InheritedClass Name="ConstraintDefinition"/>
