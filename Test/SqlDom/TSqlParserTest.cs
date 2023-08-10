@@ -430,6 +430,37 @@ PERIOD FOR SYSTEM_TIME(date1, date2)"
         [Priority(0)]
         [Timeout(GlobalConstants.DefaultTestTimeout)]
         [SqlStudioTestCategory(Category.UnitTest)]
+        public void ParsingNativelyCompiledStoredProceduresWithAtomicBlock()
+        {
+            string input = "";
+            IList<ParseError> errors = null;
+            TSqlScript script = null;
+
+            input = @"
+CREATE PROCEDURE dbo.testproc @p1 INT, @p2 INT NOT NULL
+WITH EXECUTE AS OWNER, SCHEMABINDING, NATIVE_COMPILATION
+AS
+BEGIN 
+ATOMIC WITH (TRANSACTION ISOLATION LEVEL = SNAPSHOT, LANGUAGE = N'us_english')
+UPDATE dbo.Departments
+SET p3 = ISNULL(p3, 0) + @p2
+WHERE ID = @p1
+END;";
+            errors = null;
+            script = (TSqlScript)new TSql160Parser(true).Parse(new StringReader(input), out errors);
+
+            script.Accept(new GenericFragmentVisitor<ProcedureStatementBody>(
+                 delegate (ProcedureStatementBody procedureStatementBody)
+                 {
+                     return procedureStatementBody.StatementList.StartLine.Equals(5) && procedureStatementBody.StatementList.StartColumn.Equals(1);
+                 }
+            ));
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [Timeout(GlobalConstants.DefaultTestTimeout)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void OpenRowsetBulkWithTwoFiles()
         {
             string input = @"SELECT TOP 10 * FROM OPENROWSET (BULK ('https://azureopendatastorage.blob.core.windows.net/censusdatacontainer/release/us_population_county/year=2000/*.parquet', 'https://azureopendatastorage.blob.core.windows.net/censusdatacontainer/release/us_population_county/year=2010/*.parquet'), FORMAT = 'PARQUET') AS [r9];";

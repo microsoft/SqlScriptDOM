@@ -16032,6 +16032,7 @@ beginEndBlockStatement returns [BeginEndBlockStatement vResult = this.FragmentFa
             vBeginEndAtomicBlockStatement=beginEndAtomicBlock
             {
                 vResult = vBeginEndAtomicBlockStatement;
+                UpdateTokenInfo(vResult,tBegin);
             }
         )?
         (tSemi:Semicolon)*
