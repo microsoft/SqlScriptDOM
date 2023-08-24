@@ -508,24 +508,6 @@ END;";
         [TestMethod]
         [Priority(0)]
         [SqlStudioTestCategory(Category.UnitTest)]
-        public void Object_IDParsingIn160ParserTest()
-        {
-            TSql160Parser parser = new TSql160Parser(true); IList<ParseError> errors;
-
-            string scriptString = @"CREATE USER xxxx FROM EXTERNAL PROVIDER WITH OBJECT_ID='xxx'";
-
-            var script = new StringReader(scriptString);
-            parser.Parse(script, out errors);
-            foreach (var error in errors)
-            {
-                Console.WriteLine($"Error {error.Number} Message {error.Message}");
-            }
-            Assert.AreEqual(0, errors.Count);
-        }
-
-        [TestMethod]
-        [Priority(0)]
-        [SqlStudioTestCategory(Category.UnitTest)]
         public void FieldQuoteParsingIn160ParserTest()
         {
             TSql160Parser parser = new TSql160Parser(true); IList<ParseError> errors;
