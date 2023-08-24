@@ -25,6 +25,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
             {PrincipalOptionKind.DefaultSchema, CodeGenerationSupporter.DefaultSchema},
             {PrincipalOptionKind.Login, CodeGenerationSupporter.Login},
             {PrincipalOptionKind.Type, CodeGenerationSupporter.Type},
+            {PrincipalOptionKind.Object_ID, CodeGenerationSupporter.Object_ID}
         };
 
         public override void ExplicitVisit(PrincipalOption node)
