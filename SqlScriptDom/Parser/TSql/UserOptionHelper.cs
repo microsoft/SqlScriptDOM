@@ -21,6 +21,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
             AddOptionMapping(PrincipalOptionKind.Login, CodeGenerationSupporter.Login);
             AddOptionMapping(PrincipalOptionKind.Type, CodeGenerationSupporter.Type);
             AddOptionMapping(PrincipalOptionKind.Sid, CodeGenerationSupporter.Sid);
+            AddOptionMapping(PrincipalOptionKind.Object_ID, CodeGenerationSupporter.Object_ID);
         }
 
         internal static readonly UserOptionHelper Instance = new UserOptionHelper();

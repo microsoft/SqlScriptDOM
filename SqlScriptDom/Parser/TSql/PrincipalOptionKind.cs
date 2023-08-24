@@ -26,6 +26,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         Login           = 9,
         Password        = 10,
         Type            = 11,
+        Object_ID       = 12,
     }
 
 #pragma warning restore 1591

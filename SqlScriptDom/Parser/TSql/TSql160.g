@@ -10858,7 +10858,7 @@ createUserOption[bool vHasUserLoginOption] returns [PrincipalOption vResult]
         |  vResult=literalCreateUserOption[tOption, vHasUserLoginOption]
     )
     {
-        if(vHasUserLoginOption && vResult.OptionKind != PrincipalOptionKind.DefaultSchema && vResult.OptionKind != PrincipalOptionKind.Sid && vResult.OptionKind != PrincipalOptionKind.Type)
+        if(vHasUserLoginOption && vResult.OptionKind != PrincipalOptionKind.DefaultSchema && vResult.OptionKind != PrincipalOptionKind.Sid && vResult.OptionKind != PrincipalOptionKind.Type && vResult.OptionKind != PrincipalOptionKind.Object_ID)
         {
             ThrowParseErrorException("SQL46096", tOption, TSqlParserResource.SQL46096Message, tOption.getText());
         }
@@ -10901,8 +10901,15 @@ literalCreateUserOption[IToken tOption, bool vHasUserLoginOption] returns [Liter
         }
     |    vLiteral=stringLiteral
         {
-            Match(tOption, CodeGenerationSupporter.Password);
-            vResult.OptionKind=PrincipalOptionKind.Password;
+            if(TryMatch(tOption, CodeGenerationSupporter.Object_ID))
+            {
+                vResult.OptionKind = PrincipalOptionKind.Object_ID;
+            }
+            else
+            {
+                Match(tOption, CodeGenerationSupporter.Password);
+                vResult.OptionKind=PrincipalOptionKind.Password;
+            }            
             vResult.Value=vLiteral;
         }
     |    vLiteral=integer
