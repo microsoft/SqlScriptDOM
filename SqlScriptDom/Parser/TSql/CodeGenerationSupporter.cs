@@ -672,6 +672,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         internal const string Numeric = "NUMERIC";
         internal const string NVarChar = "NVARCHAR";
         internal const string Object = "OBJECT";
+        internal const string Object_ID = "OBJECT_ID";
         internal const string ObjectName = "OBJECT_NAME";
         internal const string Off = "OFF";
         internal const string Offline = "OFFLINE";

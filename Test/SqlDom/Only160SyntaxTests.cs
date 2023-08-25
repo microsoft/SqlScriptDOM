@@ -15,6 +15,7 @@ namespace SqlStudio.Tests.UTSqlScriptDom
         // Note: These filenames are case sensitive, make sure they match the checked-in file exactly
         private static readonly ParserTest[] Only160TestInfos =
         {
+            new ParserTest160("CreateUserFromExternalProvider160.sql", nErrors80: 2, nErrors90: 1, nErrors100: 1, nErrors110: 1, nErrors120: 1, nErrors130: 1, nErrors140: 1, nErrors150: 1),
             new ParserTest160("CreateExternalTableStatementTests160.sql", nErrors80: 2, nErrors90: 2, nErrors100: 2, nErrors110: 2, nErrors120: 2, nErrors130: 2, nErrors140: 2, nErrors150: 2),
             new ParserTest160("WindowClauseTests160.sql", nErrors80: 14, nErrors90: 13, nErrors100: 13, nErrors110: 13, nErrors120: 13, nErrors130: 13, nErrors140: 13, nErrors150: 13),
             new ParserTest160("CreateExternalDataSourceStatementTests160.sql", nErrors80: 2, nErrors90: 2, nErrors100: 2, nErrors110: 2, nErrors120: 2, nErrors130: 0, nErrors140: 0, nErrors150: 0),
