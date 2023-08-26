@@ -2809,6 +2809,8 @@ azureOption returns [DatabaseOption vResult]
        vResult=azureMaxSizeDatabaseOption
      | {NextTokenMatches(CodeGenerationSupporter.Edition)}?
        vResult=azureEditionDatabaseOption
+     | {LA(3) == Identifier}?
+       vResult=azureElasticPoolServiceObjectiveDatabaseOption
      | vResult=azureServiceObjectiveDatabaseOption
     ;
 
@@ -2859,6 +2861,21 @@ azureServiceObjectiveDatabaseOption returns [LiteralDatabaseOption vResult=Fragm
             UpdateTokenInfo(vResult, tServiceObjective);
             vResult.OptionKind = DatabaseOptionKind.ServiceObjective;
             vResult.Value = vValue;
+        }
+    ;
+
+azureElasticPoolServiceObjectiveDatabaseOption returns [ElasticPoolSpecification vResult=FragmentFactory.CreateFragment<ElasticPoolSpecification>()]
+{
+    Identifier vIdentifier;
+}
+    : tServiceObjective:Identifier EqualsSign tElasticPool:Identifier LeftParenthesis tName:Identifier EqualsSign vIdentifier=identifier RightParenthesis
+        {
+            Match(tServiceObjective, CodeGenerationSupporter.ServiceObjective);
+            Match(tElasticPool, CodeGenerationSupporter.ElasticPool);
+            Match(tName, CodeGenerationSupporter.Name);
+            vResult.ElasticPoolName = vIdentifier;
+            vResult.OptionKind = DatabaseOptionKind.ServiceObjective;
+            UpdateTokenInfo(vResult, tServiceObjective);
         }
     ;
 
