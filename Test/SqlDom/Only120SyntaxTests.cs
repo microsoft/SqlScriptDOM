@@ -33,7 +33,7 @@ namespace SqlStudio.Tests.UTSqlScriptDom
 			new ParserTest120("TruncatePartitions120.sql", 1, 3, 3, 3),
 			new ParserTest120("IncrementalStatsTests.sql", 9, 8, 8, 8),
 			new ParserTest120("AlterProcedureStatementTests120.sql", 5, 5, 5, 5),
-			new ParserTest120("CreateAlterDatabaseStatementTestsAzure120.sql", 10, 10, 10, 10),
+			new ParserTest120("CreateAlterDatabaseStatementTestsAzure120.sql", 12, 12, 12, 12),
 			new ParserTest120("CreateAggregateStatementTests120.sql", 6, 2, 2, 2),
         };
 

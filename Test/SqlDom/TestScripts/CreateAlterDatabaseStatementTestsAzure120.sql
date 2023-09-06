@@ -12,3 +12,7 @@ alter database d1 modify (edition = 'basic', service_objective = 'basic')
 alter database d1 modify (service_objective = 'basic', maxsize = 100 mb)
 alter database d1 modify (maxsize = 1 gb, edition = 'basic', service_objective = 'basic')
 go
+
+-- Azure elastic pool
+create database d1 (service_objective = elastic_pool(name = [epool1] ))
+alter database d1 modify (service_objective = elastic_pool(name = [epool2] ))

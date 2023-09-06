@@ -323,6 +323,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         internal const string Dynamic = "DYNAMIC";
         internal const string DWCompatibilityLevel = "DW_COMPATIBILITY_LEVEL";
         internal const string Edition = "EDITION";
+        internal const string ElasticPool = "ELASTIC_POOL";
         internal const string Elements = "ELEMENTS";
         internal const string Emergency = "EMERGENCY";
         internal const string Empty = "EMPTY";
