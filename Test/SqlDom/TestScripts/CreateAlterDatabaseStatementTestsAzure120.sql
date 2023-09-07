@@ -16,3 +16,10 @@ go
 -- Azure elastic pool
 create database d1 (service_objective = elastic_pool(name = [epool1] ))
 alter database d1 modify (service_objective = elastic_pool(name = [epool2] ))
+go
+
+-- DB copy with service_objective
+create database d1_copy as copy of d1
+create database d2_copy as copy of d2 (service_objective = 'HS_Gen5_2')
+create database d3_copy as copy of d3 (service_objective = elastic_pool(name = [epool2] ))
+create database d4_copy as copy of server1.d4 (service_objective = elastic_pool(name = [epool3] ))

@@ -4384,12 +4384,14 @@ createDatabase returns [CreateDatabaseStatement vResult = FragmentFactory.Create
             ThrowPartialAstIfPhaseOne(vResult);
         }
       (
-        {NextTokenMatches(CodeGenerationSupporter.MaxSize,2) || NextTokenMatches(CodeGenerationSupporter.Edition,2) || NextTokenMatches(CodeGenerationSupporter.ServiceObjective,2)}?
-        azureOptions[vResult, vResult.Options]
-      |
-        {NextTokenMatches(CodeGenerationSupporter.Copy, 2)}?
-        azureAsCopyOf[vResult]
-      |
+            (
+                {NextTokenMatches(CodeGenerationSupporter.Copy, 2)}?
+                azureAsCopyOf[vResult]
+            )?
+            (
+                {NextTokenMatches(CodeGenerationSupporter.MaxSize,2) || NextTokenMatches(CodeGenerationSupporter.Edition,2) || NextTokenMatches(CodeGenerationSupporter.ServiceObjective,2)}?
+                azureOptions[vResult, vResult.Options]
+            )?
          (
             vContainment = dbContainmentOption
             {
