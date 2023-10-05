@@ -33,7 +33,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         /// </summary>
         /// <param name="tsqlParserVersion">The parser version to use.</param>
         /// <param name="initialQuotedIdentifiers">if set to <c>true</c> quoted identifiers will be on.</param>
-        public TSqlParser Create(SqlVersion tsqlParserVersion, bool initialQuotedIdentifiers)
+        public static TSqlParser CreateParser(SqlVersion tsqlParserVersion, bool initialQuotedIdentifiers)
         {
             switch (tsqlParserVersion)
             {
@@ -60,17 +60,28 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
             }
         }
 
+        [Obsolete("This method is obsolete. Call TSqlParser.CreateParser instead.")]
+        /// <summary>
+        /// Creates a TSqlParser for the specified version.
+        /// </summary>
+        /// <param name="tsqlParserVersion">The parser version to use.</param>
+        /// <param name="initialQuotedIdentifiers">if set to <c>true</c> quoted identifiers will be on.</param>
+        public TSqlParser Create(SqlVersion tsqlParserVersion, bool initialQuotedIdentifiers)
+        {
+            return TSqlParser.CreateParser(tsqlParserVersion, initialQuotedIdentifiers);
+        }
+
         #endregion
 
         #region Parser entry points
 
-        /// <summary>
-        /// The blocking parse method.
-        /// </summary>
-        /// <param name="input">The script that will be parsed.</param>
-        /// <param name="errors">The parse errors.</param>
-        /// <returns>The fragment that is created.</returns>        
-        public TSqlFragment Parse(TextReader input, out IList<ParseError> errors)
+            /// <summary>
+            /// The blocking parse method.
+            /// </summary>
+            /// <param name="input">The script that will be parsed.</param>
+            /// <param name="errors">The parse errors.</param>
+            /// <returns>The fragment that is created.</returns>        
+            public TSqlFragment Parse(TextReader input, out IList<ParseError> errors)
         {
             return Parse(input, out errors, 0, 1, 1);
         }

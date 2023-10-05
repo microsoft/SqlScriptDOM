@@ -47,7 +47,7 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                     Assert.Fail("New SqlVersion {0} needs to be added to knownVersionMapping.", version.ToString());
                 }
 
-                TSqlParser versionedParser = parser.Create(version, false);
+                TSqlParser versionedParser = TSqlParser.CreateParser(version, false);
 
                 Assert.IsNotNull(versionedParser, "Create parser returned null.");
                 Assert.IsInstanceOfType(versionedParser, expectedParserType, "Created parser is not of the expected type.");
