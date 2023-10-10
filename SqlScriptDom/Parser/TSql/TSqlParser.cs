@@ -60,12 +60,12 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
             }
         }
 
-        [Obsolete("This method is obsolete. Call TSqlParser.CreateParser instead.")]
         /// <summary>
         /// Creates a TSqlParser for the specified version.
         /// </summary>
         /// <param name="tsqlParserVersion">The parser version to use.</param>
         /// <param name="initialQuotedIdentifiers">if set to <c>true</c> quoted identifiers will be on.</param>
+        [Obsolete("This method is obsolete. Call TSqlParser.CreateParser instead.")]
         public TSqlParser Create(SqlVersion tsqlParserVersion, bool initialQuotedIdentifiers)
         {
             return TSqlParser.CreateParser(tsqlParserVersion, initialQuotedIdentifiers);
