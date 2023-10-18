@@ -51,6 +51,11 @@ namespace SqlStudio.Tests.UTSqlScriptDom
 
                 Assert.IsNotNull(versionedParser, "Create parser returned null.");
                 Assert.IsInstanceOfType(versionedParser, expectedParserType, "Created parser is not of the expected type.");
+
+                versionedParser = TSqlParser.CreateParser(version, false);
+
+                Assert.IsNotNull(versionedParser, "Create parser returned null.");
+                Assert.IsInstanceOfType(versionedParser, expectedParserType, "Created parser is not of the expected type.");
             }
         }
 
@@ -512,14 +517,14 @@ END;";
         {
             TSql160Parser parser = new TSql160Parser(true); IList<ParseError> errors;
            
-            string scriptString = @"create PROC [dbo].[test]  AS
-                                    BEGIN
-                                    CREATE TABLE #Test
-                                    ([Col1] [NVARCHAR](266));
-                                    COPY INTO #Test
-                                    FROM 'https://xxxx.blob.core.windows.net/raw/'
-                                    WITH (FIELDQUOTE='',FIRSTROW = 1)
-                                    END;";
+            string scriptString = @"create PROC [dbo].[test]  AS
+                                    BEGIN
+                                    CREATE TABLE #Test
+                                    ([Col1] [NVARCHAR](266));
+                                    COPY INTO #Test
+                                    FROM 'https://xxxx.blob.core.windows.net/raw/'
+                                    WITH (FIELDQUOTE='',FIRSTROW = 1)
+                                    END;";
            
             var script = new StringReader(scriptString);
             parser.Parse(script, out errors);
