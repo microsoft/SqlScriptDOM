@@ -1,1 +1,5 @@
-Test/* text eol=crlf
+# All files are checked into the repo with LF
+* text=auto
+
+# These files are checked out using CRLF locally
+Test/* eol=crlf
