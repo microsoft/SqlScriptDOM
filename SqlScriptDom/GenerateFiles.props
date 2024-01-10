@@ -41,15 +41,15 @@
     <Exec Command="java -cp &quot;$(AntlrLocation)&quot; antlr.Tool -o &quot;$(CsGenIntermediateOutputPath.TrimEnd('\'))&quot; &quot;%(GLexerParserCompile.Identity)&quot; &gt; NUL 2&gt;&amp;1" Condition="'$(OutputErrorInLexerParserCompile)' == 'false' And '$(OS)' != 'Windows_NT'" />
     <Exec Command="java -cp &quot;$(AntlrLocation)&quot; antlr.Tool -o &quot;$(CsGenIntermediateOutputPath.TrimEnd('\'))&quot; &quot;%(GLexerParserCompile.Identity)&quot; " Condition="'$(OutputErrorInLexerParserCompile)' == 'true' And '$(OS)' != 'Windows_NT'" />
 
+    <Exec Command="pwsh LexerPostProcessing.ps1 &quot;$(CsGenIntermediateOutputPath)%(GLexerParserCompile.Filename)LexerInternal.cs&quot; &quot;$(CsGenIntermediateOutputPath)%(GLexerParserCompile.Filename)LexerInternal_final.cs&quot;" Condition="'$(OS)' != 'Windows_NT'" />
+    <Exec Command="pwsh ParserPostProcessing.ps1 &quot;$(CsGenIntermediateOutputPath)%(GLexerParserCompile.Filename)ParserInternal.cs&quot; &quot;$(CsGenIntermediateOutputPath)%(GLexerParserCompile.Filename)ParserInternal_final.cs&quot;" Condition="'$(OS)' != 'Windows_NT'" />
+
+
     <Exec Command="&quot;$(AntlrLocation)&quot; -o &quot;$(CsGenIntermediateOutputPath.TrimEnd('\'))&quot; &quot;%(GLexerParserCompile.Identity)&quot; &gt; NUL 2&gt;&amp;1" Condition="'$(OutputErrorInLexerParserCompile)' == 'false' And '$(OS)' == 'Windows_NT'" />
     <Exec Command="&quot;$(AntlrLocation)&quot; -o &quot;$(CsGenIntermediateOutputPath.TrimEnd('\'))&quot; &quot;%(GLexerParserCompile.Identity)&quot; " Condition="'$(OutputErrorInLexerParserCompile)' == 'true' And '$(OS)' == 'Windows_NT'" />
 
-    <Exec Command="pwsh LexerPostProcessing.ps1 &quot;$(CsGenIntermediateOutputPath)%(GLexerParserCompile.Filename)LexerInternal.cs&quot; &quot;$(CsGenIntermediateOutputPath)%(GLexerParserCompile.Filename)LexerInternal_final.cs&quot;" />
-    <Exec Command="pwsh ParserPostProcessing.ps1 &quot;$(CsGenIntermediateOutputPath)%(GLexerParserCompile.Filename)ParserInternal.cs&quot; &quot;$(CsGenIntermediateOutputPath)%(GLexerParserCompile.Filename)ParserInternal_final.cs&quot;" />
-
-
-    <Exec Command="powershell -NonInteractive -Executionpolicy Unrestricted .\LexerPostProcessing.ps1 &quot;$(CsGenIntermediateOutputPath)%(GLexerParserCompile.Filename)LexerInternal.cs&quot; &quot;$(CsGenIntermediateOutputPath)%(GLexerParserCompile.Filename)LexerInternal_final.cs&quot;" />
-    <Exec Command="powershell -NonInteractive -Executionpolicy Unrestricted .\ParserPostProcessing.ps1 &quot;$(CsGenIntermediateOutputPath)%(GLexerParserCompile.Filename)ParserInternal.cs&quot; &quot;$(CsGenIntermediateOutputPath)%(GLexerParserCompile.Filename)ParserInternal_final.cs&quot;" />
+    <Exec Command="powershell -NonInteractive -Executionpolicy Unrestricted .\LexerPostProcessing.ps1 &quot;$(CsGenIntermediateOutputPath)%(GLexerParserCompile.Filename)LexerInternal.cs&quot; &quot;$(CsGenIntermediateOutputPath)%(GLexerParserCompile.Filename)LexerInternal_final.cs&quot;" Condition="'$(OS)' == 'Windows_NT'" />
+    <Exec Command="powershell -NonInteractive -Executionpolicy Unrestricted .\ParserPostProcessing.ps1 &quot;$(CsGenIntermediateOutputPath)%(GLexerParserCompile.Filename)ParserInternal.cs&quot; &quot;$(CsGenIntermediateOutputPath)%(GLexerParserCompile.Filename)ParserInternal_final.cs&quot;" Condition="'$(OS)' == 'Windows_NT'" />
 
     <ItemGroup>
       <Compile Condition="'$(SqlDomNuget)'!='true'" Include="$(CsGenIntermediateOutputPath)%(GLexerParserCompile.Filename)LexerInternal_final.cs" />
