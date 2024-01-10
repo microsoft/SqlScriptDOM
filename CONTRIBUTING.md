@@ -64,7 +64,11 @@ provided by the bot. You will only need to do this once across all repos using o
     - macOS: `brew install openjdk`
     - Linux: see https://openjdk.org/install/
 
-5. Clone the repository
+3. Install PowerShell Core
+    - macOS: `brew install powershell/tap/powershell`
+    - Linux: see https://learn.microsoft.com/powershell/scripting/install/installing-powershell-on-linux
+
+4. Clone the repository
     ```
         git clone https://github.com/microsoft/SqlScriptDOM
     ```
