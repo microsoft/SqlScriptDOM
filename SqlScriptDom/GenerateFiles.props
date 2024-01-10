@@ -26,16 +26,27 @@
     </DownloadFile>
   </Target>
   <Target Name="GSqlTokenTypesCompile" Condition="'@(GSqlTokenTypesCompile)'!=''" DependsOnTargets="CreateCsGenIntermediateOutputPath;InstallAntlr" BeforeTargets="CoreCompile" Inputs="@(GSqlTokenTypesCompile)" Outputs="@(GSqlTokenTypesCompile->'$(CsGenIntermediateOutputPath)%(filename)_final.cs')">
-    <Exec Command="&quot;$(AntlrLocation)&quot; -o &quot;$(CsGenIntermediateOutputPath.TrimEnd('\'))&quot; &quot;%(GSqlTokenTypesCompile.Identity)&quot;" />
-    <Exec Command="powershell -NonInteractive -Executionpolicy Unrestricted .\TSqlTokenTypes.ps1 &quot;$(CsGenIntermediateOutputPath)%(GSqlTokenTypesCompile.Filename).cs&quot; &quot;$(CsGenIntermediateOutputPath)%(GSqlTokenTypesCompile.Filename)_final.cs&quot;" />
+    <Exec Command="java -cp &quot;$(AntlrLocation)&quot; antlr.Tool -o &quot;$(CsGenIntermediateOutputPath.TrimEnd('\'))&quot; &quot;%(GSqlTokenTypesCompile.Identity)&quot;" Condition="'$(OS)' != 'Windows_NT'" />
+    <Exec Command="pwsh TSqlTokenTypes.ps1 &quot;$(CsGenIntermediateOutputPath)%(GSqlTokenTypesCompile.Filename).cs&quot; &quot;$(CsGenIntermediateOutputPath)%(GSqlTokenTypesCompile.Filename)_final.cs&quot;" Condition="'$(OS)' != 'Windows_NT'" />
+
+    <Exec Command="&quot;$(AntlrLocation)&quot; -o &quot;$(CsGenIntermediateOutputPath.TrimEnd('\'))&quot; &quot;%(GSqlTokenTypesCompile.Identity)&quot;" Condition="'$(OS)' == 'Windows_NT'" />
+    <Exec Command="powershell -NonInteractive -Executionpolicy Unrestricted .\TSqlTokenTypes.ps1 &quot;$(CsGenIntermediateOutputPath)%(GSqlTokenTypesCompile.Filename).cs&quot; &quot;$(CsGenIntermediateOutputPath)%(GSqlTokenTypesCompile.Filename)_final.cs&quot;" Condition="'$(OS)' == 'Windows_NT'" />
+
     <ItemGroup>
       <Compile Condition="'$(SqlDomNuget)'!='true'" Include="$(CsGenIntermediateOutputPath)%(GSqlTokenTypesCompile.Filename)_final.cs" />
     </ItemGroup>
   </Target>
   <Target Name="GLexerParserCompile" Condition="'@(GLexerParserCompile)'!=''" DependsOnTargets="CreateCsGenIntermediateOutputPath;InstallAntlr" BeforeTargets="CoreCompile" Inputs="@(GLexerParserCompile)" Outputs="@(GLexerParserCompile->'$(CsGenIntermediateOutputPath)%(filename)ParserInternal_final.cs');@(GLexerParserCompile->'$(CsGenIntermediateOutputPath)%(filename)LexerInternal_final.cs')">
     <!--Based on property we either run antlr with all warnings and errors supressed or not-->
-    <Exec Command="&quot;$(AntlrLocation)&quot; -o &quot;$(CsGenIntermediateOutputPath.TrimEnd('\'))&quot; &quot;%(GLexerParserCompile.Identity)&quot; &gt; NUL 2&gt;&amp;1" Condition="'$(OutputErrorInLexerParserCompile)' == 'false'" />
-    <Exec Command="&quot;$(AntlrLocation)&quot; -o &quot;$(CsGenIntermediateOutputPath.TrimEnd('\'))&quot; &quot;%(GLexerParserCompile.Identity)&quot; " Condition="'$(OutputErrorInLexerParserCompile)' == 'true'" />
+    <Exec Command="java -cp &quot;$(AntlrLocation)&quot; antlr.Tool -o &quot;$(CsGenIntermediateOutputPath.TrimEnd('\'))&quot; &quot;%(GLexerParserCompile.Identity)&quot; &gt; NUL 2&gt;&amp;1" Condition="'$(OutputErrorInLexerParserCompile)' == 'false' And '$(OS)' != 'Windows_NT'" />
+    <Exec Command="java -cp &quot;$(AntlrLocation)&quot; antlr.Tool -o &quot;$(CsGenIntermediateOutputPath.TrimEnd('\'))&quot; &quot;%(GLexerParserCompile.Identity)&quot; " Condition="'$(OutputErrorInLexerParserCompile)' == 'true' And '$(OS)' != 'Windows_NT'" />
+
+    <Exec Command="&quot;$(AntlrLocation)&quot; -o &quot;$(CsGenIntermediateOutputPath.TrimEnd('\'))&quot; &quot;%(GLexerParserCompile.Identity)&quot; &gt; NUL 2&gt;&amp;1" Condition="'$(OutputErrorInLexerParserCompile)' == 'false' And '$(OS)' == 'Windows_NT'" />
+    <Exec Command="&quot;$(AntlrLocation)&quot; -o &quot;$(CsGenIntermediateOutputPath.TrimEnd('\'))&quot; &quot;%(GLexerParserCompile.Identity)&quot; " Condition="'$(OutputErrorInLexerParserCompile)' == 'true' And '$(OS)' == 'Windows_NT'" />
+
+    <Exec Command="pwsh LexerPostProcessing.ps1 &quot;$(CsGenIntermediateOutputPath)%(GLexerParserCompile.Filename)LexerInternal.cs&quot; &quot;$(CsGenIntermediateOutputPath)%(GLexerParserCompile.Filename)LexerInternal_final.cs&quot;" />
+    <Exec Command="pwsh ParserPostProcessing.ps1 &quot;$(CsGenIntermediateOutputPath)%(GLexerParserCompile.Filename)ParserInternal.cs&quot; &quot;$(CsGenIntermediateOutputPath)%(GLexerParserCompile.Filename)ParserInternal_final.cs&quot;" />
+
 
     <Exec Command="powershell -NonInteractive -Executionpolicy Unrestricted .\LexerPostProcessing.ps1 &quot;$(CsGenIntermediateOutputPath)%(GLexerParserCompile.Filename)LexerInternal.cs&quot; &quot;$(CsGenIntermediateOutputPath)%(GLexerParserCompile.Filename)LexerInternal_final.cs&quot;" />
     <Exec Command="powershell -NonInteractive -Executionpolicy Unrestricted .\ParserPostProcessing.ps1 &quot;$(CsGenIntermediateOutputPath)%(GLexerParserCompile.Filename)ParserInternal.cs&quot; &quot;$(CsGenIntermediateOutputPath)%(GLexerParserCompile.Filename)ParserInternal_final.cs&quot;" />
@@ -46,16 +57,16 @@
     </ItemGroup>
   </Target>
   <Target Name="CreateAST" DependsOnTargets="AfterResolveReferences;GSqlTokenTypesCompile" BeforeTargets="CoreCompile" Inputs="$(SQLSCRIPTDOM)\Parser\TSql\Ast.xml;" Outputs="$(CsGenIntermediateOutputPath)Ast.cs;$(CsGenIntermediateOutputPath)TSqlConcreteFragmentVisitor.codegen.cs">
-    <Exec Condition="'$(SqlDomNuget)'!='true'" Command="&quot;$(BuildToolsPath)\AstGen.exe&quot; &quot;$(SQLSCRIPTDOM)\Parser\TSql\Ast.xml&quot; &quot;$(CsGenIntermediateOutputPath)TSqlFragmentVisitor.codegen.cs&quot; &quot;$(CsGenIntermediateOutputPath)TSqlConcreteFragmentVisitor.codegen.cs&quot; &quot;$(CsGenIntermediateOutputPath)Ast.cs&quot; &quot;" />
-    <Exec Condition="'$(SqlDomNuget)'=='true'" Command="&quot;$(BuildToolsPath)\AstGen.exe&quot; &quot;$(SQLSCRIPTDOM)\Parser\TSql\Ast.xml&quot; &quot;$(CsGenIntermediateOutputPath)TSqlFragmentVisitor.codegen.cs&quot; &quot;$(CsGenIntermediateOutputPath)TSqlConcreteFragmentVisitor.codegen.cs&quot; &quot;$(CsGenIntermediateOutputPath)Ast.cs&quot; -test &quot;$(CsGenIntermediateOutputPath)\OverrideSqlScriptGeneratorVisitor.codegen.cs&quot; &quot;" />
+    <Exec Condition="'$(SqlDomNuget)'!='true'" Command="&quot;$(BuildToolsPath)/AstGen&quot; &quot;$(SQLSCRIPTDOM)/Parser/TSql/Ast.xml&quot; &quot;$(CsGenIntermediateOutputPath)TSqlFragmentVisitor.codegen.cs&quot; &quot;$(CsGenIntermediateOutputPath)TSqlConcreteFragmentVisitor.codegen.cs&quot; &quot;$(CsGenIntermediateOutputPath)Ast.cs&quot; " />
+    <Exec Condition="'$(SqlDomNuget)'=='true'" Command="&quot;$(BuildToolsPath)/AstGen&quot; &quot;$(SQLSCRIPTDOM)/Parser/TSql/Ast.xml&quot; &quot;$(CsGenIntermediateOutputPath)TSqlFragmentVisitor.codegen.cs&quot; &quot;$(CsGenIntermediateOutputPath)TSqlConcreteFragmentVisitor.codegen.cs&quot; &quot;$(CsGenIntermediateOutputPath)Ast.cs&quot; -test &quot;$(CsGenIntermediateOutputPath)/OverrideSqlScriptGeneratorVisitor.codegen.cs&quot; &quot;" />
     <ItemGroup>
       <Compile Condition="'$(SqlDomNuget)'!='true'" Include="$(CsGenIntermediateOutputPath)Ast.cs" />
       <Compile Condition="'$(SqlDomNuget)'!='true'" Include="$(CsGenIntermediateOutputPath)TSqlConcreteFragmentVisitor.codegen.cs" />
     </ItemGroup>
   </Target>
   <Target Name="GenerateEverything" DependsOnTargets="AfterResolveReferences;GSqlTokenTypesCompile" BeforeTargets="CoreCompile" Inputs="$(SQLSCRIPTDOM)\ScriptDom\SqlServer\Settings\SqlScriptGeneratorOptions.xml" Outputs="$(CsGenIntermediateOutputPath)TSqlTokenTypes.txt;$(CsGenIntermediateOutputPath)TSqlFragmentVisitor.codegen.cs;$(CsGenIntermediateOutputPath)SqlScriptGeneratorOptions.cs;$(CsGenIntermediateOutputPath)ScriptGeneratorSupporter.Generated.cs">
-    <Exec Command="&quot;$(BuildToolsPath)\ScriptGenSettingsGenerator.exe&quot; &quot;$(SQLSCRIPTDOM)\ScriptDom\SqlServer\Settings\SqlScriptGeneratorOptions.xml&quot; &quot;$(CsGenIntermediateOutputPath)SqlScriptGeneratorOptions.cs&quot; &quot;$(CsGenIntermediateOutputPath)SqlScriptGeneratorOptionsAdapter.Generated.cs&quot;" />
-    <Exec Command="&quot;$(BuildToolsPath)\TokenListGenerator.exe&quot; &quot;$(CsGenIntermediateOutputPath)TSqlTokenTypes.txt&quot; &gt; &quot;$(CsGenIntermediateOutputPath)ScriptGeneratorSupporter.Generated.cs&quot;" />
+    <Exec Command="&quot;$(BuildToolsPath)/ScriptGenSettingsGenerator&quot; &quot;$(SQLSCRIPTDOM)/ScriptDom/SqlServer/Settings/SqlScriptGeneratorOptions.xml&quot; &quot;$(CsGenIntermediateOutputPath)SqlScriptGeneratorOptions.cs&quot; &quot;$(CsGenIntermediateOutputPath)SqlScriptGeneratorOptionsAdapter.Generated.cs&quot;" />
+    <Exec Command="&quot;$(BuildToolsPath)/TokenListGenerator&quot; &quot;$(CsGenIntermediateOutputPath)TSqlTokenTypes.txt&quot; &gt; &quot;$(CsGenIntermediateOutputPath)ScriptGeneratorSupporter.Generated.cs&quot;" />
     <ItemGroup>
       <Compile Condition="'$(SqlDomNuget)'!='true'" Include="$(CsGenIntermediateOutputPath)ScriptGeneratorSupporter.Generated.cs" />
       <Compile Condition="'$(SqlDomNuget)'!='true'" Include="$(CsGenIntermediateOutputPath)SqlScriptGeneratorOptions.cs" />
