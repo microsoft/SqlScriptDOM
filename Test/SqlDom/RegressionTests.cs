@@ -65,13 +65,13 @@ namespace SqlStudio.Tests.UTSqlScriptDom
 WITH (MEMORY_OPTIMIZED = ON);";
 
 			StringReader scriptReader = new StringReader(script);			
-			Parse(scriptReader).Accept(new IndexDefinitionVisitor(5, 76, 307));
+			Parse(scriptReader).Accept(new IndexDefinitionVisitor(5, 76, script.IndexOf(@"INDEX [ix_UserId] NONCLUSTERED HASH ([UserId]) WITH (BUCKET_COUNT = 1048576)")));
 
 			script = @"CREATE TABLE [dbo].[tbl] (
     [ShoppingCartId] INT NOT NULL INDEX [range_index]
 );";
 			scriptReader = new StringReader(script);			
-			Parse(scriptReader).Accept(new IndexDefinitionVisitor(35, 19, 62));
+			Parse(scriptReader).Accept(new IndexDefinitionVisitor(35, 19, script.IndexOf(@"INDEX [range_index]")));
 		}
 
         /// <summary>

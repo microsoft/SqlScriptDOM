@@ -2100,20 +2100,21 @@ create table t1 (c1 int);",
         public void SQL46010Test()
         {
             string testNumber = "SQL46010";
-
-            ParserTestUtils.ErrorTestAllParsers(
-@"create table t1 column1 float varying);
+            string sql46010TestSyntax = @"create table t1 column1 float varying);
 -- tests label having quotes
 goto [labelName];
 go
 CREATE TABLE ...t1 (c1 INT);
 go
 -- test the paranthesis checking code.
-select * from ((t1));",
+select * from ((t1));";
+
+            ParserTestUtils.ErrorTestAllParsers(
+                sql46010TestSyntax,
                 new ParserErrorInfo(16, testNumber, "column1"),
-                new ParserErrorInfo(76, testNumber, "[labelName]"),
-                new ParserErrorInfo(110, testNumber, "t1"),
-                new ParserErrorInfo(184, testNumber, "t1")
+                new ParserErrorInfo(sql46010TestSyntax.IndexOf(@"[labelName]"), testNumber, "[labelName]"),
+                new ParserErrorInfo(sql46010TestSyntax.IndexOf(@"...t1")+3, testNumber, "t1"),
+                new ParserErrorInfo(sql46010TestSyntax.IndexOf(@"t1));"), testNumber, "t1")
                 );
         }
 
@@ -2187,15 +2188,16 @@ select * from ((t1));",
         public void SQL46016Test()
         {
             string testNumber = "SQL46016";
-
-            ParserTestUtils.ErrorTestAllParsers(
-@"CREATE Table t11 (c1 as master...d);
+            string sql46016TestSyntax = @"CREATE Table t11 (c1 as master...d);
 go
 READTEXT c1 @ptrval 1 25;
-READTEXT t1..c1 @ptrval 1 25",
+READTEXT t1..c1 @ptrval 1 25";
+
+            ParserTestUtils.ErrorTestAllParsers(
+                sql46016TestSyntax,
                 new ParserErrorInfo(24, testNumber),
-                new ParserErrorInfo(51, testNumber),
-                new ParserErrorInfo(78, testNumber));
+                new ParserErrorInfo(sql46016TestSyntax.IndexOf(@"c1 @ptrval"), testNumber),
+                new ParserErrorInfo(sql46016TestSyntax.IndexOf(@"t1..c1"), testNumber));
         }
 
 
@@ -2210,7 +2212,7 @@ declare @t1 Table (c1 int, foreign key references t2);";
 
             ParserTestUtils.ErrorTestAllParsers(testScript,
                 new ParserErrorInfo(26, "SQL46010", "references"),
-                new ParserErrorInfo(70, "SQL46010", "foreign"));
+                new ParserErrorInfo(testScript.IndexOf(@"foreign"), "SQL46010", "foreign"));
         }
 
         [TestMethod]
@@ -2225,7 +2227,7 @@ declare @t2 table (c1 int, connection(n1 to n2)) as edge;";
             ParserTestUtils.ErrorTest150(
                 testScript,
                 new ParserErrorInfo(27, "SQL46010", "constraint"),
-                new ParserErrorInfo(114, "SQL46010", "to"));
+                new ParserErrorInfo(testScript.IndexOf(@"to n2"), "SQL46010", "to"));
         }
 
         [TestMethod]
@@ -2270,9 +2272,7 @@ declare @t2 table (c1 int, connection(n1 to n2)) as edge;";
         public void SQL46021Test()
         {
             string testNumber = "SQL46021";
-
-            ParserTestUtils.ErrorTestAllParsers(
-@"create default dbName.dbo.r1 as (-10)
+            string sql46021TestSyntax = @"create default dbName.dbo.r1 as (-10)
 GO
 
 create rule dbName.dbo.r1 as @a1 > 10
@@ -2285,7 +2285,10 @@ select * from t1;
 GO
 
 CREATE PROCEDURE dbName..p1 AS select * from t1
-GO",
+GO";
+
+            ParserTestUtils.ErrorTestAllParsers(
+                sql46021TestSyntax,
                 new ParserErrorInfo(15, testNumber, CodeGenerationSupporter.Default),
                 new ParserErrorInfo(57, testNumber, CodeGenerationSupporter.Rule),
                 new ParserErrorInfo(105, testNumber, CodeGenerationSupporter.Trigger),
@@ -4353,11 +4356,12 @@ select 1",
 		[SqlStudioTestCategory(Category.UnitTest)]
         public void RouteOptionDuplicationErrorTest()
         {
-            ParserTestUtils.ErrorTest90AndAbove(
-@"CREATE ROUTE [Route1] WITH
+            string duplicateServiceNameSyntax = @"CREATE ROUTE [Route1] WITH
     SERVICE_NAME = '//Adventure-Works.com/Expenses',
-    SERVICE_NAME = '//Adventure-Works.com/Expenses'",
-                new ParserErrorInfo(86, "SQL46049", "SERVICE_NAME"));
+    SERVICE_NAME = '//Adventure-Works.com/Expenses'";
+            ParserTestUtils.ErrorTest90AndAbove(
+                duplicateServiceNameSyntax,
+                new ParserErrorInfo(duplicateServiceNameSyntax.IndexOf(@"SERVICE_NAME",75), "SQL46049", "SERVICE_NAME"));
 
             ParserTestUtils.ErrorTest90AndAbove(
 @"CREATE ROUTE [Route1] WITH LIFETIME = 10, LIFETIME = 10",
@@ -5412,33 +5416,36 @@ WITH (
 
             // Create column encryption key typo, should be ENCRYPTED_VALUE
             //
-            ParserTestUtils.ErrorTest130(@"
+            string cekTypoSyntax = @"
 CREATE COLUMN ENCRYPTION KEY OneValueCEK
 WITH VALUES
 (
     COLUMN_MASTER_KEY = CMK1,
     ALGORITHM = 'RSA_OAEP',
     ENCRYPTED VALUE = 0x01700000016C006F00630061006C006D0061006300680069006E0065002F006D0079002F003200660061006600640038003100320031003400340034006500620031006100320065003000360039003300340038006100350064003400300032003300380065006600620063006300610031006300284FC4316518CF3328A6D9304F65DD2CE387B79D95D077B4156E9ED8683FC0E09FA848275C685373228762B02DF2522AFF6D661782607B4A2275F2F922A5324B392C9D498E4ECFC61B79F0553EE8FB2E5A8635C4DBC0224D5A7F1B136C182DCDE32A00451F1A7AC6B4492067FD0FAC7D3D6F4AB7FC0E86614455DBB2AB37013E0A5B8B5089B180CA36D8B06CDB15E95A7D06E25AACB645D42C85B0B7EA2962BD3080B9A7CDB805C6279FE7DD6941E7EA4C2139E0D4101D8D7891076E70D433A214E82D9030CF1F40C503103075DEEB3D64537D15D244F503C2750CF940B71967F51095BFA51A85D2F764C78704CAB6F015EA87753355367C5C9F66E465C0C66BADEDFDF76FB7E5C21A0D89A2FCCA8595471F8918B1387E055FA0B816E74201CD5C50129D29C015895CD073925B6EA87CAF4A4FAF018C06A3856F5DFB724F42807543F777D82B809232B465D983E6F19DFB572BEA7B61C50154605452A891190FB5A0C4E464862CF5EFAD5E7D91F7D65AA1A78F688E69A1EB098AB42E95C674E234173CD7E0925541AD5AE7CED9A3D12FDFE6EB8EA4F8AAD2629D4F5A18BA3DDCC9CF7F352A892D4BEBDC4A1303F9C683DACD51A237E34B045EBE579A381E26B40DCFBF49EFFA6F65D17F37C6DBA54AA99A65D5573D4EB5BA038E024910A4D36B79A1D4E3C70349DADFF08FD8B4DEE77FDB57F01CB276ED5E676F1EC973154F86
-);", new ParserErrorInfo(124, "SQL46010", "ENCRYPTED"));
+);";
+            ParserTestUtils.ErrorTest130(cekTypoSyntax, new ParserErrorInfo(cekTypoSyntax.IndexOf(@"ENCRYPTED VALUE"), "SQL46010", "ENCRYPTED"));
 
             // Alter column encryption key missing parameters
             //
-            ParserTestUtils.ErrorTest130(@"
+            string cekMissingParametersSyntax = @"
 ALTER COLUMN ENCRYPTION KEY OneValueCEK
 ADD VALUE
 (
     COLUMN_MASTER_KEY = CMK2
-);", new ParserErrorInfo(87, "SQL46010", ")"));
+);";
+            ParserTestUtils.ErrorTest130(cekMissingParametersSyntax, new ParserErrorInfo(cekMissingParametersSyntax.IndexOf(@");"), "SQL46010", ")"));
 
             // Alter column encryption key with extra parameters
             //
-            ParserTestUtils.ErrorTest130(@"ALTER COLUMN ENCRYPTION KEY OneValueCEK
+            string cekExtraParametersSyntax = @"ALTER COLUMN ENCRYPTION KEY OneValueCEK
 DROP VALUE
 (
     COLUMN_MASTER_KEY = CMK2,
     ALGORITHM = 'RSA_OAEP',
     ENCRYPTED_VALUE = 0x016E000001630075007200720065006E00740075007300650072002F006D0079002F0064006500650063006200660034006100340031003000380034006200350033003200360066003200630062006200350030003600380065003900620061003000320030003600610037003800310066001DDA6134C3B73A90D349C8905782DD819B428162CF5B051639BA46EC69A7C8C8F81591A92C395711493B25DCBCCC57836E5B9F17A0713E840721D098F3F8E023ABCDFE2F6D8CC4339FC8F88630ED9EBADA5CA8EEAFA84164C1095B12AE161EABC1DF778C07F07D413AF1ED900F578FC00894BEE705EAC60F4A5090BBE09885D2EFE1C915F7B4C581D9CE3FDAB78ACF4829F85752E9FC985DEB8773889EE4A1945BD554724803A6F5DC0A2CD5EFE001ABED8D61E8449E4FAA9E4DD392DA8D292ECC6EB149E843E395CDE0F98D04940A28C4B05F747149B34A0BAEC04FFF3E304C84AF1FF81225E615B5F94E334378A0A888EF88F4E79F66CB377E3C21964AACB5049C08435FE84EEEF39D20A665C17E04898914A85B3DE23D56575EBC682D154F4F15C37723E04974DB370180A9A579BC84F6BC9B5E7C223E5CBEE721E57EE07EFDCC0A3257BBEBF9ADFFB00DBF7EF682EC1C4C47451438F90B4CF8DA709940F72CFDC91C6EB4E37B4ED7E2385B1FF71B28A1D2669FBEB18EA89F9D391D2FDDEA0ED362E6A591AC64EF4AE31CA8766C259ECB77D01A7F5C36B8418F91C1BEADDD4491C80F0016B66421B4B788C55127135DA2FA625FB7FD195FB40D90A6C67328602ECAF3EC4F5894BFD84A99EB4753BE0D22E0D4DE6A0ADFEDC80EB1B556749B4A8AD00E73B329C95827AB91C0256347E85E3C5FD6726D0E1FE82C925D3DF4A9
-);", new ParserErrorInfo(84, "SQL46010", ","));
+);";
+            ParserTestUtils.ErrorTest130(cekExtraParametersSyntax, new ParserErrorInfo(cekExtraParametersSyntax.IndexOf(@"CMK2,")+2, "SQL46010", ","));
 
             // Drop column encryption key missing keyworkd
             //
@@ -5472,12 +5479,11 @@ WITH VALUES
 
             // Create column master key definition statement missing a quote (')
             //
-            ParserTestUtils.ErrorTest130(
-@"CREATE COLUMN MASTER KEY
+            string cmkMissingQuoteSyntax = @"CREATE COLUMN MASTER KEY
 WITH (
      KEY_STORE_PROVIDER_NAME = 'MSSQL_CERTIFICATE_STORE,
-     KEY_PATH = 'Current User/Personal/f2260f28d909d21c642a3d8e0b45a830e79a1420');",
-    new ParserErrorInfo(171, "SQL46030", "');"));
+     KEY_PATH = 'Current User/Personal/f2260f28d909d21c642a3d8e0b45a830e79a1420');";
+            ParserTestUtils.ErrorTest130(cmkMissingQuoteSyntax, new ParserErrorInfo(cmkMissingQuoteSyntax.IndexOf(@"'MSSQL_CERTIFICATE_STORE,")+24, "SQL46030", "');"));
         }
 
 
@@ -5968,7 +5974,7 @@ BEGIN
 END";
             // Typo in the keyword
             //
-            ParserTestUtils.ErrorTest150(query1, new ParserErrorInfo(67, "SQL46010", "ILINE"));
+            ParserTestUtils.ErrorTest150(query1, new ParserErrorInfo(query1.IndexOf(@"ILINE"), "SQL46010", "ILINE"));
 
             string query2 = @"CREATE OR ALTER FUNCTION [dbo].[test_udf2]
 ( )
@@ -6044,7 +6050,7 @@ USING (Source
 WHEN NOT MATCHED BY SOURCE THEN DELETE OUTPUT inserted.*, deleted.*;";
             // Typo in the Match Clause.
             //
-            ParserTestUtils.ErrorTest150(query1, new ParserErrorInfo(210, "SQL46010", ">"));
+            ParserTestUtils.ErrorTest150(query1, new ParserErrorInfo(query1.IndexOf(@">Dog"), "SQL46010", ">"));
 
             string query2 = @"MERGE INTO Owns
 
@@ -6517,9 +6523,9 @@ WHEN NOT MATCHED BY SOURCE THEN DELETE OUTPUT inserted.*, deleted.*;";
             ParserTestUtils.ErrorTest140(invalidToSyntax, new ParserErrorInfo(10, "SQL46010", "FROM"));
             ParserTestUtils.ErrorTest150(invalidToSyntax, new ParserErrorInfo(10, "SQL46010", "FROM"));
 
-            ParserTestUtils.ErrorTest130(invalidOptionSyntax, new ParserErrorInfo(217, "SQL46010", ","));
-            ParserTestUtils.ErrorTest140(invalidOptionSyntax, new ParserErrorInfo(217, "SQL46010", ","));
-            ParserTestUtils.ErrorTest150(invalidOptionSyntax, new ParserErrorInfo(217, "SQL46010", ","));
+            ParserTestUtils.ErrorTest130(invalidOptionSyntax, new ParserErrorInfo(invalidOptionSyntax.IndexOf(@"FIELDTERMINATOR,")+15, "SQL46010", ","));
+            ParserTestUtils.ErrorTest140(invalidOptionSyntax, new ParserErrorInfo(invalidOptionSyntax.IndexOf(@"FIELDTERMINATOR,")+15, "SQL46010", ","));
+            ParserTestUtils.ErrorTest150(invalidOptionSyntax, new ParserErrorInfo(invalidOptionSyntax.IndexOf(@"FIELDTERMINATOR,")+15, "SQL46010", ","));
 
             ParserTestUtils.ErrorTest130(invalidIdentityOptionSyntax, new ParserErrorInfo(1,
                 "SQL46130", "IDENTITY_INSERT"));
@@ -6635,12 +6641,12 @@ WHEN NOT MATCHED BY SOURCE THEN DELETE OUTPUT inserted.*, deleted.*;";
 
             // parameters declared more than once
             //
-            ParserTestUtils.ErrorTest160(
-                @"SELECT * FROM OPENROWSET(PROVIDER = 'CosmosDB',
+            string multipleParameterDeclarationSynax = @"SELECT * FROM OPENROWSET(PROVIDER = 'CosmosDB',
                     SERVER_CREDENTIAL = 'x',
                     OBJECT = 'y', CONNECTION = 'a', CONNECTION = 'b')
-                    with (a varchar(10)) as cols",
-                new ParserErrorInfo(147, "SQL46049", "CONNECTION"));
+                    with (a varchar(10)) as cols";
+            ParserTestUtils.ErrorTest160(multipleParameterDeclarationSynax,
+                new ParserErrorInfo(multipleParameterDeclarationSynax.IndexOf(@"CONNECTION = 'a', CONNECTION")+18, "SQL46049", "CONNECTION"));
 
             // Not all parameters provided
             //
@@ -6736,31 +6742,27 @@ WHEN NOT MATCHED BY SOURCE THEN DELETE OUTPUT inserted.*, deleted.*;";
         {
             // Empty WITH clause
             //
-            ParserTestUtils.ErrorTest160(
-                @"SELECT *
+            string emptyWithClauseSyntax = @"SELECT *
                  FROM OPENROWSET ('a', 'b', [dbo].[tbl])
-                 WITH () AS a;",
-                new ParserErrorInfo(91, "SQL46010", ")"));
+                 WITH () AS a;";
+            ParserTestUtils.ErrorTest160(emptyWithClauseSyntax, new ParserErrorInfo(emptyWithClauseSyntax.IndexOf(@"() AS a")+1, "SQL46010", ")"));
 
             // Invalid WITH clause
             //
-            ParserTestUtils.ErrorTest160(
-                @"SELECT *
+            string invalidWithClauseSyntax = @"SELECT *
                  FROM OPENROWSET ('a', 'b', c)
-                 WITH (A = 5) AS a;",
-                new ParserErrorInfo(83, "SQL46010", "="));
+                 WITH (A = 5) AS a;";
+            ParserTestUtils.ErrorTest160(invalidWithClauseSyntax, new ParserErrorInfo(invalidWithClauseSyntax.IndexOf(@"(A = 5)")+3, "SQL46010", "="));
 
-            ParserTestUtils.ErrorTest160(
-               @"SELECT *
+            string invalidWithClause2Syntax = @"SELECT *
                  FROM OPENROWSET ('a', 'b', [mytable])
-                 WITH (a) AS a;",
-               new ParserErrorInfo(90, "SQL46010", ")"));
+                 WITH (a) AS a;";
+            ParserTestUtils.ErrorTest160(invalidWithClause2Syntax, new ParserErrorInfo(invalidWithClause2Syntax.IndexOf(@"(a)")+2, "SQL46010", ")"));
 
-            ParserTestUtils.ErrorTest160(
-              @"SELECT *
+            string invalidWithClause3Syntax = @"SELECT *
                 FROM OPENROWSET ('a', 'b', [ab cd])
-                WITH a;",
-              new ParserErrorInfo(84, "SQL46010", "a"));
+                WITH a;";
+            ParserTestUtils.ErrorTest160(invalidWithClause3Syntax, new ParserErrorInfo(invalidWithClause3Syntax.IndexOf(@"a;"), "SQL46010", "a"));
         }
     }
 }

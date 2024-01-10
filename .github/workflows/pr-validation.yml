@@ -32,3 +32,11 @@ jobs:
 
       - name: Run tests
         run: dotnet test
+
+  test-linux: #runs only P0 tests on linux
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - uses: actions/checkout@v2
+      - name: Run tests
+        run: dotnet test --filter Priority=0
