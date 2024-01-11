@@ -1726,7 +1726,7 @@ GO
                              LOCATION = 'hdfs://10.10.10.10:8050',
                              PUSHDOWN = TEST
                          )";
-            ParserTestUtils.ErrorTest150(externalDataSourceCreateCommand, new ParserErrorInfo(258, "SQL46010", "TEST"));
+            ParserTestUtils.ErrorTest150(externalDataSourceCreateCommand, new ParserErrorInfo(externalDataSourceCreateCommand.IndexOf("TEST"), "SQL46010", "TEST"));
         }
         [TestMethod]
 		[Priority(0)]
@@ -3283,7 +3283,7 @@ select 1",
                                             IMPORTANCE = HIGH
                                             )";
             ParserTestUtils.ErrorTest130(query3,
-                new ParserErrorInfo(query3.IndexOf("WORKLOAD_GROUP"), "SQL46049", "WORKLOAD_GROUP"));
+                new ParserErrorInfo(query3.IndexOf("WORKLOAD_GROUP", 160), "SQL46049", "WORKLOAD_GROUP"));
 
             string query4 = @"CREATE WORKLOAD CLASSIFIER wcAllOptions 
                                             WITH(
