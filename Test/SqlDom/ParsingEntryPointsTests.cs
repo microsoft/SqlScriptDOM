@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Text.RegularExpressions;
 using Microsoft.SqlServer.TransactSql.ScriptDom;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SqlStudio.Tests.AssemblyTools.TestCategory;
@@ -67,7 +68,9 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                 reader.Close();
                 Assert.IsNotNull(actual);
                 Assert.AreEqual<int>(0, errors.Count);
-                Assert.AreEqual<string>(script, GenerateSource(scriptGen, actual));
+                string normalizedScript = Regex.Replace(script, @"\r\n|\n\r|\n|\r", Environment.NewLine);
+                string normalizedActual = Regex.Replace(GenerateSource(scriptGen, actual), @"\r\n|\n\r|\n|\r", Environment.NewLine);
+                Assert.AreEqual<string>(normalizedScript, normalizedActual);
             }
         }
 
