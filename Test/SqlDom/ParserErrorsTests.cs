@@ -84,7 +84,7 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                new ParserErrorInfo(94, "SQL46010", "RIGHT", "Incorrect syntax near RIGHT.>."));
 
             //Incorrect location value for the Location table option
-            ParserTestUtils.ErrorTest130(@"CREATE TABLE TableWithLocation
+            string invalidLocationSyntax = @"CREATE TABLE TableWithLocation
   (
     id INT NOT NULL,
     lastName VARCHAR(20),
@@ -95,11 +95,12 @@ WITH
     DISTRIBUTION = REPLICATE,
     HEAP,
     LOCATION = INVALID_LOCATION
-  );",
-               new ParserErrorInfo(183, "SQL46010", "INVALID_LOCATION"));
+  );";
+            ParserTestUtils.ErrorTest130(invalidLocationSyntax,
+               new ParserErrorInfo(invalidLocationSyntax.IndexOf("INVALID_LOCATION"), "SQL46010", "INVALID_LOCATION"));
 
             //Incorrect syntax of Ordered columns
-            ParserTestUtils.ErrorTest130(@"CREATE TABLE TableWithOrderColumns
+            string orderedColumnsSyntax = @"CREATE TABLE TableWithOrderColumns
   (
     id INT NOT NULL,
     lastName VARCHAR(20),
@@ -109,11 +110,12 @@ WITH
   (
     DISTRIBUTION = REPLICATE,
     CLUSTERED COLUMNSTORE INDEX (id, lastName)
-  );",
-               new ParserErrorInfo(193, "SQL46010", "("));
+  );";
+            ParserTestUtils.ErrorTest130(orderedColumnsSyntax,
+               new ParserErrorInfo(orderedColumnsSyntax.IndexOf("(id, lastName)"), "SQL46010", "("));
 
             //Incorrect syntax of Ordered columns
-            ParserTestUtils.ErrorTest130(@"CREATE TABLE TableCIWithOrderColumns
+            string orderedColumnsSyntax2 = @"CREATE TABLE TableCIWithOrderColumns
   (
     id INT NOT NULL,
     lastName VARCHAR(20),
@@ -123,27 +125,30 @@ WITH
   (
     DISTRIBUTION = REPLICATE,
     CLUSTERED INDEX ORDER(id, lastName)
-  );",
-               new ParserErrorInfo(183, "SQL46010", "ORDER"));
+  );";
+            ParserTestUtils.ErrorTest130(orderedColumnsSyntax2,
+               new ParserErrorInfo(orderedColumnsSyntax2.IndexOf("ORDER(id, lastName)"), "SQL46010", "ORDER"));
 
 
             // PRIMARY KEY and UNIQUE constraint are only supported with NOT ENFORCED
-            ParserTestUtils.ErrorTest130(@"CREATE TABLE [dbo].[table8] (
+            string primaryKeySyntax = @"CREATE TABLE [dbo].[table8] (
     [col1] INT NOT NULL,
     [col2] INT NOT NULL,
     PRIMARY KEY NONCLUSTERED ([col1] DESC) ENFORCED
-);",
-               new ParserErrorInfo(126, "SQL46010", "ENFORCED"));
+);";
+            ParserTestUtils.ErrorTest130(primaryKeySyntax,
+               new ParserErrorInfo(primaryKeySyntax.IndexOf("ENFORCED"), "SQL46010", "ENFORCED"));
 
             ParserTestUtils.ErrorTest130(@"CREATE TABLE table6 (c1 INT, c2 INT UNIQUE ENFORCED);",
                new ParserErrorInfo(43, "SQL46010", "ENFORCED"));
 
-            ParserTestUtils.ErrorTest130(@"CREATE TABLE [dbo].[table8] (
+            string notEnforcedSyntax = @"CREATE TABLE [dbo].[table8] (
     [col1] INT NOT NULL,
     [col2] INT NOT NULL,
     PRIMARY KEY NONCLUSTERED ([col1] DESC) NOT ENFORCE
-);",
-               new ParserErrorInfo(130, "SQL46010", "ENFORCE"));
+);";
+            ParserTestUtils.ErrorTest130(notEnforcedSyntax,
+               new ParserErrorInfo(notEnforcedSyntax.IndexOf("ENFORCE"), "SQL46010", "ENFORCE"));
         }
 
         /// <summary>
@@ -232,24 +237,25 @@ WITH
             ParserTestUtils.ErrorTest140("ALTER TABLE t1 ALTER COLUMN c1 DROP HIDDEN HIDDEN",
                 new ParserErrorInfo(43, "SQL46010", "HIDDEN"));
 
-            ParserTestUtils.ErrorTest140(@"CREATE TABLE tab_with_ignoredupkey_suppressmessages_on_uk 
-                                            (COL0 INT UNIQUE HIDDEN WITH (ALLOW_PAGE_LOCKS = ON, IGNORE_DUP_KEY = ON (SUPPRESS_MESSAGES = ON), ALLOW_ROW_LOCKS = ON));",
-                new ParserErrorInfo(121, "SQL46010", "HIDDEN"));
+            ParserTestUtils.ErrorTest140(@"CREATE TABLE tab_with_ignoredupkey_suppressmessages_on_uk (COL0 INT UNIQUE HIDDEN WITH (ALLOW_PAGE_LOCKS = ON, IGNORE_DUP_KEY = ON (SUPPRESS_MESSAGES = ON), ALLOW_ROW_LOCKS = ON));",
+                new ParserErrorInfo(75, "SQL46010", "HIDDEN"));
 
-            ParserTestUtils.ErrorTest140(@"CREATE TABLE tab_with_hidden_cols (
+            string hiddenColsSyntax = @"CREATE TABLE tab_with_hidden_cols (
                                             [K] INT HIDDEN              UNIQUE,
-                                            [L] UNIQUEIDENTIFIER  DEFAULT '123' ROWGUIDCOL NOT NULL HIDDEN UNIQUE",
-                new ParserErrorInfo(218, "SQL46010", "HIDDEN"));
+                                            [L] UNIQUEIDENTIFIER  DEFAULT '123' ROWGUIDCOL NOT NULL HIDDEN UNIQUE";
+            ParserTestUtils.ErrorTest140(hiddenColsSyntax,
+                new ParserErrorInfo(hiddenColsSyntax.IndexOf("HIDDEN UNIQUE"), "SQL46010", "HIDDEN"));
 
             ParserTestUtils.ErrorTest140("CREATE TABLE T(HIDDEN HIDDEN INT, B CHAR(32) HIDDEN)",
                  new ParserErrorInfo(29, "SQL46010", "INT"));
 
-            ParserTestUtils.ErrorTest140(@"CREATE TABLE tab_with_hidden_and_masked (
+            string hiddenMaskedSyntax = @"CREATE TABLE tab_with_hidden_and_masked (
                                             [PK]    INT                                                       NOT NULL,
                                             [Data1] NVARCHAR (32) HIDDEN MASKED WITH (FUNCTION = 'default()')  DEFAULT 'a' NOT NULL,
                                             [Data2] NVARCHAR (32) MASKED WITH (FUNCTION = 'default()')        DEFAULT 'b' NOT NULL,
-                                            CONSTRAINT [constr1] PRIMARY KEY ([PK]));",
-                 new ParserErrorInfo(237, "SQL46010", "MASKED"));
+                                            CONSTRAINT [constr1] PRIMARY KEY ([PK]));";
+            ParserTestUtils.ErrorTest140(hiddenMaskedSyntax,
+                 new ParserErrorInfo(hiddenMaskedSyntax.IndexOf("HIDDEN MASKED")+7, "SQL46010", "MASKED"));
 
         }
 
@@ -898,7 +904,7 @@ WITH
 
             // Issuing create table statement with wrongly specified retention period.
             //
-            ParserTestUtils.ErrorTest140(@"CREATE TABLE tab_with_retention (
+            string query1 = @"CREATE TABLE tab_with_retention (
     COL0      INT                                        ,
     COL1      XML                                        ,
     COL2      FLOAT                                      ,
@@ -908,10 +914,11 @@ WITH
     CONSTRAINT PK_MY_PRIMARY_KEY PRIMARY KEY CLUSTERED (COL0),
     PERIOD FOR SYSTEM_TIME (SYS_START, SYS_END)
 )
-WITH (SYSTEM_VERSIONING = ON (HISTORY_TABLE = dbo.t_history, DATA_CONSISTENCY_CHECK = ON, HISTORY_RETENTION_PERIOD = NOINFINITE))",
-                                        new ParserErrorInfo(646, "SQL46005", "INFINITE", "NOINFINITE"));
+WITH (SYSTEM_VERSIONING = ON (HISTORY_TABLE = dbo.t_history, DATA_CONSISTENCY_CHECK = ON, HISTORY_RETENTION_PERIOD = NOINFINITE))";
+            ParserTestUtils.ErrorTest140(query1,
+                                        new ParserErrorInfo(query1.IndexOf("NOINFINITE"), "SQL46005", "INFINITE", "NOINFINITE"));
 
-            ParserTestUtils.ErrorTest140(@"CREATE TABLE tab_with_retention (
+            string query2 = @"CREATE TABLE tab_with_retention (
     COL0      INT                                        ,
     COL1      XML                                        ,
     COL2      FLOAT                                      ,
@@ -921,10 +928,11 @@ WITH (SYSTEM_VERSIONING = ON (HISTORY_TABLE = dbo.t_history, DATA_CONSISTENCY_CH
     CONSTRAINT PK_MY_PRIMARY_KEY PRIMARY KEY CLUSTERED (COL0),
     PERIOD FOR SYSTEM_TIME (SYS_START, SYS_END)
 )
-WITH (SYSTEM_VERSIONING = ON (HISTORY_TABLE = dbo.t_history, DATA_CONSISTENCY_CHECK = ON, HISTORY_RETENTION_PERIOD = 5 INVALIDUNIT))",
-                                        new ParserErrorInfo(648, "SQL46010", "INVALIDUNIT"));
+WITH (SYSTEM_VERSIONING = ON (HISTORY_TABLE = dbo.t_history, DATA_CONSISTENCY_CHECK = ON, HISTORY_RETENTION_PERIOD = 5 INVALIDUNIT))";
+            ParserTestUtils.ErrorTest140(query2,
+                                        new ParserErrorInfo(query2.IndexOf("INVALIDUNIT"), "SQL46010", "INVALIDUNIT"));
 
-            ParserTestUtils.ErrorTest140(@"CREATE TABLE tab_with_retention (
+            string query3 = @"CREATE TABLE tab_with_retention (
     COL0      INT                                        ,
     COL1      XML                                        ,
     COL2      FLOAT                                      ,
@@ -934,10 +942,11 @@ WITH (SYSTEM_VERSIONING = ON (HISTORY_TABLE = dbo.t_history, DATA_CONSISTENCY_CH
     CONSTRAINT PK_MY_PRIMARY_KEY PRIMARY KEY CLUSTERED (COL0),
     PERIOD FOR SYSTEM_TIME (SYS_START, SYS_END)
 )
-WITH (SYSTEM_VERSIONING = ON (HISTORY_TABLE = dbo.t_history, DATA_CONSISTENCY_CHECK = ON, HISTORY_RETENTION_PERIOD = NOTINTEGER DAYS))",
-                                        new ParserErrorInfo(646, "SQL46005", "INFINITE", "NOTINTEGER"));
+WITH (SYSTEM_VERSIONING = ON (HISTORY_TABLE = dbo.t_history, DATA_CONSISTENCY_CHECK = ON, HISTORY_RETENTION_PERIOD = NOTINTEGER DAYS))";
+            ParserTestUtils.ErrorTest140(query3,
+                                        new ParserErrorInfo(query3.IndexOf("NOTINTEGER"), "SQL46005", "INFINITE", "NOTINTEGER"));
 
-            ParserTestUtils.ErrorTest140(@"CREATE TABLE tab_with_retention (
+            string query4 = @"CREATE TABLE tab_with_retention (
     COL0      INT                                        ,
     COL1      XML                                        ,
     COL2      FLOAT                                      ,
@@ -947,10 +956,11 @@ WITH (SYSTEM_VERSIONING = ON (HISTORY_TABLE = dbo.t_history, DATA_CONSISTENCY_CH
     CONSTRAINT PK_MY_PRIMARY_KEY PRIMARY KEY CLUSTERED (COL0),
     PERIOD FOR SYSTEM_TIME (SYS_START, SYS_END)
 )
-WITH (SYSTEM_VERSIONING = ON (HISTORY_TABLE = dbo.t_history, DATA_CONSISTENCY_CHECK = ON, , HISTORY_RETENTION_PERIOD = 5 DAYS))",
-                                        new ParserErrorInfo(619, "SQL46010", ","));
+WITH (SYSTEM_VERSIONING = ON (HISTORY_TABLE = dbo.t_history, DATA_CONSISTENCY_CHECK = ON, , HISTORY_RETENTION_PERIOD = 5 DAYS))";
+            ParserTestUtils.ErrorTest140(query4,
+                                        new ParserErrorInfo(query4.IndexOf(", ,")+2, "SQL46010", ","));
 
-            ParserTestUtils.ErrorTest140(@"CREATE TABLE tab_with_retention (
+            string query5 = @"CREATE TABLE tab_with_retention (
     COL0      INT                                        ,
     COL1      XML                                        ,
     COL2      FLOAT                                      ,
@@ -960,10 +970,11 @@ WITH (SYSTEM_VERSIONING = ON (HISTORY_TABLE = dbo.t_history, DATA_CONSISTENCY_CH
     CONSTRAINT PK_MY_PRIMARY_KEY PRIMARY KEY CLUSTERED (COL0),
     PERIOD FOR SYSTEM_TIME (SYS_START, SYS_END)
 )
-WITH (SYSTEM_VERSIONING = ON (HISTORY_TABLE = dbo.t_history, DATA_CONSISTENCY_CHECK = ON, EXTRA_IDENTIFIER HISTORY_RETENTION_PERIOD = 5 DAYS))",
-                                        new ParserErrorInfo(619, "SQL46010", "EXTRA_IDENTIFIER"));
+WITH (SYSTEM_VERSIONING = ON (HISTORY_TABLE = dbo.t_history, DATA_CONSISTENCY_CHECK = ON, EXTRA_IDENTIFIER HISTORY_RETENTION_PERIOD = 5 DAYS))";
+            ParserTestUtils.ErrorTest140(query5,
+                                        new ParserErrorInfo(query5.IndexOf("EXTRA_IDENTIFIER"), "SQL46010", "EXTRA_IDENTIFIER"));
 
-            ParserTestUtils.ErrorTest140(@"CREATE TABLE tab_with_retention (
+            string query6 = @"CREATE TABLE tab_with_retention (
     COL0      INT                                        ,
     COL1      XML                                        ,
     COL2      FLOAT                                      ,
@@ -973,10 +984,11 @@ WITH (SYSTEM_VERSIONING = ON (HISTORY_TABLE = dbo.t_history, DATA_CONSISTENCY_CH
     CONSTRAINT PK_MY_PRIMARY_KEY PRIMARY KEY CLUSTERED (COL0),
     PERIOD FOR SYSTEM_TIME (SYS_START, SYS_END)
 )
-WITH (SYSTEM_VERSIONING = ON (HISTORY_TABLE = dbo.t_history, DATA_CONSISTENCY_CHECK = ON, HISTORY_RETENTION_PERIOD EXTRA_IDENTIFIER = 5 DAYS))",
-                                        new ParserErrorInfo(619, "SQL46010", "HISTORY_RETENTION_PERIOD"));
+WITH (SYSTEM_VERSIONING = ON (HISTORY_TABLE = dbo.t_history, DATA_CONSISTENCY_CHECK = ON, HISTORY_RETENTION_PERIOD EXTRA_IDENTIFIER = 5 DAYS))";
+            ParserTestUtils.ErrorTest140(query6,
+                                        new ParserErrorInfo(query6.IndexOf("HISTORY_RETENTION_PERIOD"), "SQL46010", "HISTORY_RETENTION_PERIOD"));
 
-            ParserTestUtils.ErrorTest140(@"CREATE TABLE tab_with_retention (
+            string query7 = @"CREATE TABLE tab_with_retention (
     COL0      INT                                        ,
     COL1      XML                                        ,
     COL2      FLOAT                                      ,
@@ -986,10 +998,11 @@ WITH (SYSTEM_VERSIONING = ON (HISTORY_TABLE = dbo.t_history, DATA_CONSISTENCY_CH
     CONSTRAINT PK_MY_PRIMARY_KEY PRIMARY KEY CLUSTERED (COL0),
     PERIOD FOR SYSTEM_TIME (SYS_START, SYS_END)
 )
-WITH (SYSTEM_VERSIONING = ON (HISTORY_TABLE = dbo.t_history, DATA_CONSISTENCY_CHECK = ON, HISTORY_RETENTION_PERIOD <> 5 DAYS))",
-                                        new ParserErrorInfo(619, "SQL46010", "HISTORY_RETENTION_PERIOD"));
+WITH (SYSTEM_VERSIONING = ON (HISTORY_TABLE = dbo.t_history, DATA_CONSISTENCY_CHECK = ON, HISTORY_RETENTION_PERIOD <> 5 DAYS))";
+            ParserTestUtils.ErrorTest140(query7,
+                                        new ParserErrorInfo(query7.IndexOf("HISTORY_RETENTION_PERIOD"), "SQL46010", "HISTORY_RETENTION_PERIOD"));
 
-            ParserTestUtils.ErrorTest140(@"CREATE TABLE tab_with_retention (
+            string query8 = @"CREATE TABLE tab_with_retention (
     COL0      INT                                        ,
     COL1      XML                                        ,
     COL2      FLOAT                                      ,
@@ -999,10 +1012,11 @@ WITH (SYSTEM_VERSIONING = ON (HISTORY_TABLE = dbo.t_history, DATA_CONSISTENCY_CH
     CONSTRAINT PK_MY_PRIMARY_KEY PRIMARY KEY CLUSTERED (COL0),
     PERIOD FOR SYSTEM_TIME (SYS_START, SYS_END)
 )
-WITH (SYSTEM_VERSIONING = ON (HISTORY_TABLE = dbo.t_history, DATA_CONSISTENCY_CHECK = ON, HISTORY_RETENTION_PERIOD = 9000000000 DAYS))",
-                                        new ParserErrorInfo(646, "SQL46010", "9000000000"));
+WITH (SYSTEM_VERSIONING = ON (HISTORY_TABLE = dbo.t_history, DATA_CONSISTENCY_CHECK = ON, HISTORY_RETENTION_PERIOD = 9000000000 DAYS))";
+            ParserTestUtils.ErrorTest140(query8,
+                                        new ParserErrorInfo(query8.IndexOf("9000000000"), "SQL46010", "9000000000"));
 
-            ParserTestUtils.ErrorTest140(@"CREATE TABLE tab_with_retention (
+            string query9 = @"CREATE TABLE tab_with_retention (
     COL0      INT                                        ,
     COL1      XML                                        ,
     COL2      FLOAT                                      ,
@@ -1012,10 +1026,11 @@ WITH (SYSTEM_VERSIONING = ON (HISTORY_TABLE = dbo.t_history, DATA_CONSISTENCY_CH
     CONSTRAINT PK_MY_PRIMARY_KEY PRIMARY KEY CLUSTERED (COL0),
     PERIOD FOR SYSTEM_TIME (SYS_START, SYS_END)
 )
-WITH (SYSTEM_VERSIONING = ON (HISTORY_TABLE = dbo.t_history, DATA_CONSISTENCY_CHECK = ON, HISTORY_RETENTION_PERIOD = @x DAYS))",
-                                        new ParserErrorInfo(646, "SQL46010", "@x"));
+WITH (SYSTEM_VERSIONING = ON (HISTORY_TABLE = dbo.t_history, DATA_CONSISTENCY_CHECK = ON, HISTORY_RETENTION_PERIOD = @x DAYS))";
+            ParserTestUtils.ErrorTest140(query9,
+                                        new ParserErrorInfo(query9.IndexOf("@x"), "SQL46010", "@x"));
 
-            ParserTestUtils.ErrorTest140(@"CREATE TABLE tab_with_retention (
+            string query10 = @"CREATE TABLE tab_with_retention (
     COL0      INT                                        ,
     COL1      XML                                        ,
     COL2      FLOAT                                      ,
@@ -1025,10 +1040,11 @@ WITH (SYSTEM_VERSIONING = ON (HISTORY_TABLE = dbo.t_history, DATA_CONSISTENCY_CH
     CONSTRAINT PK_MY_PRIMARY_KEY PRIMARY KEY CLUSTERED (COL0),
     PERIOD FOR SYSTEM_TIME (SYS_START, SYS_END)
 )
-WITH (SYSTEM_VERSIONING = ON (HISTORY_TABLE = dbo.t_history, DATA_CONSISTENCY_CHECK = ON, HISTORY_RETENTION_PERIOD = '5' DAYS))",
-                                        new ParserErrorInfo(646, "SQL46010", "'5'"));
+WITH (SYSTEM_VERSIONING = ON (HISTORY_TABLE = dbo.t_history, DATA_CONSISTENCY_CHECK = ON, HISTORY_RETENTION_PERIOD = '5' DAYS))";
+            ParserTestUtils.ErrorTest140(query10,
+                                        new ParserErrorInfo(query10.IndexOf("'5'"), "SQL46010", "'5'"));
 
-            ParserTestUtils.ErrorTest140(@"CREATE TABLE tab_with_retention (
+            string query11 = @"CREATE TABLE tab_with_retention (
     COL0      INT                                        ,
     COL1      XML                                        ,
     COL2      FLOAT                                      ,
@@ -1038,10 +1054,11 @@ WITH (SYSTEM_VERSIONING = ON (HISTORY_TABLE = dbo.t_history, DATA_CONSISTENCY_CH
     CONSTRAINT PK_MY_PRIMARY_KEY PRIMARY KEY CLUSTERED (COL0),
     PERIOD FOR SYSTEM_TIME (SYS_START, SYS_END)
 )
-WITH (SYSTEM_VERSIONING = ON (HISTORY_TABLE = dbo.t_history, DATA_CONSISTENCY_CHECK = ON, HISTORY_RETENTION_PERIOD = 10 'DAYS'))",
-                                        new ParserErrorInfo(649, "SQL46010", "'DAYS'"));
+WITH (SYSTEM_VERSIONING = ON (HISTORY_TABLE = dbo.t_history, DATA_CONSISTENCY_CHECK = ON, HISTORY_RETENTION_PERIOD = 10 'DAYS'))";
+            ParserTestUtils.ErrorTest140(query11,
+                                        new ParserErrorInfo(query11.IndexOf("'DAYS'"), "SQL46010", "'DAYS'"));
 
-            ParserTestUtils.ErrorTest140(@"CREATE TABLE tab_with_retention (
+            string query12 = @"CREATE TABLE tab_with_retention (
     COL0      INT                                        ,
     COL1      XML                                        ,
     COL2      FLOAT                                      ,
@@ -1051,10 +1068,11 @@ WITH (SYSTEM_VERSIONING = ON (HISTORY_TABLE = dbo.t_history, DATA_CONSISTENCY_CH
     CONSTRAINT PK_MY_PRIMARY_KEY PRIMARY KEY CLUSTERED (COL0),
     PERIOD FOR SYSTEM_TIME (SYS_START, SYS_END)
 )
-WITH (SYSTEM_VERSIONING = ON (HISTORY_TABLE = dbo.t_history, DATA_CONSISTENCY_CHECK = ON, HISTORY_RETENTION_PERIOD = [COL0] DAYS))",
-                                        new ParserErrorInfo(646, "SQL46010", "[COL0]"));
+WITH (SYSTEM_VERSIONING = ON (HISTORY_TABLE = dbo.t_history, DATA_CONSISTENCY_CHECK = ON, HISTORY_RETENTION_PERIOD = [COL0] DAYS))";
+            ParserTestUtils.ErrorTest140(query12,
+                                        new ParserErrorInfo(query12.IndexOf("[COL0]"), "SQL46010", "[COL0]"));
 
-            ParserTestUtils.ErrorTest140(@"CREATE TABLE tab_with_retention (
+            string query13 = @"CREATE TABLE tab_with_retention (
     COL0      INT                                        ,
     COL1      XML                                        ,
     COL2      FLOAT                                      ,
@@ -1064,10 +1082,11 @@ WITH (SYSTEM_VERSIONING = ON (HISTORY_TABLE = dbo.t_history, DATA_CONSISTENCY_CH
     CONSTRAINT PK_MY_PRIMARY_KEY PRIMARY KEY CLUSTERED (COL0),
     PERIOD FOR SYSTEM_TIME (SYS_START, SYS_END)
 )
-WITH (SYSTEM_VERSIONING = ON (HISTORY_TABLE = dbo.t_history, DATA_CONSISTENCY_CHECK = ON, HISTORY_RETENTION_PERIOD = 2+3 WEEKS))",
-                                        new ParserErrorInfo(647, "SQL46010", "+"));
+WITH (SYSTEM_VERSIONING = ON (HISTORY_TABLE = dbo.t_history, DATA_CONSISTENCY_CHECK = ON, HISTORY_RETENTION_PERIOD = 2+3 WEEKS))";
+            ParserTestUtils.ErrorTest140(query13,
+                                        new ParserErrorInfo(query13.IndexOf("+"), "SQL46010", "+"));
 
-            ParserTestUtils.ErrorTest140(@"CREATE TABLE tab_with_retention (
+            string query14 = @"CREATE TABLE tab_with_retention (
     COL0      INT                                        ,
     COL1      XML                                        ,
     COL2      FLOAT                                      ,
@@ -1077,12 +1096,13 @@ WITH (SYSTEM_VERSIONING = ON (HISTORY_TABLE = dbo.t_history, DATA_CONSISTENCY_CH
     CONSTRAINT PK_MY_PRIMARY_KEY PRIMARY KEY CLUSTERED (COL0),
     PERIOD FOR SYSTEM_TIME (SYS_START, SYS_END)
 )
-WITH (SYSTEM_VERSIONING = ON (HISTORY_TABLE = dbo.t_history, DATA_CONSISTENCY_CHECK = ON, HISTORY_RETENTION_PERIOD = f(10) DAYS))",
-                                        new ParserErrorInfo(646, "SQL46005", CodeGenerationSupporter.Infinite, "f"));
+WITH (SYSTEM_VERSIONING = ON (HISTORY_TABLE = dbo.t_history, DATA_CONSISTENCY_CHECK = ON, HISTORY_RETENTION_PERIOD = f(10) DAYS))";
+            ParserTestUtils.ErrorTest140(query14,
+                                        new ParserErrorInfo(query14.IndexOf("f(10)"), "SQL46005", CodeGenerationSupporter.Infinite, "f"));
 
             // Issuing create table statement with invalid    suboptions.
             //
-            ParserTestUtils.ErrorTest130(@"CREATE TABLE tab (
+            string query15 = @"CREATE TABLE tab (
     COL0      INT                                        ,
     COL1      XML                                        ,
     COL2      FLOAT                                      ,
@@ -1092,10 +1112,11 @@ WITH (SYSTEM_VERSIONING = ON (HISTORY_TABLE = dbo.t_history, DATA_CONSISTENCY_CH
     CONSTRAINT PK_MY_PRIMARY_KEY PRIMARY KEY CLUSTERED (COL0),
     PERIOD FOR SYSTEM_TIME (SYS_START, SYS_END)
 )
-WITH (SYSTEM_VERSIONING = ON (HISTORY_TABLE = dbo.t_history, HISTORY_TABLE = dbo.t_history_2))",
-                                        new ParserErrorInfo(575, "SQL46005", "DATA_CONSISTENCY_CHECK", "HISTORY_TABLE"));
+WITH (SYSTEM_VERSIONING = ON (HISTORY_TABLE = dbo.t_history, HISTORY_TABLE = dbo.t_history_2))";
+            ParserTestUtils.ErrorTest130(query15,
+                                        new ParserErrorInfo(query15.IndexOf("HISTORY_TABLE", 550), "SQL46005", "DATA_CONSISTENCY_CHECK", "HISTORY_TABLE"));
 
-            ParserTestUtils.ErrorTest130(@"CREATE TABLE tab (
+            string query16 = @"CREATE TABLE tab (
     COL0      INT                                        ,
     COL1      XML                                        ,
     COL2      FLOAT                                      ,
@@ -1105,10 +1126,11 @@ WITH (SYSTEM_VERSIONING = ON (HISTORY_TABLE = dbo.t_history, HISTORY_TABLE = dbo
     CONSTRAINT PK_MY_PRIMARY_KEY PRIMARY KEY CLUSTERED (COL0),
     PERIOD FOR SYSTEM_TIME (SYS_START, SYS_END)
 )
-WITH (SYSTEM_VERSIONING = ON (DATA_CONSISTENCY_CHECK = ON, DATA_CONSISTENCY_CHECK = OFF))",
-                                        new ParserErrorInfo(544, "SQL46005", "HISTORY_TABLE", "DATA_CONSISTENCY_CHECK"));
+WITH (SYSTEM_VERSIONING = ON (DATA_CONSISTENCY_CHECK = ON, DATA_CONSISTENCY_CHECK = OFF))";
+            ParserTestUtils.ErrorTest130(query16,
+                                        new ParserErrorInfo(query16.IndexOf("DATA_CONSISTENCY_CHECK"), "SQL46005", "HISTORY_TABLE", "DATA_CONSISTENCY_CHECK"));
 
-            ParserTestUtils.ErrorTest140(@"CREATE TABLE tab (
+            string query17 = @"CREATE TABLE tab (
     COL0      INT                                        ,
     COL1      XML                                        ,
     COL2      FLOAT                                      ,
@@ -1118,10 +1140,11 @@ WITH (SYSTEM_VERSIONING = ON (DATA_CONSISTENCY_CHECK = ON, DATA_CONSISTENCY_CHEC
     CONSTRAINT PK_MY_PRIMARY_KEY PRIMARY KEY CLUSTERED (COL0),
     PERIOD FOR SYSTEM_TIME (SYS_START, SYS_END)
 )
-WITH (SYSTEM_VERSIONING = ON (HISTORY_RETENTION_PERIOD = 5 DAYS, HISTORY_RETENTION_PERIOD = 5 DAYS))",
-                                        new ParserErrorInfo(520, "SQL46010", "HISTORY_RETENTION_PERIOD"));
+WITH (SYSTEM_VERSIONING = ON (HISTORY_RETENTION_PERIOD = 5 DAYS, HISTORY_RETENTION_PERIOD = 5 DAYS))";
+            ParserTestUtils.ErrorTest140(query17,
+                                        new ParserErrorInfo(query17.IndexOf("SYSTEM_VERSIONING"), "SQL46010", "HISTORY_RETENTION_PERIOD"));
 
-            ParserTestUtils.ErrorTest130(@"CREATE TABLE tab (
+            string query18 = @"CREATE TABLE tab (
     COL0      INT                                        ,
     COL1      XML                                        ,
     COL2      FLOAT                                      ,
@@ -1131,10 +1154,11 @@ WITH (SYSTEM_VERSIONING = ON (HISTORY_RETENTION_PERIOD = 5 DAYS, HISTORY_RETENTI
     CONSTRAINT PK_MY_PRIMARY_KEY PRIMARY KEY CLUSTERED (COL0),
     PERIOD FOR SYSTEM_TIME (SYS_START, SYS_END)
 )
-WITH (SYSTEM_VERSIONING = ON ())",
-                                        new ParserErrorInfo(544, "SQL46010", ")"));
+WITH (SYSTEM_VERSIONING = ON ())";
+            ParserTestUtils.ErrorTest130(query18,
+                                        new ParserErrorInfo(query18.IndexOf("())")+1, "SQL46010", ")"));
 
-            ParserTestUtils.ErrorTest140(@"CREATE TABLE tab_with_retention (
+            string query19 = @"CREATE TABLE tab_with_retention (
     COL0      INT                                        ,
     COL1      XML                                        ,
     COL2      FLOAT                                      ,
@@ -1144,10 +1168,11 @@ WITH (SYSTEM_VERSIONING = ON ())",
     CONSTRAINT PK_MY_PRIMARY_KEY PRIMARY KEY CLUSTERED (COL0),
     PERIOD FOR SYSTEM_TIME (SYS_START, SYS_END)
 )
-WITH (SYSTEM_VERSIONING = ON (HISTORY_TABLE = dbo.t_history, DATA_CONSISTENCY_CHECK = ON, HISTORY_RETENTION_PERIOD = INFINITE DAYS))",
-                                        new ParserErrorInfo(655, "SQL46010", "DAYS"));
+WITH (SYSTEM_VERSIONING = ON (HISTORY_TABLE = dbo.t_history, DATA_CONSISTENCY_CHECK = ON, HISTORY_RETENTION_PERIOD = INFINITE DAYS))";
+            ParserTestUtils.ErrorTest140(query19,
+                                        new ParserErrorInfo(query19.IndexOf("DAYS"), "SQL46010", "DAYS"));
 
-            ParserTestUtils.ErrorTest130(@"CREATE TABLE tab_with_retention (
+            string query20 = @"CREATE TABLE tab_with_retention (
     COL0      INT                                        ,
     COL1      XML                                        ,
     COL2      FLOAT                                      ,
@@ -1157,10 +1182,11 @@ WITH (SYSTEM_VERSIONING = ON (HISTORY_TABLE = dbo.t_history, DATA_CONSISTENCY_CH
     CONSTRAINT PK_MY_PRIMARY_KEY PRIMARY KEY CLUSTERED (COL0),
     PERIOD FOR SYSTEM_TIME (SYS_START, SYS_END)
 )
-WITH (SYSTEM_VERSIONING = ON (HISTORY_TABLE = dbo.t_history, DATA_CONSISTENCY_CHECK = ON, HISTORY_RETENTION_PERIOD = -5 DAYS))",
-                                        new ParserErrorInfo(617, "SQL46010", ","));
+WITH (SYSTEM_VERSIONING = ON (HISTORY_TABLE = dbo.t_history, DATA_CONSISTENCY_CHECK = ON, HISTORY_RETENTION_PERIOD = -5 DAYS))";
+            ParserTestUtils.ErrorTest130(query20,
+                                        new ParserErrorInfo(query20.IndexOf(", HISTORY_RETENTION_PERIO"), "SQL46010", ","));
 
-            ParserTestUtils.ErrorTest140(@"CREATE TABLE tab_with_retention (
+            string query21 = @"CREATE TABLE tab_with_retention (
     COL0      INT                                        ,
     COL1      XML                                        ,
     COL2      FLOAT                                      ,
@@ -1170,8 +1196,9 @@ WITH (SYSTEM_VERSIONING = ON (HISTORY_TABLE = dbo.t_history, DATA_CONSISTENCY_CH
     CONSTRAINT PK_MY_PRIMARY_KEY PRIMARY KEY CLUSTERED (COL0),
     PERIOD FOR SYSTEM_TIME (SYS_START, SYS_END)
 )
-WITH (SYSTEM_VERSIONING = ON (HISTORY_TABLE = dbo.t_history, DATA_CONSISTENCY_CHECK = ON, HISTORY_RETENTION_PERIOD = 0 DAYS))",
-                                        new ParserErrorInfo(646, "SQL46116", "0"));
+WITH (SYSTEM_VERSIONING = ON (HISTORY_TABLE = dbo.t_history, DATA_CONSISTENCY_CHECK = ON, HISTORY_RETENTION_PERIOD = 0 DAYS))";
+            ParserTestUtils.ErrorTest140(query21,
+                                        new ParserErrorInfo(query21.IndexOf("0 DAYS"), "SQL46116", "0"));
         }
 
         /// <summary>
@@ -2227,7 +2254,7 @@ declare @t2 table (c1 int, connection(n1 to n2)) as edge;";
             ParserTestUtils.ErrorTest150(
                 testScript,
                 new ParserErrorInfo(27, "SQL46010", "constraint"),
-                new ParserErrorInfo(testScript.IndexOf(@"to n2"), "SQL46010", "to"));
+                new ParserErrorInfo(testScript.IndexOf(@"to n2",60), "SQL46010", "to"));
         }
 
         [TestMethod]
@@ -2290,9 +2317,9 @@ GO";
             ParserTestUtils.ErrorTestAllParsers(
                 sql46021TestSyntax,
                 new ParserErrorInfo(15, testNumber, CodeGenerationSupporter.Default),
-                new ParserErrorInfo(57, testNumber, CodeGenerationSupporter.Rule),
-                new ParserErrorInfo(105, testNumber, CodeGenerationSupporter.Trigger),
-                new ParserErrorInfo(195, testNumber, CodeGenerationSupporter.Procedure)
+                new ParserErrorInfo(sql46021TestSyntax.IndexOf(@"rule dbName")+5, testNumber, CodeGenerationSupporter.Rule),
+                new ParserErrorInfo(sql46021TestSyntax.IndexOf(@"trigger dbName")+8, testNumber, CodeGenerationSupporter.Trigger),
+                new ParserErrorInfo(sql46021TestSyntax.IndexOf(@"PROCEDURE dbName")+10, testNumber, CodeGenerationSupporter.Procedure)
                 );
         }
 
@@ -2369,9 +2396,7 @@ END",
         public void SQL46028Test()
         {
             string testNumber = "SQL46028";
-
-            ParserTestUtils.ErrorTestAllParsers(
-@"select a.b.c.d.*
+            string sql46028TestSyntax = @"select a.b.c.d.*
 go
 select a.b.c.d.rowguidcol
 go
@@ -2379,12 +2404,15 @@ select a.b.c.d.identitycol
 go
 select a.b.c.d.e.*
 go
-select * from t where contains(a.b.c.d.e.*, 'foo')",
+select * from t where contains(a.b.c.d.e.*, 'foo')";
+
+            ParserTestUtils.ErrorTestAllParsers(
+                sql46028TestSyntax,
                 new ParserErrorInfo(7, testNumber),
-                new ParserErrorInfo(29, testNumber),
-                new ParserErrorInfo(60, testNumber),
-                new ParserErrorInfo(92, testNumber),
-                new ParserErrorInfo(140, testNumber)
+                new ParserErrorInfo(sql46028TestSyntax.IndexOf("a.b.c", 10), testNumber),
+                new ParserErrorInfo(sql46028TestSyntax.IndexOf("a.b.c", 40), testNumber),
+                new ParserErrorInfo(sql46028TestSyntax.IndexOf("a.b.c", 70), testNumber),
+                new ParserErrorInfo(sql46028TestSyntax.IndexOf("a.b.c", 100), testNumber)
                 );
         }
 
@@ -2429,9 +2457,9 @@ select * from t where contains(a.b.c.d.e.*, 'foo')",
    TO SERVICE '//Adventure-Works.com/Expenses'
    ON CONTRACT [//Adventure-Works.com/Expenses/ExpenseSubmission]
    WITH LIFETIME=60, ENCRYPTION=ON";
-            ParserTestUtils.ErrorTest90AndAbove(beginDialogConversation + ", LIFETIME=10;", new ParserErrorInfo(248, "SQL46049", "LIFETIME"));
-            ParserTestUtils.ErrorTest90AndAbove(beginDialogConversation + ", RELATED_CONVERSATION_GROUP = @existing_conversation_handle, RELATED_CONVERSATION = @existing_conversation_handle ;", new ParserErrorInfo(308, "SQL46049", "RELATED_CONVERSATION"));
-            ParserTestUtils.ErrorTest90AndAbove(beginDialogConversation + ", ENCRYPTION=OFF;", new ParserErrorInfo(248, "SQL46049", "ENCRYPTION"));
+            ParserTestUtils.ErrorTest90AndAbove(beginDialogConversation + ", LIFETIME=10;", new ParserErrorInfo(beginDialogConversation.Length+2, "SQL46049", "LIFETIME"));
+            ParserTestUtils.ErrorTest90AndAbove(beginDialogConversation + ", RELATED_CONVERSATION_GROUP = @existing_conversation_handle, RELATED_CONVERSATION = @existing_conversation_handle ;", new ParserErrorInfo(beginDialogConversation.Length+62, "SQL46049", "RELATED_CONVERSATION"));
+            ParserTestUtils.ErrorTest90AndAbove(beginDialogConversation + ", ENCRYPTION=OFF;", new ParserErrorInfo(beginDialogConversation.Length+2, "SQL46049", "ENCRYPTION"));
 
             //Create Database
             //
@@ -2454,7 +2482,7 @@ select * from t where contains(a.b.c.d.e.*, 'foo')",
          FIELDTERMINATOR =' |', FIELDTERMINATOR =' |',
          ROWTERMINATOR =' |\n'
       )";
-            ParserTestUtils.ErrorTestAllParsers(bulkInsert, new ParserErrorInfo(141, "SQL46049", "FIELDTERMINATOR"));
+            ParserTestUtils.ErrorTestAllParsers(bulkInsert, new ParserErrorInfo(bulkInsert.IndexOf("FIELDTERMINATOR", 135), "SQL46049", "FIELDTERMINATOR"));
 
             string alterDatabase = @"ALTER DATABASE AdventureWorks2008R2
 ADD FILE
@@ -2466,7 +2494,7 @@ ADD FILE
     SIZE = 10MB,
     FILEGROWTH = 5MB
 );";
-            ParserTestUtils.ErrorTestAllParsers(alterDatabase, new ParserErrorInfo(218, "SQL46049", "SIZE"));
+            ParserTestUtils.ErrorTestAllParsers(alterDatabase, new ParserErrorInfo(alterDatabase.IndexOf("SIZE",205), "SQL46049", "SIZE"));
         }
 
 
@@ -2517,9 +2545,8 @@ ADD FILE
         {
             TSql100Parser parser = new TSql100Parser(true);
             ParserTestUtils.ErrorTest(parser,
-@"MERGE pi USING (SELECT * FROM t1) AS src ON (pi.ProductID = src.ProductID)
-WHEN MATCHED THEN INSERT DEFAULT VALUES;",
-                new ParserErrorInfo(94, "SQL46040"));
+@"MERGE pi USING (SELECT * FROM t1) AS src ON (pi.ProductID = src.ProductID) WHEN MATCHED THEN INSERT DEFAULT VALUES;",
+                new ParserErrorInfo(93, "SQL46040"));
         }
 
 
@@ -2530,13 +2557,11 @@ WHEN MATCHED THEN INSERT DEFAULT VALUES;",
         {
             TSql100Parser parser = new TSql100Parser(true);
             ParserTestUtils.ErrorTest(parser,
-@"MERGE pi USING (SELECT * FROM t1) AS src ON (pi.ProductID = src.ProductID)
-WHEN NOT MATCHED THEN DELETE;",
-                new ParserErrorInfo(98, "SQL46041", "Delete"));
+@"MERGE pi USING (SELECT * FROM t1) AS src ON (pi.ProductID = src.ProductID) WHEN NOT MATCHED THEN DELETE;",
+                new ParserErrorInfo(97, "SQL46041", "Delete"));
             ParserTestUtils.ErrorTest(parser,
-@"MERGE pi USING (SELECT * FROM t1) AS src ON (pi.ProductID = src.ProductID)
-WHEN NOT MATCHED THEN UPDATE SET pi.Q = 10;",
-                new ParserErrorInfo(98, "SQL46041", "Update"));
+@"MERGE pi USING (SELECT * FROM t1) AS src ON (pi.ProductID = src.ProductID) WHEN NOT MATCHED THEN UPDATE SET pi.Q = 10;",
+                new ParserErrorInfo(97, "SQL46041", "Update"));
         }
 
 
@@ -2808,10 +2833,8 @@ WHEN NOT MATCHED THEN UPDATE SET pi.Q = 10;",
         public void TokenStreamRecognitionExceptionTest()
         {
             ParserTestUtils.ErrorTestAllParsers(
-@"Create Table dbo.Table1(
-    keyid nchar(10) Not Null ]
-    on [Primary];",
-                  new ParserErrorInfo(55, "SQL46010", "]"));
+@"Create Table dbo.Table1(keyid nchar(10) Not Null ]    on [Primary];",
+                  new ParserErrorInfo(49, "SQL46010", "]"));
         }
 
 
@@ -3221,7 +3244,8 @@ select 1",
                 new ParserErrorInfo(37, "SQL46010", "blah_blah"));
             ParserTestUtils.ErrorTest130("create workload classifier wc1 with (IMPORTANCE = ab);",
                 new ParserErrorInfo(50, "SQL46010", "ab"));
-            ParserTestUtils.ErrorTest130(@"CREATE WORKLOAD CLASSIFIER wcAllOptions 
+
+            string query1 = @"CREATE WORKLOAD CLASSIFIER wcAllOptions 
                                             WITH(
                                             WORKLOAD_GROUP = 'wgDefaultParams',
                                             MEMBERNAME = 'ELTRole',
@@ -3230,9 +3254,11 @@ select 1",
                                             END_TIME = '02:00',
                                             WLM_LABEL = 'label',
                                             IMPORTANCE = HIGH
-                                            )",
-                new ParserErrorInfo(371, "SQL46134", "START_TIME"));
-            ParserTestUtils.ErrorTest130(@"CREATE WORKLOAD CLASSIFIER wcAllOptions 
+                                            )";
+            ParserTestUtils.ErrorTest130(query1,
+                new ParserErrorInfo(query1.IndexOf("START_TIME")+13, "SQL46134", "START_TIME"));
+
+            string query2 = @"CREATE WORKLOAD CLASSIFIER wcAllOptions 
                                             WITH(
                                             WORKLOAD_GROUP = 'wgDefaultParams',
                                             MEMBERNAME = 'ELTRole',
@@ -3241,9 +3267,11 @@ select 1",
                                             END_TIME = '11:40:10',
                                             WLM_LABEL = 'label',
                                             IMPORTANCE = HIGH
-                                            )",
-                new ParserErrorInfo(436, "SQL46134", "END_TIME"));
-            ParserTestUtils.ErrorTest130(@"CREATE WORKLOAD CLASSIFIER wcAllOptions 
+                                            )";
+            ParserTestUtils.ErrorTest130(query2,
+                new ParserErrorInfo(query2.IndexOf("END_TIME")+11, "SQL46134", "END_TIME"));
+
+            string query3 = @"CREATE WORKLOAD CLASSIFIER wcAllOptions 
                                             WITH(
                                             WORKLOAD_GROUP = 'wgDefaultParams',
                                             WORKLOAD_GROUP = 'wgDefaultParams',
@@ -3253,9 +3281,11 @@ select 1",
                                             END_TIME = '11:40',
                                             WLM_LABEL = 'label',
                                             IMPORTANCE = HIGH
-                                            )",
-                new ParserErrorInfo(218, "SQL46049", "WORKLOAD_GROUP"));
-            ParserTestUtils.ErrorTest130(@"CREATE WORKLOAD CLASSIFIER wcAllOptions 
+                                            )";
+            ParserTestUtils.ErrorTest130(query3,
+                new ParserErrorInfo(query3.IndexOf("WORKLOAD_GROUP"), "SQL46049", "WORKLOAD_GROUP"));
+
+            string query4 = @"CREATE WORKLOAD CLASSIFIER wcAllOptions 
                                             WITH(
                                             WORKLOAD_GROUP = 'wgDefaultParams',
                                             MEMBERNAME = 'ELTRole',
@@ -3265,9 +3295,11 @@ select 1",
                                             END_TIME = '11:40',
                                             WLM_LABEL = 'label',
                                             IMPORTANCE = HIGH
-                                            )",
-                new ParserErrorInfo(358, "SQL46049", "MEMBERNAME"));
-            ParserTestUtils.ErrorTest130(@"CREATE WORKLOAD CLASSIFIER wcAllOptions 
+                                            )";
+            ParserTestUtils.ErrorTest130(query4,
+                new ParserErrorInfo(query4.IndexOf("MEMBERNAME", 300), "SQL46049", "MEMBERNAME"));
+            
+            string query5 = @"CREATE WORKLOAD CLASSIFIER wcAllOptions 
                                             WITH(
                                             WORKLOAD_GROUP = 'wgDefaultParams',
                                             MEMBERNAME = 'ELTRole',
@@ -3277,9 +3309,11 @@ select 1",
                                             WLM_LABEL = 'label',
                                             WLM_CONTEXT = 'dim_load',
                                             IMPORTANCE = HIGH
-                                            )",
-                new ParserErrorInfo(556, "SQL46049", "WLM_CONTEXT"));
-            ParserTestUtils.ErrorTest130(@"CREATE WORKLOAD CLASSIFIER wcAllOptions 
+                                            )";
+            ParserTestUtils.ErrorTest130(query5,
+                new ParserErrorInfo(query5.IndexOf("WLM_CONTEXT",400), "SQL46049", "WLM_CONTEXT"));
+            
+            string query6 = @"CREATE WORKLOAD CLASSIFIER wcAllOptions 
                                             WITH(
                                             WORKLOAD_GROUP = 'wgDefaultParams',
                                             MEMBERNAME = 'ELTRole',
@@ -3289,9 +3323,11 @@ select 1",
                                             END_TIME = '11:40',
                                             WLM_LABEL = 'label',
                                             IMPORTANCE = HIGH
-                                            )",
-                new ParserErrorInfo(556, "SQL46049", "WLM_LABEL"));
-            ParserTestUtils.ErrorTest130(@"CREATE WORKLOAD CLASSIFIER wcAllOptions 
+                                            )";
+            ParserTestUtils.ErrorTest130(query6,
+                new ParserErrorInfo(query6.IndexOf("WLM_LABEL", 500), "SQL46049", "WLM_LABEL"));
+            
+            string query7 = @"CREATE WORKLOAD CLASSIFIER wcAllOptions 
                                             WITH(
                                             WORKLOAD_GROUP = 'wgDefaultParams',
                                             MEMBERNAME = 'ELTRole',
@@ -3301,9 +3337,11 @@ select 1",
                                             START_TIME = '09:20',
                                             END_TIME = '11:40',
                                             IMPORTANCE = HIGH
-                                            )",
-                new ParserErrorInfo(620, "SQL46049", "IMPORTANCE"));
-            ParserTestUtils.ErrorTest130(@"CREATE WORKLOAD CLASSIFIER wcAllOptions 
+                                            )";
+            ParserTestUtils.ErrorTest130(query7,
+                new ParserErrorInfo(query7.IndexOf("IMPORTANCE", 550), "SQL46049", "IMPORTANCE"));
+            
+            string query8 = @"CREATE WORKLOAD CLASSIFIER wcAllOptions 
                                             WITH(
                                             WORKLOAD_GROUP = 'wgDefaultParams',
                                             MEMBERNAME = 'ELTRole',
@@ -3313,9 +3351,11 @@ select 1",
                                             START_TIME = '09:20',
                                             END_TIME = '11:40',
                                             IMPORTANCE = HIGH
-                                            )",
-                new ParserErrorInfo(491, "SQL46049", "START_TIME"));
-            ParserTestUtils.ErrorTest130(@"CREATE WORKLOAD CLASSIFIER wcAllOptions 
+                                            )";
+            ParserTestUtils.ErrorTest130(query8,
+                new ParserErrorInfo(query8.IndexOf("START_TIME", 430), "SQL46049", "START_TIME"));
+            
+            string query9 = @"CREATE WORKLOAD CLASSIFIER wcAllOptions 
                                             WITH(
                                             WORKLOAD_GROUP = 'wgDefaultParams',
                                             MEMBERNAME = 'ELTRole',
@@ -3325,8 +3365,9 @@ select 1",
                                             END_TIME = '11:40',
                                             END_TIME = '11:40',
                                             IMPORTANCE = HIGH
-                                            )",
-                new ParserErrorInfo(556, "SQL46049", "END_TIME"));
+                                            )";
+            ParserTestUtils.ErrorTest130(query9,
+                new ParserErrorInfo(query9.IndexOf("END_TIME", 490), "SQL46049", "END_TIME"));
         }
 
         [TestMethod]
@@ -3334,17 +3375,14 @@ select 1",
         [SqlStudioTestCategory(Category.UnitTest)]
         public void PredictErrorTest()
         {
-            ParserTestUtils.ErrorTest130(@"SELECT d.*, p.Score
-            FROM PREDICT(MODE = (SELECT Model FROM Models WHERE Id = 4), DATA = testData AS d, RUNTIME=ONNX) WITH(Score float) AS p;",
-                new ParserErrorInfo(46, "SQL46005", "MODEL", "MODE"));
+            ParserTestUtils.ErrorTest130(@"SELECT d.*, p.Score FROM PREDICT(MODE = (SELECT Model FROM Models WHERE Id = 4), DATA = testData AS d, RUNTIME=ONNX) WITH(Score float) AS p;",
+                new ParserErrorInfo(33, "SQL46005", "MODEL", "MODE"));
 
-            ParserTestUtils.ErrorTest130(@"SELECT d.*, p.Score
-            FROM PREDICT(MODEL = (SELECT Model FROM trafficModel WHERE Id = 4), DATA = testData AS d, RUNTIME=ONNX) ITH(Score float) AS p;",
-                new ParserErrorInfo(137, "SQL46010", "ITH"));
+            ParserTestUtils.ErrorTest130(@"SELECT d.*, p.Score FROM PREDICT(MODEL = (SELECT Model FROM trafficModel WHERE Id = 4), DATA = testData AS d, RUNTIME=ONNX) ITH(Score float) AS p;",
+                new ParserErrorInfo(124, "SQL46010", "ITH"));
 
-            ParserTestUtils.ErrorTest130(@"SELECT d.*, p.Score
-            FROM PREDICT(MODEL = (SELECT Model FROM Models WHERE Id = 4), DATA = testData AS d, RUNTIME=ONNX, MODEL = (SELECT Model FROM Models WHERE Id = 4)) WITH(Score float) AS p;",
-                new ParserErrorInfo(129, "SQL46010", ","));
+            ParserTestUtils.ErrorTest130(@"SELECT d.*, p.Score FROM PREDICT(MODEL = (SELECT Model FROM Models WHERE Id = 4), DATA = testData AS d, RUNTIME=ONNX, MODEL = (SELECT Model FROM Models WHERE Id = 4)) WITH(Score float) AS p;",
+                new ParserErrorInfo(116, "SQL46010", ","));
         }
 
         [TestMethod]
@@ -5445,7 +5483,7 @@ DROP VALUE
     ALGORITHM = 'RSA_OAEP',
     ENCRYPTED_VALUE = 0x016E000001630075007200720065006E00740075007300650072002F006D0079002F0064006500650063006200660034006100340031003000380034006200350033003200360066003200630062006200350030003600380065003900620061003000320030003600610037003800310066001DDA6134C3B73A90D349C8905782DD819B428162CF5B051639BA46EC69A7C8C8F81591A92C395711493B25DCBCCC57836E5B9F17A0713E840721D098F3F8E023ABCDFE2F6D8CC4339FC8F88630ED9EBADA5CA8EEAFA84164C1095B12AE161EABC1DF778C07F07D413AF1ED900F578FC00894BEE705EAC60F4A5090BBE09885D2EFE1C915F7B4C581D9CE3FDAB78ACF4829F85752E9FC985DEB8773889EE4A1945BD554724803A6F5DC0A2CD5EFE001ABED8D61E8449E4FAA9E4DD392DA8D292ECC6EB149E843E395CDE0F98D04940A28C4B05F747149B34A0BAEC04FFF3E304C84AF1FF81225E615B5F94E334378A0A888EF88F4E79F66CB377E3C21964AACB5049C08435FE84EEEF39D20A665C17E04898914A85B3DE23D56575EBC682D154F4F15C37723E04974DB370180A9A579BC84F6BC9B5E7C223E5CBEE721E57EE07EFDCC0A3257BBEBF9ADFFB00DBF7EF682EC1C4C47451438F90B4CF8DA709940F72CFDC91C6EB4E37B4ED7E2385B1FF71B28A1D2669FBEB18EA89F9D391D2FDDEA0ED362E6A591AC64EF4AE31CA8766C259ECB77D01A7F5C36B8418F91C1BEADDD4491C80F0016B66421B4B788C55127135DA2FA625FB7FD195FB40D90A6C67328602ECAF3EC4F5894BFD84A99EB4753BE0D22E0D4DE6A0ADFEDC80EB1B556749B4A8AD00E73B329C95827AB91C0256347E85E3C5FD6726D0E1FE82C925D3DF4A9
 );";
-            ParserTestUtils.ErrorTest130(cekExtraParametersSyntax, new ParserErrorInfo(cekExtraParametersSyntax.IndexOf(@"CMK2,")+2, "SQL46010", ","));
+            ParserTestUtils.ErrorTest130(cekExtraParametersSyntax, new ParserErrorInfo(cekExtraParametersSyntax.IndexOf(@"CMK2,")+4, "SQL46010", ","));
 
             // Drop column encryption key missing keyworkd
             //
@@ -5453,7 +5491,7 @@ DROP VALUE
 
             // Enable column encryption with invalid encryption type
             //
-            ParserTestUtils.ErrorTest130(@"CREATE TABLE Customers (
+            string enableColumnEncryptionSyntax = @"CREATE TABLE Customers (
     CustName nvarchar(60),
     SSN varchar(11)
         COLLATE  Latin1_General_BIN2 ENCRYPTED WITH (COLUMN_ENCRYPTION_KEY = TwoValueCEK,
@@ -5464,18 +5502,20 @@ DROP VALUE
     ENCRYPTED WITH (COLUMN_ENCRYPTION_KEY = TwoValueCEK,
         ENCRYPTION_TYPE = RANDOM,
         ALGORITHM = 'AEAD_AES_256_CBC_HMAC_SHA_256')
-);", new ParserErrorInfo(390, "SQL46010", "RANDOM"));
+);";
+            ParserTestUtils.ErrorTest130(enableColumnEncryptionSyntax, new ParserErrorInfo(enableColumnEncryptionSyntax.IndexOf(@"RANDOM"), "SQL46010", "RANDOM"));
 
             // Duplicate parameters in Create column encryption key statement
             //
-            ParserTestUtils.ErrorTest130(@"
+            string duplicateAlgorithmParamSyntax = @"
 CREATE COLUMN ENCRYPTION KEY OneValueCEK
 WITH VALUES
 (
     COLUMN_MASTER_KEY = CMK1,
     ALGORITHM = 'RSA_OAEP',
     ALGORITHM = 'RSA_OAEP'
-);", new ParserErrorInfo(124, "SQL46049", "ALGORITHM"));
+);";
+            ParserTestUtils.ErrorTest130(duplicateAlgorithmParamSyntax, new ParserErrorInfo(duplicateAlgorithmParamSyntax.IndexOf("ALGORITHM", 110), "SQL46049", "ALGORITHM"));
 
             // Create column master key definition statement missing a quote (')
             //
@@ -5483,7 +5523,7 @@ WITH VALUES
 WITH (
      KEY_STORE_PROVIDER_NAME = 'MSSQL_CERTIFICATE_STORE,
      KEY_PATH = 'Current User/Personal/f2260f28d909d21c642a3d8e0b45a830e79a1420');";
-            ParserTestUtils.ErrorTest130(cmkMissingQuoteSyntax, new ParserErrorInfo(cmkMissingQuoteSyntax.IndexOf(@"'MSSQL_CERTIFICATE_STORE,")+24, "SQL46030", "');"));
+            ParserTestUtils.ErrorTest130(cmkMissingQuoteSyntax, new ParserErrorInfo(cmkMissingQuoteSyntax.IndexOf(@"');"), "SQL46030", "');"));
         }
 
 
@@ -5987,7 +6027,7 @@ BEGIN
 END";
             // Typo in the keyword
             //
-            ParserTestUtils.ErrorTest150(query2, new ParserErrorInfo(76, "SQL46010", "ONE"));
+            ParserTestUtils.ErrorTest150(query2, new ParserErrorInfo(query2.IndexOf(@"ONE"), "SQL46010", "ONE"));
 
             string query3 = @"CREATE OR ALTER FUNCTION [dbo].[test_udf2]
 ( )
@@ -6000,7 +6040,7 @@ BEGIN
 END";
             // Typo in the keyword
             //
-            ParserTestUtils.ErrorTest150(query3, new ParserErrorInfo(76, "SQL46010", "OF"));
+            ParserTestUtils.ErrorTest150(query3, new ParserErrorInfo(query3.IndexOf("OF"), "SQL46010", "OF"));
         }
 
         [TestMethod]
@@ -6064,7 +6104,7 @@ USING (Source
 WHEN NOT MATCHED BY SOURCE THEN DELETE OUTPUT inserted.*, deleted.*;";
             // Typo in the Match Clause.
             //
-            ParserTestUtils.ErrorTest150(query2, new ParserErrorInfo(209, "SQL46010", "Dog"));
+            ParserTestUtils.ErrorTest150(query2, new ParserErrorInfo(query2.IndexOf("-Dog")+1, "SQL46010", "Dog"));
         }
 
         [TestMethod]
