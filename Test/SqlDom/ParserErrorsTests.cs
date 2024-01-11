@@ -3367,7 +3367,7 @@ select 1",
                                             IMPORTANCE = HIGH
                                             )";
             ParserTestUtils.ErrorTest130(query9,
-                new ParserErrorInfo(query9.IndexOf("END_TIME", 490), "SQL46049", "END_TIME"));
+                new ParserErrorInfo(query9.IndexOf("END_TIME", 492), "SQL46049", "END_TIME"));
         }
 
         [TestMethod]
