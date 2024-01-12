@@ -61,8 +61,8 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                 baseline = baseline.Trim();
                 prettyPrinted = prettyPrinted.Trim();
 
-                string[] baselineLines = baseline.Split(new string[] { System.Environment.NewLine }, System.StringSplitOptions.None);
-                string[] prettyPrintedLines = prettyPrinted.Split(new string[] { System.Environment.NewLine }, System.StringSplitOptions.None);
+                string[] baselineLines = baseline.Split(new string[] { "\r\n", "\r", "\n" }, System.StringSplitOptions.RemoveEmptyEntries);
+                string[] prettyPrintedLines = prettyPrinted.Split(new string[] { "\r\n", "\r", "\n" }, System.StringSplitOptions.RemoveEmptyEntries);
 
                 Assert.AreEqual<int>
                 (
@@ -99,8 +99,8 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                 string baseline = ParserTestUtils.GetStringFromResource(GlobalConstants.TSqlNameSpace + "." + _baselineFolder + "." + testScriptName);
                 baseline = baseline.Trim();
 
-                string[] baselineLines = baseline.Split(new string[] { System.Environment.NewLine }, System.StringSplitOptions.RemoveEmptyEntries);
-                string[] prettyPrintedLines = prettyPrinted.Split(new string[] { System.Environment.NewLine }, System.StringSplitOptions.RemoveEmptyEntries);
+                string[] baselineLines = baseline.Split(new string[] { "\r\n", "\r", "\n" }, System.StringSplitOptions.RemoveEmptyEntries);
+                string[] prettyPrintedLines = prettyPrinted.Split(new string[] { "\r\n", "\r", "\n" }, System.StringSplitOptions.RemoveEmptyEntries);
 
                 Assert.AreEqual<int>
                 (

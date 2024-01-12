@@ -270,10 +270,17 @@ namespace SqlStudio.Tests.UTSqlScriptDom
 
         public static string GetStringFromResource(string resourceName)
         {
+            string result = null;
             using (StreamReader sr = new StreamReader(Assembly.GetExecutingAssembly().GetManifestResourceStream(resourceName)))
             {
-                return sr.ReadToEnd();
+                result = sr.ReadToEnd();
             }
+
+            // Convert line endings from \n to \r\n
+            if (System.Environment.NewLine == "\n")
+                result = result.ReplaceLineEndings("\r\n");
+
+            return result;
         }
 
         internal static void LogErrors(IList<ParseError> errors)
