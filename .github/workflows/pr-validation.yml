@@ -19,22 +19,18 @@ jobs:
     - name: Build
       run: dotnet build dirs.proj
   test: 
-    runs-on: windows-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [windows-latest, ubuntu-latest]
     needs: build
     steps:
       - uses: actions/checkout@v2
       - name: Disable strong name validation
+        if: matrix.os == 'windows-latest'
         shell: pwsh
         run: |
           .\disableStrongName.ps1
 
       - name: Run tests
         run: dotnet test
-
-  test-linux: #runs only P0 tests on linux
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - uses: actions/checkout@v2
-      - name: Run tests
-        run: dotnet test --filter Priority=0
