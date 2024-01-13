@@ -373,9 +373,37 @@ namespace SqlStudio.Tests.UTSqlScriptDom
 
         public static TSqlFragment ParseFromResource(TSqlParser parser, string sourceFilename, out IList<ParseError> errors)
         {
+            string source = null;
             using (StreamReader sr = ParserTestUtils.GetStreamReaderFromManifestResource(GlobalConstants.TestScriptsNameSpace + "." + sourceFilename))
             {
-                return parser.Parse(sr, out errors);
+                source = sr.ReadToEnd();
+            }
+
+            // Convert line endings from \n to \r\n
+            if (System.Environment.NewLine == "\n")
+                source = source.ReplaceLineEndings("\r\n");
+
+            using(TextReader tr = new StringReader(source))
+            {
+                return parser.Parse(tr, out errors);
+            }
+        }
+
+        public static IList<TSqlParserToken> ParseTokensFromResource(TSqlParser parser, string sourceFilename, out IList<ParseError> errors)
+        {
+            string source = null;
+            using (StreamReader sr = ParserTestUtils.GetStreamReaderFromManifestResource(GlobalConstants.TestScriptsNameSpace + "." + sourceFilename))
+            {
+                source = sr.ReadToEnd();
+            }
+
+            // Convert line endings from \n to \r\n
+            if (System.Environment.NewLine == "\n")
+                source = source.ReplaceLineEndings("\r\n");
+
+            using (TextReader tr = new StringReader(source))
+            {
+                return parser.GetTokenStream(tr, out errors);
             }
         }
     }
