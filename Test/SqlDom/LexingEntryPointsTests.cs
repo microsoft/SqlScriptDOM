@@ -202,6 +202,7 @@ namespace SqlStudio.Tests.UTSqlScriptDom
 		[SqlStudioTestCategory(Category.UnitTest)]
         public void LexingErrorHandler()
         {
+            #if NET
             if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows))
             {
                 ParserTestUtils.ExecuteTestForAllParsers(delegate(TSqlParser parser)
@@ -215,6 +216,18 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                     }
                 }, false);
             }
+            #else
+            ParserTestUtils.ExecuteTestForAllParsers(delegate(TSqlParser parser)
+            {
+                using (TextReader sr = new StreamReader(Path.Combine(System.Environment.GetEnvironmentVariable("windir"), @"system32\notepad.exe")))
+                {
+                    IList<ParseError> errors;
+                    parser.GetTokenStream(sr, out errors);
+                    ParserTestUtils.LogErrors(errors);
+                    Assert.AreEqual<int>(1, errors.Count);
+                }
+            }, false);
+            #endif
         }
 
 

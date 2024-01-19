@@ -276,9 +276,11 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                 result = sr.ReadToEnd();
             }
 
+            #if NET
             // Convert line endings from \n to \r\n
             if (System.Environment.NewLine == "\n")
                 result = result.ReplaceLineEndings("\r\n");
+            #endif
 
             return result;
         }
@@ -379,9 +381,11 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                 source = sr.ReadToEnd();
             }
 
+            #if NET
             // Convert line endings from \n to \r\n
             if (System.Environment.NewLine == "\n")
                 source = source.ReplaceLineEndings("\r\n");
+            #endif
 
             using(TextReader tr = new StringReader(source))
             {
@@ -397,9 +401,11 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                 source = sr.ReadToEnd();
             }
 
+            #if NET
             // Convert line endings from \n to \r\n
             if (System.Environment.NewLine == "\n")
                 source = source.ReplaceLineEndings("\r\n");
+            #endif
 
             using (TextReader tr = new StringReader(source))
             {
