@@ -99,8 +99,6 @@ dotnet build
 
 ### Running the tests
 
-> Note: Only the priority 0 tests are currently supported on macOS and Linux.
-
 You can run tests directly in Visual Studio Text Explorer or by using the ```dotnet test``` command.
 
 Example: To run all priority 0 tests

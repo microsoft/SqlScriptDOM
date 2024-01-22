@@ -202,7 +202,7 @@ namespace SqlStudio.Tests.UTSqlScriptDom
 		[SqlStudioTestCategory(Category.UnitTest)]
         public void LexingErrorHandler()
         {
-            #if NET
+            #if !NETFRAMEWORK
             if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows))
             {
                 ParserTestUtils.ExecuteTestForAllParsers(delegate(TSqlParser parser)
