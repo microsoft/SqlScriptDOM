@@ -17,20 +17,20 @@
 
   <!-- These project references make sure tools are built first.
        The SetTargetFramework tells msbuild to only build to build
-       those projects for the one and only flavor we need, i.e. $(NetfxVersion).
+       those projects for the one and only flavor we need, i.e. $(NetCoreVersion).
    -->
   <ItemGroup>
     <ProjectReference Include="..\tools\AstGen\astgen.csproj">
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-      <SetTargetFramework>TargetFramework=$(NetfxVersion)</SetTargetFramework>
+      <SetTargetFramework>TargetFramework=$(NetCoreVersion)</SetTargetFramework>
     </ProjectReference>
     <ProjectReference Include="..\tools\ScriptGenSettingsGenerator\ScriptGenSettingsGenerator.csproj">
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-      <SetTargetFramework>TargetFramework=$(NetfxVersion)</SetTargetFramework>
+      <SetTargetFramework>TargetFramework=$(NetCoreVersion)</SetTargetFramework>
     </ProjectReference>
     <ProjectReference Include="..\tools\TokenListGenerator\TokenListGenerator.csproj">
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-      <SetTargetFramework>TargetFramework=$(NetfxVersion)</SetTargetFramework>
+      <SetTargetFramework>TargetFramework=$(NetCoreVersion)</SetTargetFramework>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

@@ -27,8 +27,8 @@
     <!-- put obj files in a mirror tree off the root to keep the src folder tree cleaner -->
     <BaseIntermediateOutputPath Condition=" '$(BaseIntermediateOutputPath)' == '' ">$(EnlistmentRoot)\obj\$([MSBuild]::MakeRelative('$(EnlistmentRoot)\', $(MSBuildProjectDirectory)))</BaseIntermediateOutputPath>
 
-    <!-- Tests currently only work for netfx -->
-    <TargetFrameworks>$(NetfxVersion)</TargetFrameworks>
+    <!-- Test on netcore to cover all platforms -->
+    <TargetFrameworks>$(NetfxVersion);$(NetCoreVersion)</TargetFrameworks>
 
     <!-- The TargetGroup can be used to express condition that are common to more than one TargetFramework (currently not used)-->
     <TargetGroup Condition="'$(TargetFramework)'=='netstandard2.0' Or '$(TargetFramework)'=='netstandard2.1' Or '$(TargetFramework)'=='netstandard2.2'">netstandard</TargetGroup>

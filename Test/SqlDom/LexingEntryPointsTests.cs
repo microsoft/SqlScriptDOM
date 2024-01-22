@@ -138,8 +138,7 @@ namespace SqlStudio.Tests.UTSqlScriptDom
             string testScript = "GetTokenTypesTests.sql";
 
             IList<ParseError> errors;
-            StreamReader reader = ParserTestUtils.GetStreamReaderFromManifestResource(GlobalConstants.TestScriptsNameSpace + "." + testScript);
-            IList<TSqlParserToken> tokens = parser.GetTokenStream(reader, out errors);
+            IList<TSqlParserToken> tokens = ParserTestUtils.ParseTokensFromResource(parser, testScript, out errors);
 
             Assert.AreEqual<int>(0, errors.Count);
             Assert.AreEqual<int>(21, tokens.Count);
@@ -177,10 +176,9 @@ namespace SqlStudio.Tests.UTSqlScriptDom
         public void GetTokenStreamWithErrorTestImpl(TSqlParser parser)
         {
             string testScript = "GetTokenTypesFailureTests.sql";
-
-            StreamReader reader = ParserTestUtils.GetStreamReaderFromManifestResource(GlobalConstants.TestScriptsNameSpace + "." + testScript);
             IList<ParseError> errors;
-            IList<TSqlParserToken> tokens = parser.GetTokenStream(reader, out errors);
+
+            IList<TSqlParserToken> tokens = ParserTestUtils.ParseTokensFromResource(parser, testScript, out errors);
 
             Assert.IsNotNull(tokens);
             Assert.AreEqual<int>(10, tokens.Count);
@@ -204,6 +202,21 @@ namespace SqlStudio.Tests.UTSqlScriptDom
 		[SqlStudioTestCategory(Category.UnitTest)]
         public void LexingErrorHandler()
         {
+            #if !NETFRAMEWORK
+            if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows))
+            {
+                ParserTestUtils.ExecuteTestForAllParsers(delegate(TSqlParser parser)
+                {
+                    using (TextReader sr = new StreamReader(Path.Combine(System.Environment.GetEnvironmentVariable("windir"), @"system32\notepad.exe")))
+                    {
+                        IList<ParseError> errors;
+                        parser.GetTokenStream(sr, out errors);
+                        ParserTestUtils.LogErrors(errors);
+                        Assert.AreEqual<int>(1, errors.Count);
+                    }
+                }, false);
+            }
+            #else
             ParserTestUtils.ExecuteTestForAllParsers(delegate(TSqlParser parser)
             {
                 using (TextReader sr = new StreamReader(Path.Combine(System.Environment.GetEnvironmentVariable("windir"), @"system32\notepad.exe")))
@@ -214,6 +227,7 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                     Assert.AreEqual<int>(1, errors.Count);
                 }
             }, false);
+            #endif
         }
 
 
@@ -237,14 +251,14 @@ ff] /* /*
                     IList<ParseError> errors;
                     IList<TSqlParserToken> tokens = parser.GetTokenStream(sr, out errors);
                     Assert.AreEqual<int>(8, tokens.Count);
-                    VerifyToken(tokens[0], TSqlTokenType.AsciiStringLiteral, "'aa\r\nbb'", 0, 1, 1);
-                    VerifyToken(tokens[1], TSqlTokenType.WhiteSpace, " ", 8, 2, 4);
-                    VerifyToken(tokens[2], TSqlTokenType.UnicodeStringLiteral, "n'cc\r\ndd'", 9, 2, 5);
-                    VerifyToken(tokens[3], TSqlTokenType.WhiteSpace, " ", 18, 3, 4);
-                    VerifyToken(tokens[4], TSqlTokenType.QuotedIdentifier, "[ee\r\nff]", 19, 3, 5);
-                    VerifyToken(tokens[5], TSqlTokenType.WhiteSpace, " ", 27, 4, 4);
-                    VerifyToken(tokens[6], TSqlTokenType.MultilineComment, "/* /*\r\n*/ */", 28, 4, 5);
-                    VerifyToken(tokens[7], TSqlTokenType.EndOfFile, null, 40, 5, 6);
+                    VerifyToken(tokens[0], TSqlTokenType.AsciiStringLiteral, $"'aa{System.Environment.NewLine}bb'", 0, 1, 1);
+                    VerifyToken(tokens[1], TSqlTokenType.WhiteSpace, " ", System.Environment.NewLine == "\n" ? 7:8, 2, 4);
+                    VerifyToken(tokens[2], TSqlTokenType.UnicodeStringLiteral, $"n'cc{System.Environment.NewLine}dd'", System.Environment.NewLine == "\n" ? 8:9, 2, 5);
+                    VerifyToken(tokens[3], TSqlTokenType.WhiteSpace, " ", System.Environment.NewLine == "\n" ? 16:18, 3, 4);
+                    VerifyToken(tokens[4], TSqlTokenType.QuotedIdentifier, $"[ee{System.Environment.NewLine}ff]", System.Environment.NewLine == "\n" ? 17:19, 3, 5);
+                    VerifyToken(tokens[5], TSqlTokenType.WhiteSpace, " ", System.Environment.NewLine == "\n" ? 24:27, 4, 4);
+                    VerifyToken(tokens[6], TSqlTokenType.MultilineComment, $"/* /*{System.Environment.NewLine}*/ */", System.Environment.NewLine == "\n" ? 25:28, 4, 5);
+                    VerifyToken(tokens[7], TSqlTokenType.EndOfFile, null, System.Environment.NewLine == "\n" ? 36:40, 5, 6);
                 }
 
                 using (StringReader sr = new StringReader(multilineTokens2))
@@ -277,7 +291,7 @@ ff] /* /*
         {
             VerifyLiteralTokens("1. 1.0 0.1 .1 2147483648 02147483648 002147483647 000000000000", TSqlTokenType.Numeric);
             VerifyLiteralTokens("1 1 2147483647 02147483647", TSqlTokenType.Integer);
-            VerifyLiteralTokens("$1 $+1 £-10.00", TSqlTokenType.Money);
+            VerifyLiteralTokens("$1 $+1 Â£-10.00", TSqlTokenType.Money);
             VerifyLiteralTokens("1e1 1.0e1 10.0e-10", TSqlTokenType.Real);
             VerifyLiteralTokens("0x 0xABcD 0xA", TSqlTokenType.HexLiteral);
         }

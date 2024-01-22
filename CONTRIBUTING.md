@@ -34,7 +34,10 @@ When you submit a pull request, a CLA bot will automatically determine whether y
 a CLA and decorate the PR appropriately (e.g. status check, comment). Simply follow the instructions
 provided by the bot. You will only need to do this once across all repos using our CLA.
 
+
 ### Getting Started
+
+#### Windows
 
 1. Download .NET SDKS from https://dotnet.microsoft.com/download/visual-studio-sdks 
     - .NET Framework SDK (4.6.2 or higher)
@@ -52,13 +55,32 @@ provided by the bot. You will only need to do this once across all repos using o
         git clone https://github.com/microsoft/SqlScriptDOM
     ```
     
+#### macOS/Linux
+
+1. Download .NET SDKS from https://dotnet.microsoft.com/download/visual-studio-sdks
+    - .NET 6 SDK (see [global.json](./global.json) for latest version)
+
+2. Install the Java runtime (JRE)
+    - macOS: `brew install openjdk`
+    - Linux: see https://openjdk.org/install/
+
+3. Install PowerShell Core
+    - macOS: `brew install powershell/tap/powershell`
+    - Linux: see https://learn.microsoft.com/powershell/scripting/install/installing-powershell-on-linux
+
+4. Clone the repository
+    ```
+        git clone https://github.com/microsoft/SqlScriptDOM
+    ```
+
 ### Building
 
 Navigate to the root of the source code:
 ```cmd
-cd C:\SqlScriptDOM\
+cd SqlScriptDOM
 ```
-Generate and open Visual Studio solution. This is an optional step for developers using Visual Studio
+
+Optional, Windows-only - Generate and open Visual Studio solution. This step is not required to build the project.
 ```cmd
 slngen
 ```
@@ -72,6 +94,8 @@ To build:
 ```cmd
 dotnet build
 ```
+
+
 
 ### Running the tests
 

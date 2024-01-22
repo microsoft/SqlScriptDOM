@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Text.RegularExpressions;
 using Microsoft.SqlServer.TransactSql.ScriptDom;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SqlStudio.Tests.AssemblyTools.TestCategory;
@@ -25,11 +26,11 @@ namespace SqlStudio.Tests.UTSqlScriptDom
         private static readonly string[] ExpressionTestScripts = { "2 + 2", "someFunction(10)", "'zzz'" };
         private static readonly string[] BooleanExpressionTestScripts = { "1 < 3", "[birthdate] IN (2, 3)", "C1 IS NOT NULL" };
         // A bit strange formatting due to whitespace stripping for comparisons...
-        private static readonly string[] StatementListTestScripts = { "CREATE TABLE t1 (      c1 INT  );  CREATE TABLE t2 (      c1 INT  );",
-                "BEGIN TRANSACTION ttt1;  CREATE TABLE t1 (      c1 INT  );  COMMIT TRANSACTION;"};
-        private static readonly string[] SubqueryExpresion80TestScripts = { "SELECT *  FROM schema1.table2" };
-        private static readonly string[] SubqueryExpresionWithCTEListTestScripts = { "SELECT *  FROM schema1.table2", 
-                "WITH XMLNAMESPACES ('u' AS n1)  SELECT c1  FROM t1" };
+        private static readonly string[] StatementListTestScripts = { "CREATE TABLE t1 (     c1 INT ); CREATE TABLE t2 (     c1 INT );",
+                "BEGIN TRANSACTION ttt1; CREATE TABLE t1 (     c1 INT ); COMMIT TRANSACTION;"};
+        private static readonly string[] SubqueryExpresion80TestScripts = { "SELECT * FROM schema1.table2" };
+        private static readonly string[] SubqueryExpresionWithCTEListTestScripts = { "SELECT * FROM schema1.table2", 
+                "WITH XMLNAMESPACES ('u' AS n1) SELECT c1 FROM t1" };
 
         private static readonly string[] IPv4TestScripts = { "10.20.30.40", "192.168.0.1" };
         private static readonly string[] ConstantOrIdentifierTestScripts = { "-10", "SomeIdentifier", "'qqq'", "[a]]b]" };
@@ -44,7 +45,7 @@ namespace SqlStudio.Tests.UTSqlScriptDom
             StringBuilder result = new StringBuilder();
             foreach (Char c in writer.ToString())
             {
-                if (c == '\n' || c == '\r' || c == '\t')
+                if ( c == '\t')
                     result.Append(' ');
                 else
                     result.Append(c);
@@ -67,7 +68,8 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                 reader.Close();
                 Assert.IsNotNull(actual);
                 Assert.AreEqual<int>(0, errors.Count);
-                Assert.AreEqual<string>(script, GenerateSource(scriptGen, actual));
+                string normalizedActual = Regex.Replace(GenerateSource(scriptGen, actual), @"\r\n|\n\r|\n|\r", " ");
+                Assert.AreEqual<string>(script, normalizedActual);
             }
         }
 

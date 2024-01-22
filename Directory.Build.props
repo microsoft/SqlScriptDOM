@@ -45,13 +45,15 @@
     <OutputPath>$(BaseOutputPath)\$(Configuration)</OutputPath>
     
     <!-- Path for tools output files, .exe executable generated files for tools can be found here  -->
-    <BuildToolsPath>$(BaseOutputPath)\tools\$(NetfxVersion)</BuildToolsPath>
+    <BuildToolsPath>$(BaseOutputPath)\tools\$(NetCoreVersion)</BuildToolsPath>
 
     <!-- put obj files in a mirror tree off the root to keep the src folder tree cleaner -->
     <BaseIntermediateOutputPath Condition=" '$(BaseIntermediateOutputPath)' == '' ">$(EnlistmentRoot)\obj\$([MSBuild]::MakeRelative('$(EnlistmentRoot)\', $(MSBuildProjectDirectory)))</BaseIntermediateOutputPath>
 
-    <AntlrSourceUrl>https://www.antlr2.org/download/antlr-2.7.5.exe</AntlrSourceUrl>
-    <AntlrLocation>$(BaseIntermediateOutputPath)\antlr-2.7.5.exe</AntlrLocation>
+    <AntlrSourceUrl Condition="'$(OS)' != 'Windows_NT'">https://www.antlr2.org/download/antlr-2.7.5.jar</AntlrSourceUrl>
+    <AntlrLocation Condition="'$(OS)' != 'Windows_NT'">$(BaseIntermediateOutputPath)\antlr-2.7.5.jar</AntlrLocation>
+    <AntlrSourceUrl Condition="'$(OS)' == 'Windows_NT'">https://www.antlr2.org/download/antlr-2.7.5.exe</AntlrSourceUrl>
+    <AntlrLocation Condition="'$(OS)' == 'Windows_NT'">$(BaseIntermediateOutputPath)\antlr-2.7.5.exe</AntlrLocation>
   </PropertyGroup>
 
     <!-- Don't enable localization when we are inside VS -->

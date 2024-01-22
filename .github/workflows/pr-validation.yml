@@ -1,13 +1,14 @@
 name: pr-validation
 
 on:
-  pull_request:
-    branches:
-    - main
+  pull_request
 
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [windows-latest, ubuntu-latest]
     steps:
     - uses: actions/checkout@v2
     - uses: actions/setup-dotnet@v2
@@ -18,14 +19,23 @@ jobs:
     - name: Build
       run: dotnet build dirs.proj
   test: 
-    runs-on: windows-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [windows-latest, ubuntu-latest]
     needs: build
     steps:
       - uses: actions/checkout@v2
       - name: Disable strong name validation
+        if: matrix.os == 'windows-latest'
         shell: pwsh
         run: |
           .\disableStrongName.ps1
 
-      - name: Run tests
+      - name: Run tests Windows
+        if: matrix.os == 'windows-latest'
         run: dotnet test
+
+      - name: Run tests Linux
+        if: matrix.os == 'ubuntu-latest'
+        run: dotnet test /p:TargetFramework=net6.0
