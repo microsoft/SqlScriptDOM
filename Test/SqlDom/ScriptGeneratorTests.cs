@@ -1,5 +1,5 @@
 ﻿//------------------------------------------------------------------------------
-// <copyright file="TestUtilities.cs" company="Microsoft">
+// <copyright file="ScriptGeneratorTests.cs" company="Microsoft">
 //         Copyright (c) Microsoft Corporation.  All rights reserved.
 // </copyright>
 //------------------------------------------------------------------------------
@@ -11,7 +11,8 @@ using SqlStudio.Tests.AssemblyTools.TestCategory;
 namespace SqlStudio.Tests.UTSqlScriptDom
 {
     // These tests ensure that we get the correct SqlVersion for each type of SqlScriptGenerator's Options
-    public partial class SqlDomTests
+    [TestClass]
+    public class SqlScriptGeneratorTests
     {
         [TestMethod]
         [Priority(0)]
