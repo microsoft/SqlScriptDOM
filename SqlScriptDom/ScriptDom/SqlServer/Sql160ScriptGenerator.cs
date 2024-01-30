@@ -28,6 +28,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         public Sql160ScriptGenerator(SqlScriptGeneratorOptions options)
             : base(options)
         {
+            options.SqlVersion = SqlVersion.Sql160;
         }
 
         internal override SqlScriptGeneratorVisitor CreateSqlScriptGeneratorVisitor(SqlScriptGeneratorOptions options, ScriptWriter scriptWriter)
