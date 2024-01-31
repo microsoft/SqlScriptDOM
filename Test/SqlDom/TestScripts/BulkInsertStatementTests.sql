@@ -5,6 +5,7 @@ bulk insert v1 from 11
 
 -- bulk insert with options
 bulk insert t1 from 'f1' with (batchsize = 10, check_constraints, codepage = 866, datafiletype = 'char')
+bulk insert t1 from 'f1' with (batchsize = 10, check_constraints, codepage = '866', datafiletype = 'char')
 bulk insert t1 from 'f1' with (codepage = 'ACP', datafiletype = 'native', fieldterminator = ':')
 bulk insert t1 from 'f1' with (codepage = 'OEM', datafiletype = 'widechar', firstrow = 5)
 bulk insert t1 from 'f1' with (codepage = 'RAW', datafiletype = 'widenative', fire_triggers, keepnulls)

@@ -4244,7 +4244,9 @@ simpleBulkInsertOptionWithValue returns [LiteralBulkInsertOption vResult = Fragm
             {
                 vResult.OptionKind = BulkInsertStringOptionsHelper.Instance.ParseOption(tOption, SqlVersionFlags.TSql110);
                 UpdateTokenInfo(vResult, tOption);
-                if (vResult.OptionKind == BulkInsertOptionKind.CodePage) // Check for code page string constants
+                // Check for code page string constants. 
+                // If codepage is int just use the value as is. Same as above when value is integerOrNumeric
+                if (vResult.OptionKind == BulkInsertOptionKind.CodePage && !int.TryParse(vValue.Value, out int value))
                     MatchString(vValue, CodeGenerationSupporter.ACP, CodeGenerationSupporter.OEM, CodeGenerationSupporter.Raw);
                 else if (vResult.OptionKind == BulkInsertOptionKind.DataFileType)
                     MatchString(vValue, CodeGenerationSupporter.Char, CodeGenerationSupporter.Native, 
