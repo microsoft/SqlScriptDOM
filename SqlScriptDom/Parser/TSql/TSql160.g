@@ -28720,7 +28720,6 @@ inlineIndexColumnDefinition returns [IndexDefinition vResult = FragmentFactory.C
     Identifier vIndexIdentifier;
     FileGroupOrPartitionScheme vFileGroupOrPartitionScheme;
     IndexType vIndexType = null;
-    bool vHasColumnList = false;
     BooleanExpression vExpression;
 }
     :
@@ -28769,7 +28768,6 @@ inlineIndexColumnDefinition returns [IndexDefinition vResult = FragmentFactory.C
             tRParen:RightParenthesis
             {
                 UpdateTokenInfo(vResult,tRParen);
-                vHasColumnList=true;
             }
         )?
         (
