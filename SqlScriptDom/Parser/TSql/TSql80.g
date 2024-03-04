@@ -9062,6 +9062,12 @@ parameterlessCall returns [ParameterlessCall vResult = this.FragmentFactory.Crea
             UpdateTokenInfo(vResult,tCurrentTimestamp);
             vResult.ParameterlessCallType = ParameterlessCallType.CurrentTimestamp;
         }
+    |
+        tCurrentDate:CurrentDate
+        {
+            UpdateTokenInfo(vResult,tCurrentDate);
+            vResult.ParameterlessCallType = ParameterlessCallType.CurrentDate;
+        }
     ;
 
 identifierBuiltInFunctionCall returns [FunctionCall vResult = FragmentFactory.CreateFragment<FunctionCall>()]

@@ -18,6 +18,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
             {ParameterlessCallType.SessionUser, new KeywordGenerator(TSqlTokenType.SessionUser)},
             {ParameterlessCallType.SystemUser, new KeywordGenerator(TSqlTokenType.SystemUser)},
             {ParameterlessCallType.User, new KeywordGenerator(TSqlTokenType.User)},
+            {ParameterlessCallType.CurrentDate, new KeywordGenerator(TSqlTokenType.CurrentDate)},
         };
   
         public override void ExplicitVisit(ParameterlessCall node)

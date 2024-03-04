@@ -38,7 +38,11 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         /// <summary>
         /// The CURRENT_TIMESTAMP keyword was used.
         /// </summary>
-        CurrentTimestamp = 4
+        CurrentTimestamp = 4,
+        /// <summary>
+        /// The CURRENT_DATE keyword was used.
+        /// </summary>
+        CurrentDate = 5
     }
 
 #pragma warning restore 1591

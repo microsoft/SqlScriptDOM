@@ -686,7 +686,7 @@
   </Class>
   <Class Name="ParameterlessCall" Base="PrimaryExpression" Summary="Represents calls without the parenthesis and parameters.">
     <InheritedClass Name="PrimaryExpression" />
-    <Member Name="ParameterlessCallType" Type="ParameterlessCallType" GenerateUpdatePositionInfoCall="false" Summary="An enum that can be User, CurrentUser, SessionUser, SystemUser or CurrentTimestamp."/>
+    <Member Name="ParameterlessCallType" Type="ParameterlessCallType" GenerateUpdatePositionInfoCall="false" Summary="An enum that can be User, CurrentUser, SessionUser, SystemUser, CurrentTimestamp or CurrentDate."/>
   </Class>
   <Class Name="ScalarSubquery" Base="PrimaryExpression" Summary="Represents the subquery.">
     <InheritedClass Name="PrimaryExpression" />
