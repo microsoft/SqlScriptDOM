@@ -45,6 +45,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
                 { SqlDataTypeOption.DateTime2, new IdentifierGenerator(CodeGenerationSupporter.DateTime2) },
                 { SqlDataTypeOption.DateTimeOffset, new IdentifierGenerator(CodeGenerationSupporter.DateTimeOffset) },
                 { SqlDataTypeOption.Rowversion, new IdentifierGenerator(CodeGenerationSupporter.Rowversion) },
+                { SqlDataTypeOption.Json, new IdentifierGenerator(CodeGenerationSupporter.Json) },
         };
 
         public override void ExplicitVisit(SqlDataTypeReference node)
