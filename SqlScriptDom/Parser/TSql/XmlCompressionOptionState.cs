@@ -13,7 +13,13 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
 	/// </summary>
 	public enum XmlCompressionOptionState
 	{
+		/// <summary>
+		/// XML Compression is off
+		/// </summary>
 		Off,
+		/// <summary>
+		/// XML Compression is on
+		/// </summary>
 		On
 	}
 }

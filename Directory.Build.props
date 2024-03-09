@@ -73,9 +73,5 @@
     <LanguageSet Condition="'$(EnableLocalization)' == 'true'">VS_Main_Languages</LanguageSet>
   </PropertyGroup>
 
-  <PropertyGroup>
-    <NoWarn>1591</NoWarn>
-  </PropertyGroup>
-
   <Import Project="$(BuildPropsDir)\AssemblyInfo.props" />
 </Project>

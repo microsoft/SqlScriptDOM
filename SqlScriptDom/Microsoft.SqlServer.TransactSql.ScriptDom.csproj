@@ -11,9 +11,6 @@
     <OutputErrorInLexerParserCompile>false</OutputErrorInLexerParserCompile>
     <SQLSCRIPTDOM Condition="'$(SQLSCRIPTDOM)' == ''">$(MsBuildThisFileDirectory.TrimEnd('\'))</SQLSCRIPTDOM>
   </PropertyGroup>
-  <PropertyGroup>
-    <NoWarn>1701;1702;1591</NoWarn>
-  </PropertyGroup>
 
   <!-- These project references make sure tools are built first.
        The SetTargetFramework tells msbuild to only build to build
