@@ -154,7 +154,7 @@
     <comment>The data types that can have two parameters: user defined data type, decimal, numeric.</comment>
   </data>
   <data name="SQL46010Message" xml:space="preserve">
-    <value>Incorrect syntax near {0}.</value>
+    <value>Incorrect syntax near '{0}'.</value>
   </data>
   <data name="SQL46011Message" xml:space="preserve">
     <value>Only Unique or Primary Key constraints can be created on computed columns, while Check, Foreign Key, and Not Null constraints require that computed columns be persisted.</value>

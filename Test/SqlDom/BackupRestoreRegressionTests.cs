@@ -85,8 +85,8 @@ RESTORE DATABASE AdventureWorks2012 FROM DISK = 'Z:\SQLServerBackups\AdventureWo
                     {
                         // for the older parsers this syntax is expected to return errors
                         Assert.AreEqual(2, errors.Count);
-                        Assert.AreEqual("Incorrect syntax near URL.", errors[0].Message);
-                        Assert.AreEqual("Incorrect syntax near URL.", errors[1].Message);
+                        Assert.AreEqual("Incorrect syntax near 'URL'.", errors[0].Message);
+                        Assert.AreEqual("Incorrect syntax near 'URL'.", errors[1].Message);
                     }
                 }
             }, true);
@@ -110,7 +110,7 @@ RESTORE DATABASE AdventureWorks2012 FROM DISK = 'Z:\SQLServerBackups\AdventureWo
                     {
                         // for the older parsers this syntax is expected to return errors
                         Assert.AreEqual(1, errors.Count);
-                        Assert.AreEqual("Incorrect syntax near DATABASE_SNAPSHOT.", errors[0].Message);
+                        Assert.AreEqual("Incorrect syntax near 'DATABASE_SNAPSHOT'.", errors[0].Message);
                     }
                     else
                     {
@@ -142,8 +142,8 @@ RESTORE DATABASE MyDB FROM VIRTUAL_DEVICE='{A9FD7855-A978-4931-8027-F0EFB1D4F4EA
                     {
                         // for the older parsers this syntax is expected to return errors
                         Assert.AreEqual(2, errors.Count);
-                        Assert.AreEqual("Incorrect syntax near VIRTUAL_DEVICE.", errors[0].Message);
-                        Assert.AreEqual("Incorrect syntax near VIRTUAL_DEVICE.", errors[1].Message);
+                        Assert.AreEqual("Incorrect syntax near 'VIRTUAL_DEVICE'.", errors[0].Message);
+                        Assert.AreEqual("Incorrect syntax near 'VIRTUAL_DEVICE'.", errors[1].Message);
                     }
                     else
                     {

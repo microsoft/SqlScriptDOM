@@ -80,7 +80,7 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                 {
                     var fragment = parser.Parse(scriptReader, out IList<ParseError> errors) as TSqlScript;
                     Assert.AreEqual(1, errors.Count);
-                    Assert.AreEqual("Incorrect syntax near $node_id.", errors[0].Message);
+                    Assert.AreEqual("Incorrect syntax near '$node_id'.", errors[0].Message);
                 }
             }, new TSql130Parser(true), new TSql140Parser(true), new TSql150Parser(true), new TSql160Parser(true));
         }
