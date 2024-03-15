@@ -65,7 +65,7 @@ SELECT CONVERT(decimal(10,5), CONVERT(varbinary(20), @myval))
 select convert(datetime, @date, 101)
 
 -- test parameterless calls
-select user, current_user, session_user, system_user, current_timestamp
+select user, current_user, session_user, system_user, current_timestamp, current_date
 select user collate SQL_Latin1_General_CP1_CI_AS, current_user
 
 -- test UniqueRowFilterCall

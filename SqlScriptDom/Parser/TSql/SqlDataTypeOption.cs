@@ -245,6 +245,11 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         /// </summary>
         Rowversion = 33,
 
+        /// <summary>
+        /// JSON data type
+        /// </summary>
+        Json = 34,
+
         #endregion
 
     }
