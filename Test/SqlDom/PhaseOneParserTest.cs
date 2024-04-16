@@ -180,7 +180,6 @@ namespace SqlStudio.Tests.UTSqlScriptDom
             }, true);
         }
 
- 
         [TestMethod] 
 		[Priority(0)]
 		[SqlStudioTestCategory(Category.UnitTest)]
@@ -192,13 +191,9 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                 }, "AlterApplicationRoleTest.sql");
         }
 
- 
         [TestMethod] 
 		[Priority(0)]
 		[SqlStudioTestCategory(Category.UnitTest)]
-
-        
-
         public void AlterAssemblyTest()
         {
             PhaseOne90Test(delegate(AlterAssemblyStatement st)
@@ -207,13 +202,9 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                 }, "AlterAssemblyTest.sql");
         }
 
- 
         [TestMethod] 
 		[Priority(0)]
 		[SqlStudioTestCategory(Category.UnitTest)]
-
-        
-
         public void AlterAsymmetricKeyTest()
         {
             PhaseOne90Test(delegate(AlterAsymmetricKeyStatement st)
@@ -222,13 +213,9 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                 }, "AlterAssymetricKeyTest.sql");
         }
 
- 
         [TestMethod] 
 		[Priority(0)]
 		[SqlStudioTestCategory(Category.UnitTest)]
-
-        
-
         public void AlterRemoteServiceBindingTest()
         {
             PhaseOne90Test(delegate(AlterRemoteServiceBindingStatement st)
@@ -237,13 +224,9 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                 }, "AlterRemoteServiceBindingTest.sql");
         }
 
- 
         [TestMethod] 
 		[Priority(0)]
 		[SqlStudioTestCategory(Category.UnitTest)]
-
-        
-
         public void AlterCertificateTest()
         {
             PhaseOne90Test(delegate(AlterCertificateStatement st)
@@ -252,13 +235,9 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                 }, "AlterCertificateTest.sql");
         }
 
- 
         [TestMethod] 
 		[Priority(0)]
 		[SqlStudioTestCategory(Category.UnitTest)]
-
-        
-
         public void AlterCredentialTest()
         {
             PhaseOne90Test(delegate(AlterCredentialStatement st)
@@ -267,13 +246,9 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                 }, "AlterCredentialTest.sql");
         }
 
- 
         [TestMethod] 
 		[Priority(0)]
 		[SqlStudioTestCategory(Category.UnitTest)]
-
-        
-
         public void AlterEndpointTest()
         {
             PhaseOne90Test(delegate(AlterEndpointStatement st)
@@ -282,13 +257,9 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                 }, "AlterEndpointTest.sql");
         }
 
- 
         [TestMethod] 
 		[Priority(0)]
 		[SqlStudioTestCategory(Category.UnitTest)]
-
-        
-
         public void AlterFulltextIndexTest()
         {
             PhaseOne90Test(delegate(AlterFullTextIndexStatement st)
@@ -297,13 +268,9 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                 }, "AlterFulltextIndexTest.sql");
         }
 
- 
         [TestMethod] 
 		[Priority(0)]
 		[SqlStudioTestCategory(Category.UnitTest)]
-
-        
-
         public void AlterFulltextCatalogTest()
         {
             PhaseOne90Test(delegate(AlterFullTextCatalogStatement st)
@@ -312,13 +279,9 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                 }, "AlterFulltextCatalogTest.sql");
         }
 
- 
         [TestMethod] 
 		[Priority(0)]
 		[SqlStudioTestCategory(Category.UnitTest)]
-
-        
-
         public void AlterLoginTest()
         {
             PhaseOne90Test(delegate(AlterLoginStatement st)
@@ -327,13 +290,9 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                 }, "AlterLoginTest.sql");
         }
 
- 
         [TestMethod] 
 		[Priority(0)]
 		[SqlStudioTestCategory(Category.UnitTest)]
-
-        
-
         public void AlterMessageTypeTest()
         {
             PhaseOne90Test(delegate(AlterMessageTypeStatement st)
@@ -342,13 +301,9 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                 }, "AlterMessageTypeTest.sql");
         }
 
- 
         [TestMethod] 
 		[Priority(0)]
 		[SqlStudioTestCategory(Category.UnitTest)]
-
-        
-
         public void AlterPartitionFunctionTest()
         {
             PhaseOne90Test(delegate(AlterPartitionFunctionStatement st)
@@ -357,13 +312,9 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                 }, "AlterPartitionFunctionTest.sql");
         }
 
- 
         [TestMethod] 
 		[Priority(0)]
 		[SqlStudioTestCategory(Category.UnitTest)]
-
-        
-
         public void AlterPartitionSchemeTest()
         {
             PhaseOne90Test(delegate(AlterPartitionSchemeStatement st)
@@ -372,13 +323,9 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                 }, "AlterPartitionSchemeTest.sql");
         }
 
- 
         [TestMethod] 
 		[Priority(0)]
 		[SqlStudioTestCategory(Category.UnitTest)]
-
-        
-
         public void AlterQueueTest()
         {
             PhaseOne90Test(delegate(AlterQueueStatement st)
@@ -387,13 +334,9 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                 }, "AlterQueueTest.sql");
         }
 
- 
         [TestMethod] 
 		[Priority(0)]
 		[SqlStudioTestCategory(Category.UnitTest)]
-
-        
-
         public void AlterRoleTest()
         {
             PhaseOne90Test(delegate(AlterRoleStatement st)
@@ -402,13 +345,9 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                 }, "AlterRoleTest.sql");
         }
 
- 
         [TestMethod] 
 		[Priority(0)]
 		[SqlStudioTestCategory(Category.UnitTest)]
-
-        
-
         public void AlterRouteTest()
         {
             PhaseOne90Test(delegate(AlterRouteStatement st)
@@ -417,13 +356,9 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                 }, "AlterRouteTest.sql");
         }
 
- 
         [TestMethod] 
 		[Priority(0)]
 		[SqlStudioTestCategory(Category.UnitTest)]
-
-        
-
         public void AlterServiceTest()
         {
             PhaseOne90Test(delegate(AlterServiceStatement st)
@@ -432,13 +367,9 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                 }, "AlterServiceTest.sql");
         }
 
- 
         [TestMethod] 
 		[Priority(0)]
 		[SqlStudioTestCategory(Category.UnitTest)]
-
-        
-
         public void AlterServiceMasterKeyTest()
         {
             PhaseOne90Test(delegate(AlterServiceMasterKeyStatement st)
@@ -447,13 +378,9 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                 }, "AlterServiceMasterKeyTest.sql");
         }
 
- 
         [TestMethod] 
 		[Priority(0)]
 		[SqlStudioTestCategory(Category.UnitTest)]
-
-        
-
         public void AlterSymmetricKeyTest()
         {
             PhaseOne90Test(delegate(AlterSymmetricKeyStatement st)
@@ -462,13 +389,9 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                 }, "AlterSymmetricKeyTest.sql");
         }
 
- 
         [TestMethod] 
 		[Priority(0)]
 		[SqlStudioTestCategory(Category.UnitTest)]
-
-        
-
         public void AlterUserTest()
         {
             PhaseOne90Test(delegate(AlterUserStatement st)
@@ -477,13 +400,9 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                 }, "AlterUserTest.sql");
         }
 
- 
         [TestMethod] 
 		[Priority(0)]
 		[SqlStudioTestCategory(Category.UnitTest)]
-
-        
-
         public void AlterXmlSchemaCollectionTest()
         {
             PhaseOne90Test(delegate(AlterXmlSchemaCollectionStatement st)
@@ -492,13 +411,9 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                 }, "AlterXmlSchemaCollectionTest.sql");
         }
 
- 
         [TestMethod] 
 		[Priority(0)]
 		[SqlStudioTestCategory(Category.UnitTest)]
-
-        
-
         public void AlterDatabaseWithSqlCommandIdentifier()
         {
             PhaseOneAllParserTest(delegate(AlterDatabaseAddFileGroupStatement statement)
@@ -508,13 +423,9 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                 }, "AlterDatabaseWithSqlCommandIdentifier.sql");
         }
 
- 
         [TestMethod] 
 		[Priority(0)]
 		[SqlStudioTestCategory(Category.UnitTest)]
-
-        
-
         public void AlterDatabaseAddFilegroupStatementTest()
         {
             PhaseOneAllParserTest(delegate(AlterDatabaseAddFileGroupStatement statement)
@@ -524,13 +435,9 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                 }, "AlterDatabaseAddFilegroupStatementTest.sql");
         }
 
- 
         [TestMethod] 
 		[Priority(0)]
 		[SqlStudioTestCategory(Category.UnitTest)]
-
-        
-
         public void AlterDatabaseAddFileStatementTest()
         {
             PhaseOneAllParserTest(delegate(AlterDatabaseAddFileStatement statement)
@@ -541,13 +448,9 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                 }, "AlterDatabaseAddFileStatementTest.sql");
         }
 
- 
         [TestMethod] 
 		[Priority(0)]
 		[SqlStudioTestCategory(Category.UnitTest)]
-
-        
-
         public void AlterDatabaseAddLogFileStatementTest()
         {
             PhaseOneAllParserTest(delegate(AlterDatabaseAddFileStatement statement)
@@ -558,13 +461,9 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                 }, "AlterDatabaseAddLogFileStatementTest.sql");
         }
 
- 
         [TestMethod] 
 		[Priority(0)]
 		[SqlStudioTestCategory(Category.UnitTest)]
-
-        
-
         public void AlterDatabaseModifyFilegroup1StatementTest()
         {
             PhaseOneAllParserTest(delegate(AlterDatabaseModifyFileGroupStatement statement)
@@ -575,13 +474,9 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                 }, "AlterDatabaseModifyFilegroup1StatementTest.sql");
         }
 
- 
         [TestMethod] 
 		[Priority(0)]
 		[SqlStudioTestCategory(Category.UnitTest)]
-
-        
-
         public void AlterDatabaseModifyFilegroup2StatementTest()
         {
             PhaseOneAllParserTest(delegate(AlterDatabaseModifyFileGroupStatement statement)
@@ -592,13 +487,9 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                 }, "AlterDatabaseModifyFilegroup2StatementTest.sql");
         }
 
- 
         [TestMethod] 
 		[Priority(0)]
 		[SqlStudioTestCategory(Category.UnitTest)]
-
-        
-
         public void AlterDatabaseModifyFilegroup3StatementTest()
         {
             PhaseOneAllParserTest(delegate(AlterDatabaseModifyFileGroupStatement statement)
@@ -608,13 +499,9 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                 }, "AlterDatabaseModifyFilegroup3StatementTest.sql");
         }
 
- 
         [TestMethod] 
 		[Priority(0)]
 		[SqlStudioTestCategory(Category.UnitTest)]
-
-        
-
         public void AlterDatabaseModifyFileStatementTest()
         {
             PhaseOneAllParserTest(delegate(AlterDatabaseModifyFileStatement statement)
@@ -623,13 +510,9 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                 }, "AlterDatabaseModifyFileStatementTest.sql");
         }
 
- 
         [TestMethod] 
 		[Priority(0)]
 		[SqlStudioTestCategory(Category.UnitTest)]
-
-        
-
         public void AlterDatabaseModifyNameStatementTest()
         {
             PhaseOneAllParserTest(delegate(AlterDatabaseModifyNameStatement statement)
@@ -639,13 +522,9 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                 }, "AlterDatabaseModifyNameStatementTest.sql");
         }
 
- 
         [TestMethod] 
 		[Priority(0)]
 		[SqlStudioTestCategory(Category.UnitTest)]
-
-        
-
         public void AlterDatabaseRemoveFilegroupStatementTest()
         {
             PhaseOneAllParserTest(delegate(AlterDatabaseRemoveFileGroupStatement statement)
@@ -655,13 +534,9 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                 }, "AlterDatabaseRemoveFilegroupStatementTest.sql");
         }
 
- 
         [TestMethod] 
 		[Priority(0)]
 		[SqlStudioTestCategory(Category.UnitTest)]
-
-        
-
         public void AlterDatabaseRemoveFileStatementTest()
         {
             PhaseOneAllParserTest(delegate(AlterDatabaseRemoveFileStatement statement)
@@ -671,13 +546,9 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                 }, "AlterDatabaseRemoveFileStatementTest.sql");
         }
 
- 
         [TestMethod] 
 		[Priority(0)]
 		[SqlStudioTestCategory(Category.UnitTest)]
-
-        
-
         public void AlterTableAddCheckConstraintTest()
         {
             PhaseOneAllParserTest(delegate(AlterTableAddTableElementStatement alterTable)
@@ -690,13 +561,9 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                 }, "AlterTableAddCheckConstraintTest.sql");
         }
 
- 
         [TestMethod] 
 		[Priority(0)]
 		[SqlStudioTestCategory(Category.UnitTest)]
-
-        
-
         public void AlterTableAddColumnDefinitionTest()
         {
             PhaseOneAllParserTest(delegate(AlterTableAddTableElementStatement alterTable)
@@ -708,13 +575,9 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                 }, "AlterTableAddColumnDefinitionTest.sql");
         }
 
- 
         [TestMethod] 
 		[Priority(0)]
 		[SqlStudioTestCategory(Category.UnitTest)]
-
-        
-
         public void AlterTableAddDefaultConstraintTest()
         {
             PhaseOneAllParserTest(delegate(AlterTableAddTableElementStatement alterTable)
@@ -727,7 +590,6 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                 }, "AlterTableAddDefaultConstraintTest.sql");
         }
 
- 
         [TestMethod] 
         [Priority(0)]
         [SqlStudioTestCategory(Category.UnitTest)]
@@ -761,9 +623,6 @@ namespace SqlStudio.Tests.UTSqlScriptDom
         [TestMethod] 
 		[Priority(0)]
 		[SqlStudioTestCategory(Category.UnitTest)]
-
-        
-
         public void AlterTableAddPrimaryKeyConstraintTest()
         {
             PhaseOneAllParserTest(delegate(AlterTableAddTableElementStatement alterTable)
@@ -777,13 +636,9 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                 }, "AlterTableAddPrimaryKeyConstraintTest.sql");
         }
 
- 
         [TestMethod] 
 		[Priority(0)]
 		[SqlStudioTestCategory(Category.UnitTest)]
-
-        
-
         public void AlterTableAddUniqueConstraintTest()
         {
             PhaseOneAllParserTest(delegate(AlterTableAddTableElementStatement alterTable)
@@ -797,13 +652,9 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                 }, "AlterTableAddUniqueConstraintTest.sql");
         }
 
- 
         [TestMethod] 
 		[Priority(0)]
 		[SqlStudioTestCategory(Category.UnitTest)]
-
-        
-
         public void AlterTableAlterColumnStatementTest()
         {
             PhaseOneAllParserTest(delegate(AlterTableAlterColumnStatement alterTable)
@@ -813,13 +664,9 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                 }, "AlterTableAlterColumnStatementTest.sql");
         }
 
- 
         [TestMethod] 
 		[Priority(0)]
 		[SqlStudioTestCategory(Category.UnitTest)]
-
-        
-
         public void AlterTableConstraintModificationStatementTest()
         {
             PhaseOneAllParserTest(delegate(AlterTableConstraintModificationStatement alterTable)
@@ -832,13 +679,9 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                 }, "AlterTableConstraintModificationStatementTest.sql");
         }
 
- 
         [TestMethod] 
 		[Priority(0)]
 		[SqlStudioTestCategory(Category.UnitTest)]
-
-        
-
         public void AlterTableDropTableElementStatementTest()
         {
             PhaseOneAllParserTest(delegate(AlterTableDropTableElementStatement alterTable)
@@ -850,13 +693,9 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                 }, "AlterTableDropTableElementStatementTest.sql");
         }
 
- 
         [TestMethod] 
 		[Priority(0)]
 		[SqlStudioTestCategory(Category.UnitTest)]
-
-        
-
         public void AlterTableTriggerModificationStatementTest()
         {
             PhaseOneAllParserTest(delegate(AlterTableTriggerModificationStatement alterTable)
@@ -868,13 +707,9 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                 }, "AlterTableTriggerModificationStatementTest.sql");
         }
 
- 
         [TestMethod] 
 		[Priority(0)]
 		[SqlStudioTestCategory(Category.UnitTest)]
-
-        
-
         public void AvoidingInfiniteLoopAtStatementLevelTest()
         {
             PhaseOneAllParserTest(delegate(TSqlStatement st)
@@ -882,13 +717,9 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                 }, "AvoidingInfiniteLoopAtStatementLevel.sql");
         }
 
- 
         [TestMethod] 
 		[Priority(0)]
 		[SqlStudioTestCategory(Category.UnitTest)]
-
-        
-
         public void AvoidingInfiniteRecursionAtBatchLevelTest()
         {
             PhaseOneAllParserTest(delegate(TSqlStatement statement)
@@ -896,13 +727,9 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                 }, "AvoidingInfiniteRecursionAtBatchLevel.sql");
         }
 
- 
         [TestMethod] 
 		[Priority(0)]
 		[SqlStudioTestCategory(Category.UnitTest)]
-
-        
-
         public void BackupStatementTest()
         {
             PhaseOneAllParserTest(delegate(BackupDatabaseStatement statement)
@@ -911,13 +738,9 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                 }, "BackupStatementTest.sql");
         }
 
- 
         [TestMethod] 
 		[Priority(0)]
 		[SqlStudioTestCategory(Category.UnitTest)]
-
-        
-
         public void BulkInsertStatementTest()
         {
             PhaseOneAllParserTest(delegate(BulkInsertStatement statement)
@@ -926,7 +749,6 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                 }, "BulkInsertTest.sql");
         }
 
- 
         [TestMethod] 
 		[Priority(0)]
 		[SqlStudioTestCategory(Category.UnitTest)]
@@ -940,13 +762,9 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                 }, "InsertBulkTest.sql");
         }
 
- 
         [TestMethod] 
 		[Priority(0)]
 		[SqlStudioTestCategory(Category.UnitTest)]
-
-        
-
         public void RestoreStatementTest()
         {
             PhaseOneAllParserTest(delegate(RestoreStatement statement)
@@ -956,13 +774,9 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                 }, "RestoreStatementTest.sql");
         }
 
- 
         [TestMethod] 
 		[Priority(0)]
 		[SqlStudioTestCategory(Category.UnitTest)]
-
-        
-
         public void CreateAggregate()
         {
             PhaseOne90Test(delegate(CreateAggregateStatement statement)
@@ -971,7 +785,6 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                 }, "CreateAggregate.sql");
         }
 
- 
         [TestMethod] 
 		[Priority(0)]
 		[SqlStudioTestCategory(Category.UnitTest)]
@@ -985,13 +798,9 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                 }, "CreateApplicationRole.sql");
         }
 
- 
         [TestMethod] 
 		[Priority(0)]
 		[SqlStudioTestCategory(Category.UnitTest)]
-
-        
-
         public void CreateAssembly()
         {
             PhaseOne90Test(delegate(CreateAssemblyStatement statement)
@@ -1000,13 +809,9 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                 }, "CreateAssembly.sql");
         }
 
- 
         [TestMethod] 
 		[Priority(0)]
 		[SqlStudioTestCategory(Category.UnitTest)]
-
-        
-
         public void CreateAsymmetricKey()
         {
             PhaseOne90Test(delegate(CreateAsymmetricKeyStatement statement)
@@ -1015,13 +820,9 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                 }, "CreateAsymmetricKey.sql");
         }
 
- 
         [TestMethod] 
 		[Priority(0)]
 		[SqlStudioTestCategory(Category.UnitTest)]
-
-        
-
         public void CreateCertificate()
         {
             PhaseOne90Test(delegate(CreateCertificateStatement statement)
@@ -1030,13 +831,9 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                 }, "CreateCertificate.sql");
         }
 
- 
         [TestMethod] 
 		[Priority(0)]
 		[SqlStudioTestCategory(Category.UnitTest)]
-
-        
-
         public void CreateContract()
         {
             PhaseOne90Test(delegate(CreateContractStatement statement)
@@ -1045,13 +842,9 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                 }, "CreateContract.sql");
         }
 
- 
         [TestMethod] 
 		[Priority(0)]
 		[SqlStudioTestCategory(Category.UnitTest)]
-
-        
-
         public void CreateCredential()
         {
             PhaseOne90Test(delegate(CreateCredentialStatement statement)
@@ -1060,13 +853,9 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                 }, "CreateCredential.sql");
         }
 
- 
         [TestMethod] 
 		[Priority(0)]
 		[SqlStudioTestCategory(Category.UnitTest)]
-
-        
-
         public void CreateDatabase()
         {
             PhaseOneAllParserTest(delegate(CreateDatabaseStatement statement)
@@ -1075,14 +864,10 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                 }, "CreateDatabase.sql");
         }
 
- 
         [TestMethod] 
 		[Priority(0)]
 		[SqlStudioTestCategory(Category.UnitTest)]
-
-		
-
-		public void AlterDatabaseScopedCredential()
+        public void AlterDatabaseScopedCredential()
 		{
 			PhaseOne130Test(delegate(AlterCredentialStatement statement)
 			{
@@ -1090,14 +875,10 @@ namespace SqlStudio.Tests.UTSqlScriptDom
 			}, "AlterDatabaseScopedCredential.sql");
 		}
 
- 
         [TestMethod] 
 		[Priority(0)]
 		[SqlStudioTestCategory(Category.UnitTest)]
-
-		
-
-		public void CreateDatabaseScopedCredential()
+        public void CreateDatabaseScopedCredential()
 		{
 			PhaseOne130Test(delegate(CreateCredentialStatement statement)
 			{
@@ -1105,13 +886,9 @@ namespace SqlStudio.Tests.UTSqlScriptDom
 			}, "CreateDatabaseScopedCredential.sql");
 		}
 
- 
         [TestMethod] 
 		[Priority(0)]
 		[SqlStudioTestCategory(Category.UnitTest)]
-
-        
-
         public void CreateDefaultStatementTest()
         {
             PhaseOneAllParserTest(delegate(CreateDefaultStatement createDefault)
@@ -1120,13 +897,9 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                 }, "CreateDefaultStatementTest.sql");
         }
 
- 
         [TestMethod] 
 		[Priority(0)]
 		[SqlStudioTestCategory(Category.UnitTest)]
-
-        
-
         public void CreateEndpoint()
         {
             PhaseOne90Test(delegate(CreateEndpointStatement statement)
@@ -1135,13 +908,9 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                 }, "CreateEndpoint.sql");
         }
 
- 
         [TestMethod] 
 		[Priority(0)]
 		[SqlStudioTestCategory(Category.UnitTest)]
-
-        
-
         public void CreateEventNotification()
         {
             PhaseOne90Test(delegate(CreateEventNotificationStatement statement)
@@ -1150,13 +919,9 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                 }, "CreateEventNotification.sql");
         }
 
- 
         [TestMethod] 
 		[Priority(0)]
 		[SqlStudioTestCategory(Category.UnitTest)]
-
-        
-
         public void CreateFulltextCatalog()
         {
             PhaseOne90Test(delegate(CreateFullTextCatalogStatement statement)
@@ -1165,13 +930,9 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                 }, "CreateFulltextCatalog.sql");
         }
 
- 
         [TestMethod] 
 		[Priority(0)]
 		[SqlStudioTestCategory(Category.UnitTest)]
-
-        
-
         public void CreateFulltextIndex()
         {
             PhaseOne90Test(delegate(CreateFullTextIndexStatement statement)
@@ -1180,13 +941,9 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                 }, "CreateFulltextIndex.sql");
         }
 
- 
         [TestMethod] 
 		[Priority(0)]
 		[SqlStudioTestCategory(Category.UnitTest)]
-
-        
-
         public void CreateFunctionStatementTest()
         {
             PhaseOneAllParserTest(delegate(CreateFunctionStatement createFunction)
@@ -1196,13 +953,9 @@ namespace SqlStudio.Tests.UTSqlScriptDom
             SqlModuleObjectNameAllTest("dbo", "f1", "CreateFunctionStatementTest.sql");
         }
 
- 
         [TestMethod] 
 		[Priority(0)]
 		[SqlStudioTestCategory(Category.UnitTest)]
-
-        
-
         public void CreateIndexStatementTest()
         {
             PhaseOneAllParserTest(delegate(CreateIndexStatement createIndex)
@@ -1212,13 +965,9 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                 }, "CreateIndexStatementTest.sql");
         }
 
- 
         [TestMethod] 
 		[Priority(0)]
 		[SqlStudioTestCategory(Category.UnitTest)]
-
-        
-
         public void CreateLogin()
         {
             PhaseOne90Test(delegate(CreateLoginStatement statement)
@@ -1227,13 +976,9 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                 }, "CreateLogin.sql");
         }
 
- 
         [TestMethod] 
 		[Priority(0)]
 		[SqlStudioTestCategory(Category.UnitTest)]
-
-        
-
         public void CreateMessageType()
         {
             PhaseOne90Test(delegate(CreateMessageTypeStatement statement)
@@ -1242,13 +987,9 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                 }, "CreateMessageType.sql");
         }
 
- 
         [TestMethod] 
 		[Priority(0)]
 		[SqlStudioTestCategory(Category.UnitTest)]
-
-        
-
         public void CreatePartitionFunction()
         {
             PhaseOne90Test(delegate(CreatePartitionFunctionStatement statement)
@@ -1257,13 +998,9 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                 }, "CreatePartitionFunction.sql");
         }
 
- 
         [TestMethod] 
 		[Priority(0)]
 		[SqlStudioTestCategory(Category.UnitTest)]
-
-        
-
         public void CreatePartitionScheme()
         {
             PhaseOne90Test(delegate(CreatePartitionSchemeStatement statement)
@@ -1272,13 +1009,9 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                 }, "CreatePartitionScheme.sql");
         }
 
- 
         [TestMethod] 
 		[Priority(0)]
 		[SqlStudioTestCategory(Category.UnitTest)]
-
-        
-
         public void CreatePrimaryXmlIndex()
         {
             PhaseOne90Test(delegate(CreateXmlIndexStatement statement)
@@ -1289,13 +1022,9 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                 }, "CreatePrimaryXmlIndex.sql");
         }
 
- 
         [TestMethod] 
 		[Priority(0)]
 		[SqlStudioTestCategory(Category.UnitTest)]
-
-        
-
         public void CreateProcedureStatementTest()
         {
             PhaseOneAllParserTest(delegate(CreateProcedureStatement createProc)
@@ -1305,13 +1034,9 @@ namespace SqlStudio.Tests.UTSqlScriptDom
             SqlModuleObjectNameAllTest("dbo", "p1", "CreateProcedureStatementTest.sql");
         }
 
- 
         [TestMethod] 
 		[Priority(0)]
 		[SqlStudioTestCategory(Category.UnitTest)]
-
-        
-
         public void CreateQueue()
         {
             PhaseOne90Test(delegate(CreateQueueStatement statement)
@@ -1320,13 +1045,9 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                 }, "CreateQueue.sql");
         }
 
- 
         [TestMethod] 
 		[Priority(0)]
 		[SqlStudioTestCategory(Category.UnitTest)]
-
-        
-
         public void CreateRemoteServiceBinding()
         {
             PhaseOne90Test(delegate(CreateRemoteServiceBindingStatement statement)
@@ -1335,13 +1056,9 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                 }, "CreateRemoteServiceBinding.sql");
         }
 
- 
         [TestMethod] 
 		[Priority(0)]
 		[SqlStudioTestCategory(Category.UnitTest)]
-
-        
-
         public void CreateRole()
         {
             PhaseOne90Test(delegate(CreateRoleStatement statement)
@@ -1350,13 +1067,9 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                 }, "CreateRole.sql");
         }
 
- 
         [TestMethod] 
 		[Priority(0)]
 		[SqlStudioTestCategory(Category.UnitTest)]
-
-        
-
         public void CreateRoute()
         {
             PhaseOne90Test(delegate(CreateRouteStatement statement)
@@ -1365,13 +1078,9 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                 }, "CreateRoute.sql");
         }
 
- 
         [TestMethod] 
 		[Priority(0)]
 		[SqlStudioTestCategory(Category.UnitTest)]
-
-        
-
         public void CreateRuleStatementTest()
         {
             PhaseOneAllParserTest(delegate(CreateRuleStatement createRule)
@@ -1380,13 +1089,9 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                 }, "CreateRuleStatementTest.sql");
         }
 
- 
         [TestMethod] 
 		[Priority(0)]
 		[SqlStudioTestCategory(Category.UnitTest)]
-
-        
-
         public void CreateSchemaStatementTest()
         {
             PhaseOneAllParserTest(delegate(CreateSchemaStatement createSchema)
@@ -1396,13 +1101,9 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                 }, "CreateSchemaStatementTest.sql");
         }
 
- 
         [TestMethod] 
 		[Priority(0)]
 		[SqlStudioTestCategory(Category.UnitTest)]
-
-        
-
         public void CreateService()
         {
             PhaseOne90Test(delegate(CreateServiceStatement statement)
@@ -1411,13 +1112,9 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                 }, "CreateService.sql");
         }
 
- 
         [TestMethod] 
 		[Priority(0)]
 		[SqlStudioTestCategory(Category.UnitTest)]
-
-        
-
         public void CreateStatisticsStatementTest()
         {
             PhaseOneAllParserTest(delegate(CreateStatisticsStatement createStat)
@@ -1427,13 +1124,9 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                 }, "CreateStatisticsStatementTest.sql");
         }
 
- 
         [TestMethod] 
 		[Priority(0)]
 		[SqlStudioTestCategory(Category.UnitTest)]
-
-        
-
         public void CreateSymmetricKey()
         {
             PhaseOne90Test(delegate(CreateSymmetricKeyStatement statement)
@@ -1442,13 +1135,9 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                 }, "CreateSymmetricKey.sql");
         }
 
- 
         [TestMethod] 
 		[Priority(0)]
 		[SqlStudioTestCategory(Category.UnitTest)]
-
-        
-
         public void CreateSynonym()
         {
             PhaseOne90Test(delegate(CreateSynonymStatement statement)
@@ -1457,13 +1146,9 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                 }, "CreateSynonym.sql");
         }
 
- 
         [TestMethod] 
 		[Priority(0)]
 		[SqlStudioTestCategory(Category.UnitTest)]
-
-        
-
         public void CreateTableStatementTest()
         {
             PhaseOneAllParserTest(delegate(CreateTableStatement createTable)
@@ -1472,13 +1157,9 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                 }, "CreateTableStatementTest.sql");
         }
 
- 
         [TestMethod] 
 		[Priority(0)]
 		[SqlStudioTestCategory(Category.UnitTest)]
-
-        
-
         public void CreateTriggerStatementTest()
         {
             PhaseOneAllParserTest(delegate(CreateTriggerStatement createTrigger)
@@ -1490,13 +1171,9 @@ namespace SqlStudio.Tests.UTSqlScriptDom
             TriggerTargetObjectNameAllTest(null, "trig1", "dbo", "t1", "CreateTriggerStatementTest.sql");
         }
 
- 
         [TestMethod] 
 		[Priority(0)]
 		[SqlStudioTestCategory(Category.UnitTest)]
-
-        
-
         public void CreateTypeUddt()
         {
             PhaseOne90Test(delegate(CreateTypeUddtStatement statement)
@@ -1505,13 +1182,9 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                 }, "CreateTypeUddt.sql");
         }
 
- 
         [TestMethod] 
 		[Priority(0)]
 		[SqlStudioTestCategory(Category.UnitTest)]
-
-        
-
         public void CreateTypeUdt()
         {
             PhaseOne90Test(delegate(CreateTypeUdtStatement statement)
@@ -1520,13 +1193,9 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                 },"CreateTypeUdt.sql");
         }
 
- 
         [TestMethod] 
 		[Priority(0)]
 		[SqlStudioTestCategory(Category.UnitTest)]
-
-        
-
         public void CreateUser()
         {
             PhaseOne90Test(delegate(CreateUserStatement statement)
@@ -1535,13 +1204,9 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                 }, "CreateUser.sql");
         }
 
- 
         [TestMethod] 
 		[Priority(0)]
 		[SqlStudioTestCategory(Category.UnitTest)]
-
-        
-
         public void CreateViewStatementTest()
         {
             PhaseOneAllParserTest(delegate(CreateViewStatement createView)
@@ -1551,13 +1216,9 @@ namespace SqlStudio.Tests.UTSqlScriptDom
             SqlModuleObjectNameAllTest("dbo", "v1", "CreateViewStatementTest.sql");
         }
 
- 
         [TestMethod] 
 		[Priority(0)]
 		[SqlStudioTestCategory(Category.UnitTest)]
-
-        
-
         public void AlterTriggerAllServerTest()
         {
             PhaseOne90Test(delegate(AlterTriggerStatement alterTrigger)
@@ -1569,13 +1230,9 @@ namespace SqlStudio.Tests.UTSqlScriptDom
             SqlModuleObjectName90PlusTest(null, "t1", "AlterTriggerAllServerTest.sql");
         }
 
- 
         [TestMethod] 
 		[Priority(0)]
 		[SqlStudioTestCategory(Category.UnitTest)]
-
-        
-
         public void AlterTriggerDatabaseTest()
         {
             PhaseOne90Test(delegate(AlterTriggerStatement alterTrigger)
@@ -1587,13 +1244,9 @@ namespace SqlStudio.Tests.UTSqlScriptDom
             SqlModuleObjectName90PlusTest(null, "t1", "AlterTriggerDatabaseTest.sql");
         }
 
- 
         [TestMethod] 
 		[Priority(0)]
 		[SqlStudioTestCategory(Category.UnitTest)]
-
-        
-
         public void CreateXmlIndexTest()
         {
             PhaseOne90Test(delegate(CreateXmlIndexStatement statement)
@@ -1604,13 +1257,9 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                 }, "CreateXmlIndex.sql");
         }
 
- 
         [TestMethod] 
 		[Priority(0)]
 		[SqlStudioTestCategory(Category.UnitTest)]
-
-        
-
         public void CreateXmlSchemaCollection()
         {
             PhaseOne90Test(delegate(CreateXmlSchemaCollectionStatement statement)
@@ -1619,13 +1268,9 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                 }, "CreateXmlSchemaCollection.sql");
         }
 
- 
         [TestMethod] 
 		[Priority(0)]
 		[SqlStudioTestCategory(Category.UnitTest)]
-
-        
-
         public void ColumnDefinitionNotInAlterTable()
         {
             ParserTestUtils.ExecuteTestForAllParsers(delegate(TSqlParser parser)
@@ -1637,13 +1282,9 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                 }, true);
         }
 
- 
         [TestMethod] 
 		[Priority(0)]
 		[SqlStudioTestCategory(Category.UnitTest)]
-
-        
-
         public void ResourcePoolStatementTests()
         {
             PhaseOne100TestString(delegate(CreateResourcePoolStatement statement)
@@ -1657,13 +1298,9 @@ namespace SqlStudio.Tests.UTSqlScriptDom
             }, "alter resource pool rp1");
         }
 
- 
         [TestMethod] 
 		[Priority(0)]
 		[SqlStudioTestCategory(Category.UnitTest)]
-
-        
-
         public void WorkloadGroupStatementTests()
         {
             PhaseOne100TestString(delegate(CreateWorkloadGroupStatement statement)
@@ -1677,13 +1314,9 @@ namespace SqlStudio.Tests.UTSqlScriptDom
             }, "alter workload group wg1");
         }
 
- 
         [TestMethod] 
 		[Priority(0)]
 		[SqlStudioTestCategory(Category.UnitTest)]
-
-        
-
         public void BrokerPriorityStatementTests()
         {
             PhaseOne100TestString(delegate(CreateBrokerPriorityStatement statement)
@@ -1697,13 +1330,9 @@ namespace SqlStudio.Tests.UTSqlScriptDom
             }, "alter broker priority bp1");
         }
 
- 
         [TestMethod] 
 		[Priority(0)]
 		[SqlStudioTestCategory(Category.UnitTest)]
-
-        
-
         public void FulltextStoplistStatementTests()
         {
             PhaseOne100TestString(delegate(CreateFullTextStopListStatement statement)
@@ -1717,13 +1346,9 @@ namespace SqlStudio.Tests.UTSqlScriptDom
             }, "alter fulltext stoplist fs1");
         }
 
- 
         [TestMethod] 
 		[Priority(0)]
 		[SqlStudioTestCategory(Category.UnitTest)]
-
-        
-
         public void CryptographicProviderStatementTests()
         {
             PhaseOne100TestString(delegate(CreateCryptographicProviderStatement statement)
@@ -1737,13 +1362,9 @@ namespace SqlStudio.Tests.UTSqlScriptDom
             }, "alter cryptographic provider cp1");
         }
 
- 
         [TestMethod] 
 		[Priority(0)]
 		[SqlStudioTestCategory(Category.UnitTest)]
-
-        
-
         public void EventSessionStatementTests()
         {
             PhaseOne100TestString(delegate(CreateEventSessionStatement statement)
@@ -1757,13 +1378,9 @@ namespace SqlStudio.Tests.UTSqlScriptDom
             }, "alter event session es1");
         }
 
- 
         [TestMethod] 
 		[Priority(0)]
 		[SqlStudioTestCategory(Category.UnitTest)]
-
-        
-
         public void CreateSpatialIndexStatementTest()
         {
             PhaseOne100TestString(delegate(CreateSpatialIndexStatement statement)
@@ -1772,13 +1389,9 @@ namespace SqlStudio.Tests.UTSqlScriptDom
             }, "create spatial index sp1");
         }
 
- 
         [TestMethod] 
 		[Priority(0)]
 		[SqlStudioTestCategory(Category.UnitTest)]
-
-        
-
         public void AuditStatementsTest()
         {
             PhaseOne100TestString(delegate(CreateServerAuditStatement st)
@@ -1812,13 +1425,9 @@ namespace SqlStudio.Tests.UTSqlScriptDom
             }, "ALTER DATABASE AUDIT SPECIFICATION sp1");
         }
 
- 
         [TestMethod] 
 		[Priority(0)]
 		[SqlStudioTestCategory(Category.UnitTest)]
-
-        
-
         public void CreateExternalDataSource()
         {
             PhaseOne130Test(delegate(CreateExternalDataSourceStatement statement)
@@ -1827,13 +1436,9 @@ namespace SqlStudio.Tests.UTSqlScriptDom
             }, "CreateExternalDataSource.sql");
         }
 
- 
         [TestMethod] 
 		[Priority(0)]
 		[SqlStudioTestCategory(Category.UnitTest)]
-
-        
-
         public void CreateExternalFileFormat()
         {
             PhaseOne130Test(delegate(CreateExternalFileFormatStatement statement)
@@ -1842,13 +1447,9 @@ namespace SqlStudio.Tests.UTSqlScriptDom
             }, "CreateExternalFileFormat.sql");
         }
 
- 
         [TestMethod] 
 		[Priority(0)]
 		[SqlStudioTestCategory(Category.UnitTest)]
-
-        
-
         public void CreateExternalTable()
         {
             PhaseOne130Test(delegate(CreateExternalTableStatement statement)

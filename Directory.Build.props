@@ -50,6 +50,8 @@
     <!-- put obj files in a mirror tree off the root to keep the src folder tree cleaner -->
     <BaseIntermediateOutputPath Condition=" '$(BaseIntermediateOutputPath)' == '' ">$(EnlistmentRoot)\obj\$([MSBuild]::MakeRelative('$(EnlistmentRoot)\', $(MSBuildProjectDirectory)))</BaseIntermediateOutputPath>
 
+    <AnalysisLevelPerformance>latest-minimum</AnalysisLevelPerformance>
+
     <AntlrSourceUrl Condition="'$(OS)' != 'Windows_NT'">https://www.antlr2.org/download/antlr-2.7.5.jar</AntlrSourceUrl>
     <AntlrLocation Condition="'$(OS)' != 'Windows_NT'">$(BaseIntermediateOutputPath)\antlr-2.7.5.jar</AntlrLocation>
     <AntlrSourceUrl Condition="'$(OS)' == 'Windows_NT'">https://www.antlr2.org/download/antlr-2.7.5.exe</AntlrSourceUrl>

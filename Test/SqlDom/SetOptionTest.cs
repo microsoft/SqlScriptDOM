@@ -43,7 +43,6 @@ namespace SqlStudio.Tests.UTSqlScriptDom
             return String.Format("{0} {1} {2}", "SET", option, isOn ? "ON" : "OFF");
         }
 
- 
         [TestMethod] 
 		[Priority(0)]
 		[SqlStudioTestCategory(Category.UnitTest)]
@@ -103,7 +102,7 @@ namespace SqlStudio.Tests.UTSqlScriptDom
             }, true);
         }
 
-        private PredicateSetStatement AssertPredicateState(TSqlParser parser, string strStatement, SetOptions option, bool isOn)
+        private static PredicateSetStatement AssertPredicateState(TSqlParser parser, string strStatement, SetOptions option, bool isOn)
         {
             TSqlScript script = (TSqlScript)ParserTestUtils.ParseStringNoErrors(parser, strStatement);
 
@@ -117,7 +116,7 @@ namespace SqlStudio.Tests.UTSqlScriptDom
             return statement;
         }
 
-        private SetStatisticsStatement AssertSetStatementState(TSqlParser parser, string strStatement, SetStatisticsOptions option, bool isOn)
+        private static SetStatisticsStatement AssertSetStatementState(TSqlParser parser, string strStatement, SetStatisticsOptions option, bool isOn)
         {
             TSqlScript script = (TSqlScript)ParserTestUtils.ParseStringNoErrors(parser, strStatement);
 
