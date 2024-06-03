@@ -1,3 +1,6 @@
+-- Table with Json Column
+CREATE TABLE t1(c1 json)
+
 -- xml compression
 CREATE TABLE t1 (c1 INT) 
 	WITH (XML_COMPRESSION = ON ON PARTITIONS (1))

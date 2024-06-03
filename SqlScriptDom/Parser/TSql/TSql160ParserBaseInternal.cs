@@ -56,6 +56,17 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
             VerifyAllowedOnlineIndexOptionLowPriorityLockWait(statement, option);
         }
 
+        protected static SqlDataTypeOption ParseDataType160(string token)
+        {
+            switch (token.ToUpperInvariant())
+            {
+                case "JSON":
+                    return SqlDataTypeOption.Json;
+                default:
+                    return ParseDataType100(token);
+            }
+        }
+
         /// <summary>
         /// Checks if table definition contains 'generated always' columns that match period definition,
         /// if period definition exists.

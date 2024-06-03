@@ -30081,7 +30081,7 @@ scalarDataType returns [DataTypeReference vResult = null]
                 if (vName.SchemaIdentifier == null ||
                     (vName.SchemaIdentifier != null && IsSys(vName.SchemaIdentifier)))
                 {
-                    typeOption = ParseDataType100(vName.BaseIdentifier.Value);
+                    typeOption = ParseDataType160(vName.BaseIdentifier.Value);
                     isXmlDataType = IsXml(vName.BaseIdentifier);
                 }
             }
