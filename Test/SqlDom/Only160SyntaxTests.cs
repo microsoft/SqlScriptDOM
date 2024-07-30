@@ -15,6 +15,8 @@ namespace SqlStudio.Tests.UTSqlScriptDom
         // Note: These filenames are case sensitive, make sure they match the checked-in file exactly
         private static readonly ParserTest[] Only160TestInfos =
         {
+            new ParserTest160("AlterTableStatementTests160.sql", nErrors80: 0, nErrors90: 0, nErrors100: 0, nErrors110: 0, nErrors120: 0, nErrors130: 0, nErrors140: 0, nErrors150: 0),
+            new ParserTest160("ExpressionTests160.sql", nErrors80: 1, nErrors90: 0, nErrors100: 0, nErrors110: 0, nErrors120: 0, nErrors130: 0, nErrors140: 0, nErrors150: 0),
             new ParserTest160("CreateUserFromExternalProvider160.sql", nErrors80: 2, nErrors90: 1, nErrors100: 1, nErrors110: 1, nErrors120: 1, nErrors130: 1, nErrors140: 1, nErrors150: 1),
             new ParserTest160("CreateExternalTableStatementTests160.sql", nErrors80: 2, nErrors90: 2, nErrors100: 2, nErrors110: 2, nErrors120: 2, nErrors130: 2, nErrors140: 2, nErrors150: 2),
             new ParserTest160("WindowClauseTests160.sql", nErrors80: 14, nErrors90: 13, nErrors100: 13, nErrors110: 13, nErrors120: 13, nErrors130: 13, nErrors140: 13, nErrors150: 13),
@@ -25,6 +27,8 @@ namespace SqlStudio.Tests.UTSqlScriptDom
             new ParserTest160("MergeStatementTests160.sql", nErrors80: 1, nErrors90: 5, nErrors100: 5, nErrors110: 5, nErrors120: 5, nErrors130: 5, nErrors140: 5, nErrors150: 5),
             new ParserTest160("SelectStatementTests160.sql", nErrors80: 5, nErrors90: 5, nErrors100: 5, nErrors110: 5, nErrors120: 5, nErrors130: 5, nErrors140: 5, nErrors150: 5),
             new ParserTest160("CreateTableTests160.sql", nErrors80: 11, nErrors90: 11, nErrors100: 11, nErrors110: 11, nErrors120: 11, nErrors130: 7, nErrors140: 7, nErrors150: 7),
+            new ParserTest160("CreateFunctionStatementTests160.sql", nErrors80: 0, nErrors90: 0, nErrors100: 0, nErrors110: 0, nErrors120: 0, nErrors130: 0, nErrors140: 0, nErrors150: 0),
+            new ParserTest160("CreateProcedureStatementTests160.sql", nErrors80: 0, nErrors90: 0, nErrors100: 0, nErrors110: 0, nErrors120: 0, nErrors130: 0, nErrors140: 0, nErrors150: 0),
             new ParserTest160("OpenRowsetStatementTests160.sql", nErrors80: 9, nErrors90: 9, nErrors100: 9, nErrors110: 9, nErrors120: 9, nErrors130: 9, nErrors140: 9, nErrors150: 3),
             new ParserTest160("WithinGroupTests160.sql", nErrors80: 2, nErrors90: 2, nErrors100: 2, nErrors110: 2, nErrors120: 2, nErrors130: 0, nErrors140: 0, nErrors150: 0),
             // Built-in functions with valid opening and closing parantheses are recognized by default for all parser versions
