@@ -37,6 +37,10 @@ CREATE TABLE t3 (
 )
 WITH (XML_COMPRESSION = ON, DATA_COMPRESSION = PAGE);
 
+CREATE TABLE t4 (
+    c1 VECTOR (10)
+);
+
 CREATE TABLE myTable1_HASH_MCD (
     id       INT          NOT NULL,
     lastName VARCHAR (20),
