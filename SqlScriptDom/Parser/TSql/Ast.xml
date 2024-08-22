@@ -3552,12 +3552,14 @@
     <InheritedClass Name="TableReferenceWithAliasAndColumns" />
     <Member Name="Target" Type="SchemaObjectName" Summary="Table on which to obtain tracked changes."/>
     <Member Name="SinceVersion" Type="ValueExpression" Summary="Specifies the point from which changes are required."/>
+    <Member Name="ForceSeek" Type="bool" Summary="Optional parameter that forces a seek operation to be used to access the table_name"/>
   </Class>
   <Class Name="ChangeTableVersionTableReference" Base="TableReferenceWithAliasAndColumns" Summary="CHANGETABLE clause with VERSION option.">
     <InheritedClass Name="TableReferenceWithAliasAndColumns" />
     <Member Name="Target" Type="SchemaObjectName" Summary="Table on which to obtain tracked changes."/>
     <Member Name="PrimaryKeyColumns" Type="Identifier" Collection="true" Summary="Primary key column names."/>
     <Member Name="PrimaryKeyValues" Type="ScalarExpression" Collection="true" Summary="Values for primary key columns."/>
+    <Member Name="ForceSeek" Type="bool" Summary="Optional parameter that forces a seek operation to be used to access the table_name"/>
   </Class>
   <Class Name="BooleanTernaryExpression" Base="BooleanExpression" Summary="A boolean expression that has three expressions as children.">
     <Member Name="TernaryExpressionType" Type="BooleanTernaryExpressionType" GenerateUpdatePositionInfoCall="false" Summary="The type of the expression."/>

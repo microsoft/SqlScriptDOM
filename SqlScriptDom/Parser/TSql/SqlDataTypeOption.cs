@@ -250,6 +250,11 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         /// </summary>
         Json = 34,
 
+        /// <summary>
+        /// Vector data type
+        /// </summary>
+        Vector = 35,
+
         #endregion
 
     }

@@ -62,6 +62,8 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
             {
                 case "JSON":
                     return SqlDataTypeOption.Json;
+                case "VECTOR":
+                    return SqlDataTypeOption.Vector;
                 default:
                     return ParseDataType100(token);
             }

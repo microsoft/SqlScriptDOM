@@ -48,7 +48,7 @@ namespace SqlStudio.Tests.UTSqlScriptDom
             new ParserTest150("CreateExternalLanguage150.sql", 2, 2, 2, 2, 2, 4, 4),
             new ParserTest150("AlterExternalLanguage150.sql", 2, 2, 2, 2, 2, 6, 6),
             new ParserTest150("DropExternalLanguage150.sql", 2, 2, 2, 2, 2, 2, 2),
-            new ParserTest150("FromClauseTests150.sql", 2, 2, 0, 0, 0, 0, 0),
+            new ParserTest150("FromClauseTests150.sql", 12, 12, 5, 5, 5, 0, 0),
             new ParserTest150("DeclareTableVariableTests150.sql", 1, 1, 1, 1, 1, 1, 1),
             new ParserTest150("MaterializedViewTests150.sql", 6, 3, 3, 3, 3, 0, 0)
         };

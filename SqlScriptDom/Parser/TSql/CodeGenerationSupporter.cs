@@ -1065,6 +1065,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         internal const string VardecimalStorageFormat = "VARDECIMAL_STORAGE_FORMAT";
         internal const string Varp = "VARP";
         internal const string VDevNo = "VDEVNO";
+        internal const string Vector = "Vector";
         internal const string Verbose = "VERBOSE";
         internal const string VerboseLogging = "VerboseLogging";
         internal const string VerifyOnly = "VERIFYONLY";

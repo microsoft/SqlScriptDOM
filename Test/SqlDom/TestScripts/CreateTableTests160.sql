@@ -24,6 +24,9 @@ CREATE TABLE t1 (c1 INT)
 CREATE TABLE t3 (c1 INT) 
 	WITH (XML_COMPRESSION = ON, DATA_COMPRESSION = PAGE);
 
+-- Table with vector column
+CREATE TABLE t4 (c1 vector(10))
+
 -- Table - Multi Column Distribution 
 --
 CREATE TABLE myTable1_HASH_MCD (

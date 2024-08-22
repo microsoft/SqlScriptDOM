@@ -21,7 +21,11 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
         {
             GenerateChangeTablePrefix(node.Target, CodeGenerationSupporter.Changes);
             GenerateFragmentIfNotNull(node.SinceVersion);
-
+            if (node.ForceSeek)
+            {
+                GenerateSymbolAndSpace(TSqlTokenType.Comma);
+                GenerateIdentifier(CodeGenerationSupporter.ForceSeek);
+            }
             GenerateSymbol(TSqlTokenType.RightParenthesis);
             GenerateTableAndColumnAliases(node);
         }
@@ -32,7 +36,11 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
             GenerateParenthesisedCommaSeparatedList(node.PrimaryKeyColumns);
             GenerateSymbolAndSpace(TSqlTokenType.Comma);
             GenerateParenthesisedCommaSeparatedList(node.PrimaryKeyValues);
-
+            if (node.ForceSeek)
+            {
+                GenerateSymbolAndSpace(TSqlTokenType.Comma);
+                GenerateIdentifier(CodeGenerationSupporter.ForceSeek);
+            }
             GenerateSymbol(TSqlTokenType.RightParenthesis);
             GenerateTableAndColumnAliases(node);
         }

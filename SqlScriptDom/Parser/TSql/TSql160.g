@@ -19135,7 +19135,7 @@ changesChangeTableParams [SchemaObjectName vTarget] returns [ChangeTableChangesT
     ValueExpression vSinceVersion;
     vResult.Target = vTarget;
 }
-    :   vSinceVersion = integerOrVariable
+    :   (vSinceVersion = integerOrVariable
         {
             vResult.SinceVersion = vSinceVersion;
         }
@@ -19144,6 +19144,13 @@ changesChangeTableParams [SchemaObjectName vTarget] returns [ChangeTableChangesT
         {
             vResult.SinceVersion = vSinceVersion;
         }
+        )
+        (Comma tHint:Identifier 
+            {
+                Match(tHint, CodeGenerationSupporter.ForceSeek);
+                vResult.ForceSeek = true;
+            }
+        )?
     ;
 
 versionChangeTableParams [SchemaObjectName vTarget] returns [ChangeTableVersionTableReference vResult = FragmentFactory.CreateFragment<ChangeTableVersionTableReference>()]
@@ -19157,6 +19164,12 @@ versionChangeTableParams [SchemaObjectName vTarget] returns [ChangeTableVersionT
         {
             UpdateTokenInfo(vResult, tRParen);
         }
+        (Comma tHint:Identifier 
+            {
+                Match(tHint, CodeGenerationSupporter.ForceSeek);
+                vResult.ForceSeek = true;
+            }
+        )?
     ;
 
 subDmlTableReference [SubDmlFlags subDmlFlags] returns [DataModificationTableReference vResult = FragmentFactory.CreateFragment<DataModificationTableReference>()]

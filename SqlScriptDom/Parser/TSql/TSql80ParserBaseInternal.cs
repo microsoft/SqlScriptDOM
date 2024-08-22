@@ -186,7 +186,8 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
             SqlDataTypeOption.Char, SqlDataTypeOption.VarChar, SqlDataTypeOption.NChar,
             SqlDataTypeOption.NVarChar, SqlDataTypeOption.Decimal, SqlDataTypeOption.Float, 
             SqlDataTypeOption.Numeric, SqlDataTypeOption.Binary, SqlDataTypeOption.VarBinary,
-            SqlDataTypeOption.Time, SqlDataTypeOption.DateTime2, SqlDataTypeOption.DateTimeOffset
+            SqlDataTypeOption.Time, SqlDataTypeOption.DateTime2, SqlDataTypeOption.DateTimeOffset,
+            SqlDataTypeOption.Vector
         };
 
         #region Constructors
