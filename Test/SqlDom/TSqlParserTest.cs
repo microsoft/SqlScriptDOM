@@ -535,6 +535,66 @@ END;";
             Assert.AreEqual(0, errors.Count);
         }
 
+        /// <summary>
+        /// This test validates the generation of table and stored procedure that contains CTAS statements
+        /// </summary>
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void CreateCTASParser160Test()
+        {
+            TSql160Parser parser = new TSql160Parser(true);
+            StringReader reader = new StringReader(@"
+                                                    -- CTAS
+                                                    CREATE TABLE TestTable AS
+                                                    SELECT customername, contactname
+                                                    FROM customers
+                                                    GO;
+
+                                                    -- CTAS in stored procedure - 'create table As Select *'
+                                                    CREATE PROCEDURE test_proc_withCreateSelect
+                                                    AS
+                                                    BEGIN
+                                                       CREATE TABLE Test1
+                                                       AS
+                                                       SELECT * FROM Test
+                                                    END
+                                                    GO;
+
+                                                    -- CTAS in stored procedure - 'create table With( ) As Select'
+                                                    CREATE PROCEDURE test_proc_withCreateWith
+                                                    AS
+                                                    BEGIN
+                                                       CREATE TABLE [dbo].[ReplicateToHash_ID]
+                                                       WITH(DISTRIBUTION = Hash(id))  
+                                                       AS SELECT ID FROM [dbo].[REPLICATE_TEST_UPDATE]
+                                                    END
+                                                    GO;
+
+                                                    -- CTAS in stored procedure - 'create table as Select columnsNames'
+                                                    CREATE PROCEDURE test_proc_withSelectColumns
+                                                    AS
+                                                    BEGIN
+                                                       CREATE TABLE Test1
+                                                       AS
+                                                       SELECT Id AS ID,
+	                                                    person AS Person
+	                                                    FROM Test
+                                                    END
+                                                    GO;");
+
+            var fragments = parser.Parse(reader, out IList<ParseError> errors);
+
+            Assert.IsTrue(errors.Count == 0);
+            Assert.AreEqual(4, ((TSqlScript)fragments).Batches.Count);
+            foreach(TSqlBatch batch in ((TSqlScript)fragments).Batches)
+            {
+                TSqlStatement statement = batch.Statements[0];
+                Assert.IsNotNull(statement);
+                Assert.IsTrue(statement is CreateTableStatement || statement is CreateProcedureStatement);
+            }
+        }
+
         void VerifyTokenTypesAndOffsets(IList<TSqlParserToken> tokens, TSqlTokenType[] tokenTypes, int[] zeroBasedTokenOffsets, int offsetShift)
         {
             Assert.AreEqual<int>(tokenTypes.Length, tokens.Count);

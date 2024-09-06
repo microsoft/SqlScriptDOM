@@ -4,9 +4,11 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
+using System.Collections.Generic;
 using System.IO;
 using Microsoft.SqlServer.TransactSql.ScriptDom;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Newtonsoft.Json.Linq;
 using SqlStudio.Tests.AssemblyTools.TestCategory;
 
 namespace SqlStudio.Tests.UTSqlScriptDom

@@ -26510,6 +26510,11 @@ createTableStatement returns [CreateTableStatement vResult = this.FragmentFactor
                     }
                     UpdateTokenInfo(vResult, tFileTableOrGraphEdge);
                 }
+            |
+                As
+                {
+                    vResult.SelectStatement = selectStatement(SubDmlFlags.None);
+                }
         )
 
         // Default is not used as a keyword after on or textimage_on (even though it is a keyword)
