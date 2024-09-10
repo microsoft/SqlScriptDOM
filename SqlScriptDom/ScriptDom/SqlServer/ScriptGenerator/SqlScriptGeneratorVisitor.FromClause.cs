@@ -31,8 +31,12 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
 
                     MarkClauseBodyAlignmentWhenNecessary(_options.NewLineBeforeFromClause, clauseBody);
 
-                    GenerateSpace();
-
+                    GenerateNewLineOrSpace(_options.NewLineAfterFromClause);
+                    if (_options.NewLineAfterFromClause)
+                    {
+                        Indent();
+                    }
+                    
                     AlignmentPoint fromItems = new AlignmentPoint();
                     MarkAndPushAlignmentPoint(fromItems);
 

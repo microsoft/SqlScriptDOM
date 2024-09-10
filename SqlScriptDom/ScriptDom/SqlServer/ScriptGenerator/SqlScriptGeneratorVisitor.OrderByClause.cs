@@ -17,6 +17,11 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
             GenerateKeyword(TSqlTokenType.Order);
             GenerateSpaceAndKeyword(TSqlTokenType.By);
 
+            if (_options.NewLineAfterHavingKeyword)
+            {
+                NewLineAndIndent();
+            }
+
             AlignmentPoint clauseBody = GetAlignmentPointForFragment(node, ClauseBody);
             MarkClauseBodyAlignmentWhenNecessary(_options.NewLineBeforeOrderByClause, clauseBody);
 

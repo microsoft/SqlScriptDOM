@@ -16,6 +16,11 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
             GenerateKeyword(TSqlTokenType.Group);
             GenerateSpaceAndKeyword(TSqlTokenType.By);
 
+            if (_options.NewLineAfterGroupByKeyword)
+            {
+                NewLineAndIndent();
+            }
+
             if (node.All)
             {
                 GenerateSpaceAndKeyword(TSqlTokenType.All);

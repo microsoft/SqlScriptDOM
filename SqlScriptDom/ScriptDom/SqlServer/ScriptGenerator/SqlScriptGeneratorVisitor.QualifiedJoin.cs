@@ -51,8 +51,20 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
             NewLine();
             GenerateFragmentIfNotNull(node.SecondTableReference);
 
-            NewLine();
-            GenerateKeyword(TSqlTokenType.On); 
+            if (_options.NewLineBeforeOnKeyword)
+            {
+                NewLine();
+            }
+            else
+            {
+                GenerateSpace();
+            }
+            GenerateKeyword(TSqlTokenType.On);
+            if (_options.NewLineAfterOnKeyword)
+            {
+                NewLine();
+                Indent();
+            }
 
             GenerateSpaceAndFragmentIfNotNull(node.SearchCondition);
         }

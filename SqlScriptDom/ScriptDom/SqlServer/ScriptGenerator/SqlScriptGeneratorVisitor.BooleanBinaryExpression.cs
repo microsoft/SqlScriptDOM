@@ -19,11 +19,13 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
 
             Boolean insertNewline = RightPredicateOnNewline(node);
 
-            GenerateNewLineOrSpace(insertNewline);
+            GenerateNewLineOrSpace(insertNewline && _options.NewLineBeforeBinaryBooleanExpresson);
 
             GenerateBinaryOperator(node.BinaryExpressionType);
 
-            GenerateSpaceAndFragmentIfNotNull(node.SecondExpression);
+            GenerateNewLineOrSpace(insertNewline && _options.NewLineAfterBinaryBooleanExpresson);
+
+            GenerateFragmentIfNotNull(node.SecondExpression);
 
             PopAlignmentPoint();
         }

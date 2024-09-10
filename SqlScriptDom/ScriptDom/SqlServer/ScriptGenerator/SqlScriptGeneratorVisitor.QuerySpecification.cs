@@ -33,7 +33,15 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
 
             GenerateSpaceAndFragmentIfNotNull(node.TopRowFilter);
 
-            GenerateSpace();
+            if (_options.NewLineAfterSelectKeyword)
+            {
+                NewLineAndIndent();
+            }
+            else
+            {
+                GenerateSpace();
+            }
+
             GenerateSelectElementsList(node.SelectElements);
 
             if (intoClause != null)
