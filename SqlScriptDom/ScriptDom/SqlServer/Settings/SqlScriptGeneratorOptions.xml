@@ -50,19 +50,19 @@
     <Setting name="NewLineBeforeWhereClause" type="bool" default="true">
       <Summary>Gets or sets a boolean indicating if there should be a newline before the WHERE clause in a SELECT statement</Summary>
     </Setting>
-	<Setting name="NewLineAfterGroupByKeyword" type="bool" default="true">
+	<Setting name="NewLineAfterGroupByKeyword" type="bool" default="false">
 	 <Summary>Gets or sets a boolean indicating if there should be a newline after the GROUP BY keyword in a GROUP BY clause</Summary>
 	</Setting>
     <Setting name="NewLineBeforeGroupByClause" type="bool" default="true">
       <Summary>Gets or sets a boolean indicating if there should be a newline before the GROUP BY clause in a SELECT statement</Summary>
     </Setting>
-	<Setting name="NewLineAfterOrderByKeyword" type="bool" default="true">
+	<Setting name="NewLineAfterOrderByKeyword" type="bool" default="false">
 	  <Summary>Gets or sets a boolean indicating if there should be a newline after the ORDER BY keyword in a GROUP BY clause</Summary>
 	</Setting>
     <Setting name="NewLineBeforeOrderByClause" type="bool" default="true">
       <Summary>Gets or sets a boolean indicating if there should be a newline before the ORDER BY clause in a SELECT statement</Summary>
     </Setting>
-	<Setting name="NewLineAfterHavingKeyword" type="bool" default="true">
+	<Setting name="NewLineAfterHavingKeyword" type="bool" default="false">
 	  <Summary>Gets or sets a boolean indicating if there should be a newline after the HAVING keyword in a GROUP BY clause</Summary>
 	</Setting>
     <Setting name="NewLineBeforeHavingClause" type="bool" default="true">
