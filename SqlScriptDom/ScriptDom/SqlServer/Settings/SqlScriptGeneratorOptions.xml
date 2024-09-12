@@ -38,33 +38,33 @@
     <Setting name="NewLineBeforeFromClause" type="bool" default="true">
       <Summary>Gets or sets a boolean indicating if there should be a newline before the FROM clause in a SELECT statement</Summary>
     </Setting>
-	<Setting name="NewLineAfterFromClause" type="bool" default="false">
-	  <Summary>Gets or sets a boolean indicating if there should be a newline after the FROM clause in a SELECT statement</Summary>
-	</Setting>
-	<Setting name="NewLineAfterSelectKeyword" type="bool" default="false">
-	  <Summary>Gets or sets a boolean indicating if there should be a newline after the SELECT in a SELECT statement</Summary>
-	</Setting>
-	 <Setting name="NewLineAfterWhereKeyword" type="bool" default="false">
-	  <Summary>Gets or sets a boolean indicating if there should be a newline after the WHERE keyword in a WHERE clause</Summary>
-	 </Setting>
+    <Setting name="NewLineAfterFromClause" type="bool" default="false">
+  	  <Summary>Gets or sets a boolean indicating if there should be a newline after the FROM clause in a SELECT statement</Summary>
+  	</Setting>
+  	<Setting name="NewLineAfterSelectKeyword" type="bool" default="false">
+  	  <Summary>Gets or sets a boolean indicating if there should be a newline after the SELECT in a SELECT statement</Summary>
+  	</Setting>
+  	<Setting name="NewLineAfterWhereKeyword" type="bool" default="false">
+  	  <Summary>Gets or sets a boolean indicating if there should be a newline after the WHERE keyword in a WHERE clause</Summary>
+  	</Setting>
     <Setting name="NewLineBeforeWhereClause" type="bool" default="true">
       <Summary>Gets or sets a boolean indicating if there should be a newline before the WHERE clause in a SELECT statement</Summary>
     </Setting>
-	<Setting name="NewLineAfterGroupByKeyword" type="bool" default="false">
-	 <Summary>Gets or sets a boolean indicating if there should be a newline after the GROUP BY keyword in a GROUP BY clause</Summary>
-	</Setting>
+  	<Setting name="NewLineAfterGroupByKeyword" type="bool" default="false">
+  	  <Summary>Gets or sets a boolean indicating if there should be a newline after the GROUP BY keyword in a GROUP BY clause</Summary>
+  	</Setting>
     <Setting name="NewLineBeforeGroupByClause" type="bool" default="true">
       <Summary>Gets or sets a boolean indicating if there should be a newline before the GROUP BY clause in a SELECT statement</Summary>
     </Setting>
-	<Setting name="NewLineAfterOrderByKeyword" type="bool" default="false">
-	  <Summary>Gets or sets a boolean indicating if there should be a newline after the ORDER BY keyword in a GROUP BY clause</Summary>
-	</Setting>
+  	<Setting name="NewLineAfterOrderByKeyword" type="bool" default="false">
+  	  <Summary>Gets or sets a boolean indicating if there should be a newline after the ORDER BY keyword in a GROUP BY clause</Summary>
+  	</Setting>
     <Setting name="NewLineBeforeOrderByClause" type="bool" default="true">
       <Summary>Gets or sets a boolean indicating if there should be a newline before the ORDER BY clause in a SELECT statement</Summary>
     </Setting>
-	<Setting name="NewLineAfterHavingKeyword" type="bool" default="false">
-	  <Summary>Gets or sets a boolean indicating if there should be a newline after the HAVING keyword in a GROUP BY clause</Summary>
-	</Setting>
+  	<Setting name="NewLineAfterHavingKeyword" type="bool" default="false">
+  	  <Summary>Gets or sets a boolean indicating if there should be a newline after the HAVING keyword in a GROUP BY clause</Summary>
+  	</Setting>
     <Setting name="NewLineBeforeHavingClause" type="bool" default="true">
       <Summary>Gets or sets a boolean indicating if there should be a newline before the HAVING clause in a SELECT statement</Summary>
     </Setting>
@@ -74,24 +74,24 @@
     <Setting name="NewLineBeforeJoinClause" type="bool" default="true">
       <Summary>Gets or sets a boolean indicating if there should be a newline before the JOIN clause in a SELECT statement</Summary>
     </Setting>
-	<Setting name="NewLineBeforeOnKeyword" type="bool" default="true">
-	  <Summary>Gets or sets a boolean indicating if there should be a newline before the ON keyword in a JOIN clause</Summary>
-	</Setting>
-	<Setting name="NewLineAfterOnKeyword" type="bool" default="false">
-	  <Summary>Gets or sets a boolean indicating if there should be a newline after the ON keyword in a JOIN clause</Summary>
-	</Setting>
+  	<Setting name="NewLineBeforeOnKeyword" type="bool" default="true">
+  	  <Summary>Gets or sets a boolean indicating if there should be a newline before the ON keyword in a JOIN clause</Summary>
+  	</Setting>
+  	<Setting name="NewLineAfterOnKeyword" type="bool" default="false">
+  	  <Summary>Gets or sets a boolean indicating if there should be a newline after the ON keyword in a JOIN clause</Summary>
+  	</Setting>
     <Setting name="NewLineBeforeOffsetClause" type="bool" default="true">
       <Summary>Gets or sets a boolean indicating if there should be a newline before the OFFSET clause</Summary>
     </Setting>
     <Setting name="NewLineBeforeOutputClause" type="bool" default="true">
       <Summary>Gets or sets a boolean indicating if there should be a newline before the OUTPUT clause</Summary>
     </Setting>
-	<Setting name="NewLineBeforeBinaryBooleanExpresson" type="bool" default="true">
-	  <Summary>Gets or sets a boolean indicating if there should be a newline before the AND/OR keyword</Summary>
-	</Setting>
-	<Setting name="NewLineAfterBinaryBooleanExpresson" type="bool" default="false">
-	  <Summary>Gets or sets a boolean indicating if there should be a newline after the AND/OR keyword</Summary>
-	</Setting>
+  	<Setting name="NewLineBeforeBinaryBooleanExpresson" type="bool" default="true">
+  	  <Summary>Gets or sets a boolean indicating if there should be a newline before the AND/OR keyword</Summary>
+  	</Setting>
+  	<Setting name="NewLineAfterBinaryBooleanExpresson" type="bool" default="false">
+  	  <Summary>Gets or sets a boolean indicating if there should be a newline after the AND/OR keyword</Summary>
+  	</Setting>
   </SettingGroup>
   <SettingGroup name="Alignment">
     <Setting name="AlignClauseBodies" type="bool" default="true">
