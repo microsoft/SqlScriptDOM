@@ -466,6 +466,28 @@ END;";
         [Priority(0)]
         [Timeout(GlobalConstants.DefaultTestTimeout)]
         [SqlStudioTestCategory(Category.UnitTest)]
+        public void ParsingSelectWithNoOptimizerHint()
+        {
+            string input = "";
+            IList<ParseError> errors = null;
+            TSqlScript script = null;
+
+            input = @"Select 1";
+            errors = null;
+            script = (TSqlScript)new TSql80Parser(true).Parse(new StringReader(input), out errors);
+
+            script.Accept(new GenericFragmentVisitor<SelectStatement>(
+                 delegate (SelectStatement select)
+                 {
+                     return select != null && !select.OptimizerHints.Any();
+                 }
+            ));
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [Timeout(GlobalConstants.DefaultTestTimeout)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void OpenRowsetBulkWithTwoFiles()
         {
             string input = @"SELECT TOP 10 * FROM OPENROWSET (BULK ('https://azureopendatastorage.blob.core.windows.net/censusdatacontainer/release/us_population_county/year=2000/*.parquet', 'https://azureopendatastorage.blob.core.windows.net/censusdatacontainer/release/us_population_county/year=2010/*.parquet'), FORMAT = 'PARQUET') AS [r9];";
