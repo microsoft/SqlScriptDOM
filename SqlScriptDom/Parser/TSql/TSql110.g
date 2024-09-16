@@ -17873,39 +17873,47 @@ simpleOptimizerHint returns [OptimizerHint vResult = FragmentFactory.CreateFragm
     : tHashLoop:Identifier Join
         {
             vResult.HintKind = ParseJoinOptimizerHint(tHashLoop);
+            UpdateTokenInfo(vResult, tHashLoop); 
         }
-    | Merge Join
+    | tMerge:Merge Join
         {
             vResult.HintKind = OptimizerHintKind.MergeJoin;
+            UpdateTokenInfo(vResult, tMerge); 
         }
-    | tConcatHashKeep:Identifier Union 
+    | tConcatHashKeep:Identifier Union
         {
             vResult.HintKind = ParseUnionOptimizerHint(tConcatHashKeep);
+            UpdateTokenInfo(vResult, tConcatHashKeep);
         }
-    | Merge Union 
+    | tMergeUnion:Merge Union
         {
             vResult.HintKind = OptimizerHintKind.MergeUnion;
+            UpdateTokenInfo(vResult, tMergeUnion); 
         }
     | tForce:Identifier Order
         {
             Match(tForce, CodeGenerationSupporter.Force);
             vResult.HintKind = OptimizerHintKind.ForceOrder;
+            UpdateTokenInfo(vResult, tForce); 
         }
     | tHash:Identifier Group
         {
             Match(tHash, CodeGenerationSupporter.Hash);
             vResult.HintKind = OptimizerHintKind.HashGroup;
+            UpdateTokenInfo(vResult, tHash);
         }
     | tOrder:Order Group
         {
             vResult.HintKind = OptimizerHintKind.OrderGroup;
+            UpdateTokenInfo(vResult, tOrder); 
         }
     | tPlan:Identifier Plan
         {
             vResult.HintKind = PlanOptimizerHintHelper.Instance.ParseOption(tPlan, SqlVersionFlags.TSql110);
+            UpdateTokenInfo(vResult, tPlan); 
         }
     | tFirstWord:Identifier tSecondWord:Identifier
-        ( 
+        (
             /* empty */
             {
                 if (TryMatch(tFirstWord, CodeGenerationSupporter.Expand))
@@ -17928,27 +17936,21 @@ simpleOptimizerHint returns [OptimizerHint vResult = FragmentFactory.CreateFragm
                     Match(tFirstWord, CodeGenerationSupporter.Bypass);
                     Match(tSecondWord, CodeGenerationSupporter.OptimizerQueue);
                     vResult.HintKind = OptimizerHintKind.BypassOptimizerQueue;
-                }        
+                }
+                UpdateTokenInfo(vResult, tFirstWord); 
             }
         | tUnion2:Union All
             {
                 Match(tFirstWord, CodeGenerationSupporter.Optimize);
                 Match(tSecondWord, CodeGenerationSupporter.Correlated);
                 vResult.HintKind = OptimizerHintKind.OptimizeCorrelatedUnionAll;
+                UpdateTokenInfo(vResult, tUnion2); 
             }
         )
-    | tRecompileOrColumnStore:Identifier
+    | tMonoHint:Identifier
         {
-            if (TryMatch(tRecompileOrColumnStore, CodeGenerationSupporter.Recompile))
-            {
-                Match(tRecompileOrColumnStore, CodeGenerationSupporter.Recompile);
-                vResult.HintKind = OptimizerHintKind.Recompile;
-            }
-            else
-            {
-                Match(tRecompileOrColumnStore, CodeGenerationSupporter.IgnoreNonClusteredColumnStoreIndex);
-                vResult.HintKind = OptimizerHintKind.IgnoreNonClusteredColumnStoreIndex;
-            }
+            vResult.HintKind = MonoOptimizerHintHelper.Instance.ParseOption(tMonoHint, SqlVersionFlags.TSql110);
+            UpdateTokenInfo(vResult, tMonoHint); 
         }
     ;
 
