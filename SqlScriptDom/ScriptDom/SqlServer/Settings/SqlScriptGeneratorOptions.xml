@@ -28,6 +28,9 @@
       <Description>IncludeSemiColons_Description</Description>
       <Summary>Gets or sets a boolean indicating if a semi colon should be included after each statement</Summary>
     </Setting>
+    <Setting name="NumNewlinesAfterStatement" type="int" default="1" min="0">
+      <Summary>Gets or sets the number of newlines to include after each statement</Summary>
+    </Setting>
   </SettingGroup>
   <SettingGroup name="CREATE TABLE">
     <Setting name="AlignColumnDefinitionFields" type="bool" default="true">
