@@ -18450,10 +18450,19 @@ simpleOptimizerHint returns [OptimizerHint vResult = FragmentFactory.CreateFragm
                 UpdateTokenInfo(vResult, tUnion2); 
             }
         )
-    | tMonoHint:Identifier
+    | tRecompileOrColumnStore:Identifier
         {
-            vResult.HintKind = MonoOptimizerHintHelper.Instance.ParseOption(tMonoHint, SqlVersionFlags.TSql120);
-            UpdateTokenInfo(vResult, tMonoHint); 
+            if (TryMatch(tRecompileOrColumnStore, CodeGenerationSupporter.Recompile))
+            {
+                Match(tRecompileOrColumnStore, CodeGenerationSupporter.Recompile);
+                vResult.HintKind = OptimizerHintKind.Recompile;
+            }
+            else
+            {
+                Match(tRecompileOrColumnStore, CodeGenerationSupporter.IgnoreNonClusteredColumnStoreIndex);
+                vResult.HintKind = OptimizerHintKind.IgnoreNonClusteredColumnStoreIndex;
+            }
+            UpdateTokenInfo(vResult, tRecompileOrColumnStore); 
         }
     ;
 
