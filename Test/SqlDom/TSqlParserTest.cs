@@ -466,6 +466,57 @@ END;";
         [Priority(0)]
         [Timeout(GlobalConstants.DefaultTestTimeout)]
         [SqlStudioTestCategory(Category.UnitTest)]
+        public void ParsingSelectWithOptimizerHint()
+        {
+            string input = "";
+            IList<ParseError> errors = null;
+            TSqlScript script = null;
+
+            input = @"Select 1 option(
+HASH  GROUP, 
+ORDER  GROUP, 
+CONCAT UNION, 
+HASH UNION,
+MERGE UNION,
+Keep UNION,
+LOOP  JOIN, 
+HASH  JOIN, 
+MERGE  JOIN,  
+PARAMETERIZATION Simple,
+IGNORE_NONCLUSTERED_COLUMNSTORE_INDEX, 
+KEEP PLAN, 
+KEEPFIXED PLAN,
+recompile, 
+EXPAND VIEWS)";
+            errors = null;
+            script = (TSqlScript)new TSql160Parser(true).Parse(new StringReader(input), out errors);
+            Assert.IsTrue(errors.Count == 0, "Unexpected parsing error");
+
+            var selectStatement = (SelectStatement) script.Batches[0].Statements[0];
+            Assert.IsNotNull(selectStatement);
+            Assert.IsTrue(selectStatement.OptimizerHints.Any());
+
+            SqlScriptGenerator scriptGenerator = new Sql160ScriptGenerator();
+            scriptGenerator.GenerateScript(script, out string actualResult);
+            Assert.IsTrue(actualResult.IndexOf("option", StringComparison.OrdinalIgnoreCase) > 0);
+
+            foreach (var hint in selectStatement.OptimizerHints)
+            {
+                Assert.IsTrue(hint.FirstTokenIndex > 0 && hint.LastTokenIndex > 0);
+            }
+
+            selectStatement.Accept(new GenericFragmentVisitor<SelectStatement>(
+                 delegate (SelectStatement select)
+                 {
+                     return select != null && select.OptimizerHints.Any();
+                 }
+            ));
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [Timeout(GlobalConstants.DefaultTestTimeout)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void OpenRowsetBulkWithTwoFiles()
         {
             string input = @"SELECT TOP 10 * FROM OPENROWSET (BULK ('https://azureopendatastorage.blob.core.windows.net/censusdatacontainer/release/us_population_county/year=2000/*.parquet', 'https://azureopendatastorage.blob.core.windows.net/censusdatacontainer/release/us_population_county/year=2010/*.parquet'), FORMAT = 'PARQUET') AS [r9];";
