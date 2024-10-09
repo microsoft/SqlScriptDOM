@@ -16,3 +16,7 @@ SELECT VECTOR_NORM(@v1, 'norm2');
 -- VECTOR_NORMALIZE
 SELECT VECTOR_NORMALIZE(@v1, 'norm1') AS normalized_vector;
 SELECT VECTOR_NORMALIZE(@v1, 'norm2') AS normalized_vector;
+
+-- VECTORPROPERTY Metadata function
+SELECT VECTORPROPERTY(@v1, 'Dimensions');
+SELECT VECTORPROPERTY(@v1, 'BaseType');
