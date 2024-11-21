@@ -4,6 +4,7 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
+using System;
 using Microsoft.SqlServer.TransactSql.ScriptDom;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SqlStudio.Tests.AssemblyTools.TestCategory;
@@ -112,6 +113,49 @@ namespace SqlStudio.Tests.UTSqlScriptDom
             var options = new SqlScriptGeneratorOptions();
             var scriptGenerator = new SqlServerlessScriptGenerator(options);
             Assert.AreEqual(SqlVersion.Sql160, scriptGenerator.Options.SqlVersion);
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestNewlinesBetweenStatementsGeneratorOption() {
+            var tableName = new SchemaObjectName();
+            tableName.Identifiers.Add(new Identifier { Value = "TableName" });
+
+            var tableStatement = new CreateTableStatement
+            {
+                SchemaObjectName = tableName
+            };
+            var tableStatementString = "CREATE TABLE TableName;";
+
+            var statements = new StatementList();
+            statements.Statements.Add(tableStatement);
+            statements.Statements.Add(tableStatement);
+
+            var generatorOptions = new SqlScriptGeneratorOptions {
+                KeywordCasing = KeywordCasing.Uppercase,
+                IncludeSemicolons = true,
+                NumNewlinesAfterStatement = 0
+            };
+
+            var generator = new Sql80ScriptGenerator(generatorOptions);
+
+            generator.GenerateScript(statements, out var sql);
+
+            Assert.AreEqual(tableStatementString + tableStatementString, sql);
+
+            generatorOptions.NumNewlinesAfterStatement = 1;
+            generator = new Sql80ScriptGenerator(generatorOptions);
+
+            generator.GenerateScript(statements, out sql);
+
+            Assert.AreEqual(tableStatementString + Environment.NewLine + tableStatementString, sql);
+
+            generatorOptions.NumNewlinesAfterStatement = 2;
+            generator = new Sql80ScriptGenerator(generatorOptions);
+
+            generator.GenerateScript(statements, out sql);
+            Assert.AreEqual(tableStatementString + Environment.NewLine + Environment.NewLine + tableStatementString, sql);
         }
     }
 }

@@ -23,7 +23,10 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
                     }
                     else
                     {
-                        NewLine();
+                        for (var i = 0; i < _options.NumNewlinesAfterStatement; i++)
+                        {
+                            NewLine();
+                        }
                     }
 
                     GenerateFragmentIfNotNull(statement);
