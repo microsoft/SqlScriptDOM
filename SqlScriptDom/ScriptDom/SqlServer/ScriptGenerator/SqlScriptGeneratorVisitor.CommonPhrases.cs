@@ -411,7 +411,10 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
         {
             if (node.Parameters.Count > 0)
             {
-                GenerateParenthesisedCommaSeparatedList(node.Parameters);
+                if (_options.SpaceBetweenDataTypeAndParameters) {
+                    GenerateSpace();
+                }
+                GenerateParenthesisedCommaSeparatedList(node.Parameters, _options.SpaceBetweenParametersInDataType);
             }
         }
 
