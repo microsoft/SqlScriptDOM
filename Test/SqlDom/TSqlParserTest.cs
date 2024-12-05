@@ -34,7 +34,8 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                 { SqlVersion.Sql130, typeof(TSql130Parser) },
                 { SqlVersion.Sql140, typeof(TSql140Parser) },
                 { SqlVersion.Sql150, typeof(TSql150Parser) },
-                { SqlVersion.Sql160, typeof(TSql160Parser) }
+                { SqlVersion.Sql160, typeof(TSql160Parser) },
+                { SqlVersion.Sql170, typeof(TSql170Parser) }
             };
 
             TSqlParser parser = new TSql80Parser(false);

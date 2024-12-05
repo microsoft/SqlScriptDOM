@@ -216,5 +216,18 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                 ParserTest.ParseAndVerify(parser, scriptGen, ti._scriptFilename, ti._result160);
             }
         }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void CommonSyntaxIn170ParserTest()
+        {
+            TSql170Parser parser = new TSql170Parser(true);
+            SqlScriptGenerator scriptGen = ParserTestUtils.CreateScriptGen(SqlVersion.Sql170);
+            foreach (ParserTest ti in CommonTestInfos)
+            {
+                ParserTest.ParseAndVerify(parser, scriptGen, ti._scriptFilename, ti._result170);
+            }
+        }
     }
 }

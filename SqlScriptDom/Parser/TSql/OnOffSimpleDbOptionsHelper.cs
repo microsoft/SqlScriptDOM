@@ -62,6 +62,10 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
 
             // 160 options
             AddOptionMapping(DatabaseOptionKind.Ledger, CodeGenerationSupporter.Ledger, SqlVersionFlags.TSql160AndAbove);
+
+            // 170 options
+            // TODO: add any new 170 options here
+
         }
 
         internal static readonly OnOffSimpleDbOptionsHelper Instance = new OnOffSimpleDbOptionsHelper();
