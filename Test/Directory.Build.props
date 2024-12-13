@@ -31,8 +31,7 @@
     <TargetFrameworks>$(NetfxVersion);$(NetCoreVersion)</TargetFrameworks>
 
     <!-- The TargetGroup can be used to express condition that are common to more than one TargetFramework (currently not used)-->
-    <TargetGroup Condition="'$(TargetFramework)'=='netstandard2.0' Or '$(TargetFramework)'=='netstandard2.1' Or '$(TargetFramework)'=='netstandard2.2'">netstandard</TargetGroup>
-    <TargetGroup Condition="'$(TargetFramework)'=='netcoreapp3.1' Or '$(TargetFramework)'=='net5.0' Or '$(TargetFramework)'=='net6.0'">netcore</TargetGroup>
+    <TargetGroup Condition="'$(TargetFramework)'=='net8.0'">netcore</TargetGroup>
     <TargetGroup Condition="'$(TargetGroup)'==''">netfx</TargetGroup>
 
     <!-- Enable optimized NuGet restore -->
