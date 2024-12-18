@@ -1,0 +1,5 @@
+﻿SELECT EDIT_DISTANCE('sitting', 'kitten');
+SELECT EDIT_DISTANCE('sitting', 'kitten', 2);
+SELECT EDIT_DISTANCE_SIMILARITY('hello1', NULL);
+SELECT JARO_WINKLER_DISTANCE('', '');
+SELECT JARO_WINKLER_SIMILARITY('abcdefghij', 'jihgfedcba');

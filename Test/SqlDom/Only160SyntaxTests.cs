@@ -38,6 +38,7 @@ namespace SqlStudio.Tests.UTSqlScriptDom
             new ParserTest160("TrimFunctionTests160.sql", nErrors80: 7, nErrors90: 7, nErrors100: 7, nErrors110: 7, nErrors120: 7, nErrors130: 7, nErrors140: 4, nErrors150: 4),
             new ParserTest160("JsonFunctionTests160.sql", nErrors80: 9, nErrors90: 8, nErrors100: 14, nErrors110: 14, nErrors120: 14, nErrors130: 14, nErrors140: 14, nErrors150: 14),
             new ParserTest160(scriptFilename: "IgnoreRespectNullsSyntaxTests160.sql", nErrors80: 12, nErrors90: 8, nErrors100: 8, nErrors110: 8, nErrors120: 8, nErrors130: 8, nErrors140: 8, nErrors150: 8),
+            new ParserTest160(scriptFilename: "FuzzyStringMatchingTests160.sql",  nErrors80: 0, nErrors90: 0, nErrors100: 0, nErrors110: 0, nErrors120: 0, nErrors130: 0, nErrors140: 0, nErrors150: 0),
             // OPENROWSET BULK statements specific to SQL Serverless Pools
             new ParserTest160(scriptFilename: "OpenRowsetBulkStatementTests160.sql", nErrors80: 8, nErrors90: 8, nErrors100: 8, nErrors110: 8, nErrors120: 8, nErrors130: 8, nErrors140: 8, nErrors150: 8),
             new ParserTest160(scriptFilename: "CreateStatisticsStatementTests160.sql", nErrors80: 4, nErrors90: 4, nErrors100: 4, nErrors110: 4, nErrors120: 4, nErrors130: 4, nErrors140: 4, nErrors150: 4),
