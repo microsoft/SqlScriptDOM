@@ -18966,7 +18966,7 @@ selectTableReferenceElementWithoutJoinParenthesis[SubDmlFlags subDmlFlags] retur
         {NextTokenMatches(CodeGenerationSupporter.ChangeTable)}?
         vResult=changeTableTableReference
     |   vResult=builtInFunctionTableReference
-    |   {NextIdentifierMatchesOneOf(new string[] {CodeGenerationSupporter.StringSplit, CodeGenerationSupporter.GenerateSeries})}?
+    |   {NextIdentifierMatchesOneOf(new string[] {CodeGenerationSupporter.StringSplit, CodeGenerationSupporter.GenerateSeries, CodeGenerationSupporter.RegexpMatches, CodeGenerationSupporter.RegexpSplitToTable})}?
         vResult=globalFunctionTableReference
     |   vResult=variableTableReference
     |   vResult=variableMethodCallTableReference
