@@ -28,6 +28,18 @@
       <Description>IncludeSemiColons_Description</Description>
       <Summary>Gets or sets a boolean indicating if a semi colon should be included after each statement</Summary>
     </Setting>
+    <Setting name="NewLineFormattedIndexDefinition" type="bool" default="false">
+      <Summary>Gets or sets a boolean indicating if index definitions should have UNIQUE, INCLUDE and WHERE on their own line</Summary>
+    </Setting>
+    <Setting name="NewlineFormattedCheckConstraint" type="bool" default="false">
+      <Summary>Gets or sets a boolean indicating if check constraints should have the CHECK part on it's own line</Summary>
+    </Setting>
+    <Setting name="SpaceBetweenDataTypeAndParameters" type="bool" default="true">
+      <Summary>Gets or sets a boolean indicating if a space should be included between the data type and the parameters in a data type definition</Summary>
+    </Setting>
+    <Setting name="SpaceBetweenParametersInDataType" type="bool" default="true">
+      <Summary>Gets or sets a boolean indicating if a space should be included between parameters in a data type</Summary>
+    </Setting>
     <Setting name="NumNewlinesAfterStatement" type="int" default="1" min="0">
       <Summary>Gets or sets the number of newlines to include after each statement</Summary>
     </Setting>

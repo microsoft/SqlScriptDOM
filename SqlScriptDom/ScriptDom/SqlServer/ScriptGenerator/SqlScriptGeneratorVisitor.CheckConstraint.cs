@@ -15,7 +15,12 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
 
             MarkAndPushAlignmentPoint(start);
 
-            GenerateConstraintHead(node);
+            GenerateConstraintHead(node, _options.NewlineFormattedCheckConstraint);
+
+            if (_options.NewlineFormattedCheckConstraint)
+            {
+                Indent();
+            }
 
             GenerateKeyword(TSqlTokenType.Check); 
 
