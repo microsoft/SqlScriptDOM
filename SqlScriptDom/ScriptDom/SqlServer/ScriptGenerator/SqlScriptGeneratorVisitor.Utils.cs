@@ -276,9 +276,9 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
         }
 
         // generate a parenthsised comma-separated list
-        protected void GenerateParenthesisedCommaSeparatedList<T>(IList<T> list, Boolean generateSpaces = true) where T : TSqlFragment
+        protected void GenerateParenthesisedCommaSeparatedList<T>(IList<T> list) where T : TSqlFragment
         {
-            GenerateParenthesisedCommaSeparatedList(list, false, generateSpaces);
+            GenerateParenthesisedCommaSeparatedList(list, false);
         }
 
         // generate a parenthsised comma-separated list
