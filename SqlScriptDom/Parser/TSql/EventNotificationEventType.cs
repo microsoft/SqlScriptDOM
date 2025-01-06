@@ -1092,6 +1092,11 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         DropExternalLanguage = 331,
 
         /// <summary>
+        /// CREATE_VECTOR_INDEX
+        /// </summary>
+        CreateVectorIndex = 344,
+
+        /// <summary>
         /// AUDIT_LOGIN.
         /// </summary>
         AuditLogin = 1014,
