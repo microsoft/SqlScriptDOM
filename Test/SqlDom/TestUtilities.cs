@@ -29,7 +29,8 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                 new TSql130Parser(quotedIdentifiers),
                 new TSql140Parser(quotedIdentifiers),
                 new TSql150Parser(quotedIdentifiers),
-                new TSql160Parser(quotedIdentifiers));
+                new TSql160Parser(quotedIdentifiers),
+                new TSql170Parser(quotedIdentifiers));
         }
 
         public static void ExecuteTestForParsers(Action<TSqlParser> test, params TSqlParser[] parsers)
@@ -64,6 +65,8 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                     return new Sql150ScriptGenerator(options);
                 case SqlVersion.Sql160:
                     return new Sql160ScriptGenerator(options);
+                case SqlVersion.Sql170:
+                    return new Sql170ScriptGenerator(options);
                 default:
                     Debug.Assert(false, "Unknown SQL version");
                     return null;
@@ -111,6 +114,8 @@ namespace SqlStudio.Tests.UTSqlScriptDom
             ErrorTest(parser150, testScript, expectedErrors);
             TSql160Parser parser160 = new TSql160Parser(quotedIdentifiers);
             ErrorTest(parser160, testScript, expectedErrors);
+            TSql170Parser parser170 = new TSql170Parser(quotedIdentifiers);
+            ErrorTest(parser170, testScript, expectedErrors);
         }
 
         internal static void ErrorTestAllParsersUntil150(string testScript, params ParserErrorInfo[] expectedErrors)
@@ -153,6 +158,8 @@ namespace SqlStudio.Tests.UTSqlScriptDom
             ErrorTest(parser150, testScript, expectedErrors);
             TSql160Parser parser160 = new TSql160Parser(quotedIdentifiers);
             ErrorTest(parser160, testScript, expectedErrors);
+            TSql170Parser parser170 = new TSql170Parser(quotedIdentifiers);
+            ErrorTest(parser170, testScript, expectedErrors);
         }
 
         internal static void ErrorTest90andAboveUntil150(string testScript, params ParserErrorInfo[] expectedErrors)
@@ -199,6 +206,8 @@ namespace SqlStudio.Tests.UTSqlScriptDom
             ErrorTest(parser150, testScript, expectedErrors);
             TSql160Parser parser160 = new TSql160Parser(quotedIdentifiers);
             ErrorTest(parser160, testScript, expectedErrors);
+            TSql170Parser parser170 = new TSql170Parser(quotedIdentifiers);
+            ErrorTest(parser170, testScript, expectedErrors);
         }
 
         internal static void ErrorTest110(string testScript, params ParserErrorInfo[] expectedErrors)
@@ -247,6 +256,14 @@ namespace SqlStudio.Tests.UTSqlScriptDom
 
             TSql160Parser parser160 = new TSql160Parser(quotedIdentifiers);
             ErrorTest(parser160, testScript, expectedErrors);
+        }
+
+        internal static void ErrorTest170(string testScript, params ParserErrorInfo[] expectedErrors)
+        {
+            const bool quotedIdentifiers = true;
+
+            TSql170Parser parser170 = new TSql170Parser(quotedIdentifiers);
+            ErrorTest(parser170, testScript, expectedErrors);
         }
 
         internal static void ErrorTest<T>(string testScript, params ParserErrorInfo[] expectedErrors) where T : TSqlParser

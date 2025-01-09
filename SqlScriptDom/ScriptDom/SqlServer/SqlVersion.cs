@@ -56,5 +56,10 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         /// Sql 16.0 mode.
         /// </summary>
         Sql160 = 8,
+
+        /// <summary>
+        /// Sql 17.0 mode.
+        /// </summary>
+        Sql170 = 9,
     }
 }

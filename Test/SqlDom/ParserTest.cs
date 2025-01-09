@@ -26,12 +26,14 @@ namespace SqlStudio.Tests.UTSqlScriptDom
         public readonly ParserTestOutput _result140;
         public readonly ParserTestOutput _result150;
         public readonly ParserTestOutput _result160;
+        public readonly ParserTestOutput _result170;
 
         public ParserTest(
             string scriptFilename,
             ParserTestOutput result80, ParserTestOutput result90, ParserTestOutput result100,
             ParserTestOutput result110, ParserTestOutput result120, ParserTestOutput result130,
-            ParserTestOutput result140, ParserTestOutput result150, ParserTestOutput result160)
+            ParserTestOutput result140, ParserTestOutput result150, ParserTestOutput result160, 
+            ParserTestOutput result170)
         {
             _scriptFilename = scriptFilename;
             _result80 = result80;
@@ -43,6 +45,22 @@ namespace SqlStudio.Tests.UTSqlScriptDom
             _result140 = result140;
             _result150 = result150;
             _result160 = result160;
+            _result170 = result170;
+
+        }
+
+        public ParserTest(
+            string scriptFilename,
+            ParserTestOutput result80, ParserTestOutput result90, ParserTestOutput result100,
+            ParserTestOutput result110, ParserTestOutput result120, ParserTestOutput result130,
+            ParserTestOutput result140, ParserTestOutput result150, ParserTestOutput result160)
+            : this(
+                scriptFilename,
+                result80, result90, result100,
+                result110, result120, result130,
+                result140, result150, result160,
+                result160)
+        {
         }
 
         public ParserTest(
@@ -54,7 +72,8 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                 scriptFilename,
                 result80, result90, result100,
                 result110, result120, result130,
-                result140, result150, result150)
+                result140, result150, result150,
+                result150)
         {
         }
 
