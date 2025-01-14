@@ -63,7 +63,11 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         protected static void VerifyAllowedIndexOption120(IndexAffectingStatement statement, IndexOption option)
         {
             VerifyAllowedIndexOption(statement, option, SqlVersionFlags.TSql120);
+            VerifyAllowedOnlineIndexOptionLowPriorityLockWait(statement, option, SqlVersionFlags.TSql120);
+        }
 
+        protected static void VerifyAllowedOnlineIndexOptionLowPriorityLockWait(IndexAffectingStatement statement, IndexOption option, SqlVersionFlags versionFlags)
+        {
             // for a low priority lock wait (MLP) option, check if it is allowed for the statement.
             //
             if (option is OnlineIndexOption)
@@ -71,6 +75,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
                 OnlineIndexOption onlineIndexOption = option as OnlineIndexOption;
                 if (onlineIndexOption.LowPriorityLockWaitOption != null)
                 {
+                    // This syntax for CREATE INDEX currently applies to SQL Server 2022 (16.x), Azure SQL Database, and Azure SQL Managed Instance only. For ALTER INDEX, this syntax applies to SQL Server (Starting with SQL Server 2014 (12.x)) and Azure SQL Database.
                     switch (statement)
                     {
                         case IndexAffectingStatement.AlterIndexRebuildOnePartition:
@@ -80,6 +85,19 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
                             // allowed
                             //
                             break;
+
+                        case IndexAffectingStatement.CreateIndex:
+                            // allowed in Sql160 and higher only
+                            //
+                            if (versionFlags > SqlVersionFlags.TSql150)
+                            {
+                                break;
+                            }
+                            else
+                            {
+                                ThrowWrongIndexOptionError(statement, onlineIndexOption.LowPriorityLockWaitOption);
+                                break;
+                            }
 
                         default:
                             // WAIT_AT_LOW_PRIORITY is not a valid index option in the statement
