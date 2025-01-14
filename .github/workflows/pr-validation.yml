@@ -26,6 +26,9 @@ jobs:
     needs: build
     steps:
       - uses: actions/checkout@v2
+      - uses: actions/setup-dotnet@v2
+        with:
+          global-json-file: global.json
       - name: Disable strong name validation
         if: matrix.os == 'windows-latest'
         shell: pwsh
