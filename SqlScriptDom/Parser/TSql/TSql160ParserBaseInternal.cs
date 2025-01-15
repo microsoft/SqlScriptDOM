@@ -53,7 +53,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         protected static void VerifyAllowedIndexOption160(IndexAffectingStatement statement, IndexOption option)
         {
             VerifyAllowedIndexOption(statement, option, SqlVersionFlags.TSql160);
-            VerifyAllowedOnlineIndexOptionLowPriorityLockWait(statement, option);
+            VerifyAllowedOnlineIndexOptionLowPriorityLockWait(statement, option, SqlVersionFlags.TSql160);
         }
 
         protected static SqlDataTypeOption ParseDataType160(string token)

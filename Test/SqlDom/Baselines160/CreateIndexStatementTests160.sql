@@ -48,3 +48,6 @@ CREATE CLUSTERED INDEX tableWithClusteredIndex_index
 
 CREATE UNIQUE INDEX tableWithUniqueIndex_index
     ON dbo.tableWithUniqueIndex(c1) WITH (XML_COMPRESSION = ON);
+
+CREATE CLUSTERED INDEX idx_1
+    ON dbo.T2(a) WITH (ONLINE = ON (WAIT_AT_LOW_PRIORITY (MAX_DURATION = 5 MINUTES, ABORT_AFTER_WAIT = SELF)));

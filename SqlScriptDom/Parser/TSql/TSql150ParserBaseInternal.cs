@@ -49,36 +49,9 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         protected static void VerifyAllowedIndexOption150(IndexAffectingStatement statement, IndexOption option)
         {
             VerifyAllowedIndexOption(statement, option, SqlVersionFlags.TSql150);
-            VerifyAllowedOnlineIndexOptionLowPriorityLockWait(statement, option);
+            VerifyAllowedOnlineIndexOptionLowPriorityLockWait(statement, option, SqlVersionFlags.TSql150);
         }
 
-        protected static void VerifyAllowedOnlineIndexOptionLowPriorityLockWait(IndexAffectingStatement statement, IndexOption option)
-        {
-            // for a low priority lock wait (MLP) option, check if it is allowed for the statement.
-            //
-            if (option is OnlineIndexOption)
-            {
-                OnlineIndexOption onlineIndexOption = option as OnlineIndexOption;
-                if (onlineIndexOption.LowPriorityLockWaitOption != null)
-                {
-                    switch (statement)
-                    {
-                        case IndexAffectingStatement.AlterIndexRebuildOnePartition:
-                        case IndexAffectingStatement.AlterTableRebuildOnePartition:
-                        case IndexAffectingStatement.AlterIndexRebuildAllPartitions:
-                        case IndexAffectingStatement.AlterTableRebuildAllPartitions:
-                            // allowed
-                            //
-                            break;
-
-                        default:
-                            // WAIT_AT_LOW_PRIORITY is not a valid index option in the statement
-                            //
-                            ThrowWrongIndexOptionError(statement, onlineIndexOption.LowPriorityLockWaitOption);
-                            break;
-                    }
-                }
-            }
-        }
+        
     }
 }
