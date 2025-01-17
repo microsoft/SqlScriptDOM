@@ -16,7 +16,7 @@ namespace SqlStudio.Tests.UTSqlScriptDom
         private static readonly ParserTest[] Only140TestInfos = 
         {
             new ParserTest140("AlterIndexStatementTests140.sql", 2, 20, 20, 20, 20, 20),
-            new ParserTest140("AlterDatabaseOptionsTests140.sql", 18, 18, 18, 18, 18, 18),
+            new ParserTest140("AlterDatabaseOptionsTests140.sql", 20, 20, 20, 20, 20, 20),
             new ParserTest140("CreateIndexStatementTests140.sql", 18, 14, 14, 14, 14, 14),
             new ParserTest140("CreateTableTests140.sql", 17, 15, 15, 15, 15, 11),
             new ParserTest140("OptimizerHintsTests140.sql", 6, 6, 6, 6, 6, 0),

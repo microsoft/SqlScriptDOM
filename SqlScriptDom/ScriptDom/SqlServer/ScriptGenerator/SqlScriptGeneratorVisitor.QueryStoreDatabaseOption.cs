@@ -74,5 +74,24 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
 			GenerateNameEqualsValue(CodeGenerationSupporter.StaleQueryThresholdDays, node.StaleQueryThreshold);
 			GenerateSymbol(TSqlTokenType.RightParenthesis);
 		}
+
+		public override void ExplicitVisit(QueryStoreWaitStatsCaptureOption node)
+		{
+			System.Diagnostics.Debug.Assert(node.OptionKind == QueryStoreOptionKind.Wait_Stats_Capture_Mode);
+			GenerateIdentifier(CodeGenerationSupporter.WaitStatsCaptureMode);
+			GenerateSpace();
+
+			switch (node.OptionState)
+			{
+				case OptionState.Off:
+					GenerateSymbolAndSpace(TSqlTokenType.EqualsSign);
+					GenerateKeyword(TSqlTokenType.Off);
+					break;
+				case OptionState.On:
+					GenerateSymbolAndSpace(TSqlTokenType.EqualsSign);
+					GenerateKeyword(TSqlTokenType.On);
+					break;
+			}
+		}
 	}
 }
