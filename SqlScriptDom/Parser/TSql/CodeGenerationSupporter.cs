@@ -1264,7 +1264,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         internal const string Russian = "RUSSIAN";
         internal const string Romanian = "ROMANIAN";
         internal const string Brazilian = "BRAZILIAN";
-        internal const string NorwegianBokmal = "NORWEGIAN (BOKM�L)";
+        internal const string NorwegianBokmal = "NORWEGIAN (BOKMÅL)";
         internal const string Dutch = "DUTCH";
         internal const string Korean = "KOREAN";
         internal const string Japanese = "JAPANESE";
