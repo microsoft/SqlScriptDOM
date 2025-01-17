@@ -3144,6 +3144,9 @@ queryStoreOneOption returns [QueryStoreOption vResult = null]
         |
         {NextTokenMatches(CodeGenerationSupporter.CleanupPolicy)}?
         vResult = queryStoreTimeCleanupPolicy
+        |
+        {NextTokenMatches(CodeGenerationSupporter.WaitStatsCaptureMode)}?
+        vResult = queryStoreWaitStatsCaptureOption
     ;
 
 queryStoreDesiredStateOption returns [QueryStoreDesiredStateOption vResult = FragmentFactory.CreateFragment<QueryStoreDesiredStateOption>()]
@@ -3324,6 +3327,30 @@ queryStoreTimeCleanupPolicy returns [QueryStoreTimeCleanupPolicyOption vResult =
         {
             UpdateTokenInfo(vResult, tRParen);
         }
+    ;
+
+queryStoreWaitStatsCaptureOption returns [QueryStoreWaitStatsCaptureOption vResult = FragmentFactory.CreateFragment<QueryStoreWaitStatsCaptureOption>()]
+    : tWaitStatsCaptureMode:Identifier
+        {
+            Match(tWaitStatsCaptureMode, CodeGenerationSupporter.WaitStatsCaptureMode);
+            vResult.OptionKind = QueryStoreOptionKind.Wait_Stats_Capture_Mode;
+            UpdateTokenInfo(vResult, tWaitStatsCaptureMode);
+        }
+        (
+            (EqualsSign tOff:Off
+                {
+                    vResult.OptionState = OptionState.Off;
+                    UpdateTokenInfo(vResult, tOff);
+                }
+            )
+        |
+            (EqualsSign tOn:On
+                {
+                    vResult.OptionState = OptionState.On;
+                    UpdateTokenInfo(vResult, tOn);
+                }
+            )
+        )
     ;
 
 automaticTuningDbOption returns [AutomaticTuningDatabaseOption vResult = FragmentFactory.CreateFragment<AutomaticTuningDatabaseOption>()]

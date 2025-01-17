@@ -21,7 +21,8 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
 		Interval_Length_Minutes,
 		Current_Storage_Size_MB,
 		Max_Plans_Per_Query,
-		Stale_Query_Threshold_Days
+		Stale_Query_Threshold_Days,
+		Wait_Stats_Capture_Mode
 	}
 
 
