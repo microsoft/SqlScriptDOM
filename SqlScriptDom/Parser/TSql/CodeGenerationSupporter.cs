@@ -798,6 +798,8 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         internal const string RecursiveTriggers = "RECURSIVE_TRIGGERS";
         internal const string Recovery = "RECOVERY";
         internal const string Regenerate = "REGENERATE";
+        internal const string RegexpMatches = "REGEXP_MATCHES";
+        internal const string RegexpSplitToTable = "REGEXP_SPLIT_TO_TABLE";
         internal const string RejectType = "REJECT_TYPE";
         internal const string RejectSampleValue = "REJECT_SAMPLE_VALUE";
         internal const string RejectValue = "REJECT_VALUE";
