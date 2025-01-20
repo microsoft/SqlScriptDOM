@@ -27,13 +27,13 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
                 new KeywordGenerator(TSqlTokenType.Null),}},
         };
   
-        protected void GenerateConstraintHead(ConstraintDefinition node)
+        protected void GenerateConstraintHead(ConstraintDefinition node, bool newline = false)
         {
             if (node.ConstraintIdentifier != null)
             {
                 GenerateKeyword(TSqlTokenType.Constraint); 
                 GenerateSpaceAndFragmentIfNotNull(node.ConstraintIdentifier);
-                GenerateSpace();
+                GenerateNewLineOrSpace(newline);
             }
         }
 

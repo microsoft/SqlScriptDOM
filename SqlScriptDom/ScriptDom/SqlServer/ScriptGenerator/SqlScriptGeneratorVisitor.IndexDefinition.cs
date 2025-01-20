@@ -11,6 +11,12 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
     {
         public override void ExplicitVisit(IndexDefinition node)
         {
+            if (_options.NewLineFormattedIndexDefinition)
+            {
+                AlignmentPoint start = new AlignmentPoint();
+                MarkAndPushAlignmentPoint(start);
+            }
+
             GenerateKeyword(TSqlTokenType.Index);
 
             if (node.Name != null)
@@ -20,7 +26,15 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
 
             if (node.Unique)
             {
-                GenerateSpaceAndKeyword(TSqlTokenType.Unique);
+                if (_options.NewLineFormattedIndexDefinition)
+                {
+                    NewLineAndIndent();
+                }
+                else
+                {
+                    GenerateSpace();
+                }
+                GenerateKeyword(TSqlTokenType.Unique);
             }
 
             if (node.IndexType != null)
@@ -56,16 +70,32 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
 
             if (node.IncludeColumns.Count > 0)
             {
-                GenerateSpaceAndIdentifier(CodeGenerationSupporter.Include);
+                if (_options.NewLineFormattedIndexDefinition)
+                {
+                    NewLineAndIndent();
+                }
+                else
+                {
+                    GenerateSpace();
+                }
+                GenerateIdentifier(CodeGenerationSupporter.Include);
                 GenerateSpace();
                 GenerateParenthesisedCommaSeparatedList(node.IncludeColumns);
             }
 
 			if (node.FilterPredicate != null)
 			{
-				GenerateSpaceAndKeyword(TSqlTokenType.Where);
-				GenerateSpaceAndFragmentIfNotNull(node.FilterPredicate);
-			}
+                if (_options.NewLineFormattedIndexDefinition)
+                {
+                    NewLineAndIndent();
+                }
+                else
+                {
+                    GenerateSpace();
+                }
+                GenerateKeyword(TSqlTokenType.Where);
+                GenerateSpaceAndFragmentIfNotNull(node.FilterPredicate);
+            }
 
             if (node.IndexOptions.Count > 0)
             {                            
@@ -81,6 +111,11 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
             }
 
             GenerateFileStreamOn(node);
+
+            if (_options.NewLineFormattedIndexDefinition)
+            {
+                PopAlignmentPoint();
+            }
         }
     }
 }
