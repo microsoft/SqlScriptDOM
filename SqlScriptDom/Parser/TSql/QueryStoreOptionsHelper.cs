@@ -26,6 +26,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
 			AddOptionMapping(QueryStoreOptionKind.Current_Storage_Size_MB, CodeGenerationSupporter.MaxQdsSize);
 			AddOptionMapping(QueryStoreOptionKind.Max_Plans_Per_Query, CodeGenerationSupporter.MaxPlansPerQuery);
 			AddOptionMapping(QueryStoreOptionKind.Stale_Query_Threshold_Days, CodeGenerationSupporter.CleanupPolicy);
+			AddOptionMapping(QueryStoreOptionKind.Wait_Stats_Capture_Mode, CodeGenerationSupporter.WaitStatsCaptureMode, SqlVersionFlags.TSql140AndAbove);
 		}
 
 		internal static readonly QueryStoreOptionsHelper Instance = new QueryStoreOptionsHelper();

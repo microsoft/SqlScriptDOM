@@ -2529,6 +2529,10 @@
     <InheritedClass Name="QueryStoreOption"/>
     <Member Name="StaleQueryThreshold" Type="Literal" Summary="Stale Query Threshold Value in Days, specified as an integer"/>
   </Class>
+  <Class Name="QueryStoreWaitStatsCaptureOption" Base="QueryStoreOption" Summary="Wait Stats Capture part of QueryStore Options">
+    <InheritedClass Name="QueryStoreOption"/>
+    <Member Name="OptionState" Type="OptionState" GenerateUpdatePositionInfoCall="false" Summary="Controls whether wait statistics are captured per query"/>
+  </Class>
   <Class Name="AutomaticTuningDatabaseOption" Base="DatabaseOption" Summary="Automatic tuning option in ALTER DATABASE statement, SET case">
     <InheritedClass Name="DatabaseOption" />
     <Member Name="AutomaticTuningState" Type="AutomaticTuningState" GenerateUpdatePositionInfoCall="false" Summary="Option state ( AUTO | INHERIT | CUSTOM )."/>
