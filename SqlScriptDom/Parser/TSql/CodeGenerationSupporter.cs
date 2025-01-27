@@ -1,4 +1,4 @@
-//------------------------------------------------------------------------------
+﻿//------------------------------------------------------------------------------
 // <copyright file="CodeGenerationSupporter.cs" company="Microsoft">
 //         Copyright (c) Microsoft Corporation.  All rights reserved.
 // </copyright>
@@ -1078,6 +1078,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         internal const string VirtualDevice = "VIRTUAL_DEVICE";
         internal const string VStart = "VSTART";
         internal const string WaitAtLowPriority = "WAIT_AT_LOW_PRIORITY";
+        internal const string WaitStatsCaptureMode = "WAIT_STATS_CAPTURE_MODE";
         internal const string WebMethod = "WEBMETHOD";
         internal const string WellFormedXml = "WELL_FORMED_XML";
         internal const string WideChar = "WIDECHAR";
@@ -1265,7 +1266,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         internal const string Russian = "RUSSIAN";
         internal const string Romanian = "ROMANIAN";
         internal const string Brazilian = "BRAZILIAN";
-        internal const string NorwegianBokmal = "NORWEGIAN (BOKM�L)";
+        internal const string NorwegianBokmal = "NORWEGIAN (BOKMÅL)";
         internal const string Dutch = "DUTCH";
         internal const string Korean = "KOREAN";
         internal const string Japanese = "JAPANESE";
