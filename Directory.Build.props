@@ -26,7 +26,7 @@
 
     <!-- This is the default target framework for all the projects. 
          Individual projects may specify additional target frameworks -->
-    <NetfxVersion>net462</NetfxVersion>
+    <NetfxVersion>net472</NetfxVersion>
     <NetStandardVersion>netstandard2.1</NetStandardVersion>
     <NetStandardVersion20>netstandard2.0</NetStandardVersion20>
     <NetCoreVersion>net8.0</NetCoreVersion>
