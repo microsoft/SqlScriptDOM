@@ -5,6 +5,7 @@
 //------------------------------------------------------------------------------
 
 using System;
+using System.IO;
 using Microsoft.SqlServer.TransactSql.ScriptDom;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SqlStudio.Tests.AssemblyTools.TestCategory;
@@ -156,6 +157,182 @@ namespace SqlStudio.Tests.UTSqlScriptDom
 
             generator.GenerateScript(statements, out sql);
             Assert.AreEqual(tableStatementString + Environment.NewLine + Environment.NewLine + tableStatementString, sql);
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestNewLineFormattedIndexDefinitionDefault() {
+            Assert.AreEqual(false, new SqlScriptGeneratorOptions().NewLineFormattedIndexDefinition);
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestNewlineFormattedCheckConstraintDefault() {
+            Assert.AreEqual(false, new SqlScriptGeneratorOptions().NewlineFormattedCheckConstraint);
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestSpaceBetweenDataTypeAndParametersDefault() {
+            Assert.AreEqual(true, new SqlScriptGeneratorOptions().SpaceBetweenDataTypeAndParameters);
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestSpaceBetweenParametersInDataTypeDefault() {
+            Assert.AreEqual(true, new SqlScriptGeneratorOptions().SpaceBetweenParametersInDataType);
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestSpaceBetweenDataTypeAndParametersWhenFalse() {
+            var expectedSqlText = @"CREATE TABLE DummyTable (
+    ColumnName VARCHAR(50)
+);";
+
+            ParseAndAssertEquality(expectedSqlText, new SqlScriptGeneratorOptions {
+                SpaceBetweenDataTypeAndParameters = false
+            });
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestSpaceBetweenDataTypeAndParametersWhenTrue() {
+            var expectedSqlText = @"CREATE TABLE DummyTable (
+    ColumnName VARCHAR (50)
+);";
+
+            ParseAndAssertEquality(expectedSqlText, new SqlScriptGeneratorOptions {
+                SpaceBetweenDataTypeAndParameters = true
+            });
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestSpaceBetweenParametersInDataTypeWhenFalse() {
+            var expectedSqlText = @"CREATE TABLE DummyTable (
+    ColumnName DECIMAL (5,2)
+);";
+
+            ParseAndAssertEquality(expectedSqlText, new SqlScriptGeneratorOptions {
+                SpaceBetweenParametersInDataType = false
+            });
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestSpaceBetweenParametersInDataTypeWhenTrue() {
+            var expectedSqlText = @"CREATE TABLE DummyTable (
+    ColumnName DECIMAL (5, 2)
+);";
+
+            ParseAndAssertEquality(expectedSqlText, new SqlScriptGeneratorOptions {
+                SpaceBetweenParametersInDataType = true
+            });
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestNewlineFormattedCheckConstraintWhenFalse() {
+            var expectedSqlText = @"CREATE TABLE DummyTable (
+    CONSTRAINT ComplicatedConstraint CHECK ((Col1 IS NULL
+                                             AND (Col2 <> ''
+                                                  OR Col3 = 0))
+                                            OR (Col1 IS NOT NULL
+                                                AND ((Col2 = ''
+                                                      AND Col3 <> 0)
+                                                     OR (Col4 IN ('', 'ABC', 'JKL', 'XYZ')
+                                                         AND Col3 < 0
+                                                         AND (Col5 <> ''
+                                                              OR Col6 <> '')))))
+);";
+
+            ParseAndAssertEquality(expectedSqlText, new SqlScriptGeneratorOptions {
+                NewlineFormattedCheckConstraint = false
+            });
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestNewlineFormattedCheckConstraintWhenTrue() {
+            var expectedSqlText = @"CREATE TABLE DummyTable (
+    CONSTRAINT ComplicatedConstraint
+        CHECK ((Col1 IS NULL
+                AND (Col2 <> ''
+                     OR Col3 = 0))
+               OR (Col1 IS NOT NULL
+                   AND ((Col2 = ''
+                         AND Col3 <> 0)
+                        OR (Col4 IN ('', 'ABC', 'JKL', 'XYZ')
+                            AND Col3 < 0
+                            AND (Col5 <> ''
+                                 OR Col6 <> '')))))
+);";
+
+            ParseAndAssertEquality(expectedSqlText, new SqlScriptGeneratorOptions {
+                NewlineFormattedCheckConstraint = true
+            });
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestNewLineFormattedIndexDefinitionWhenFalse() {
+            var expectedSqlText = @"CREATE TABLE DummyTable (
+    INDEX ComplicatedIndex UNIQUE (Col1, Col2, Col3) INCLUDE (Col4, Col5, Col6, Col7, Col8) WHERE Col4 = 'AR'
+                                                                                                  AND Col3 IN ('ABC', 'XYZ')
+                                                                                                      AND Col5 = 0
+                                                                                                          AND Col6 = 1
+                                                                                                              AND Col7 = 0
+                                                                                                                  AND Col8 IS NOT NULL
+);";
+
+            ParseAndAssertEquality(expectedSqlText, new SqlScriptGeneratorOptions {
+                NewLineFormattedIndexDefinition = false
+            });
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestNewLineFormattedIndexDefinitionWhenTrue() {
+            var expectedSqlText = @"CREATE TABLE DummyTable (
+    INDEX ComplicatedIndex
+        UNIQUE (Col1, Col2, Col3)
+        INCLUDE (Col4, Col5, Col6, Col7, Col8)
+        WHERE Col4 = 'AR'
+              AND Col3 IN ('ABC', 'XYZ')
+                  AND Col5 = 0
+                      AND Col6 = 1
+                          AND Col7 = 0
+                              AND Col8 IS NOT NULL
+);";
+
+            ParseAndAssertEquality(expectedSqlText, new SqlScriptGeneratorOptions {
+                NewLineFormattedIndexDefinition = true
+            });
+        }
+
+        void ParseAndAssertEquality(string sqlText, SqlScriptGeneratorOptions generatorOptions) {
+            var parser = new TSql160Parser(true);
+            var fragment = parser.ParseStatementList(new StringReader(sqlText), out var errors);
+
+            Assert.AreEqual(0, errors.Count);
+
+            var generator = new Sql160ScriptGenerator(generatorOptions);
+            generator.GenerateScript(fragment, out var generatedSqlText);
+
+            Assert.AreEqual(sqlText, generatedSqlText);
         }
     }
 }

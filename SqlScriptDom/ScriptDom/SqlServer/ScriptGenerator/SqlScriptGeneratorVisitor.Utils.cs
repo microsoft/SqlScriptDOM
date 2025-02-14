@@ -220,7 +220,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
         }
 
         // generate a comma-separated list
-        protected void GenerateCommaSeparatedList<T>(IList<T> list, bool insertNewLine, bool indent) where T : TSqlFragment
+        protected void GenerateCommaSeparatedList<T>(IList<T> list, bool insertNewLine, bool indent, bool generateSpaces = true) where T : TSqlFragment
         {
             GenerateList(list, delegate()
             {
@@ -234,7 +234,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
                         Indent();
                     }
                 }
-                else
+                else if (generateSpaces)
                 {
                     GenerateSpace();
                 } 
@@ -282,12 +282,12 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
         }
 
         // generate a parenthsised comma-separated list
-        protected void GenerateParenthesisedCommaSeparatedList<T>(IList<T> list, Boolean alwaysGenerateParenthses) where T : TSqlFragment
+        protected void GenerateParenthesisedCommaSeparatedList<T>(IList<T> list, Boolean alwaysGenerateParenthses, Boolean generateSpaces = true) where T : TSqlFragment
         {
             if (list != null && list.Count > 0)
             {
                 GenerateSymbol(TSqlTokenType.LeftParenthesis);
-                GenerateCommaSeparatedList(list);
+                GenerateCommaSeparatedList(list, false, false, generateSpaces);
                 GenerateSymbol(TSqlTokenType.RightParenthesis);
             }
             else if (alwaysGenerateParenthses)
