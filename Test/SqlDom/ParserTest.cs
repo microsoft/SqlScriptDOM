@@ -27,13 +27,14 @@ namespace SqlStudio.Tests.UTSqlScriptDom
         public readonly ParserTestOutput _result150;
         public readonly ParserTestOutput _result160;
         public readonly ParserTestOutput _result170;
+        public readonly ParserTestOutput _resultFabricDW;
 
         public ParserTest(
             string scriptFilename,
             ParserTestOutput result80, ParserTestOutput result90, ParserTestOutput result100,
             ParserTestOutput result110, ParserTestOutput result120, ParserTestOutput result130,
             ParserTestOutput result140, ParserTestOutput result150, ParserTestOutput result160, 
-            ParserTestOutput result170)
+            ParserTestOutput result170, ParserTestOutput resultFabricDW)
         {
             _scriptFilename = scriptFilename;
             _result80 = result80;
@@ -46,7 +47,7 @@ namespace SqlStudio.Tests.UTSqlScriptDom
             _result150 = result150;
             _result160 = result160;
             _result170 = result170;
-
+            _resultFabricDW = resultFabricDW;
         }
 
         public ParserTest(
@@ -59,7 +60,7 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                 result80, result90, result100,
                 result110, result120, result130,
                 result140, result150, result160,
-                result160)
+                result160, result160)
         {
         }
 
@@ -73,7 +74,7 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                 result80, result90, result100,
                 result110, result120, result130,
                 result140, result150, result150,
-                result150)
+                result150, result150)
         {
         }
 
@@ -473,7 +474,7 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                 new ParserTestOutput(nErrors80), new ParserTestOutput(nErrors90), new ParserTestOutput(nErrors100),
                 new ParserTestOutput(nErrors110), new ParserTestOutput(nErrors120), new ParserTestOutput(nErrors130),
                 new ParserTestOutput(nErrors140), new ParserTestOutput(nErrors150), new ParserTestOutput(nErrors160),
-                new ParserTestOutput("Baselines170"))
+                new ParserTestOutput("Baselines170"), new ParserTestOutput(nErrors160))
         { }
 
         public ParserTest170(string scriptFilename, ParserTestOutput output80, ParserTestOutput output90, ParserTestOutput output100,
@@ -486,7 +487,8 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                 output140,
                 output150,
                 output160,
-                new ParserTestOutput("Baselines170"))
+                new ParserTestOutput("Baselines170"),
+                output160)
         { }
 
         public ParserTest170(string scriptFilename, params ParserErrorInfo[] errors80And90And100And110And120and130and140and150and160)
