@@ -1097,6 +1097,16 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         CreateVectorIndex = 344,
 
         /// <summary>
+        /// ADD_INFORMATION_PROTECTION
+        /// </summary>
+        AddInformationProtection = 345,
+
+        /// <summary>
+        /// DROP_INFORMATION_PROTECTION
+        /// </summary>
+        DropInformationProtection = 346,
+
+        /// <summary>
         /// AUDIT_LOGIN.
         /// </summary>
         AuditLogin = 1014,
