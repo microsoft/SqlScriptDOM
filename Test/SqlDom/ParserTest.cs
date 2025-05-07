@@ -504,6 +504,49 @@ namespace SqlStudio.Tests.UTSqlScriptDom
         { }
     }
 
+    internal class ParserTestFabricDW : ParserTest
+    {
+        public ParserTestFabricDW(string scriptFilename, int nErrors80, int nErrors90, int nErrors100, int nErrors110, int nErrors120, int nErrors130, int nErrors140, int nErrors150, int nErrors160, int nErrors170)
+            : base(
+                scriptFilename,
+                new ParserTestOutput(nErrors80), new ParserTestOutput(nErrors90), new ParserTestOutput(nErrors100),
+                new ParserTestOutput(nErrors110), new ParserTestOutput(nErrors120), new ParserTestOutput(nErrors130),
+                new ParserTestOutput(nErrors140), new ParserTestOutput(nErrors150), new ParserTestOutput(nErrors160),
+                new ParserTestOutput(nErrors170), new ParserTestOutput("BaselinesFabricDW"))
+        { }
+
+        public ParserTestFabricDW(string scriptFilename, ParserTestOutput output80, ParserTestOutput output90, ParserTestOutput output100,
+            ParserTestOutput output110, ParserTestOutput output120, ParserTestOutput output130, ParserTestOutput output140, ParserTestOutput output150, ParserTestOutput output160,
+            ParserTestOutput output170)
+            : base(
+                scriptFilename,
+                output80, output90, output100,
+                output110, output120,
+                output130,
+                output140,
+                output150,
+                output160,
+                output170,
+                new ParserTestOutput("BaselinesFabricDW"))
+        { }
+
+        public ParserTestFabricDW(string scriptFilename, params ParserErrorInfo[] errors80And90And100And110And120and130and140and150and160and170)
+            : base(
+                scriptFilename,
+                new ParserTestOutput(errors80And90And100And110And120and130and140and150and160and170),
+                new ParserTestOutput(errors80And90And100And110And120and130and140and150and160and170),
+                new ParserTestOutput(errors80And90And100And110And120and130and140and150and160and170),
+                new ParserTestOutput(errors80And90And100And110And120and130and140and150and160and170),
+                new ParserTestOutput(errors80And90And100And110And120and130and140and150and160and170),
+                new ParserTestOutput(errors80And90And100And110And120and130and140and150and160and170),
+                new ParserTestOutput(errors80And90And100And110And120and130and140and150and160and170),
+                new ParserTestOutput(errors80And90And100And110And120and130and140and150and160and170),
+                new ParserTestOutput(errors80And90And100And110And120and130and140and150and160and170),
+                new ParserTestOutput(errors80And90And100And110And120and130and140and150and160and170),
+                new ParserTestOutput("BaselinesFabricDW"))
+        { }
+    }
+
     internal class ParserTest80And90 : ParserTest
     {
         public ParserTest80And90(string scriptFilename, int nErrors100)
