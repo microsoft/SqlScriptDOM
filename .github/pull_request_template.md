@@ -8,5 +8,6 @@ In addition, go through the checklist below and check each item as you validate 
 # Code Changes
 
 - [ ] [Unit tests](https://github.com/microsoft/SqlScriptDOM/tree/main/Test) are added, if possible
+- [ ] Existing [tests are passing](https://github.com/microsoft/SqlScriptDOM/blob/main/CONTRIBUTING.md#running-the-tests)
 - [ ] New or updated code follows the guidelines [here](https://github.com/microsoft/SqlScriptDOM/blob/main/CONTRIBUTING.md#helpful-notes-for-sqldom-extensions)
 
