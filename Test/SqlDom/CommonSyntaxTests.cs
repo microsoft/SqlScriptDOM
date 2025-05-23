@@ -229,5 +229,19 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                 ParserTest.ParseAndVerify(parser, scriptGen, ti._scriptFilename, ti._result170);
             }
         }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void CommonSyntaxInFabricDWParserTest()
+        {
+            TSqlFabricDWParser parser = new TSqlFabricDWParser(true);
+            SqlScriptGenerator scriptGen = ParserTestUtils.CreateScriptGen(SqlVersion.SqlFabricDW);
+
+            foreach (ParserTest ti in CommonTestInfos)
+            {
+                ParserTest.ParseAndVerify(parser, scriptGen, ti._scriptFilename, ti._resultFabricDW);
+            }
+        }
     }
 }

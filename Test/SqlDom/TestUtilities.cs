@@ -30,7 +30,8 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                 new TSql140Parser(quotedIdentifiers),
                 new TSql150Parser(quotedIdentifiers),
                 new TSql160Parser(quotedIdentifiers),
-                new TSql170Parser(quotedIdentifiers));
+                new TSql170Parser(quotedIdentifiers),
+                new TSqlFabricDWParser(quotedIdentifiers));
         }
 
         public static void ExecuteTestForParsers(Action<TSqlParser> test, params TSqlParser[] parsers)
@@ -67,6 +68,8 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                     return new Sql160ScriptGenerator(options);
                 case SqlVersion.Sql170:
                     return new Sql170ScriptGenerator(options);
+                case SqlVersion.SqlFabricDW:
+                    return new SqlFabricDWScriptGenerator(options);
                 default:
                     Debug.Assert(false, "Unknown SQL version");
                     return null;
@@ -116,6 +119,8 @@ namespace SqlStudio.Tests.UTSqlScriptDom
             ErrorTest(parser160, testScript, expectedErrors);
             TSql170Parser parser170 = new TSql170Parser(quotedIdentifiers);
             ErrorTest(parser170, testScript, expectedErrors);
+            TSqlFabricDWParser parserFabricDW = new TSqlFabricDWParser(quotedIdentifiers);
+            ErrorTest(parserFabricDW, testScript, expectedErrors);
         }
 
         internal static void ErrorTestAllParsersUntil150(string testScript, params ParserErrorInfo[] expectedErrors)
@@ -264,6 +269,14 @@ namespace SqlStudio.Tests.UTSqlScriptDom
 
             TSql170Parser parser170 = new TSql170Parser(quotedIdentifiers);
             ErrorTest(parser170, testScript, expectedErrors);
+        }
+
+        internal static void ErrorTestFabricDW(string testScript, params ParserErrorInfo[] expectedErrors)
+        {
+            const bool quotedIdentifiers = true;
+
+            TSqlFabricDWParser parserFabricDW = new TSqlFabricDWParser(quotedIdentifiers);
+            ErrorTest(parserFabricDW, testScript, expectedErrors);
         }
 
         internal static void ErrorTest<T>(string testScript, params ParserErrorInfo[] expectedErrors) where T : TSqlParser
