@@ -26504,6 +26504,8 @@ createTableStatement returns [CreateTableStatement vResult = this.FragmentFactor
     TableDefinition vTableDefinition;
     FederationScheme vFederationScheme;
     FileGroupOrPartitionScheme vFileGroupOrPartitionScheme;
+    SchemaObjectName vCloneSource;
+    ScalarExpression vCloneTime;
 }
     : tCreate:Create Table vSchemaObjectName=schemaObjectThreePartName
         {
@@ -26534,6 +26536,19 @@ createTableStatement returns [CreateTableStatement vResult = this.FragmentFactor
             )
             |
                 ctasCreateTableStatement[vResult]
+            |
+                As tClone:Identifier Of vCloneSource=schemaObjectThreePartName
+                {
+                    Match(tClone, CodeGenerationSupporter.Clone);
+                    vResult.CloneSource = vCloneSource;
+                }
+                (
+                    tAt:Identifier vCloneTime=stringLiteral
+                    {
+                        Match(tAt, CodeGenerationSupporter.At);
+                        vResult.ClonePointInTime = vCloneTime;
+                    }
+                )?
             |
                 As tFileTableOrGraphEdge:Identifier
                 {

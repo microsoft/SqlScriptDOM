@@ -2674,6 +2674,9 @@
     <!-- CTAS additions for SQL Dw-->
     <Member Name="SelectStatement" Type="SelectStatement" Summary="Represents the query part of a CTAS statement."/>
     <Member Name="CtasColumns" Type="Identifier" Collection="true"  Summary="The columns for the view. This is optionally supported with CTAS statements."/>
+    <!-- CTAC additions for Fabric DW SQL-->
+    <Member Name="CloneSource" Type="SchemaObjectName" Summary="Source table for CLONE syntax."/>
+    <Member Name="ClonePointInTime" Type="ScalarExpression" Summary="Optional point in time for CLONE statement."/>
   </Class>
   <Class Name="FederationScheme" Summary="This class stores the federation scheme for a table">
     <Member Name="DistributionName" Type="Identifier" Summary="The name of the distribution."/>

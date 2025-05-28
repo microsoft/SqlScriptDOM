@@ -208,6 +208,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         internal const string Cluster = "CLUSTER";
         internal const string Clustered = "CLUSTERED";
         internal const string ClearPort = "CLEAR_PORT";
+        internal const string Clone = "CLONE";
         internal const string CodePage = "CODEPAGE";
         internal const string Collection = "COLLECTION";
         internal const string Column = "COLUMN";
