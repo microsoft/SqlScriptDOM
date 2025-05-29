@@ -55,6 +55,8 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
                     return new TSql150Parser(initialQuotedIdentifiers);
                 case SqlVersion.Sql160:
                     return new TSql160Parser(initialQuotedIdentifiers);
+                case SqlVersion.SqlFabricDW:
+                    return new TSqlFabricDWParser(initialQuotedIdentifiers);
                 case SqlVersion.Sql170:
                     return new TSql170Parser(initialQuotedIdentifiers);
                 default:

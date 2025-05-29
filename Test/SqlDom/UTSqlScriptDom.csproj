@@ -29,6 +29,7 @@
     <EmbeddedResource Include="Baselines150\*.sql" />
     <EmbeddedResource Include="Baselines160\*.sql" />
     <EmbeddedResource Include="Baselines170\*.sql" />
+    <EmbeddedResource Include="BaselinesFabricDW\*.sql" />
     <EmbeddedResource Include="PhaseOneTestScripts\*.sql" />
     <EmbeddedResource Include="TestScripts\*.sql" />
   </ItemGroup>
