@@ -11,8 +11,7 @@ namespace SqlStudio.Tests.UTSqlScriptDom
         {
             new ParserTestFabricDW("CloneTableTestsFabricDW.sql", nErrors80: 4, nErrors90: 4, nErrors100: 4, nErrors110: 4, nErrors120: 4, nErrors130: 4, nErrors140: 4, nErrors150: 4, nErrors160: 4, nErrors170: 4),
             new ParserTestFabricDW("CreateProcedureCloneTableTestsFabricDW.sql", nErrors80: 4, nErrors90: 4, nErrors100: 4, nErrors110: 4, nErrors120: 4, nErrors130: 4, nErrors140: 4, nErrors150: 4, nErrors160: 4, nErrors170: 4),
-            new ParserTestFabricDW("ScalarFunctionIntTestsFabricDW.sql", nErrors80: 0, nErrors90: 0, nErrors100: 0, nErrors110: 0, nErrors120: 0, nErrors130: 0, nErrors140: 0, nErrors150: 0, nErrors160: 0, nErrors170: 0),
-            new ParserTestFabricDW("ScalarFunctionVarCharTestsFabricDW.sql", nErrors80: 0, nErrors90: 0, nErrors100: 0, nErrors110: 0, nErrors120: 0, nErrors130: 0, nErrors140: 0, nErrors150: 0, nErrors160: 0, nErrors170: 0)
+            new ParserTestFabricDW("ScalarFunctionTestsFabricDW.sql", nErrors80: 3, nErrors90: 2, nErrors100: 2, nErrors110: 2, nErrors120: 2, nErrors130: 0, nErrors140: 0, nErrors150: 0, nErrors160: 0, nErrors170: 0),
         };
 
         [TestMethod]

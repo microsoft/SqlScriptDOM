@@ -13006,6 +13006,93 @@ functionParameterList[FunctionStatementBody vResult]
         )*
     ;
 
+scalarFunctionParameter[ProcedureParameter vParent]
+{
+    DataTypeReference vDataType;
+    ScalarExpression vDefault;
+}
+    : vDataType=scalarDataType
+        {
+            vParent.DataType = vDataType;
+        }
+        (
+            EqualsSign
+            (
+                vDefault=possibleNegativeConstantOrIdentifierWithDefault
+                {
+                    vParent.Value = vDefault;
+                }
+            )
+        )?
+        (
+            tId2:Identifier
+            {
+                if (TryMatch(tId2,  CodeGenerationSupporter.Output) || TryMatch(tId2,  CodeGenerationSupporter.Out))
+                {
+                    ThrowParseErrorException("SQL46039", tId2, TSqlParserResource.SQL46039Message);
+                }
+                else
+                {
+                    ThrowParseErrorException("SQL46026", tId2, TSqlParserResource.SQL46026Message, tId2.getText());
+                }
+            }
+        )?
+    ;
+
+scalarFunctionAttributeNoExecuteAs returns [FunctionOption vResult = FragmentFactory.CreateFragment<FunctionOption>()]
+    : tOption:Identifier
+        {
+            if (TryMatch(tOption, CodeGenerationSupporter.SchemaBinding))
+            {
+                vResult.OptionKind = FunctionOptionKind.SchemaBinding;
+            }
+            else
+            {
+                ThrowParseErrorException("SQL46026", tOption, TSqlParserResource.SQL46026Message, tOption.getText());
+            }
+            UpdateTokenInfo(vResult, tOption);
+        }
+    | tReturns:Identifier Null On Null tInput:Identifier
+        {
+            Match(tReturns,CodeGenerationSupporter.Returns);
+            Match(tInput,CodeGenerationSupporter.Input);
+            vResult.OptionKind = FunctionOptionKind.ReturnsNullOnNullInput;
+            UpdateTokenInfo(vResult, tInput);
+        }
+    | tCalled:Identifier On Null tInput2:Identifier
+        {
+            Match(tCalled,CodeGenerationSupporter.Called);
+            Match(tInput2,CodeGenerationSupporter.Input);
+            vResult.OptionKind = FunctionOptionKind.CalledOnNullInput;
+            UpdateTokenInfo(vResult, tInput2);
+        }
+    ;
+
+
+scalarFunctionAttribute returns [FunctionOption vResult]
+    : vResult=scalarFunctionAttributeNoExecuteAs
+    | vResult=functionExecuteAsOption
+    ;
+
+scalarFunctionAttributes [FunctionStatementBody vParent]
+{
+    FunctionOption vOption;
+    long encounteredOptions = 0;
+}
+    : With vOption=scalarFunctionAttribute
+        {
+            CheckOptionDuplication(ref encounteredOptions, (int)vOption.OptionKind, vOption);
+            AddAndUpdateTokenInfo(vParent, vParent.Options, vOption);
+        }
+        (
+            Comma vOption=scalarFunctionAttribute
+            {
+                CheckOptionDuplication(ref encounteredOptions, (int)vOption.OptionKind, vOption);
+                AddAndUpdateTokenInfo(vParent, vParent.Options, vOption);
+            }
+        )*
+    ;
+
 functionParameter returns[ProcedureParameter vResult = FragmentFactory.CreateFragment<ProcedureParameter>()]
 {
     Identifier vIdentifier;
@@ -13014,7 +13101,7 @@ functionParameter returns[ProcedureParameter vResult = FragmentFactory.CreateFra
         {
             vResult.VariableName = vIdentifier;
         }
-        scalarProcedureParameter[vResult, false, true]
+        scalarFunctionParameter[vResult]
     ;
 
 functionReturnTypeAndBody [FunctionStatementBody vParent, out bool vParseErrorOccurred]
@@ -13034,7 +13121,7 @@ functionReturnTypeAndBody [FunctionStatementBody vParent, out bool vParseErrorOc
             vScalarResult.DataType = vDataType;
             vParent.ReturnType = vScalarResult;
         }
-        (functionAttributes[vParent])? (As)?
+        (scalarFunctionAttributes[vParent])? (As)?
         (
             vCompoundStatement = beginEndBlockStatement
             {
