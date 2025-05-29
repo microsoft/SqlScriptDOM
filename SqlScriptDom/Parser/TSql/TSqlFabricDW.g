@@ -26838,6 +26838,9 @@ createTableOption returns [TableOption vResult]
         {NextTokenMatches(CodeGenerationSupporter.Distribution)}?
         vResult = tableDistributionOption
       |
+        {NextTokenMatches(CodeGenerationSupporter.Cluster)}?
+        vResult = clusterByTableOption
+      |
         vResult = tableIndexOption
       |
         {NextTokenMatches(CodeGenerationSupporter.Partition)}?
@@ -27061,6 +27064,15 @@ tableRoundRobinDistributionPolicy returns [TableRoundRobinDistributionPolicy vRe
             Match(tRoundRobin, CodeGenerationSupporter.RoundRobin);
             UpdateTokenInfo(vResult, tRoundRobin);
         }
+    ;
+
+clusterByTableOption returns [ClusterByTableOption vResult = this.FragmentFactory.CreateFragment<ClusterByTableOption>()]
+    : tCluster:Identifier By
+        {
+            Match(tCluster, CodeGenerationSupporter.Cluster);
+            UpdateTokenInfo(vResult, tCluster);
+        }
+        identifierColumnList[vResult, vResult.Columns]
     ;
 
 tableIndexOption returns [TableIndexOption vResult = FragmentFactory.CreateFragment<TableIndexOption>()]
@@ -28000,6 +28012,7 @@ alterTableStatement returns [AlterTableStatement vResult = null]
             {NextTokenMatches(CodeGenerationSupporter.FileTableNamespace, 2)}?
             vResult=alterTableFileTableNamespaceStatement
         |   vResult=alterTableSetStatement
+        |   vResult=alterTableAddClusterByStatement
         )
         {
             // Update position later, because instantiation is lazy
@@ -28136,6 +28149,21 @@ alterTableSetStatement returns [AlterTableSetStatement vResult = FragmentFactory
                     AddAndUpdateTokenInfo(vResult, vResult.Options,vTableOption);
                 }
             )*
+        tRParen:RightParenthesis
+        {
+            UpdateTokenInfo(vResult, tRParen);
+        }
+    ;
+
+alterTableAddClusterByStatement returns [AlterTableAddClusterByStatement vResult = FragmentFactory.CreateFragment<AlterTableAddClusterByStatement>()]
+{
+    ClusterByTableOption vClusterByOption;
+}
+    : tAdd:Add LeftParenthesis vClusterByOption = clusterByTableOption
+        {
+            vResult.ClusterByOption = vClusterByOption;
+            UpdateTokenInfo(vResult, tAdd);
+        }
         tRParen:RightParenthesis
         {
             UpdateTokenInfo(vResult, tRParen);

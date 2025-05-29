@@ -1459,6 +1459,10 @@
     <InheritedMember Name="SchemaObjectName" ContainerClass="AlterTableStatement"/>
     <Member Name="Options" Type="TableOption" Collection="true" Summary="Options to be set."/>
   </Class>
+  <Class Name="AlterTableAddClusterByStatement" Base="AlterTableStatement" Summary="Alters a table by adding a CLUSTER BY specification.">
+    <InheritedMember Name="SchemaObjectName" ContainerClass="AlterTableStatement"/>
+    <Member Name="ClusterByOption" Type="ClusterByTableOption" Summary="The CLUSTER BY option to be added to the table."/>
+  </Class>
   <Class Name="TableOption" Abstract="true" Summary="A single table option.">
     <Member Name="OptionKind" Type="TableOptionKind" GenerateUpdatePositionInfoCall="false" Summary="The option kind."/>
   </Class>
@@ -2709,6 +2713,11 @@
     <Member Name="DistributionColumns" Type="Identifier" Collection="true" GenerateUpdatePositionInfoCall="false" Summary="The column reference in the HASH option for a table distribution policy."/>
   </Class>
 
+  <!-- CLUSTER BY additions for Fabric DW SQL-->
+  <Class Name="ClusterByTableOption" Base="TableOption" Summary="Represents the CLUSTER BY option for tables.">
+    <InheritedClass Name="TableOption"/>
+    <Member Name="Columns" Type="ColumnReferenceExpression" Collection="true" Summary="The columns for clustering the table."/>
+  </Class>
   <Class Name="TableIndexOption" Base="TableOption" Summary="Represents the table INDEX option for SQL DW tables.">
     <InheritedClass Name="TableOption"/>
     <Member Name="Value" Type="TableIndexType" GenerateUpdatePositionInfoCall="false" Summary="The table index types could be clustered or non-clustered (heap)."/>
