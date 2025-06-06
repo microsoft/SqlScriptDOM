@@ -6824,7 +6824,7 @@ WHEN NOT MATCHED BY SOURCE THEN DELETE OUTPUT inserted.*, deleted.*;";
                                                 RETURN '$' + CAST(@amount AS VARCHAR)
                                             END;
                                             ";
-            ParserTestUtils.ErrorTestFabricDW(scalarFunctionSyntax, new ParserErrorInfo(330, "SQL46026", "ENCRYPTION"));
+            ParserTestUtils.ErrorTestFabricDW(scalarFunctionSyntax, new ParserErrorInfo(scalarFunctionSyntax.IndexOf("ENCRYPTION"), "SQL46026", "ENCRYPTION"));
 
             string scalarFunctionSyntax2 = @"CREATE OR ALTER FUNCTION dbo.ConcatNames
                                             (
@@ -6837,7 +6837,7 @@ WHEN NOT MATCHED BY SOURCE THEN DELETE OUTPUT inserted.*, deleted.*;";
                                             BEGIN
                                                 RETURN @first + ' ' + @last
                                             END;";
-            ParserTestUtils.ErrorTestFabricDW(scalarFunctionSyntax2, new ParserErrorInfo(425, "SQL46010", "INLINE"));
+            ParserTestUtils.ErrorTestFabricDW(scalarFunctionSyntax2, new ParserErrorInfo(scalarFunctionSyntax2.IndexOf("INLINE"), "SQL46010", "INLINE"));
             
             string scalarFunctionSyntax3 = @"CREATE OR ALTER FUNCTION dbo.CountProducts
                                             (
@@ -6849,7 +6849,7 @@ WHEN NOT MATCHED BY SOURCE THEN DELETE OUTPUT inserted.*, deleted.*;";
                                             BEGIN
                                                 RETURN (SELECT COUNT(*) FROM @ProductTable)
                                             END;";
-            ParserTestUtils.ErrorTestFabricDW(scalarFunctionSyntax3, new ParserErrorInfo(172, "SQL46026", "READONLY"));
+            ParserTestUtils.ErrorTestFabricDW(scalarFunctionSyntax3, new ParserErrorInfo(scalarFunctionSyntax3.IndexOf("READONLY"), "SQL46026", "READONLY"));
 
             string scalarFunctionSyntax4 = @"CREATE OR ALTER FUNCTION sales.TotalSalesForRegion
                                             (
@@ -6866,7 +6866,7 @@ WHEN NOT MATCHED BY SOURCE THEN DELETE OUTPUT inserted.*, deleted.*;";
                                                     WHERE RegionId = @RegionId
                                                 )
                                             END;";
-            ParserTestUtils.ErrorTestFabricDW(scalarFunctionSyntax4, new ParserErrorInfo(171, "SQL46010", "NULL"));
+            ParserTestUtils.ErrorTestFabricDW(scalarFunctionSyntax4, new ParserErrorInfo(scalarFunctionSyntax4.IndexOf("NULL"), "SQL46010", "NULL"));
         }
     }
 }
