@@ -36,7 +36,7 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                     Assert.AreEqual(ColumnType.Regular, (fragment.Batches[0].Statements[0] as CreateIndexStatement).Columns[0].Column.ColumnType);
                     Assert.AreEqual("c1", (fragment.Batches[0].Statements[0] as CreateIndexStatement).Columns[0].Column.MultiPartIdentifier.Identifiers[0].Value);
                 }
-            }, new TSql140Parser(true), new TSql150Parser(true), new TSql160Parser(true), new TSql170Parser(true));
+            }, new TSql140Parser(true), new TSql150Parser(true), new TSql160Parser(true), new TSql170Parser(true), new TSqlFabricDWParser(true));
         }
 
         /// <summary>
@@ -61,7 +61,7 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                     Assert.AreEqual(ColumnType.Regular, (fragment.Batches[0].Statements[0] as CreateTableStatement).Definition.Indexes[0].Columns[0].Column.ColumnType);
                     Assert.AreEqual("c1", (fragment.Batches[0].Statements[0] as CreateTableStatement).Definition.Indexes[0].Columns[0].Column.MultiPartIdentifier.Identifiers[0].Value);
                 }
-            }, new TSql150Parser(true), new TSql160Parser(true), new TSql170Parser(true));
+            }, new TSql150Parser(true), new TSql160Parser(true), new TSql170Parser(true), new TSqlFabricDWParser(true));
         }
 
         /// <summary>
@@ -82,7 +82,7 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                     Assert.AreEqual(1, errors.Count);
                     Assert.AreEqual("Incorrect syntax near '$node_id'.", errors[0].Message);
                 }
-            }, new TSql130Parser(true), new TSql140Parser(true), new TSql150Parser(true), new TSql160Parser(true), new TSql170Parser(true));
+            }, new TSql130Parser(true), new TSql140Parser(true), new TSql150Parser(true), new TSql160Parser(true), new TSql170Parser(true), new TSqlFabricDWParser(true));
         }
     }
 }

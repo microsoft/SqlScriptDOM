@@ -128,6 +128,8 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
                     return SqlVersionFlags.TSql160;
                 case SqlVersion.Sql170:
                     return SqlVersionFlags.TSql170;
+                case SqlVersion.SqlFabricDW:
+                    return SqlVersionFlags.TSqlFabricDW;
                 default:
                     throw new ArgumentException(String.Format(CultureInfo.CurrentCulture, SqlScriptGeneratorResource.UnknownEnumValue, sqlVersion, "SqlVersion"), "sqlVersion");
             }
