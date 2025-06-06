@@ -394,7 +394,13 @@ namespace SqlStudio.Tests.UTSqlScriptDom
         }
 
         public static TSqlFragment ParseString(TSqlParser parser, string source, out IList<ParseError> errors)
-        {
+        {   
+#if NET
+            // Convert line endings from \n to \r\n
+            if (System.Environment.NewLine == "\n")
+                source = source.ReplaceLineEndings("\r\n");
+#endif
+
             TSqlFragment fragment;
             using (StringReader sr = new StringReader(source))
             {
