@@ -1459,6 +1459,10 @@
     <InheritedMember Name="SchemaObjectName" ContainerClass="AlterTableStatement"/>
     <Member Name="Options" Type="TableOption" Collection="true" Summary="Options to be set."/>
   </Class>
+  <Class Name="AlterTableAddClusterByStatement" Base="AlterTableStatement" Summary="Alters a table by adding a CLUSTER BY specification.">
+    <InheritedMember Name="SchemaObjectName" ContainerClass="AlterTableStatement"/>
+    <Member Name="ClusterByOption" Type="ClusterByTableOption" Summary="The CLUSTER BY option to be added to the table."/>
+  </Class>
   <Class Name="TableOption" Abstract="true" Summary="A single table option.">
     <Member Name="OptionKind" Type="TableOptionKind" GenerateUpdatePositionInfoCall="false" Summary="The option kind."/>
   </Class>
@@ -2674,6 +2678,9 @@
     <!-- CTAS additions for SQL Dw-->
     <Member Name="SelectStatement" Type="SelectStatement" Summary="Represents the query part of a CTAS statement."/>
     <Member Name="CtasColumns" Type="Identifier" Collection="true"  Summary="The columns for the view. This is optionally supported with CTAS statements."/>
+    <!-- CTAC additions for Fabric DW SQL-->
+    <Member Name="CloneSource" Type="SchemaObjectName" Summary="Source table for CLONE syntax."/>
+    <Member Name="ClonePointInTime" Type="ScalarExpression" Summary="Optional point in time for CLONE statement."/>
   </Class>
   <Class Name="FederationScheme" Summary="This class stores the federation scheme for a table">
     <Member Name="DistributionName" Type="Identifier" Summary="The name of the distribution."/>
@@ -2706,6 +2713,11 @@
     <Member Name="DistributionColumns" Type="Identifier" Collection="true" GenerateUpdatePositionInfoCall="false" Summary="The column reference in the HASH option for a table distribution policy."/>
   </Class>
 
+  <!-- CLUSTER BY additions for Fabric DW SQL-->
+  <Class Name="ClusterByTableOption" Base="TableOption" Summary="Represents the CLUSTER BY option for tables.">
+    <InheritedClass Name="TableOption"/>
+    <Member Name="Columns" Type="ColumnReferenceExpression" Collection="true" Summary="The columns for clustering the table."/>
+  </Class>
   <Class Name="TableIndexOption" Base="TableOption" Summary="Represents the table INDEX option for SQL DW tables.">
     <InheritedClass Name="TableOption"/>
     <Member Name="Value" Type="TableIndexType" GenerateUpdatePositionInfoCall="false" Summary="The table index types could be clustered or non-clustered (heap)."/>

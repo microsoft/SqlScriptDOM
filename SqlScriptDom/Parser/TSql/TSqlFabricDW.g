@@ -13006,6 +13006,93 @@ functionParameterList[FunctionStatementBody vResult]
         )*
     ;
 
+scalarFunctionParameter[ProcedureParameter vParent]
+{
+    DataTypeReference vDataType;
+    ScalarExpression vDefault;
+}
+    : vDataType=scalarDataType
+        {
+            vParent.DataType = vDataType;
+        }
+        (
+            EqualsSign
+            (
+                vDefault=possibleNegativeConstantOrIdentifierWithDefault
+                {
+                    vParent.Value = vDefault;
+                }
+            )
+        )?
+        (
+            tId2:Identifier
+            {
+                if (TryMatch(tId2,  CodeGenerationSupporter.Output) || TryMatch(tId2,  CodeGenerationSupporter.Out))
+                {
+                    ThrowParseErrorException("SQL46039", tId2, TSqlParserResource.SQL46039Message);
+                }
+                else
+                {
+                    ThrowParseErrorException("SQL46026", tId2, TSqlParserResource.SQL46026Message, tId2.getText());
+                }
+            }
+        )?
+    ;
+
+scalarFunctionAttributeNoExecuteAs returns [FunctionOption vResult = FragmentFactory.CreateFragment<FunctionOption>()]
+    : tOption:Identifier
+        {
+            if (TryMatch(tOption, CodeGenerationSupporter.SchemaBinding))
+            {
+                vResult.OptionKind = FunctionOptionKind.SchemaBinding;
+            }
+            else
+            {
+                ThrowParseErrorException("SQL46026", tOption, TSqlParserResource.SQL46026Message, tOption.getText());
+            }
+            UpdateTokenInfo(vResult, tOption);
+        }
+    | tReturns:Identifier Null On Null tInput:Identifier
+        {
+            Match(tReturns,CodeGenerationSupporter.Returns);
+            Match(tInput,CodeGenerationSupporter.Input);
+            vResult.OptionKind = FunctionOptionKind.ReturnsNullOnNullInput;
+            UpdateTokenInfo(vResult, tInput);
+        }
+    | tCalled:Identifier On Null tInput2:Identifier
+        {
+            Match(tCalled,CodeGenerationSupporter.Called);
+            Match(tInput2,CodeGenerationSupporter.Input);
+            vResult.OptionKind = FunctionOptionKind.CalledOnNullInput;
+            UpdateTokenInfo(vResult, tInput2);
+        }
+    ;
+
+
+scalarFunctionAttribute returns [FunctionOption vResult]
+    : vResult=scalarFunctionAttributeNoExecuteAs
+    | vResult=functionExecuteAsOption
+    ;
+
+scalarFunctionAttributes [FunctionStatementBody vParent]
+{
+    FunctionOption vOption;
+    long encounteredOptions = 0;
+}
+    : With vOption=scalarFunctionAttribute
+        {
+            CheckOptionDuplication(ref encounteredOptions, (int)vOption.OptionKind, vOption);
+            AddAndUpdateTokenInfo(vParent, vParent.Options, vOption);
+        }
+        (
+            Comma vOption=scalarFunctionAttribute
+            {
+                CheckOptionDuplication(ref encounteredOptions, (int)vOption.OptionKind, vOption);
+                AddAndUpdateTokenInfo(vParent, vParent.Options, vOption);
+            }
+        )*
+    ;
+
 functionParameter returns[ProcedureParameter vResult = FragmentFactory.CreateFragment<ProcedureParameter>()]
 {
     Identifier vIdentifier;
@@ -13014,7 +13101,7 @@ functionParameter returns[ProcedureParameter vResult = FragmentFactory.CreateFra
         {
             vResult.VariableName = vIdentifier;
         }
-        scalarProcedureParameter[vResult, false, true]
+        scalarFunctionParameter[vResult]
     ;
 
 functionReturnTypeAndBody [FunctionStatementBody vParent, out bool vParseErrorOccurred]
@@ -13034,7 +13121,7 @@ functionReturnTypeAndBody [FunctionStatementBody vParent, out bool vParseErrorOc
             vScalarResult.DataType = vDataType;
             vParent.ReturnType = vScalarResult;
         }
-        (functionAttributes[vParent])? (As)?
+        (scalarFunctionAttributes[vParent])? (As)?
         (
             vCompoundStatement = beginEndBlockStatement
             {
@@ -26504,6 +26591,8 @@ createTableStatement returns [CreateTableStatement vResult = this.FragmentFactor
     TableDefinition vTableDefinition;
     FederationScheme vFederationScheme;
     FileGroupOrPartitionScheme vFileGroupOrPartitionScheme;
+    SchemaObjectName vCloneSource;
+    ScalarExpression vCloneTime;
 }
     : tCreate:Create Table vSchemaObjectName=schemaObjectThreePartName
         {
@@ -26534,6 +26623,19 @@ createTableStatement returns [CreateTableStatement vResult = this.FragmentFactor
             )
             |
                 ctasCreateTableStatement[vResult]
+            |
+                As tClone:Identifier Of vCloneSource=schemaObjectThreePartName
+                {
+                    Match(tClone, CodeGenerationSupporter.Clone);
+                    vResult.CloneSource = vCloneSource;
+                }
+                (
+                    tAt:Identifier vCloneTime=stringLiteral
+                    {
+                        Match(tAt, CodeGenerationSupporter.At);
+                        vResult.ClonePointInTime = vCloneTime;
+                    }
+                )?
             |
                 As tFileTableOrGraphEdge:Identifier
                 {
@@ -26735,6 +26837,9 @@ createTableOption returns [TableOption vResult]
       |
         {NextTokenMatches(CodeGenerationSupporter.Distribution)}?
         vResult = tableDistributionOption
+      |
+        {NextTokenMatches(CodeGenerationSupporter.Cluster)}?
+        vResult = clusterByTableOption
       |
         vResult = tableIndexOption
       |
@@ -26959,6 +27064,15 @@ tableRoundRobinDistributionPolicy returns [TableRoundRobinDistributionPolicy vRe
             Match(tRoundRobin, CodeGenerationSupporter.RoundRobin);
             UpdateTokenInfo(vResult, tRoundRobin);
         }
+    ;
+
+clusterByTableOption returns [ClusterByTableOption vResult = this.FragmentFactory.CreateFragment<ClusterByTableOption>()]
+    : tCluster:Identifier By
+        {
+            Match(tCluster, CodeGenerationSupporter.Cluster);
+            UpdateTokenInfo(vResult, tCluster);
+        }
+        identifierColumnList[vResult, vResult.Columns]
     ;
 
 tableIndexOption returns [TableIndexOption vResult = FragmentFactory.CreateFragment<TableIndexOption>()]
@@ -27898,6 +28012,7 @@ alterTableStatement returns [AlterTableStatement vResult = null]
             {NextTokenMatches(CodeGenerationSupporter.FileTableNamespace, 2)}?
             vResult=alterTableFileTableNamespaceStatement
         |   vResult=alterTableSetStatement
+        |   vResult=alterTableAddClusterByStatement
         )
         {
             // Update position later, because instantiation is lazy
@@ -28034,6 +28149,21 @@ alterTableSetStatement returns [AlterTableSetStatement vResult = FragmentFactory
                     AddAndUpdateTokenInfo(vResult, vResult.Options,vTableOption);
                 }
             )*
+        tRParen:RightParenthesis
+        {
+            UpdateTokenInfo(vResult, tRParen);
+        }
+    ;
+
+alterTableAddClusterByStatement returns [AlterTableAddClusterByStatement vResult = FragmentFactory.CreateFragment<AlterTableAddClusterByStatement>()]
+{
+    ClusterByTableOption vClusterByOption;
+}
+    : tAdd:Add LeftParenthesis vClusterByOption = clusterByTableOption
+        {
+            vResult.ClusterByOption = vClusterByOption;
+            UpdateTokenInfo(vResult, tAdd);
+        }
         tRParen:RightParenthesis
         {
             UpdateTokenInfo(vResult, tRParen);

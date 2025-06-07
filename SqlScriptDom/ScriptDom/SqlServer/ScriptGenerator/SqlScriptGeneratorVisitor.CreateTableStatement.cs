@@ -20,6 +20,20 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
 
             GenerateSpaceAndFragmentIfNotNull(node.SchemaObjectName);
 
+            if (node.CloneSource != null)
+            {
+                GenerateSpaceAndKeyword(TSqlTokenType.As);
+                GenerateSpaceAndIdentifier(CodeGenerationSupporter.Clone);
+                GenerateSpaceAndKeyword(TSqlTokenType.Of);
+                GenerateSpaceAndFragmentIfNotNull(node.CloneSource);
+
+                if (node.ClonePointInTime != null)
+                {
+                    GenerateSpaceAndIdentifier(CodeGenerationSupporter.At);
+                    GenerateSpaceAndFragmentIfNotNull(node.ClonePointInTime);
+                }
+            }
+
             if (node.Definition != null)
             {
                 List<TSqlFragment> columnsAndConstraintsAndIndexesAndPeriods = new List<TSqlFragment>();

@@ -19,8 +19,8 @@ namespace SqlStudio.Tests.UTSqlScriptDom
         /// as user id/name start/end columns
         /// </summary>
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void CreateTableGeneratedAlwaysNegativeTest()
         {
             // Generated always as UserId start column must be unique
@@ -255,11 +255,11 @@ WITH
                                             [Data2] NVARCHAR (32) MASKED WITH (FUNCTION = 'default()')        DEFAULT 'b' NOT NULL,
                                             CONSTRAINT [constr1] PRIMARY KEY ([PK]));";
             ParserTestUtils.ErrorTest140(hiddenMaskedSyntax,
-                 new ParserErrorInfo(hiddenMaskedSyntax.IndexOf("HIDDEN MASKED")+7, "SQL46010", "MASKED"));
+                 new ParserErrorInfo(hiddenMaskedSyntax.IndexOf("HIDDEN MASKED") + 7, "SQL46010", "MASKED"));
 
         }
 
-         /// <summary>
+        /// <summary>
         /// Negative tests for BULK INSERT command
         /// </summary>
         [TestMethod]
@@ -282,8 +282,8 @@ WITH
         /// as user id/name start/end columns
         /// </summary>
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void AlterTableAddGeneratedAlwaysNegativeTest()
         {
             // Generated always as UserId start column must be unique
@@ -311,8 +311,8 @@ WITH
         /// Negative tests for alter column with generated always
         /// </summary>
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void AlterColumnAddGeneratedAlwaysNegativeTest()
         {
             ParserTestUtils.ErrorTest130("ALTER TABLE T ALTER COLUMN C GENERATED ALWAYS AS SUSER_SID START",
@@ -348,8 +348,8 @@ WITH
         /// for temporal generated always columns
         /// </summary>
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void AddDropHiddenNegativeTests()
         {
             ParserTestUtils.ErrorTest130("ALTER TABLE T1 ALTER COLUMN C1 ADD DROP HIDDEN",
@@ -376,8 +376,8 @@ WITH
         /// for ALTER TABLE
         /// </summary>
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void AddSplitMergeNegativeTests()
         {
             ParserTestUtils.ErrorTest130("ALTER TABLE T SPLI RANGE ('2004-01-01')",
@@ -400,8 +400,8 @@ WITH
         /// Negative tests for OPENJSON syntax.
         /// </summary>
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void OpenJsonNegativeTest()
         {
             ParserTestUtils.ErrorTest130("select * from openjson()",
@@ -507,8 +507,8 @@ WITH
         /// Negative tests for Data Masking Alter Column syntax.
         /// </summary>
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void DataMaskingAlterColumnSyntaxNegativeTest()
         {
             // Add data masking: missing WITH keyword
@@ -601,8 +601,8 @@ WITH
         /// Negative tests for Data Masking Column Definition syntax.
         /// </summary>
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void DataMaskingColumnDefinitionSyntaxNegativeTest()
         {
             // Missing WITH keyword
@@ -655,8 +655,8 @@ WITH
         /// Only ON and OFF options are allowed for ALTER INDEX REORGANIZE's COMPRESS_ALL_ROW_GROUPS option.
         /// </summary>
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void AlterIndexReorganizeCompressAllRowGroupsOptionNegativeTest()
         {
             ParserTestUtils.ErrorTest130("ALTER INDEX cci ON cciTable REORGANIZE WITH (COMPRESS_ALL_ROW_GROUPS = ONN);",
@@ -690,8 +690,8 @@ WITH
         /// Only columnstore indexes should accept compression delay on inline index create.
         /// </summary>
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void CreateTableWithInlineIndexWithCompressionDelayNegativeTests()
         {
             ParserTestUtils.ErrorTest130("CREATE TABLE t (col0 INT, INDEX ind (col0) WITH (COMPRESSION_DELAY = 2));",
@@ -704,8 +704,8 @@ WITH
         /// Only columnstore indexes should accept compression delay on index create.
         /// </summary>
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void CreateIndexWithCompressionDelayNegativeTests()
         {
             ParserTestUtils.ErrorTest130("CREATE INDEX ind ON table1 (col0) WITH (COMPRESSION_DELAY = 2));",
@@ -716,8 +716,8 @@ WITH
         /// ALTER INDEX [indexName] ON [tableName] SET (COMPRESSION_DELAY = value MINUTES) accepts AUTO and numbers in [0, maxint].
         /// </summary>
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void AlterIndexSetCompressionDelayOptionNegativeTest()
         {
             ParserTestUtils.ErrorTest130("ALTER INDEX cci ON cciTable SET(COMPRESSION_DELAY = ON);",
@@ -754,72 +754,72 @@ WITH
         }
 
 
-		/// <summary>
-		/// Within a create statement, SUPPRESS_MESSAGES can only be set when IGNORE_DUP_KEY is ON, and it must be a suboption of IGNORE_DUP_KEY.
-		/// </summary>
+        /// <summary>
+        /// Within a create statement, SUPPRESS_MESSAGES can only be set when IGNORE_DUP_KEY is ON, and it must be a suboption of IGNORE_DUP_KEY.
+        /// </summary>
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
-		public void CreateTableWithInlineIndexWithSuppressMessagesNegativeTests()
-		{
-			ParserTestUtils.ErrorTest140("CREATE UNIQUE NONCLUSTERED INDEX nci ON table1(col1) WITH (SUPPRESS_MESSAGES = ON);",
-				 new ParserErrorInfo(59, "SQL46010", "SUPPRESS_MESSAGES"));
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void CreateTableWithInlineIndexWithSuppressMessagesNegativeTests()
+        {
+            ParserTestUtils.ErrorTest140("CREATE UNIQUE NONCLUSTERED INDEX nci ON table1(col1) WITH (SUPPRESS_MESSAGES = ON);",
+                 new ParserErrorInfo(59, "SQL46010", "SUPPRESS_MESSAGES"));
 
-			ParserTestUtils.ErrorTest140("CREATE UNIQUE NONCLUSTERED INDEX nci ON table1(col1) WITH (SUPPRESS_MESSAGES = OFF);",
-				 new ParserErrorInfo(59, "SQL46010", "SUPPRESS_MESSAGES"));
+            ParserTestUtils.ErrorTest140("CREATE UNIQUE NONCLUSTERED INDEX nci ON table1(col1) WITH (SUPPRESS_MESSAGES = OFF);",
+                 new ParserErrorInfo(59, "SQL46010", "SUPPRESS_MESSAGES"));
 
-			ParserTestUtils.ErrorTest140("CREATE UNIQUE NONCLUSTERED INDEX nci ON table1(col1) WITH (IGNORE_DUP_KEY = OFF (SUPPRESS_MESSAGES = ON));",
-				 new ParserErrorInfo(80, "SQL46010", "("));
+            ParserTestUtils.ErrorTest140("CREATE UNIQUE NONCLUSTERED INDEX nci ON table1(col1) WITH (IGNORE_DUP_KEY = OFF (SUPPRESS_MESSAGES = ON));",
+                 new ParserErrorInfo(80, "SQL46010", "("));
 
-			ParserTestUtils.ErrorTest140("CREATE UNIQUE NONCLUSTERED INDEX nci ON table1(col1) WITH (IGNORE_DUP_KEY = OFF (SUPPRESS_MESSAGES = OFF));",
-				 new ParserErrorInfo(80, "SQL46010", "("));
+            ParserTestUtils.ErrorTest140("CREATE UNIQUE NONCLUSTERED INDEX nci ON table1(col1) WITH (IGNORE_DUP_KEY = OFF (SUPPRESS_MESSAGES = OFF));",
+                 new ParserErrorInfo(80, "SQL46010", "("));
 
-			ParserTestUtils.ErrorTest140("CREATE UNIQUE NONCLUSTERED INDEX nci ON table1(col1) WITH (IGNORE_DUP_KEY = ON, SUPPRESS_MESSAGES = ON));",
-				 new ParserErrorInfo(80, "SQL46010", "SUPPRESS_MESSAGES"));
+            ParserTestUtils.ErrorTest140("CREATE UNIQUE NONCLUSTERED INDEX nci ON table1(col1) WITH (IGNORE_DUP_KEY = ON, SUPPRESS_MESSAGES = ON));",
+                 new ParserErrorInfo(80, "SQL46010", "SUPPRESS_MESSAGES"));
 
-			ParserTestUtils.ErrorTest140("CREATE UNIQUE NONCLUSTERED INDEX nci ON table1(col1) WITH (IGNORE_DUP_KEY = ON, SUPPRESS_MESSAGES = OFF));",
-				 new ParserErrorInfo(80, "SQL46010", "SUPPRESS_MESSAGES"));
+            ParserTestUtils.ErrorTest140("CREATE UNIQUE NONCLUSTERED INDEX nci ON table1(col1) WITH (IGNORE_DUP_KEY = ON, SUPPRESS_MESSAGES = OFF));",
+                 new ParserErrorInfo(80, "SQL46010", "SUPPRESS_MESSAGES"));
 
-		}
+        }
 
-		/// <summary>
-		/// Within an ALTER statement, SUPPRESS_MESSAGES is a suboption of IGNORE_DUP_KEY only when IGNORE_DUP_KEY is ON.
-		/// </summary>
+        /// <summary>
+        /// Within an ALTER statement, SUPPRESS_MESSAGES is a suboption of IGNORE_DUP_KEY only when IGNORE_DUP_KEY is ON.
+        /// </summary>
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
-		public void AlterIndexSetSuppressMessagesOptionNegativeTest()
-		{
-			ParserTestUtils.ErrorTest140("ALTER INDEX ci ON ciTable SET (SUPPRESS_MESSAGES = ON);",
-				 new ParserErrorInfo(31, "SQL46010", "SUPPRESS_MESSAGES"));
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void AlterIndexSetSuppressMessagesOptionNegativeTest()
+        {
+            ParserTestUtils.ErrorTest140("ALTER INDEX ci ON ciTable SET (SUPPRESS_MESSAGES = ON);",
+                 new ParserErrorInfo(31, "SQL46010", "SUPPRESS_MESSAGES"));
 
-			ParserTestUtils.ErrorTest140("ALTER INDEX ci ON ciTable SET (SUPPRESS_MESSAGES = OFF);",
-				 new ParserErrorInfo(31, "SQL46010", "SUPPRESS_MESSAGES"));
+            ParserTestUtils.ErrorTest140("ALTER INDEX ci ON ciTable SET (SUPPRESS_MESSAGES = OFF);",
+                 new ParserErrorInfo(31, "SQL46010", "SUPPRESS_MESSAGES"));
 
-			ParserTestUtils.ErrorTest140("ALTER INDEX ci ON ciTable SET (IGNORE_DUP_KEY = OFF (SUPPRESS_MESSAGES = ON));",
-				 new ParserErrorInfo(52, "SQL46010", "("));
+            ParserTestUtils.ErrorTest140("ALTER INDEX ci ON ciTable SET (IGNORE_DUP_KEY = OFF (SUPPRESS_MESSAGES = ON));",
+                 new ParserErrorInfo(52, "SQL46010", "("));
 
-			ParserTestUtils.ErrorTest140("ALTER INDEX ci ON ciTable SET (IGNORE_DUP_KEY = OFF (SUPPRESS_MESSAGES = OFF));",
-				 new ParserErrorInfo(52, "SQL46010", "("));
+            ParserTestUtils.ErrorTest140("ALTER INDEX ci ON ciTable SET (IGNORE_DUP_KEY = OFF (SUPPRESS_MESSAGES = OFF));",
+                 new ParserErrorInfo(52, "SQL46010", "("));
 
-			ParserTestUtils.ErrorTest140("ALTER INDEX ci ON ciTable SET (IGNORE_DUP_KEY = ON, SUPPRESS_MESSAGES = ON);",
-				 new ParserErrorInfo(52, "SQL46010", "SUPPRESS_MESSAGES"));
+            ParserTestUtils.ErrorTest140("ALTER INDEX ci ON ciTable SET (IGNORE_DUP_KEY = ON, SUPPRESS_MESSAGES = ON);",
+                 new ParserErrorInfo(52, "SQL46010", "SUPPRESS_MESSAGES"));
 
-			ParserTestUtils.ErrorTest140("ALTER INDEX ci ON ciTable SET (IGNORE_DUP_KEY = ON, SUPPRESS_MESSAGES = OFF);",
-				 new ParserErrorInfo(52, "SQL46010", "SUPPRESS_MESSAGES"));
+            ParserTestUtils.ErrorTest140("ALTER INDEX ci ON ciTable SET (IGNORE_DUP_KEY = ON, SUPPRESS_MESSAGES = OFF);",
+                 new ParserErrorInfo(52, "SQL46010", "SUPPRESS_MESSAGES"));
 
-			// Check that parsers below 140 don't recognize SUPPRESS_MESSAGES as valid.
-			//
-			ParserTestUtils.ErrorTest130("ALTER INDEX ci ON ciTable SET (IGNORE_DUP_KEY = ON (SUPPRESS_MESSAGES = ON));",
-				new ParserErrorInfo(51, "SQL46010", "("));
-		}
+            // Check that parsers below 140 don't recognize SUPPRESS_MESSAGES as valid.
+            //
+            ParserTestUtils.ErrorTest130("ALTER INDEX ci ON ciTable SET (IGNORE_DUP_KEY = ON (SUPPRESS_MESSAGES = ON));",
+                new ParserErrorInfo(51, "SQL46010", "("));
+        }
 
         /// <summary>
         /// Column level and table level filtered indexes on hekaton tables are not allowed.
         /// </summary>
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void HekatonTableInlineFilteredIndex()
         {
             ParserTestUtils.ErrorTest130("CREATE TABLE T1 (C1 INT NOT NULL PRIMARY KEY NONCLUSTERED, C2 INT NOT NULL INDEX idx NONCLUSTERED WHERE C2 > 10) WITH (MEMORY_OPTIMIZED=on);",
@@ -833,8 +833,8 @@ WITH
         /// Nonclustered columnstore indexes are not allowed on hekaton tables.
         /// </summary>
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void HekatonTableNonClusteredColumnStoreIndex()
         {
             ParserTestUtils.ErrorTest130("CREATE TABLE T1 (C1 INT NOT NULL PRIMARY KEY NONCLUSTERED, C2 INT NOT NULL, INDEX idx NONCLUSTERED COLUMNSTORE (C2)) WITH (MEMORY_OPTIMIZED=ON);",
@@ -845,8 +845,8 @@ WITH
         /// Negative tests for FOR JSON syntax.
         /// </summary>
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void JsonForClauseNegativeTest()
         {
             ParserTestUtils.ErrorTest130("select * from t1 for json",
@@ -893,8 +893,8 @@ WITH
         /// Negative tests for Temporal syntax.
         /// </summary>
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void TemporalSyntaxNegativeTest()
         {
             // Issuing select statement using temporal clause and an expression as source.
@@ -958,7 +958,7 @@ WITH (SYSTEM_VERSIONING = ON (HISTORY_TABLE = dbo.t_history, DATA_CONSISTENCY_CH
 )
 WITH (SYSTEM_VERSIONING = ON (HISTORY_TABLE = dbo.t_history, DATA_CONSISTENCY_CHECK = ON, , HISTORY_RETENTION_PERIOD = 5 DAYS))";
             ParserTestUtils.ErrorTest140(query4,
-                                        new ParserErrorInfo(query4.IndexOf(", ,")+2, "SQL46010", ","));
+                                        new ParserErrorInfo(query4.IndexOf(", ,") + 2, "SQL46010", ","));
 
             string query5 = @"CREATE TABLE tab_with_retention (
     COL0      INT                                        ,
@@ -1156,7 +1156,7 @@ WITH (SYSTEM_VERSIONING = ON (HISTORY_RETENTION_PERIOD = 5 DAYS, HISTORY_RETENTI
 )
 WITH (SYSTEM_VERSIONING = ON ())";
             ParserTestUtils.ErrorTest130(query18,
-                                        new ParserErrorInfo(query18.IndexOf("())")+1, "SQL46010", ")"));
+                                        new ParserErrorInfo(query18.IndexOf("())") + 1, "SQL46010", ")"));
 
             string query19 = @"CREATE TABLE tab_with_retention (
     COL0      INT                                        ,
@@ -1205,8 +1205,8 @@ WITH (SYSTEM_VERSIONING = ON (HISTORY_TABLE = dbo.t_history, DATA_CONSISTENCY_CH
         /// Negative tests for inline COLUMNSTORE indexes
         /// </summary>
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void ColumnStoreInlineIndexNegativeTest()
         {
             // Columns in CCI
@@ -1244,8 +1244,8 @@ WITH (SYSTEM_VERSIONING = ON (HISTORY_TABLE = dbo.t_history, DATA_CONSISTENCY_CH
         /// Negative tests for DROP IF EXISTS statements
         /// </summary>
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void DropIfExistsNegativeTest()
         {
             // DROP DATABASE
@@ -1410,8 +1410,8 @@ WITH (SYSTEM_VERSIONING = ON (HISTORY_TABLE = dbo.t_history, DATA_CONSISTENCY_CH
         }
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void CreateTableInlineFilteredIndexNegativeTests()
         {
             // Table level inline clustered index with filter
@@ -1428,8 +1428,8 @@ WITH (SYSTEM_VERSIONING = ON (HISTORY_TABLE = dbo.t_history, DATA_CONSISTENCY_CH
         }
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void FederationStatementErrorTest()
         {
             //Two and Three-Part name
@@ -1463,7 +1463,7 @@ WITH (SYSTEM_VERSIONING = ON (HISTORY_TABLE = dbo.t_history, DATA_CONSISTENCY_CH
             // This is a limitation of SQLDOM parser. There are a number of instances where this happens, and an UNDONE to allow errors to take into account multiple options. So here can't say expected HIGH or LOW
             // SQL46005: Expected HIGH but encountered K1 instead.
             //
-            ParserTestUtils.ErrorTest110("ALTER FEDERATION FED DROP AT (K1 = 10)", new ParserErrorInfo(30, "SQL46005", new string[]{"HIGH","K1"}));
+            ParserTestUtils.ErrorTest110("ALTER FEDERATION FED DROP AT (K1 = 10)", new ParserErrorInfo(30, "SQL46005", new string[] { "HIGH", "K1" }));
             ParserTestUtils.ErrorTest110("ALTER FEDERATION FED DROP AT (low K1 10)", new ParserErrorInfo(37, "SQL46010", "10"));
 
             // USE
@@ -1481,8 +1481,8 @@ WITH (SYSTEM_VERSIONING = ON (HISTORY_TABLE = dbo.t_history, DATA_CONSISTENCY_CH
         }
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void CreateTableDanglingCommaTest()
         {
             // One dangling comma is ok - but only in create table
@@ -1520,11 +1520,11 @@ WITH (SYSTEM_VERSIONING = ON (HISTORY_TABLE = dbo.t_history, DATA_CONSISTENCY_CH
         }
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void CreateTriggerStatementErrorTests()
         {
-            ParserTestUtils.ExecuteTestForAllParsers(delegate(TSqlParser parser)
+            ParserTestUtils.ExecuteTestForAllParsers(delegate (TSqlParser parser)
             {
                 TestErrorRecoverySingleErrorTest(parser, "CreateTriggerStatementErrorTests.sql",
                     new ParserErrorInfo(141, "SQL46010", ";"));
@@ -1549,11 +1549,11 @@ GO
         }
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void CreateSchemaStatementErrorTests()
         {
-            ParserTestUtils.ExecuteTestForAllParsers(delegate(TSqlParser parser)
+            ParserTestUtils.ExecuteTestForAllParsers(delegate (TSqlParser parser)
             {
                 TestErrorRecoverySingleErrorTest(parser, "CreateSchemaStatementErrorTests.sql",
                     new ParserErrorInfo(102, "SQL46010", "on"));
@@ -1561,8 +1561,8 @@ GO
         }
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void MultipleErrorTests()
         {
             ParserTestUtils.ExecuteTestForAllParsers(MultipleErrorTestImpl, true);
@@ -1594,8 +1594,8 @@ GO
         }
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void ViewOptionRepeatErrorTest()
         {
             const string source = "CREATE View v1 WITH encryption, schemabinding, encryption as select 10;";
@@ -1605,8 +1605,8 @@ GO
         }
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void QueryOptimizerHintErrorTest()
         {
             const string source = "SELECT * FROM t1 OPTION (SOME_HINT_NEVER_EXISTS);";
@@ -1620,8 +1620,8 @@ GO
         /// Tests the USE HINT query hint mechanism
         /// </summary>
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void QueryOptimizerUseHintClauseErrorTest()
         {
             // SQL DOM doesn't check for valid/invalid strings, so this should only fail on parsers
@@ -1665,7 +1665,7 @@ GO
             ParserTestUtils.ErrorTest100(sourceNoHintKeyword, new ParserErrorInfo(29, "SQL46010", "("));
             ParserTestUtils.ErrorTest110(sourceNoHintKeyword, new ParserErrorInfo(29, "SQL46010", "("));
             ParserTestUtils.ErrorTest120(sourceNoHintKeyword, new ParserErrorInfo(29, "SQL46010", "("));
-	        ParserTestUtils.ErrorTest130(sourceNoHintKeyword, new ParserErrorInfo(25, "SQL46010", "USE"));
+            ParserTestUtils.ErrorTest130(sourceNoHintKeyword, new ParserErrorInfo(25, "SQL46010", "USE"));
             ParserTestUtils.ErrorTest140(sourceNoHintKeyword, new ParserErrorInfo(25, "SQL46010", "USE"));
 
             // USE keyword is omitted, should fail on all parsers.
@@ -1729,8 +1729,8 @@ GO
             ParserTestUtils.ErrorTest150(externalDataSourceCreateCommand, new ParserErrorInfo(externalDataSourceCreateCommand.IndexOf("TEST"), "SQL46010", "TEST"));
         }
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void BeginEndStatementErrorTests()
         {
             ParserTestUtils.ExecuteTestForAllParsers(BeginEndStatementErrorTestImpl, true);
@@ -1751,8 +1751,8 @@ GO
         }
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void MLPOptionErrorTest()
         {
             // Syntax errors
@@ -1803,8 +1803,8 @@ GO
         }
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void InlineIndexErrors()
         {
             // Syntax errors
@@ -1823,8 +1823,8 @@ GO
         }
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void AlterDatabaseSetEqualsOnOfOptionErrors()
         {
             // Syntax errors
@@ -1837,8 +1837,8 @@ GO
         /// Only Secondary database can accept a PRIMARY value for configuration option
         /// </summary>
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void AlterDatabaseScopedConfigurationOptionNegativeTests()
         {
             // Case: Setting invalid values for primary database
@@ -1913,8 +1913,8 @@ GO
         }
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void TruncatePartitionsErrorTests()
         {
             // Syntax errors
@@ -1924,8 +1924,8 @@ GO
         }
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void LexerErrorTest()
         {
             ParserTestUtils.ErrorTestAllParsers("CREATE TABLE table1 (c1 int) [])",
@@ -1946,7 +1946,7 @@ GO
             //
             const string windowInOverClause = "SELECT Sum(c1) OVER Win1 FROM t1 WINDOW Win1 AS (PARTITION BY c1);";
 
-            ParserTestUtils.ErrorTest150(windowInOverClause,new ParserErrorInfo(15, "SQL46010", "OVER"));
+            ParserTestUtils.ErrorTest150(windowInOverClause, new ParserErrorInfo(15, "SQL46010", "OVER"));
             ParserTestUtils.ErrorTest140(windowInOverClause, new ParserErrorInfo(15, "SQL46010", "OVER"));
             ParserTestUtils.ErrorTest130(windowInOverClause, new ParserErrorInfo(15, "SQL46010", "OVER"));
 
@@ -2015,8 +2015,8 @@ GO
         }
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void SQL46002Test()
         {
             ParserTestUtils.ErrorTestAllParsers("create table t1 (c1 national int varying);",
@@ -2027,8 +2027,8 @@ GO
         }
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void SQL46003Test()
         {
             string testNumber = "SQL46003";
@@ -2042,8 +2042,8 @@ GO
 
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void SQL46004Test()
         {
             ParserTestUtils.ErrorTestAllParsers("create table t1 (column1 float varying);",
@@ -2055,8 +2055,8 @@ GO
 
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void SQL46005Test()
         {
             string testNumber = "SQL46005";
@@ -2067,8 +2067,8 @@ GO
 
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void SQL46006Test()
         {
             string testNumber = "SQL46006";
@@ -2082,8 +2082,8 @@ CREATE TABLE t1 (int i1)",
 
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void SQL46007Test()
         {
             string testNumber = "SQL46007";
@@ -2098,8 +2098,8 @@ create table t1 (c1 int);",
 
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void SQL46008Test()
         {
             string testNumber = "SQL46008";
@@ -2110,8 +2110,8 @@ create table t1 (c1 int);",
 
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void SQL46009Test()
         {
             string testNumber = "SQL46009";
@@ -2122,8 +2122,8 @@ create table t1 (c1 int);",
 
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void SQL46010Test()
         {
             string testNumber = "SQL46010";
@@ -2140,15 +2140,15 @@ select * from ((t1));";
                 sql46010TestSyntax,
                 new ParserErrorInfo(16, testNumber, "column1"),
                 new ParserErrorInfo(sql46010TestSyntax.IndexOf(@"[labelName]"), testNumber, "[labelName]"),
-                new ParserErrorInfo(sql46010TestSyntax.IndexOf(@"...t1")+3, testNumber, "t1"),
+                new ParserErrorInfo(sql46010TestSyntax.IndexOf(@"...t1") + 3, testNumber, "t1"),
                 new ParserErrorInfo(sql46010TestSyntax.IndexOf(@"t1));"), testNumber, "t1")
                 );
         }
 
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void SQL46011Test()
         {
             string testScript = "create table t1 (c1 int, c2 as -c1 check (c2 < 10));";
@@ -2161,8 +2161,8 @@ select * from ((t1));";
 
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void SQL46012Test()
         {
             string testNumber = "SQL46012";
@@ -2173,8 +2173,8 @@ select * from ((t1));";
 
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void SQL46013Test()
         {
             string testNumber = "SQL46013";
@@ -2185,8 +2185,8 @@ select * from ((t1));";
 
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void SQL46014Test()
         {
             string testNumber = "SQL46014";
@@ -2197,8 +2197,8 @@ select * from ((t1));";
 
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void SQL46015Test()
         {
             string testNumber = "SQL46015";
@@ -2210,8 +2210,8 @@ select * from ((t1));";
 
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void SQL46016Test()
         {
             string testNumber = "SQL46016";
@@ -2229,8 +2229,8 @@ READTEXT t1..c1 @ptrval 1 25";
 
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void ForeignKeyInDeclareTableErrorTest()
         {
             string testScript =
@@ -2254,12 +2254,12 @@ declare @t2 table (c1 int, connection(n1 to n2)) as edge;";
             ParserTestUtils.ErrorTest150(
                 testScript,
                 new ParserErrorInfo(27, "SQL46010", "constraint"),
-                new ParserErrorInfo(testScript.IndexOf(@"to n2",60), "SQL46010", "to"));
+                new ParserErrorInfo(testScript.IndexOf(@"to n2", 60), "SQL46010", "to"));
         }
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void SQL46018Test()
         {
             string testNumber = "SQL46018";
@@ -2270,8 +2270,8 @@ declare @t2 table (c1 int, connection(n1 to n2)) as edge;";
 
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void SQL46019Test()
         {
             string testNumber = "SQL46019";
@@ -2282,8 +2282,8 @@ declare @t2 table (c1 int, connection(n1 to n2)) as edge;";
 
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void SQL46020Test()
         {
             string testNumber = "SQL46020";
@@ -2294,8 +2294,8 @@ declare @t2 table (c1 int, connection(n1 to n2)) as edge;";
 
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void SQL46021Test()
         {
             string testNumber = "SQL46021";
@@ -2317,16 +2317,16 @@ GO";
             ParserTestUtils.ErrorTestAllParsers(
                 sql46021TestSyntax,
                 new ParserErrorInfo(15, testNumber, CodeGenerationSupporter.Default),
-                new ParserErrorInfo(sql46021TestSyntax.IndexOf(@"rule dbName")+5, testNumber, CodeGenerationSupporter.Rule),
-                new ParserErrorInfo(sql46021TestSyntax.IndexOf(@"trigger dbName")+8, testNumber, CodeGenerationSupporter.Trigger),
-                new ParserErrorInfo(sql46021TestSyntax.IndexOf(@"PROCEDURE dbName")+10, testNumber, CodeGenerationSupporter.Procedure)
+                new ParserErrorInfo(sql46021TestSyntax.IndexOf(@"rule dbName") + 5, testNumber, CodeGenerationSupporter.Rule),
+                new ParserErrorInfo(sql46021TestSyntax.IndexOf(@"trigger dbName") + 8, testNumber, CodeGenerationSupporter.Trigger),
+                new ParserErrorInfo(sql46021TestSyntax.IndexOf(@"PROCEDURE dbName") + 10, testNumber, CodeGenerationSupporter.Procedure)
                 );
         }
 
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void SQL46022Test()
         {
             string testNumber = "SQL46022";
@@ -2337,8 +2337,8 @@ GO";
 
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void SQL46023Test()
         {
             string testNumber = "SQL46023";
@@ -2349,8 +2349,8 @@ GO";
 
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void SQL46025Test()
         {
             string testNumber = "SQL46025";
@@ -2363,8 +2363,8 @@ AS SELECT c1 FROM schema1.table2",
 
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void SQL46026Test()
         {
             string testNumber = "SQL46026";
@@ -2379,8 +2379,8 @@ END",
 
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void SQL46027Test()
         {
             string testNumber = "SQL46027";
@@ -2391,8 +2391,8 @@ END",
 
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void SQL46028Test()
         {
             string testNumber = "SQL46028";
@@ -2418,8 +2418,8 @@ select * from t where contains(a.b.c.d.e.*, 'foo')";
 
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void SQL46029Test()
         {
             string testNumber = "SQL46029";
@@ -2430,8 +2430,8 @@ select * from t where contains(a.b.c.d.e.*, 'foo')";
 
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void SQL46049Test()
         {
             //Function Execute AS
@@ -2457,9 +2457,9 @@ select * from t where contains(a.b.c.d.e.*, 'foo')";
    TO SERVICE '//Adventure-Works.com/Expenses'
    ON CONTRACT [//Adventure-Works.com/Expenses/ExpenseSubmission]
    WITH LIFETIME=60, ENCRYPTION=ON";
-            ParserTestUtils.ErrorTest90AndAbove(beginDialogConversation + ", LIFETIME=10;", new ParserErrorInfo(beginDialogConversation.Length+2, "SQL46049", "LIFETIME"));
-            ParserTestUtils.ErrorTest90AndAbove(beginDialogConversation + ", RELATED_CONVERSATION_GROUP = @existing_conversation_handle, RELATED_CONVERSATION = @existing_conversation_handle ;", new ParserErrorInfo(beginDialogConversation.Length+62, "SQL46049", "RELATED_CONVERSATION"));
-            ParserTestUtils.ErrorTest90AndAbove(beginDialogConversation + ", ENCRYPTION=OFF;", new ParserErrorInfo(beginDialogConversation.Length+2, "SQL46049", "ENCRYPTION"));
+            ParserTestUtils.ErrorTest90AndAbove(beginDialogConversation + ", LIFETIME=10;", new ParserErrorInfo(beginDialogConversation.Length + 2, "SQL46049", "LIFETIME"));
+            ParserTestUtils.ErrorTest90AndAbove(beginDialogConversation + ", RELATED_CONVERSATION_GROUP = @existing_conversation_handle, RELATED_CONVERSATION = @existing_conversation_handle ;", new ParserErrorInfo(beginDialogConversation.Length + 62, "SQL46049", "RELATED_CONVERSATION"));
+            ParserTestUtils.ErrorTest90AndAbove(beginDialogConversation + ", ENCRYPTION=OFF;", new ParserErrorInfo(beginDialogConversation.Length + 2, "SQL46049", "ENCRYPTION"));
 
             //Create Database
             //
@@ -2494,13 +2494,13 @@ ADD FILE
     SIZE = 10MB,
     FILEGROWTH = 5MB
 );";
-            ParserTestUtils.ErrorTestAllParsers(alterDatabase, new ParserErrorInfo(alterDatabase.IndexOf("SIZE",205), "SQL46049", "SIZE"));
+            ParserTestUtils.ErrorTestAllParsers(alterDatabase, new ParserErrorInfo(alterDatabase.IndexOf("SIZE", 205), "SQL46049", "SIZE"));
         }
 
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void SQL46035Test()
         {
             ParserTestUtils.ErrorTestAllParsers("select * from { oj t1 cross join t2 }",
@@ -2509,8 +2509,8 @@ ADD FILE
 
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void SQL46036Test()
         {
             ParserTestUtils.ErrorTestAllParsers(@"select * from --(* vendor(microsoft),product(odbc) oj t1 cross join t2 *)--",
@@ -2519,8 +2519,8 @@ ADD FILE
 
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void SQL46038Test()
         {
             ParserTestUtils.ErrorTestAllParsers("drop statistics s1",
@@ -2529,8 +2529,8 @@ ADD FILE
 
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void SQL46039Test()
         {
             ParserTestUtils.ErrorTestAllParsers("create function f1(@p int output) returns int as begin return 1; end",
@@ -2539,8 +2539,8 @@ ADD FILE
 
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void SQL46040Test()
         {
             TSql100Parser parser = new TSql100Parser(true);
@@ -2551,8 +2551,8 @@ ADD FILE
 
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void SQL46041Test()
         {
             TSql100Parser parser = new TSql100Parser(true);
@@ -2566,8 +2566,8 @@ ADD FILE
 
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void SQL46042Test()
         {
             ParserTestUtils.ErrorTestAllParsers(
@@ -2577,8 +2577,8 @@ ADD FILE
 
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void SQL46043Test()
         {
             ParserTestUtils.ErrorTestAllParsers(
@@ -2588,8 +2588,8 @@ ADD FILE
 
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void SQL46047Test()
         {
             ParserTestUtils.ErrorTestAllParsers(
@@ -2599,8 +2599,8 @@ ADD FILE
 
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void SQL46048Test()
         {
             ParserTestUtils.ErrorTestAllParsers(
@@ -2610,8 +2610,8 @@ ADD FILE
 
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void SQL46050Test()
         {
             ParserTestUtils.ErrorTest100(
@@ -2624,8 +2624,8 @@ ADD FILE
 
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void SQL46058Test()
         {
             TSql100Parser parser100 = new TSql100Parser(true);
@@ -2638,8 +2638,8 @@ ADD FILE
 
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void SQL46059Test()
         {
             ParserTestUtils.ErrorTest100("CREATE INDEX i1 ON t1(c1) WHERE c1 < CONVERT(int, CONVERT(int, 20))",
@@ -2650,8 +2650,8 @@ ADD FILE
 
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void SQL46060Test()
         {
             ParserTestUtils.ErrorTestAllParsers("CREATE TABLE t1(c1 INT PRIMARY KEY WITH FILLFACTOR = 105)",
@@ -2662,8 +2662,8 @@ ADD FILE
 
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void SQL46061Test()
         {
             TSql100Parser parser100 = new TSql100Parser(true);
@@ -2703,8 +2703,8 @@ ADD FILE
 
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void SQL46062Test()
         {
             ParserTestUtils.ErrorTestAllParsers("CREATE DATABASE db1 ON (NAME=n1, NEWNAME=n2, FILENAME='zzz')",
@@ -2786,8 +2786,8 @@ ADD FILE
 
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void IntoClauseErrorTests()
         {
             ParserTestUtils.ErrorTestAllParsers("insert t1 select c1 into t2",
@@ -2808,8 +2808,8 @@ ADD FILE
         }
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void UnclosedTokenTest()
         {
             ParserTestUtils.ErrorTestAllParsers("create table t1(c1 int) 'zz",
@@ -2828,8 +2828,8 @@ ADD FILE
 
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void TokenStreamRecognitionExceptionTest()
         {
             ParserTestUtils.ErrorTestAllParsers(
@@ -2839,8 +2839,8 @@ ADD FILE
 
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void IPAddressErrorTest()
         {
             // T-SQL 80 doesn't have IPs!
@@ -2861,8 +2861,8 @@ ADD FILE
 
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void EmptyParserInputTest()
         {
             ParserTestUtils.ErrorTestAllParsers(string.Empty);
@@ -2870,8 +2870,8 @@ ADD FILE
 
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void QuotedIdentifierErrorTest()
         {
             // Check, that tokens like "aaa" are treated as ascii literals if quoted identifiers are off
@@ -2884,13 +2884,13 @@ ADD FILE
 
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void QuotedIdentfierPerBatchResetTest()
         {
             string SwitchingOffScript =
 "CREATE TABLE \"t1\"(c1 int);\n\r GO SET QUOTED_IDENTIFIER OFF; CREATE TABLE \"t2\"(c1 int);";
-            ParserTestUtils.ExecuteTestForAllParsers(delegate(TSqlParser parser)
+            ParserTestUtils.ExecuteTestForAllParsers(delegate (TSqlParser parser)
             {
                 ParserTestUtils.ErrorTest(parser, SwitchingOffScript,
                     new ParserErrorInfo(72, "SQL46010", "\"t2\""));
@@ -2899,7 +2899,7 @@ ADD FILE
             string SwitchingOnScript =
 "SET QUOTED_IDENTIFIER ON; CREATE TABLE \"t1\"(c1 int);\n\r GO CREATE TABLE \"t2\"(c1 int)";
 
-            ParserTestUtils.ExecuteTestForAllParsers(delegate(TSqlParser parser)
+            ParserTestUtils.ExecuteTestForAllParsers(delegate (TSqlParser parser)
             {
                 ParserTestUtils.ErrorTest(parser, SwitchingOnScript,
                     new ParserErrorInfo(71, "SQL46010", "\"t2\""));
@@ -2908,8 +2908,8 @@ ADD FILE
 
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void ProcNameSemiColonErrorTest()
         {
             ParserTestUtils.ErrorTestAllParsers(
@@ -2920,8 +2920,8 @@ ADD FILE
 
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void RequiredSemiColonTest()
         {
             ParserTestUtils.ErrorTest100AndAbove(
@@ -2952,17 +2952,17 @@ select 1",
 @"ALTER SEARCH PROPERTY LIST foo DROP 'bax'",
     new ParserErrorInfo(27, "SQL46097", "Search Property List"));
 
-               ParserTestUtils.ErrorTest110(
+            ParserTestUtils.ErrorTest110(
 @"drop search property list list1",
-    new ParserErrorInfo(26, "SQL46097", "Search Property List"));
+ new ParserErrorInfo(26, "SQL46097", "Search Property List"));
 
         }
 
 
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void CreateEventNotificationStatementErrorTest()
         {
             // T-SQL 80 doesn't have CREATE EVENT NOTIFICATION statement
@@ -2983,8 +2983,8 @@ select 1",
 
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void CreateLogonTriggerStatementErrorTest()
         {
             ParserTestUtils.ErrorTest90AndAbove("create trigger trig1 on database for logon as Create Table t1 (int i1);",
@@ -2993,8 +2993,8 @@ select 1",
 
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void CreateTriggerStatementWithUnkownEventsErrorTest()
         {
             ParserTestUtils.ErrorTest90AndAbove("create trigger trig1 on database for blah_blah as Create Table t1 (int i1);",
@@ -3003,8 +3003,8 @@ select 1",
 
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void CreateResourcePoolStatementErrorTest()
         {
             ParserTestUtils.ErrorTest100("create resource pool res_pool with (MIN_CPU_PERCENT = 105);",
@@ -3044,7 +3044,7 @@ select 1",
 
 
         [TestMethod]
-		[Priority(0)]
+        [Priority(0)]
         public void CreateExternalResourcePoolStatementErrorTest()
         {
             ParserTestUtils.ErrorTest130("create external resource pool res_pool with (MAX_MEMORY_PERCENT = 0);",
@@ -3113,8 +3113,8 @@ select 1",
 
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void AlterExternalResourcePoolStatementErrorTest()
         {
             ParserTestUtils.ErrorTest130("alter external resource pool res_pool with (MAX_MEMORY_PERCENT = 0);",
@@ -3183,8 +3183,8 @@ select 1",
 
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void CreateWorkloadGroupStatementErrorTest()
         {
             ParserTestUtils.ErrorTest100("create workload group wg1 with (IMPORTANC = HIGH);",
@@ -3256,7 +3256,7 @@ select 1",
                                             IMPORTANCE = HIGH
                                             )";
             ParserTestUtils.ErrorTest130(query1,
-                new ParserErrorInfo(query1.IndexOf("START_TIME")+13, "SQL46134", "START_TIME"));
+                new ParserErrorInfo(query1.IndexOf("START_TIME") + 13, "SQL46134", "START_TIME"));
 
             string query2 = @"CREATE WORKLOAD CLASSIFIER wcAllOptions 
                                             WITH(
@@ -3269,7 +3269,7 @@ select 1",
                                             IMPORTANCE = HIGH
                                             )";
             ParserTestUtils.ErrorTest130(query2,
-                new ParserErrorInfo(query2.IndexOf("END_TIME")+11, "SQL46134", "END_TIME"));
+                new ParserErrorInfo(query2.IndexOf("END_TIME") + 11, "SQL46134", "END_TIME"));
 
             string query3 = @"CREATE WORKLOAD CLASSIFIER wcAllOptions 
                                             WITH(
@@ -3298,7 +3298,7 @@ select 1",
                                             )";
             ParserTestUtils.ErrorTest130(query4,
                 new ParserErrorInfo(query4.IndexOf("MEMBERNAME", 300), "SQL46049", "MEMBERNAME"));
-            
+
             string query5 = @"CREATE WORKLOAD CLASSIFIER wcAllOptions 
                                             WITH(
                                             WORKLOAD_GROUP = 'wgDefaultParams',
@@ -3311,8 +3311,8 @@ select 1",
                                             IMPORTANCE = HIGH
                                             )";
             ParserTestUtils.ErrorTest130(query5,
-                new ParserErrorInfo(query5.IndexOf("WLM_CONTEXT",400), "SQL46049", "WLM_CONTEXT"));
-            
+                new ParserErrorInfo(query5.IndexOf("WLM_CONTEXT", 400), "SQL46049", "WLM_CONTEXT"));
+
             string query6 = @"CREATE WORKLOAD CLASSIFIER wcAllOptions 
                                             WITH(
                                             WORKLOAD_GROUP = 'wgDefaultParams',
@@ -3326,7 +3326,7 @@ select 1",
                                             )";
             ParserTestUtils.ErrorTest130(query6,
                 new ParserErrorInfo(query6.IndexOf("WLM_LABEL", 500), "SQL46049", "WLM_LABEL"));
-            
+
             string query7 = @"CREATE WORKLOAD CLASSIFIER wcAllOptions 
                                             WITH(
                                             WORKLOAD_GROUP = 'wgDefaultParams',
@@ -3340,7 +3340,7 @@ select 1",
                                             )";
             ParserTestUtils.ErrorTest130(query7,
                 new ParserErrorInfo(query7.IndexOf("IMPORTANCE", 550), "SQL46049", "IMPORTANCE"));
-            
+
             string query8 = @"CREATE WORKLOAD CLASSIFIER wcAllOptions 
                                             WITH(
                                             WORKLOAD_GROUP = 'wgDefaultParams',
@@ -3354,7 +3354,7 @@ select 1",
                                             )";
             ParserTestUtils.ErrorTest130(query8,
                 new ParserErrorInfo(query8.IndexOf("START_TIME", 430), "SQL46049", "START_TIME"));
-            
+
             string query9 = @"CREATE WORKLOAD CLASSIFIER wcAllOptions 
                                             WITH(
                                             WORKLOAD_GROUP = 'wgDefaultParams',
@@ -3386,8 +3386,8 @@ select 1",
         }
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void CreateBrokerPriorityStatementErrorTest()
         {
             ParserTestUtils.ErrorTest100("create broker priority bp1 for conversatio;",
@@ -3412,8 +3412,8 @@ select 1",
 
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void AlterTableAlterIndexElementStatementErrorTest()
         {
             ParserTestUtils.ErrorTest130("ALTER TABLE t1 ALTER INDEX i1 REBUILD WITH (BUCKET_COUNT = 1, BUCKET_COUNT = 1);",
@@ -3424,8 +3424,8 @@ select 1",
 
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void AlterTableChangeTrackingDisableWithOptionsErrorTest()
         {
             ParserTestUtils.ErrorTest100("ALTER TABLE t1 DISABLE CHANGE_TRACKING WITH (TRACK_COLUMNS_UPDATED = ON)",
@@ -3434,8 +3434,8 @@ select 1",
 
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void MultipleForClauseTest()
         {
             ParserTestUtils.ErrorTest100("select 1 for browse for xml",
@@ -3459,8 +3459,8 @@ select 1",
 
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void ColumnDefinitionStorageAttributesErrorTest()
         {
             TSql100Parser parser = new TSql100Parser(true);
@@ -3503,8 +3503,8 @@ select 1",
 
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void NotForReplicationNotAllowedInTableVariablesFunctionsTypesErrorTest()
         {
             // Column check constraint
@@ -3534,8 +3534,8 @@ select 1",
 
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void NoConstraintNamesInTableVariablesFunctionsTypesErrorTest()
         {
             // Named column constraints
@@ -3559,8 +3559,8 @@ select 1",
 
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void ServerAuditStatementsErrorTest()
         {
             TSql100Parser parser100 = new TSql100Parser(true);
@@ -3591,8 +3591,8 @@ select 1",
 
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void SecurityStatementsErrorTest()
         {
             //Columns cannot be specified on both the permission and the object  in grant/deny/revoke
@@ -3607,8 +3607,8 @@ select 1",
 
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void EventSessionStatementErrorTest()
         {
             TSql100Parser parser = new TSql100Parser(true);
@@ -3649,8 +3649,8 @@ select 1",
 
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void When_session_scope_is_other_than_database_or_server_CREATE_EVENT_SESSION_fails_for_130()
         {
             var tSql130Parser = new TSql130Parser(true);
@@ -3670,8 +3670,8 @@ select 1",
         // Test the key option duplication is not allowed
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void KeyOptionDuplicationErrorTest()
         {
             ParserTestUtils.ErrorTest90AndAbove(
@@ -3697,8 +3697,8 @@ select 1",
 
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void SQL46069Test()
         {
             ParserTestUtils.ErrorTest90AndAbove("create queue q1 with status = on, Activation(status = on, procedure_name = dbo..p1,  execute as self), retention = off;",
@@ -3713,8 +3713,8 @@ select 1",
 
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void MaxParameterInDataTypesErrorTest()
         {
             ParserTestUtils.ErrorTest90AndAbove("CREATE TABLE t1(c1 CHAR(max))",
@@ -3727,8 +3727,8 @@ select 1",
 
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void CreateSpatialIndexStatementErrorTest()
         {
             TSql100Parser parser = new TSql100Parser(true);
@@ -3809,8 +3809,8 @@ select 1",
 
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void OffsetErrorTest()
         {
             //Offset no order by
@@ -3820,8 +3820,8 @@ select 1",
 
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void CommitTransactionErrorTest()
         {
             ParserTestUtils.ErrorTest120("COMMIT TRANSACTION WITH (DELAYED_DURABILITY = ONN)", new ParserErrorInfo(46, "SQL46010", "ONN"));
@@ -3834,8 +3834,8 @@ select 1",
 
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void AlterDatabaseErrorTest()
         {
             ParserTestUtils.ErrorTest120("ALTER DATABASE testdb SET DELAYED_DURABILITY = ALLOWEDD)", new ParserErrorInfo(47, "SQL46010", "ALLOWEDD"));
@@ -3903,8 +3903,8 @@ select 1",
         }
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void AlterDatabaseModifyFilegroupErrorTest()
         {
             ParserTestUtils.ErrorTest130("ALTER DATABASE testdb MODIFY FILEGROUP [PRIMARY] READ ONLY)", new ParserErrorInfo(49, "SQL46010", "READ"));
@@ -3915,8 +3915,8 @@ select 1",
 
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void IncrementalStatisticsErrorTest()
         {
             ParserTestUtils.ErrorTest120("ALTER DATABASE testdb SET AUTO_CREATE_STATISTICS ON (INCREMENTAL)", new ParserErrorInfo(64, "SQL46010", ")"));
@@ -3937,8 +3937,8 @@ select 1",
 
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void Dev10Bug462552()
         {
             ParserTestUtils.ErrorTestAllParsers("CREATE PROCEDURE Proc1 @CurrencyCursor CURSOR AS SET @CurrencyCursor = CURSOR FORWARD_ONLY STATIC FOR SELECT column_1 FROM Table1;",
@@ -3954,8 +3954,8 @@ select 1",
 
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void SQL46070Test()
         {
             // Tests for checking that duplication of options in DROP INDEX STATEMENT is not allowed
@@ -3976,8 +3976,8 @@ select 1",
 
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void SQL46071Test()
         {
             ParserTestUtils.ErrorTestAllParsers("CREATE STATISTICS [stat] ON t1 (c1, c2) WITH FULLSCAN, NORECOMPUTE, SAMPLE 12 ROWS;",
@@ -3990,8 +3990,8 @@ select 1",
 
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void SQL46072Test()
         {
             ParserTestUtils.ErrorTest100("WITH change_tracking_context (0xff),DIRREPS(C1,c2) as (SELECT c1 FROM t1) select c1 from t1",
@@ -4002,8 +4002,8 @@ select 1",
 
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void SQL46074Test()
         {
             ParserTestUtils.ErrorTestAllParsers("INSERT INTO pi WITH (INDEX (i1)) DEFAULT VALUES",
@@ -4031,8 +4031,8 @@ select 1",
         /// Currently, only INSERT allows sub-DMLs
         /// </summary>
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void SQL46075Test()
         {
             TSql100Parser parser = new TSql100Parser(true);
@@ -4059,8 +4059,8 @@ select 1",
         /// Checks, that sub-DML are not allowed in SELECT which is not source for insert
         /// </summary>
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void SQL46076Test()
         {
             TSql100Parser parser = new TSql100Parser(true);
@@ -4093,8 +4093,8 @@ select 1",
         /// Checks, that sub-DMLs are not allowed in UPDATE or DELETE FROM clauses
         /// </summary>
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void SQL46077Test()
         {
             TSql100Parser parser = new TSql100Parser(true);
@@ -4119,8 +4119,8 @@ select 1",
         /// Checks, that sub-DMLs are not allowed in USING clause of MERGE statement
         /// </summary>
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void SQL46078Test()
         {
             TSql100Parser parser = new TSql100Parser(true);
@@ -4141,8 +4141,8 @@ select 1",
         /// Checks, that sub-DMLs have OUTPUT clause
         /// </summary>
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void SQL46079Test()
         {
             TSql100Parser parser = new TSql100Parser(true);
@@ -4170,8 +4170,8 @@ select 1",
         /// Checks, that WHERE CURRENT OF is not allowed in sub-dmls
         /// </summary>
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void SQL46083Test()
         {
             TSql100Parser parser = new TSql100Parser(true);
@@ -4190,8 +4190,8 @@ select 1",
         /// Checks that OPENROWSETBULK has at SINGLE_BLOB, SINGLE_CLOB, SINGLE_NCLOB or FORMATFILE option
         /// </summary>
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void SQL46082Test()
         {
             ParserTestUtils.ErrorTest90andAboveUntil150(
@@ -4203,8 +4203,8 @@ select 1",
         /// Checks that CUBE, ROLLUP and GROUPING SETS are not allowed in GROUP BY ALL clause
         /// </summary>
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void SQL46084Test()
         {
             ParserTestUtils.ErrorTestAllParsers("SELECT c1 FROM t1 GROUP BY ALL c1 WITH CUBE",
@@ -4225,8 +4225,8 @@ select 1",
         /// Checks that WITH CUBE and WITH ROLLUP are not allowed when CUBE, ROLLUP or GROUPING SETS specified
         /// </summary>
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void SQL46085Test()
         {
             TSql100Parser parser100 = new TSql100Parser(true);
@@ -4272,8 +4272,8 @@ select 1",
         /// Checks that DISTINCT is not allowed in aggregate calls with OVER clause
         /// </summary>
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void SQL46086Test()
         {
             // User-defined aggregate
@@ -4293,8 +4293,8 @@ select 1",
         /// Check that OUTPUT only allowed when passing variable to procedure
         /// </summary>
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void SQL46088Test()
         {
             ParserTestUtils.ErrorTestAllParsers("EXEC zzz 1 OUTPUT",
@@ -4307,8 +4307,8 @@ select 1",
         /// Check that simple parameters ('value') are not allowed in procedure call after '@name = value' syntax
         /// </summary>
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void SQL46089Test()
         {
             ParserTestUtils.ErrorTestAllParsers("EXEC zzz 1, N'q', @v1 = 2, @v2 = 'a'");
@@ -4321,8 +4321,8 @@ select 1",
 
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void CreateServerAuditStatementErrorTest()
         {
             // CHECKS IF THE VALUE OF MAX_ROLLOVER_FILES IS LESS THAN 2147483647
@@ -4332,8 +4332,8 @@ select 1",
 
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void CreateEndpointStatementErrorTest()
         {
             // CHECKS IF THE VALUE FOR THE OPTIONS AUTH_REALM AND DEFAULT_LOGON_DOMAIN ARE NON-EMPTY STRINGS
@@ -4358,8 +4358,8 @@ select 1",
 
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void CreateIndexStatementErrorTest()
         {
             ParserTestUtils.ErrorTest100("CREATE INDEX ind1 ON t1(c1) WHERE (...f1.IDENTITYCOL IS NULL)",
@@ -4380,8 +4380,8 @@ select 1",
         /// Check that the value of MAXDOP index option is within range
         /// </summary>
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void SQL46091Test()
         {
             ParserTestUtils.ErrorTest90AndAbove("CREATE INDEX ind1 ON dbo.t1 (c1) WITH (MAXDOP = 40000)",
@@ -4390,8 +4390,8 @@ select 1",
 
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void RouteOptionDuplicationErrorTest()
         {
             string duplicateServiceNameSyntax = @"CREATE ROUTE [Route1] WITH
@@ -4399,7 +4399,7 @@ select 1",
     SERVICE_NAME = '//Adventure-Works.com/Expenses'";
             ParserTestUtils.ErrorTest90AndAbove(
                 duplicateServiceNameSyntax,
-                new ParserErrorInfo(duplicateServiceNameSyntax.IndexOf(@"SERVICE_NAME",75), "SQL46049", "SERVICE_NAME"));
+                new ParserErrorInfo(duplicateServiceNameSyntax.IndexOf(@"SERVICE_NAME", 75), "SQL46049", "SERVICE_NAME"));
 
             ParserTestUtils.ErrorTest90AndAbove(
 @"CREATE ROUTE [Route1] WITH LIFETIME = 10, LIFETIME = 10",
@@ -4408,8 +4408,8 @@ select 1",
 
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void SQL46092Test()
         {
             ParserTestUtils.ErrorTestAllParsers("CREATE VIEW #v_temp AS SELECT * FROM sysobjects",
@@ -4421,8 +4421,8 @@ select 1",
 
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void SQL46093Test()
         {
             ParserTestUtils.ErrorTestAllParsers("CREATE FUNCTION #fun_test (@param1 int) RETURNS TABLE AS RETURN (SELECT @param1 AS c1)",
@@ -4436,8 +4436,8 @@ select 1",
         /// Check that the PERCENT value is between 0 and 100
         /// </summary>
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void SQL46094Test()
         {
             TSql80Parser parser80 = new TSql80Parser(true);
@@ -4461,8 +4461,8 @@ select 1",
         /// Check that the identifiers are less than 128 characters
         /// </summary>
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void SQL46095Test()
         {
             string longIdentifier = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
@@ -4480,8 +4480,8 @@ select 1",
         /// Check contained options are not specified on non-contained users
         /// </summary>
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void SQL46096Test()
         {
             ParserTestUtils.ErrorTest110("CREATE USER [BadUser] for login [login1] WITH password = 'PLACEHOLDER1'",
@@ -4494,8 +4494,8 @@ select 1",
 
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void TableHintAsParamTest()
         {
             // This should be ok
@@ -4512,8 +4512,8 @@ select 1",
 
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void CreateMessageTypeStatementErrorTest()
         {
             // CREATE MESSAGE TYPE m1  VALIDATION = VALID_XML
@@ -4530,8 +4530,8 @@ select 1",
 
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void SQL46098Test()
         {
             // Missing FILENAME option should cause an error...
@@ -4574,8 +4574,8 @@ select 1",
         /// Check that frame bounds that are not supported by RANGE are not allowed
         /// </summary>
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void SQL46099Test()
         {
             ParserTestUtils.ErrorTest110("SELECT SUM(a) OVER (ORDER BY shuffled_id RANGE BETWEEN 1 FOLLOWING AND 1 PRECEDING) FROM table",
@@ -4586,8 +4586,8 @@ select 1",
         /// Check that invalid frame specification inside Over clause is caught.
         /// </summary>
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void SQL46100Test()
         {
             ParserTestUtils.ErrorTest110("SELECT id, AVG(f) OVER ( ORDER BY shuffled_id  ROWS BETWEEN 1 FOLLOWING AND 1 PRECEDING) FROM table",
@@ -4610,8 +4610,8 @@ select 1",
         /// Check the max_duration value of low priority lock wait option.
         /// </summary>
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void SQL46101Test()
         {
             ParserTestUtils.ErrorTest120("ALTER INDEX idx1 ON t1 REBUILD WITH (ONLINE = ON (WAIT_AT_LOW_PRIORITY (MAX_DURATION = 71583, ABORT_AFTER_WAIT = NONE)))",
@@ -4626,8 +4626,8 @@ select 1",
         /// Check the max_duration value of low priority lock wait option.
         /// </summary>
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void SQL46102Test()
         {
             ParserTestUtils.ErrorTest120("ALTER INDEX idx1 ON t1 REBUILD WITH (ONLINE = ON (WAIT_AT_LOW_PRIORITY (MAX_DURATION = 0, ABORT_AFTER_WAIT = SELF)))",
@@ -4640,8 +4640,8 @@ select 1",
 
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void SecurityPolicyStatementErrorsTest()
         {
             // Three part names
@@ -4770,8 +4770,8 @@ select 1",
         /// Negative tests for a table with REMOTE_DATA_ARCHIVE
         /// </summary>
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void RemoteDataArchiveTableNegativeTest()
         {
             // Create table with RDA
@@ -4805,43 +4805,43 @@ select 1",
             ParserTestUtils.ErrorTest130("ALTER TABLE T1 SET (REMOTE_DATA_ARCHIVE = ON (MIGRATION_STATE = ON))", new ParserErrorInfo(64, "SQL46010", "ON"));
             ParserTestUtils.ErrorTest130("ALTER TABLE T1 SET (REMOTE_DATA_ARCHIVE = ON (MIGRATION_STATE = DISABLE))", new ParserErrorInfo(64, "SQL46010", "DISABLE"));
 
-			ParserTestUtils.ErrorTest130("alter table t_stretch SET (REMOTE_DATA_ARCHIVE = OFF (MIGRATION_STATE = OUTBOUND, FILTER PREDICATE = dbo.f1(c1)))", new ParserErrorInfo(89, "SQL46010", "PREDICATE"));
-			ParserTestUtils.ErrorTest130("alter table t_stretch SET (REMOTE_DATA_ARCHIVE = OFF (MIGRATION_STATE ON, FILTER_PREDICATE = database.dbo.f1(c1)))", new ParserErrorInfo(70, "SQL46010", "ON"));
-			ParserTestUtils.ErrorTest130("alter table t_stretch SET (REMOTE_DATA_ARCHIVE = OFF (MIGRATION_STATE = OUTBOUND, FILTER_PREDICATE dbo.f1(c1)))", new ParserErrorInfo(99, "SQL46010", "dbo"));
-			ParserTestUtils.ErrorTest130("alter table t_stretch SET (REMOTE_DATA_ARCHIVE = OFF (MIIGRATION_STATE = OUTBOUND, FILTER_PREDICATE = dbo.f1(c1)))", new ParserErrorInfo(54, "SQL46005", "MIGRATION_STATE", "MIIGRATION_STATE"));
-			ParserTestUtils.ErrorTest130("alter table t_stretch SET (REMOTE_DATA_ARCHIVE = OFF (MIGRATION_STATE = OUTBOUND, FILTER_PREDICATE = NUL))", new ParserErrorInfo(82, "SQL46005", "MIGRATION_STATE", "FILTER_PREDICATE"));
-			ParserTestUtils.ErrorTest130("alter table t_stretch SET (REMOTE_DATA_ARCHIVE = OFF (MIGRATION_STATE = OUTBOUND, FIILTER_PREDICATE = dbo.f1(c1)))", new ParserErrorInfo(82, "SQL46005", "FILTER_PREDICATE", "FIILTER_PREDICATE"));
-			ParserTestUtils.ErrorTest130("alter table t_stretch SET (REMOTE_DATA_ARCHIVE = OFF (MIGRATIONSTATE = OUTBOUND, FILTER_PREDICATE = dbo.f1(c1)))", new ParserErrorInfo(54, "SQL46005", "MIGRATION_STATE", "MIGRATIONSTATE"));
-			ParserTestUtils.ErrorTest130("alter table t_stretch SET (REMOTE_DATA_ARCHIVE = OFF (MIGRATION_STATE = OUTBOUND, FILTERPREDICATE = dbo.f1(c1)))", new ParserErrorInfo(82, "SQL46005", "FILTER_PREDICATE", "FILTERPREDICATE"));
-			ParserTestUtils.ErrorTest130("alter table t_stretch SET (REMOTE_DATA_ARCHIVE = OFF (MIGRATION_SSTATE = OUTBOUND, FILTERR_PREDICATE = dbo.f1(c1)))", new ParserErrorInfo(54, "SQL46005", "MIGRATION_STATE", "MIGRATION_SSTATE"));
+            ParserTestUtils.ErrorTest130("alter table t_stretch SET (REMOTE_DATA_ARCHIVE = OFF (MIGRATION_STATE = OUTBOUND, FILTER PREDICATE = dbo.f1(c1)))", new ParserErrorInfo(89, "SQL46010", "PREDICATE"));
+            ParserTestUtils.ErrorTest130("alter table t_stretch SET (REMOTE_DATA_ARCHIVE = OFF (MIGRATION_STATE ON, FILTER_PREDICATE = database.dbo.f1(c1)))", new ParserErrorInfo(70, "SQL46010", "ON"));
+            ParserTestUtils.ErrorTest130("alter table t_stretch SET (REMOTE_DATA_ARCHIVE = OFF (MIGRATION_STATE = OUTBOUND, FILTER_PREDICATE dbo.f1(c1)))", new ParserErrorInfo(99, "SQL46010", "dbo"));
+            ParserTestUtils.ErrorTest130("alter table t_stretch SET (REMOTE_DATA_ARCHIVE = OFF (MIIGRATION_STATE = OUTBOUND, FILTER_PREDICATE = dbo.f1(c1)))", new ParserErrorInfo(54, "SQL46005", "MIGRATION_STATE", "MIIGRATION_STATE"));
+            ParserTestUtils.ErrorTest130("alter table t_stretch SET (REMOTE_DATA_ARCHIVE = OFF (MIGRATION_STATE = OUTBOUND, FILTER_PREDICATE = NUL))", new ParserErrorInfo(82, "SQL46005", "MIGRATION_STATE", "FILTER_PREDICATE"));
+            ParserTestUtils.ErrorTest130("alter table t_stretch SET (REMOTE_DATA_ARCHIVE = OFF (MIGRATION_STATE = OUTBOUND, FIILTER_PREDICATE = dbo.f1(c1)))", new ParserErrorInfo(82, "SQL46005", "FILTER_PREDICATE", "FIILTER_PREDICATE"));
+            ParserTestUtils.ErrorTest130("alter table t_stretch SET (REMOTE_DATA_ARCHIVE = OFF (MIGRATIONSTATE = OUTBOUND, FILTER_PREDICATE = dbo.f1(c1)))", new ParserErrorInfo(54, "SQL46005", "MIGRATION_STATE", "MIGRATIONSTATE"));
+            ParserTestUtils.ErrorTest130("alter table t_stretch SET (REMOTE_DATA_ARCHIVE = OFF (MIGRATION_STATE = OUTBOUND, FILTERPREDICATE = dbo.f1(c1)))", new ParserErrorInfo(82, "SQL46005", "FILTER_PREDICATE", "FILTERPREDICATE"));
+            ParserTestUtils.ErrorTest130("alter table t_stretch SET (REMOTE_DATA_ARCHIVE = OFF (MIGRATION_SSTATE = OUTBOUND, FILTERR_PREDICATE = dbo.f1(c1)))", new ParserErrorInfo(54, "SQL46005", "MIGRATION_STATE", "MIGRATION_SSTATE"));
 
-			ParserTestUtils.ErrorTest130("ALTER TABLE T1 SET (REMOTE_DATA_ARCHIVE = OFF (MIGRATION_STATE = MigrationOutbound))", new ParserErrorInfo(65, "SQL46010", "MigrationOutbound"));
-			ParserTestUtils.ErrorTest130("ALTER TABLE T1 SET (REMOTE_DATA_ARCHIVE = OFF (MIGRATION_STATE = MigrationState))", new ParserErrorInfo(65, "SQL46010", "MigrationState"));
-			ParserTestUtils.ErrorTest130("ALTER TABLE T1 SET (REMOTE_DATA_ARCHIVE = OFF (MIGRATION_STATE = OTBOUND))", new ParserErrorInfo(65, "SQL46010", "OTBOUND"));
-			ParserTestUtils.ErrorTest130("ALTER TABLE T1 SET (REMOTE_DATA_ARCHIVE = OFF (MIGRATION_STATE = OUT]BOUND))", new ParserErrorInfo(68, "SQL46010", "]"));
-			ParserTestUtils.ErrorTest130("ALTER TABLE T1 SET (REMOTE_DATA_ARCHIVE = OFF (MIGRATION_STATE = ))", new ParserErrorInfo(65, "SQL46010", ")"));
-			ParserTestUtils.ErrorTest130("ALTER TABLE T1 SET (REMOTE_DATA_ARCHIVE = OFF (MIGRATION_STATE = OFF))", new ParserErrorInfo(65, "SQL46010", "OFF"));
-			ParserTestUtils.ErrorTest130("ALTER TABLE T1 SET (REMOTE_DATA_ARCHIVE = OFF (MIGRATION_STATE = ON))", new ParserErrorInfo(65, "SQL46010", "ON"));
-			ParserTestUtils.ErrorTest130("ALTER TABLE T1 SET (REMOTE_DATA_ARCHIVE = OFF (MIGRATION_STATE = DISABLE))", new ParserErrorInfo(65, "SQL46010", "DISABLE"));
+            ParserTestUtils.ErrorTest130("ALTER TABLE T1 SET (REMOTE_DATA_ARCHIVE = OFF (MIGRATION_STATE = MigrationOutbound))", new ParserErrorInfo(65, "SQL46010", "MigrationOutbound"));
+            ParserTestUtils.ErrorTest130("ALTER TABLE T1 SET (REMOTE_DATA_ARCHIVE = OFF (MIGRATION_STATE = MigrationState))", new ParserErrorInfo(65, "SQL46010", "MigrationState"));
+            ParserTestUtils.ErrorTest130("ALTER TABLE T1 SET (REMOTE_DATA_ARCHIVE = OFF (MIGRATION_STATE = OTBOUND))", new ParserErrorInfo(65, "SQL46010", "OTBOUND"));
+            ParserTestUtils.ErrorTest130("ALTER TABLE T1 SET (REMOTE_DATA_ARCHIVE = OFF (MIGRATION_STATE = OUT]BOUND))", new ParserErrorInfo(68, "SQL46010", "]"));
+            ParserTestUtils.ErrorTest130("ALTER TABLE T1 SET (REMOTE_DATA_ARCHIVE = OFF (MIGRATION_STATE = ))", new ParserErrorInfo(65, "SQL46010", ")"));
+            ParserTestUtils.ErrorTest130("ALTER TABLE T1 SET (REMOTE_DATA_ARCHIVE = OFF (MIGRATION_STATE = OFF))", new ParserErrorInfo(65, "SQL46010", "OFF"));
+            ParserTestUtils.ErrorTest130("ALTER TABLE T1 SET (REMOTE_DATA_ARCHIVE = OFF (MIGRATION_STATE = ON))", new ParserErrorInfo(65, "SQL46010", "ON"));
+            ParserTestUtils.ErrorTest130("ALTER TABLE T1 SET (REMOTE_DATA_ARCHIVE = OFF (MIGRATION_STATE = DISABLE))", new ParserErrorInfo(65, "SQL46010", "DISABLE"));
 
-			ParserTestUtils.ErrorTest130("alter table t_stretch SET (REMOTE_DATA_ARCHIVE = OFF_WITHOUT_DATA_RECOVERY (MIGRATION_STATE = OUTBOUND, FILTER PREDICATE = dbo.f1(c1)))", new ParserErrorInfo(111, "SQL46010", "PREDICATE"));
-			ParserTestUtils.ErrorTest130("alter table t_stretch SET (REMOTE_DATA_ARCHIVE = OFF_WITHOUT_DATA_RECOVERY (MIGRATION_STATE ON, FILTER_PREDICATE = database.dbo.f1(c1)))", new ParserErrorInfo(92, "SQL46010", "ON"));
-			ParserTestUtils.ErrorTest130("alter table t_stretch SET (REMOTE_DATA_ARCHIVE = OFF_WITHOUT_DATA_RECOVERY (MIGRATION_STATE = OUTBOUND, FILTER_PREDICATE dbo.f1(c1)))", new ParserErrorInfo(121, "SQL46010", "dbo"));
-			ParserTestUtils.ErrorTest130("alter table t_stretch SET (REMOTE_DATA_ARCHIVE = OFF_WITHOUT_DATA_RECOVERY (MIIGRATION_STATE = OUTBOUND, FILTER_PREDICATE = dbo.f1(c1)))", new ParserErrorInfo(76, "SQL46005", "MIGRATION_STATE", "MIIGRATION_STATE"));
-			ParserTestUtils.ErrorTest130("alter table t_stretch SET (REMOTE_DATA_ARCHIVE = OFF_WITHOUT_DATA_RECOVERY (MIGRATION_STATE = OUTBOUND, FILTER_PREDICATE = NUL))", new ParserErrorInfo(104, "SQL46005", "MIGRATION_STATE", "FILTER_PREDICATE"));
-			ParserTestUtils.ErrorTest130("alter table t_stretch SET (REMOTE_DATA_ARCHIVE = OFF_WITHOUT_DATA_RECOVERY (MIGRATION_STATE = OUTBOUND, FIILTER_PREDICATE = dbo.f1(c1)))", new ParserErrorInfo(104, "SQL46005", "FILTER_PREDICATE", "FIILTER_PREDICATE"));
-			ParserTestUtils.ErrorTest130("alter table t_stretch SET (REMOTE_DATA_ARCHIVE = OFF_WITHOUT_DATA_RECOVERY (MIGRATIONSTATE = OUTBOUND, FILTER_PREDICATE = dbo.f1(c1)))", new ParserErrorInfo(76, "SQL46005", "MIGRATION_STATE", "MIGRATIONSTATE"));
-			ParserTestUtils.ErrorTest130("alter table t_stretch SET (REMOTE_DATA_ARCHIVE = OFF_WITHOUT_DATA_RECOVERY (MIGRATION_STATE = OUTBOUND, FILTERPREDICATE = dbo.f1(c1)))", new ParserErrorInfo(104, "SQL46005", "FILTER_PREDICATE", "FILTERPREDICATE"));
-			ParserTestUtils.ErrorTest130("alter table t_stretch SET (REMOTE_DATA_ARCHIVE = OFF_WITHOUT_DATA_RECOVERY (MIGRATION_SSTATE = OUTBOUND, FILTERR_PREDICATE = dbo.f1(c1)))", new ParserErrorInfo(76, "SQL46005", "MIGRATION_STATE", "MIGRATION_SSTATE"));
+            ParserTestUtils.ErrorTest130("alter table t_stretch SET (REMOTE_DATA_ARCHIVE = OFF_WITHOUT_DATA_RECOVERY (MIGRATION_STATE = OUTBOUND, FILTER PREDICATE = dbo.f1(c1)))", new ParserErrorInfo(111, "SQL46010", "PREDICATE"));
+            ParserTestUtils.ErrorTest130("alter table t_stretch SET (REMOTE_DATA_ARCHIVE = OFF_WITHOUT_DATA_RECOVERY (MIGRATION_STATE ON, FILTER_PREDICATE = database.dbo.f1(c1)))", new ParserErrorInfo(92, "SQL46010", "ON"));
+            ParserTestUtils.ErrorTest130("alter table t_stretch SET (REMOTE_DATA_ARCHIVE = OFF_WITHOUT_DATA_RECOVERY (MIGRATION_STATE = OUTBOUND, FILTER_PREDICATE dbo.f1(c1)))", new ParserErrorInfo(121, "SQL46010", "dbo"));
+            ParserTestUtils.ErrorTest130("alter table t_stretch SET (REMOTE_DATA_ARCHIVE = OFF_WITHOUT_DATA_RECOVERY (MIIGRATION_STATE = OUTBOUND, FILTER_PREDICATE = dbo.f1(c1)))", new ParserErrorInfo(76, "SQL46005", "MIGRATION_STATE", "MIIGRATION_STATE"));
+            ParserTestUtils.ErrorTest130("alter table t_stretch SET (REMOTE_DATA_ARCHIVE = OFF_WITHOUT_DATA_RECOVERY (MIGRATION_STATE = OUTBOUND, FILTER_PREDICATE = NUL))", new ParserErrorInfo(104, "SQL46005", "MIGRATION_STATE", "FILTER_PREDICATE"));
+            ParserTestUtils.ErrorTest130("alter table t_stretch SET (REMOTE_DATA_ARCHIVE = OFF_WITHOUT_DATA_RECOVERY (MIGRATION_STATE = OUTBOUND, FIILTER_PREDICATE = dbo.f1(c1)))", new ParserErrorInfo(104, "SQL46005", "FILTER_PREDICATE", "FIILTER_PREDICATE"));
+            ParserTestUtils.ErrorTest130("alter table t_stretch SET (REMOTE_DATA_ARCHIVE = OFF_WITHOUT_DATA_RECOVERY (MIGRATIONSTATE = OUTBOUND, FILTER_PREDICATE = dbo.f1(c1)))", new ParserErrorInfo(76, "SQL46005", "MIGRATION_STATE", "MIGRATIONSTATE"));
+            ParserTestUtils.ErrorTest130("alter table t_stretch SET (REMOTE_DATA_ARCHIVE = OFF_WITHOUT_DATA_RECOVERY (MIGRATION_STATE = OUTBOUND, FILTERPREDICATE = dbo.f1(c1)))", new ParserErrorInfo(104, "SQL46005", "FILTER_PREDICATE", "FILTERPREDICATE"));
+            ParserTestUtils.ErrorTest130("alter table t_stretch SET (REMOTE_DATA_ARCHIVE = OFF_WITHOUT_DATA_RECOVERY (MIGRATION_SSTATE = OUTBOUND, FILTERR_PREDICATE = dbo.f1(c1)))", new ParserErrorInfo(76, "SQL46005", "MIGRATION_STATE", "MIGRATION_SSTATE"));
 
-			ParserTestUtils.ErrorTest130("ALTER TABLE T1 SET (REMOTE_DATA_ARCHIVE = OFF_WITHOUT_DATA_RECOVERY (MIGRATION_STATE = MigrationOutbound))", new ParserErrorInfo(87, "SQL46010", "MigrationOutbound"));
-			ParserTestUtils.ErrorTest130("ALTER TABLE T1 SET (REMOTE_DATA_ARCHIVE = OFF_WITHOUT_DATA_RECOVERY (MIGRATION_STATE = MigrationState))", new ParserErrorInfo(87, "SQL46010", "MigrationState"));
-			ParserTestUtils.ErrorTest130("ALTER TABLE T1 SET (REMOTE_DATA_ARCHIVE = OFF_WITHOUT_DATA_RECOVERY (MIGRATION_STATE = OTBOUND))", new ParserErrorInfo(87, "SQL46010", "OTBOUND"));
-			ParserTestUtils.ErrorTest130("ALTER TABLE T1 SET (REMOTE_DATA_ARCHIVE = OFF_WITHOUT_DATA_RECOVERY (MIGRATION_STATE = OUT]BOUND))", new ParserErrorInfo(90, "SQL46010", "]"));
-			ParserTestUtils.ErrorTest130("ALTER TABLE T1 SET (REMOTE_DATA_ARCHIVE = OFF_WITHOUT_DATA_RECOVERY (MIGRATION_STATE = ))", new ParserErrorInfo(87, "SQL46010", ")"));
-			ParserTestUtils.ErrorTest130("ALTER TABLE T1 SET (REMOTE_DATA_ARCHIVE = OFF_WITHOUT_DATA_RECOVERY (MIGRATION_STATE = OFF))", new ParserErrorInfo(87, "SQL46010", "OFF"));
-			ParserTestUtils.ErrorTest130("ALTER TABLE T1 SET (REMOTE_DATA_ARCHIVE = OFF_WITHOUT_DATA_RECOVERY (MIGRATION_STATE = ON))", new ParserErrorInfo(87, "SQL46010", "ON"));
-			ParserTestUtils.ErrorTest130("ALTER TABLE T1 SET (REMOTE_DATA_ARCHIVE = OFF_WITHOUT_DATA_RECOVERY (MIGRATION_STATE = DISABLE))", new ParserErrorInfo(87, "SQL46010", "DISABLE"));
+            ParserTestUtils.ErrorTest130("ALTER TABLE T1 SET (REMOTE_DATA_ARCHIVE = OFF_WITHOUT_DATA_RECOVERY (MIGRATION_STATE = MigrationOutbound))", new ParserErrorInfo(87, "SQL46010", "MigrationOutbound"));
+            ParserTestUtils.ErrorTest130("ALTER TABLE T1 SET (REMOTE_DATA_ARCHIVE = OFF_WITHOUT_DATA_RECOVERY (MIGRATION_STATE = MigrationState))", new ParserErrorInfo(87, "SQL46010", "MigrationState"));
+            ParserTestUtils.ErrorTest130("ALTER TABLE T1 SET (REMOTE_DATA_ARCHIVE = OFF_WITHOUT_DATA_RECOVERY (MIGRATION_STATE = OTBOUND))", new ParserErrorInfo(87, "SQL46010", "OTBOUND"));
+            ParserTestUtils.ErrorTest130("ALTER TABLE T1 SET (REMOTE_DATA_ARCHIVE = OFF_WITHOUT_DATA_RECOVERY (MIGRATION_STATE = OUT]BOUND))", new ParserErrorInfo(90, "SQL46010", "]"));
+            ParserTestUtils.ErrorTest130("ALTER TABLE T1 SET (REMOTE_DATA_ARCHIVE = OFF_WITHOUT_DATA_RECOVERY (MIGRATION_STATE = ))", new ParserErrorInfo(87, "SQL46010", ")"));
+            ParserTestUtils.ErrorTest130("ALTER TABLE T1 SET (REMOTE_DATA_ARCHIVE = OFF_WITHOUT_DATA_RECOVERY (MIGRATION_STATE = OFF))", new ParserErrorInfo(87, "SQL46010", "OFF"));
+            ParserTestUtils.ErrorTest130("ALTER TABLE T1 SET (REMOTE_DATA_ARCHIVE = OFF_WITHOUT_DATA_RECOVERY (MIGRATION_STATE = ON))", new ParserErrorInfo(87, "SQL46010", "ON"));
+            ParserTestUtils.ErrorTest130("ALTER TABLE T1 SET (REMOTE_DATA_ARCHIVE = OFF_WITHOUT_DATA_RECOVERY (MIGRATION_STATE = DISABLE))", new ParserErrorInfo(87, "SQL46010", "DISABLE"));
 
             // Alter table with invalid/ mis-spelled RDA
             //
@@ -4865,15 +4865,15 @@ select 1",
             // Alter table remote_data_archive with mis-spelled option
             //
             ParserTestUtils.ErrorTest130("alter table t_stretch SET (REMOTE_DATA_ARCHIVE = OF (MIGRATION_STATE = PAUSED)", new ParserErrorInfo(49, "SQL46010", "OF"));
-			ParserTestUtils.ErrorTest130("alter table t_stretch SET (REMOTE_DATA_ARCHIVE = OFF_WITHOUT_DATA_RECOVER (MIGRATION_STATE = PAUSED)", new ParserErrorInfo(49, "SQL46005", "OFF_WITHOUT_DATA_RECOVERY", "OFF_WITHOUT_DATA_RECOVER"));
+            ParserTestUtils.ErrorTest130("alter table t_stretch SET (REMOTE_DATA_ARCHIVE = OFF_WITHOUT_DATA_RECOVER (MIGRATION_STATE = PAUSED)", new ParserErrorInfo(49, "SQL46005", "OFF_WITHOUT_DATA_RECOVERY", "OFF_WITHOUT_DATA_RECOVER"));
         }
 
         /// <summary>
         /// Negative tests for a database with REMOTE_DATA_ARCHIVE
         /// </summary>
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void RemoteDataArchiveDatabaseNegativeTest()
         {
             ParserTestUtils.ErrorTest130("ALTER database db_test WITH SET REMOTE_DATA_ARCHIVE= OFF (SERVER = N'Test')", new ParserErrorInfo(15, "SQL46010", "db_test"));
@@ -4901,8 +4901,8 @@ select 1",
 
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void CreateColumnStoreIndexNegativeTest()
         {
             // cannot create clustered index with filter predicate
@@ -4936,8 +4936,8 @@ select 1",
 
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void CreateExternalDataSourceNegativeTest()
         {
             // Create external data source keyword typos
@@ -4977,10 +4977,10 @@ select 1",
             ParserTestUtils.ErrorTest130("CREATE EXTERNAL DATA SOURCE eds1 WITH (TYPE = SHARD_MAP_MANAGER, LOCATION = 'someServer', DATABASE_NAME = 'someDatabase', SHRD_MAP_NAME = 'someShardMap')", new ParserErrorInfo(122, "SQL46010", "SHRD_MAP_NAME"));
             ParserTestUtils.ErrorTest130("CREATE EXTERNAL DATA SOURCE eds1 WITH (TYPE = SHARD_MAP_MANAGER, LOCATION = 'someServer', DATABASE_NAME = 'someDatabase', SHARD_MAP_NAME 'someShardMap')", new ParserErrorInfo(122, "SQL46010", "SHARD_MAP_NAME"));
 
-			ParserTestUtils.ErrorTest130("CREATE EXTERNAL DATA SOURCE eds1 WITH (TYPE = RDBMS, LOCATION = 'someServer' DATABASE_NAME = 'someDatabase')", new ParserErrorInfo(77, "SQL46010", "DATABASE_NAME"));
-			ParserTestUtils.ErrorTest130("CREATE EXTERNAL DATA SOURCE eds1 WITH (TYPE = RDBMS, LOCATION = 'someServer', DATABASE_NAMES = 'someDatabase')", new ParserErrorInfo(78, "SQL46010", "DATABASE_NAMES"));
-			ParserTestUtils.ErrorTest130("CREATE EXTERNAL DATA SOURCE eds1 WITH (TYPE = RDBMS, LOCATION = 'someServer', DATABSE_NAME = 'someDatabase')", new ParserErrorInfo(78, "SQL46010", "DATABSE_NAME"));
-			ParserTestUtils.ErrorTest130("CREATE EXTERNAL DATA SOURCE eds1 WITH (TYPE = RDBMS, LOCATION = 'someServer', DATABASE_NAME 'someDatabase')", new ParserErrorInfo(78, "SQL46010", "DATABASE_NAME"));
+            ParserTestUtils.ErrorTest130("CREATE EXTERNAL DATA SOURCE eds1 WITH (TYPE = RDBMS, LOCATION = 'someServer' DATABASE_NAME = 'someDatabase')", new ParserErrorInfo(77, "SQL46010", "DATABASE_NAME"));
+            ParserTestUtils.ErrorTest130("CREATE EXTERNAL DATA SOURCE eds1 WITH (TYPE = RDBMS, LOCATION = 'someServer', DATABASE_NAMES = 'someDatabase')", new ParserErrorInfo(78, "SQL46010", "DATABASE_NAMES"));
+            ParserTestUtils.ErrorTest130("CREATE EXTERNAL DATA SOURCE eds1 WITH (TYPE = RDBMS, LOCATION = 'someServer', DATABSE_NAME = 'someDatabase')", new ParserErrorInfo(78, "SQL46010", "DATABSE_NAME"));
+            ParserTestUtils.ErrorTest130("CREATE EXTERNAL DATA SOURCE eds1 WITH (TYPE = RDBMS, LOCATION = 'someServer', DATABASE_NAME 'someDatabase')", new ParserErrorInfo(78, "SQL46010", "DATABASE_NAME"));
 
             // Missing required properties
             //
@@ -4992,8 +4992,8 @@ select 1",
             ParserTestUtils.ErrorTest130("CREATE EXTERNAL DATA SOURCE eds1 WITH (TYPE = HADOP, LOCATION = 'protocol://ip_address:port', RESOURCE_MANAGER_LOCATION = 'ip_address:port', CREDENTIAL = cred1)", new ParserErrorInfo(46, "SQL46010", "HADOP"));
             ParserTestUtils.ErrorTest130("CREATE EXTERNAL DATA SOURCE eds1 WITH (TYPE = SHARD_MAP_MANGER, LOCATION = 'someServer', DATABASE_NAME = 'someDatabase', SHARD_MAP_NAME = 'someDatabase')", new ParserErrorInfo(46, "SQL46010", "SHARD_MAP_MANGER"));
             ParserTestUtils.ErrorTest130("CREATE EXTERNAL DATA SOURCE eds1 WITH (TYPE = 'SHARD_MAP_MANAGER', LOCATION = 'someServer', DATABASE_NAME = 'someDatabase', SHARD_MAP_NAME = 'someShardMap', CREDENTIAL = someCred)", new ParserErrorInfo(46, "SQL46010", "'SHARD_MAP_MANAGER'"));
-			ParserTestUtils.ErrorTest130("CREATE EXTERNAL DATA SOURCE eds1 WITH (TYPE = RDMBS, LOCATION = 'someServer', DATABASE_NAME = 'someDatabase')", new ParserErrorInfo(46, "SQL46010", "RDMBS"));
-			ParserTestUtils.ErrorTest130("CREATE EXTERNAL DATA SOURCE eds1 WITH (TYPE = 'RDBMS', LOCATION = 'someServer', DATABASE_NAME = 'someDatabase', CREDENTIAL = someCred)", new ParserErrorInfo(46, "SQL46010", "'RDBMS'"));
+            ParserTestUtils.ErrorTest130("CREATE EXTERNAL DATA SOURCE eds1 WITH (TYPE = RDMBS, LOCATION = 'someServer', DATABASE_NAME = 'someDatabase')", new ParserErrorInfo(46, "SQL46010", "RDMBS"));
+            ParserTestUtils.ErrorTest130("CREATE EXTERNAL DATA SOURCE eds1 WITH (TYPE = 'RDBMS', LOCATION = 'someServer', DATABASE_NAME = 'someDatabase', CREDENTIAL = someCred)", new ParserErrorInfo(46, "SQL46010", "'RDBMS'"));
 
             // Create external data source with incorrect data source location value
             //
@@ -5010,17 +5010,17 @@ select 1",
             ParserTestUtils.ErrorTest130("CREATE EXTERNAL DATA SOURCE eds1 WITH (TYPE = SHARD_MAP_MANAGER, LOCATION = 'someServer', DATABASE_NAME = 'someDatabase', SHARD_MAP_NAME = someShardMap, CREDENTIAL = someCred)", new ParserErrorInfo(122, "SQL46010", "SHARD_MAP_NAME"));
             ParserTestUtils.ErrorTest130("CREATE EXTERNAL DATA SOURCE eds1 WITH (TYPE = SHARD_MAP_MANAGER, LOCATION = 'someServer', DATABASE_NAME = 'someDatabase', SHARD_MAP_NAME = 'someShardMap', CREDENTIAL = 'someCred')", new ParserErrorInfo(155, "SQL46010", "CREDENTIAL"));
 
-			// Create external rdbms data source with various incorrect values
-			//
-			ParserTestUtils.ErrorTest130("CREATE EXTERNAL DATA SOURCE eds1 WITH (TYPE = RDBMS, LOCATION = someServer, DATABASE_NAME = 'someDatabase', CREDENTIAL = someCred)", new ParserErrorInfo(64, "SQL46010", "someServer"));
-			ParserTestUtils.ErrorTest130("CREATE EXTERNAL DATA SOURCE eds1 WITH (TYPE = RDBMS, LOCATION = 'someServer', DATABASE_NAME = someDatabase, CREDENTIAL = someCred)", new ParserErrorInfo(78, "SQL46010", "DATABASE_NAME"));
-			ParserTestUtils.ErrorTest130("CREATE EXTERNAL DATA SOURCE eds1 WITH (TYPE = RDBMS, LOCATION = 'someServer', DATABASE_NAME = 'someDatabase', CREDENTIAL = 'someCred')", new ParserErrorInfo(110, "SQL46010", "CREDENTIAL"));
+            // Create external rdbms data source with various incorrect values
+            //
+            ParserTestUtils.ErrorTest130("CREATE EXTERNAL DATA SOURCE eds1 WITH (TYPE = RDBMS, LOCATION = someServer, DATABASE_NAME = 'someDatabase', CREDENTIAL = someCred)", new ParserErrorInfo(64, "SQL46010", "someServer"));
+            ParserTestUtils.ErrorTest130("CREATE EXTERNAL DATA SOURCE eds1 WITH (TYPE = RDBMS, LOCATION = 'someServer', DATABASE_NAME = someDatabase, CREDENTIAL = someCred)", new ParserErrorInfo(78, "SQL46010", "DATABASE_NAME"));
+            ParserTestUtils.ErrorTest130("CREATE EXTERNAL DATA SOURCE eds1 WITH (TYPE = RDBMS, LOCATION = 'someServer', DATABASE_NAME = 'someDatabase', CREDENTIAL = 'someCred')", new ParserErrorInfo(110, "SQL46010", "CREDENTIAL"));
         }
 
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void AlterExternalDataSourceNegativeTest()
         {
             // Alter external data source keyword typos
@@ -5078,8 +5078,8 @@ select 1",
 
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void DropExternalDataSourceNegativeTest()
         {
             // Drop external data source keyword typos
@@ -5097,8 +5097,8 @@ select 1",
 
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void CreateExternalFileFormatNegativeTest()
         {
             // Create external file format keyword typos
@@ -5218,8 +5218,8 @@ select 1",
 
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void DropExternalFileFormatNegativeTest()
         {
             // Drop external file format keyword typos
@@ -5237,8 +5237,8 @@ select 1",
 
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void CreateExternalTableNegativeTest()
         {
             // Create external table keyword typos
@@ -5375,8 +5375,8 @@ select 1",
         }
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void DropExternalTableNegativeTest()
         {
             // Drop external table keyword typos
@@ -5392,8 +5392,8 @@ select 1",
 
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void CreateUserFromExternalProviderNegativeTest()
         {
             // Drop external data source keyword typos
@@ -5410,8 +5410,8 @@ select 1",
 
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void AlterTableAlterColumnOnlineTestsNegativeTest()
         {
             ParserTestUtils.ErrorTest130("ALTER TABLE t1 ALTER COLUMN c1 VARCHAR (20) WITH (ONLINE2 = ON);",
@@ -5434,8 +5434,8 @@ select 1",
 
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest, Feature.AlwaysEncrypted)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest, Feature.AlwaysEncrypted)]
         public void AlwaysEncryptedNegativeTest()
         {
 
@@ -5483,7 +5483,7 @@ DROP VALUE
     ALGORITHM = 'RSA_OAEP',
     ENCRYPTED_VALUE = 0x016E000001630075007200720065006E00740075007300650072002F006D0079002F0064006500650063006200660034006100340031003000380034006200350033003200360066003200630062006200350030003600380065003900620061003000320030003600610037003800310066001DDA6134C3B73A90D349C8905782DD819B428162CF5B051639BA46EC69A7C8C8F81591A92C395711493B25DCBCCC57836E5B9F17A0713E840721D098F3F8E023ABCDFE2F6D8CC4339FC8F88630ED9EBADA5CA8EEAFA84164C1095B12AE161EABC1DF778C07F07D413AF1ED900F578FC00894BEE705EAC60F4A5090BBE09885D2EFE1C915F7B4C581D9CE3FDAB78ACF4829F85752E9FC985DEB8773889EE4A1945BD554724803A6F5DC0A2CD5EFE001ABED8D61E8449E4FAA9E4DD392DA8D292ECC6EB149E843E395CDE0F98D04940A28C4B05F747149B34A0BAEC04FFF3E304C84AF1FF81225E615B5F94E334378A0A888EF88F4E79F66CB377E3C21964AACB5049C08435FE84EEEF39D20A665C17E04898914A85B3DE23D56575EBC682D154F4F15C37723E04974DB370180A9A579BC84F6BC9B5E7C223E5CBEE721E57EE07EFDCC0A3257BBEBF9ADFFB00DBF7EF682EC1C4C47451438F90B4CF8DA709940F72CFDC91C6EB4E37B4ED7E2385B1FF71B28A1D2669FBEB18EA89F9D391D2FDDEA0ED362E6A591AC64EF4AE31CA8766C259ECB77D01A7F5C36B8418F91C1BEADDD4491C80F0016B66421B4B788C55127135DA2FA625FB7FD195FB40D90A6C67328602ECAF3EC4F5894BFD84A99EB4753BE0D22E0D4DE6A0ADFEDC80EB1B556749B4A8AD00E73B329C95827AB91C0256347E85E3C5FD6726D0E1FE82C925D3DF4A9
 );";
-            ParserTestUtils.ErrorTest130(cekExtraParametersSyntax, new ParserErrorInfo(cekExtraParametersSyntax.IndexOf(@"CMK2,")+4, "SQL46010", ","));
+            ParserTestUtils.ErrorTest130(cekExtraParametersSyntax, new ParserErrorInfo(cekExtraParametersSyntax.IndexOf(@"CMK2,") + 4, "SQL46010", ","));
 
             // Drop column encryption key missing keyworkd
             //
@@ -5528,8 +5528,8 @@ WITH (
 
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void AlterDatabaseScopedCredentialNegativeTest()
         {
 
@@ -5607,8 +5607,8 @@ WITH (
 
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void CreateDatabaseScopedCredentialNegativeTest()
         {
 
@@ -5685,8 +5685,8 @@ WITH (
 
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void DropDatabaseScopedCredentialNegativeTest()
         {
 
@@ -5716,45 +5716,45 @@ WITH (
 
 
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
-		public void CreateMasterKeyNegativeTest()
-		{
-			// Keyword typos
-			ParserTestUtils.ErrorTest130("CREAT MASTER KEY", new ParserErrorInfo(6, "SQL46010", "MASTER"));
-			ParserTestUtils.ErrorTest130("CREATE MASTE KEY", new ParserErrorInfo(7, "SQL46010", "MASTE"));
-			ParserTestUtils.ErrorTest130("CREATE MASTER KY", new ParserErrorInfo(7, "SQL46010", "MASTER"));
-			ParserTestUtils.ErrorTest130("CREATE MASTER KEY BY PASSWD = N'Placeholder'", new ParserErrorInfo(18, "SQL46010", "BY"));
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void CreateMasterKeyNegativeTest()
+        {
+            // Keyword typos
+            ParserTestUtils.ErrorTest130("CREAT MASTER KEY", new ParserErrorInfo(6, "SQL46010", "MASTER"));
+            ParserTestUtils.ErrorTest130("CREATE MASTE KEY", new ParserErrorInfo(7, "SQL46010", "MASTE"));
+            ParserTestUtils.ErrorTest130("CREATE MASTER KY", new ParserErrorInfo(7, "SQL46010", "MASTER"));
+            ParserTestUtils.ErrorTest130("CREATE MASTER KEY BY PASSWD = N'Placeholder'", new ParserErrorInfo(18, "SQL46010", "BY"));
 
-			// Missing keyword
-			ParserTestUtils.ErrorTest130("CREATE KEY ENCRYPTION BY PASSWORD = N'Placeholder'", new ParserErrorInfo(0, "SQL46010", "CREATE"), new ParserErrorInfo(7, "SQL46010", "KEY"));
-			ParserTestUtils.ErrorTest130("CREATE MASTER KEY ENCRYPTION  = N'Placeholder'", new ParserErrorInfo(18, "SQL46010", "ENCRYPTION"));
-			ParserTestUtils.ErrorTest130("CREATE MASTER KEY ENCRYPTION PASSWORD = N'Placeholder'", new ParserErrorInfo(18, "SQL46010", "ENCRYPTION"));
+            // Missing keyword
+            ParserTestUtils.ErrorTest130("CREATE KEY ENCRYPTION BY PASSWORD = N'Placeholder'", new ParserErrorInfo(0, "SQL46010", "CREATE"), new ParserErrorInfo(7, "SQL46010", "KEY"));
+            ParserTestUtils.ErrorTest130("CREATE MASTER KEY ENCRYPTION  = N'Placeholder'", new ParserErrorInfo(18, "SQL46010", "ENCRYPTION"));
+            ParserTestUtils.ErrorTest130("CREATE MASTER KEY ENCRYPTION PASSWORD = N'Placeholder'", new ParserErrorInfo(18, "SQL46010", "ENCRYPTION"));
 
-			// Missing password
+            // Missing password
             // [SuppressMessage("Microsoft.Security", "CS002:SecretInNextLine", Justification="No password in next line")]
-			ParserTestUtils.ErrorTest130("CREATE MASTER KEY ENCRYPTION BY PASSWORD = ", new ParserErrorInfo(43, "SQL46029", "="));
+            ParserTestUtils.ErrorTest130("CREATE MASTER KEY ENCRYPTION BY PASSWORD = ", new ParserErrorInfo(43, "SQL46029", "="));
 
-			// Missing equal sign, 2 equal signs
-			ParserTestUtils.ErrorTest130("CREATE MASTER KEY ENCRYPTION BY PASSWORD N'Placeholder'", new ParserErrorInfo(41, "SQL46010", "N'Placeholder'"));
-			ParserTestUtils.ErrorTest130("CREATE MASTER KEY ENCRYPTION BY PASSWORD == 'Placeholder'", new ParserErrorInfo(42, "SQL46010", "="));
+            // Missing equal sign, 2 equal signs
+            ParserTestUtils.ErrorTest130("CREATE MASTER KEY ENCRYPTION BY PASSWORD N'Placeholder'", new ParserErrorInfo(41, "SQL46010", "N'Placeholder'"));
+            ParserTestUtils.ErrorTest130("CREATE MASTER KEY ENCRYPTION BY PASSWORD == 'Placeholder'", new ParserErrorInfo(42, "SQL46010", "="));
 
-			// Improperly quoted password
-			ParserTestUtils.ErrorTest130("CREATE MASTER KEY ENCRYPTION BY PASSWORD N'Placeholder", new ParserErrorInfo(41, "SQL46030", "N'Placeholder"));
-			ParserTestUtils.ErrorTest130("CREATE MASTER KEY ENCRYPTION BY PASSWORD Placeholder'", new ParserErrorInfo(52, "SQL46030", "'"));
+            // Improperly quoted password
+            ParserTestUtils.ErrorTest130("CREATE MASTER KEY ENCRYPTION BY PASSWORD N'Placeholder", new ParserErrorInfo(41, "SQL46030", "N'Placeholder"));
+            ParserTestUtils.ErrorTest130("CREATE MASTER KEY ENCRYPTION BY PASSWORD Placeholder'", new ParserErrorInfo(52, "SQL46030", "'"));
 
-			// Extra stuff after statement
-			ParserTestUtils.ErrorTest130("CREATE MASTER KEY CREATE", new ParserErrorInfo(18, "SQL46010", "CREATE"));
-			ParserTestUtils.ErrorTest130("CREATE MASTER KEY foobar", new ParserErrorInfo(18, "SQL46010", "foobar"));
-			ParserTestUtils.ErrorTest130("CREATE MASTER KEY ENCRYPTION BY PASSWORD = N'Placeholder' KEY", new ParserErrorInfo(58, "SQL46010", "KEY"));
-		}
+            // Extra stuff after statement
+            ParserTestUtils.ErrorTest130("CREATE MASTER KEY CREATE", new ParserErrorInfo(18, "SQL46010", "CREATE"));
+            ParserTestUtils.ErrorTest130("CREATE MASTER KEY foobar", new ParserErrorInfo(18, "SQL46010", "foobar"));
+            ParserTestUtils.ErrorTest130("CREATE MASTER KEY ENCRYPTION BY PASSWORD = N'Placeholder' KEY", new ParserErrorInfo(58, "SQL46010", "KEY"));
+        }
 
         /// <summary>
         /// Negative tests for CREATE OR ALTER statements
         /// </summary>
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void CreateOrAlterNegativeTest()
         {
             // CREATE OR ALTER FUNCTIONS
@@ -5794,8 +5794,8 @@ WITH (
         /// Trim built-in negative tests.
         /// </summary>
         [TestMethod]
-		[Priority(0)]
-		[SqlStudioTestCategory(Category.UnitTest)]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void TrimBuiltInNegativeTest()
         {
             ParserTestUtils.ErrorTest140("SELECT TRIM(' TestString ';", new ParserErrorInfo(26, "SQL46010", ";"));
@@ -6104,7 +6104,7 @@ USING (Source
 WHEN NOT MATCHED BY SOURCE THEN DELETE OUTPUT inserted.*, deleted.*;";
             // Typo in the Match Clause.
             //
-            ParserTestUtils.ErrorTest150(query2, new ParserErrorInfo(query2.IndexOf("-Dog")+1, "SQL46010", "Dog"));
+            ParserTestUtils.ErrorTest150(query2, new ParserErrorInfo(query2.IndexOf("-Dog") + 1, "SQL46010", "Dog"));
         }
 
         [TestMethod]
@@ -6563,9 +6563,9 @@ WHEN NOT MATCHED BY SOURCE THEN DELETE OUTPUT inserted.*, deleted.*;";
             ParserTestUtils.ErrorTest140(invalidToSyntax, new ParserErrorInfo(10, "SQL46010", "FROM"));
             ParserTestUtils.ErrorTest150(invalidToSyntax, new ParserErrorInfo(10, "SQL46010", "FROM"));
 
-            ParserTestUtils.ErrorTest130(invalidOptionSyntax, new ParserErrorInfo(invalidOptionSyntax.IndexOf(@"FIELDTERMINATOR,")+15, "SQL46010", ","));
-            ParserTestUtils.ErrorTest140(invalidOptionSyntax, new ParserErrorInfo(invalidOptionSyntax.IndexOf(@"FIELDTERMINATOR,")+15, "SQL46010", ","));
-            ParserTestUtils.ErrorTest150(invalidOptionSyntax, new ParserErrorInfo(invalidOptionSyntax.IndexOf(@"FIELDTERMINATOR,")+15, "SQL46010", ","));
+            ParserTestUtils.ErrorTest130(invalidOptionSyntax, new ParserErrorInfo(invalidOptionSyntax.IndexOf(@"FIELDTERMINATOR,") + 15, "SQL46010", ","));
+            ParserTestUtils.ErrorTest140(invalidOptionSyntax, new ParserErrorInfo(invalidOptionSyntax.IndexOf(@"FIELDTERMINATOR,") + 15, "SQL46010", ","));
+            ParserTestUtils.ErrorTest150(invalidOptionSyntax, new ParserErrorInfo(invalidOptionSyntax.IndexOf(@"FIELDTERMINATOR,") + 15, "SQL46010", ","));
 
             ParserTestUtils.ErrorTest130(invalidIdentityOptionSyntax, new ParserErrorInfo(1,
                 "SQL46130", "IDENTITY_INSERT"));
@@ -6686,7 +6686,7 @@ WHEN NOT MATCHED BY SOURCE THEN DELETE OUTPUT inserted.*, deleted.*;";
                     OBJECT = 'y', CONNECTION = 'a', CONNECTION = 'b')
                     with (a varchar(10)) as cols";
             ParserTestUtils.ErrorTest160(multipleParameterDeclarationSynax,
-                new ParserErrorInfo(multipleParameterDeclarationSynax.IndexOf(@"CONNECTION = 'a', CONNECTION")+18, "SQL46049", "CONNECTION"));
+                new ParserErrorInfo(multipleParameterDeclarationSynax.IndexOf(@"CONNECTION = 'a', CONNECTION") + 18, "SQL46049", "CONNECTION"));
 
             // Not all parameters provided
             //
@@ -6785,24 +6785,88 @@ WHEN NOT MATCHED BY SOURCE THEN DELETE OUTPUT inserted.*, deleted.*;";
             string emptyWithClauseSyntax = @"SELECT *
                  FROM OPENROWSET ('a', 'b', [dbo].[tbl])
                  WITH () AS a;";
-            ParserTestUtils.ErrorTest160(emptyWithClauseSyntax, new ParserErrorInfo(emptyWithClauseSyntax.IndexOf(@"() AS a")+1, "SQL46010", ")"));
+            ParserTestUtils.ErrorTest160(emptyWithClauseSyntax, new ParserErrorInfo(emptyWithClauseSyntax.IndexOf(@"() AS a") + 1, "SQL46010", ")"));
 
             // Invalid WITH clause
             //
             string invalidWithClauseSyntax = @"SELECT *
                  FROM OPENROWSET ('a', 'b', c)
                  WITH (A = 5) AS a;";
-            ParserTestUtils.ErrorTest160(invalidWithClauseSyntax, new ParserErrorInfo(invalidWithClauseSyntax.IndexOf(@"(A = 5)")+3, "SQL46010", "="));
+            ParserTestUtils.ErrorTest160(invalidWithClauseSyntax, new ParserErrorInfo(invalidWithClauseSyntax.IndexOf(@"(A = 5)") + 3, "SQL46010", "="));
 
             string invalidWithClause2Syntax = @"SELECT *
                  FROM OPENROWSET ('a', 'b', [mytable])
                  WITH (a) AS a;";
-            ParserTestUtils.ErrorTest160(invalidWithClause2Syntax, new ParserErrorInfo(invalidWithClause2Syntax.IndexOf(@"(a)")+2, "SQL46010", ")"));
+            ParserTestUtils.ErrorTest160(invalidWithClause2Syntax, new ParserErrorInfo(invalidWithClause2Syntax.IndexOf(@"(a)") + 2, "SQL46010", ")"));
 
             string invalidWithClause3Syntax = @"SELECT *
                 FROM OPENROWSET ('a', 'b', [ab cd])
                 WITH a;";
             ParserTestUtils.ErrorTest160(invalidWithClause3Syntax, new ParserErrorInfo(invalidWithClause3Syntax.IndexOf(@"a;"), "SQL46010", "a"));
+        }
+        
+        /// <summary>
+        /// Negative tests for Scalar Functions in Fabric DW.
+        /// </summary>
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void ScalarFunctionNegativeTestsFabricDW()
+        {
+            string scalarFunctionSyntax = @"CREATE OR ALTER FUNCTION dbo.FormatPrice
+                                            (
+                                                @amount AS DECIMAL(10,2) = 0.0
+                                            )
+                                            RETURNS VARCHAR(20)
+                                            WITH ENCRYPTION, SCHEMABINDING, RETURNS NULL ON NULL INPUT, INLINE = ON
+                                            AS
+                                            BEGIN
+                                                RETURN '$' + CAST(@amount AS VARCHAR)
+                                            END;
+                                            ";
+            ParserTestUtils.ErrorTestFabricDW(scalarFunctionSyntax, new ParserErrorInfo(scalarFunctionSyntax.IndexOf("ENCRYPTION"), "SQL46026", "ENCRYPTION"));
+
+            string scalarFunctionSyntax2 = @"CREATE OR ALTER FUNCTION dbo.ConcatNames
+                                            (
+                                                @first AS NVARCHAR(50),
+                                                @last  AS NVARCHAR(50)
+                                            )
+                                            RETURNS NVARCHAR(101)
+                                            WITH RETURNS NULL ON NULL INPUT, INLINE = OFF, EXECUTE AS CALLER
+                                            AS
+                                            BEGIN
+                                                RETURN @first + ' ' + @last
+                                            END;";
+            ParserTestUtils.ErrorTestFabricDW(scalarFunctionSyntax2, new ParserErrorInfo(scalarFunctionSyntax2.IndexOf("INLINE"), "SQL46010", "INLINE"));
+            
+            string scalarFunctionSyntax3 = @"CREATE OR ALTER FUNCTION dbo.CountProducts
+                                            (
+                                                @ProductTable AS dbo.ProductType READONLY
+                                            )
+                                            RETURNS INT
+                                            WITH SCHEMABINDING
+                                            AS
+                                            BEGIN
+                                                RETURN (SELECT COUNT(*) FROM @ProductTable)
+                                            END;";
+            ParserTestUtils.ErrorTestFabricDW(scalarFunctionSyntax3, new ParserErrorInfo(scalarFunctionSyntax3.IndexOf("READONLY"), "SQL46026", "READONLY"));
+
+            string scalarFunctionSyntax4 = @"CREATE OR ALTER FUNCTION sales.TotalSalesForRegion
+                                            (
+                                                @RegionId    AS sys.INT NULL,
+                                                @SalesData   AS sales.SalesTableType READONLY
+                                            )
+                                            RETURNS MONEY
+                                            WITH RETURNS NULL ON NULL INPUT
+                                            AS
+                                            BEGIN
+                                                RETURN (
+                                                    SELECT SUM(Amount)
+                                                    FROM @SalesData
+                                                    WHERE RegionId = @RegionId
+                                                )
+                                            END;";
+            ParserTestUtils.ErrorTestFabricDW(scalarFunctionSyntax4, new ParserErrorInfo(scalarFunctionSyntax4.IndexOf("NULL"), "SQL46010", "NULL"));
         }
     }
 }
