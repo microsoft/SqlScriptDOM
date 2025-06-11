@@ -564,6 +564,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         internal const string LSquareParen = "[";
         internal const string MaintainIndex = "MAINTAIN_INDEX";
         internal const string Manual = "MANUAL";
+        internal const string ManualCutover = "MANUAL_CUTOVER";
         internal const string Mark = "MARK";
         internal const string MarkInUseForRemoval = "MARK_IN_USE_FOR_REMOVAL";
         internal const string Masked = "MASKED";
@@ -728,6 +729,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         internal const string Paused = "PAUSED";
         internal const string Percentage = "PERCENTAGE";
         internal const string PerCpu = "PER_CPU";
+        internal const string PerformCutover = "PERFORM_CUTOVER";
         internal const string Period = "PERIOD";
         internal const string PermissionSet = "PERMISSION_SET";
         internal const string PerNode = "PER_NODE";
