@@ -10,7 +10,8 @@ namespace SqlStudio.Tests.UTSqlScriptDom
         private static readonly ParserTest[] Only170TestInfos =
         {
             new ParserTest170("RegexpTVFTests170.sql", nErrors80: 1, nErrors90: 1, nErrors100: 0, nErrors110: 0, nErrors120: 0, nErrors130: 0, nErrors140: 0, nErrors150: 0, nErrors160: 0),
-            new ParserTest170("AlterDatabaseManualCutoverTests170.sql", nErrors80: 4, nErrors90: 4, nErrors100: 4, nErrors110: 4, nErrors120: 4, nErrors130: 4, nErrors140: 4, nErrors150: 4, nErrors160: 4)
+            new ParserTest170("AlterDatabaseManualCutoverTests170.sql", nErrors80: 4, nErrors90: 4, nErrors100: 4, nErrors110: 4, nErrors120: 4, nErrors130: 4, nErrors140: 4, nErrors150: 4, nErrors160: 4),
+            new ParserTest170("CreateColumnStoreIndexTests170.sql", nErrors80: 3, nErrors90: 3, nErrors100: 3, nErrors110: 3, nErrors120: 3, nErrors130: 0, nErrors140: 0, nErrors150: 0, nErrors160: 0)
         };
 
         private static readonly ParserTest[] SqlAzure170_TestInfos =

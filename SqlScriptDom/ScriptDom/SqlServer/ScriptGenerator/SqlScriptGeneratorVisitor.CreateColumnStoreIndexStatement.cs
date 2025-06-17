@@ -36,8 +36,10 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
                 GenerateParenthesisedCommaSeparatedList(node.Columns);
             }
 
-            // If clustered columstore index, generate ordered columns if any
-            if(node.Clustered.GetValueOrDefault() && node.OrderedColumns != null && node.OrderedColumns.Count > 0)
+            // Generate ordered columns if any, for both clustered and non-clustered indexes
+            // If node.Clustered is null or false, it indicates index type is non-clustered.
+            // If node.Clustered is true, it indicates index type is clustered.
+            if (node.OrderedColumns != null && node.OrderedColumns.Count > 0)
             {
                 GenerateSpaceAndKeyword(TSqlTokenType.Order);
                 GenerateParenthesisedCommaSeparatedList(node.OrderedColumns);
