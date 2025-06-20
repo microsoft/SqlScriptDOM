@@ -29587,32 +29587,9 @@ rowguidcolConstraint [ColumnDefinition vParent]
     ;
 
 identityConstraint [IndexAffectingStatement statementType] returns [IdentityOptions vResult = FragmentFactory.CreateFragment<IdentityOptions>()]
-{
-    ScalarExpression vExpression;
-    bool vNotForReplication;
-}
     : tIdentity:Identity
         {
             UpdateTokenInfo(vResult,tIdentity);
-        }
-        (
-            (LeftParenthesis seedIncrement)=> // necessary because select statement can start with LeftParenthesis
-            LeftParenthesis vExpression=seedIncrement
-            {
-                vResult.IdentitySeed = vExpression;
-            }
-            Comma vExpression=seedIncrement
-            {
-                vResult.IdentityIncrement = vExpression;
-            }
-            tRParen:RightParenthesis
-            {
-                UpdateTokenInfo(vResult,tRParen);
-            }
-        )?
-        vNotForReplication = replicationClauseOpt[statementType, vResult]
-        {
-            vResult.IsIdentityNotForReplication = vNotForReplication;
         }
     ;
 
