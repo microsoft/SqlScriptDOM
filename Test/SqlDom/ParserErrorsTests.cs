@@ -6889,14 +6889,14 @@ WHEN NOT MATCHED BY SOURCE THEN DELETE OUTPUT inserted.*, deleted.*;";
                                                 Name VARCHAR(50)
                                             );
                                             ";
-            ParserTestUtils.ErrorTestFabricDW(identityColumnSyntax, new ParserErrorInfo(90, "SQL46010", "("));
+            ParserTestUtils.ErrorTestFabricDW(identityColumnSyntax, new ParserErrorInfo(identityColumnSyntax.IndexOf("IDENTITY(") + 8, "SQL46010", "("));
 
             string identityColumnSyntax2 = @"CREATE TABLE TestTable2 (
                                                 RecordID BIGINT IDENTITY(100,5),
                                                 Description NVARCHAR(200)
                                             );
                                             ";
-            ParserTestUtils.ErrorTestFabricDW(identityColumnSyntax2, new ParserErrorInfo(99, "SQL46010", "("));
+            ParserTestUtils.ErrorTestFabricDW(identityColumnSyntax2, new ParserErrorInfo(identityColumnSyntax2.IndexOf("IDENTITY(") + 8, "SQL46010", "("));
         }
     }
 }
