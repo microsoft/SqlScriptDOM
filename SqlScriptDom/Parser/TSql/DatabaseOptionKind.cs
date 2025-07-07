@@ -95,7 +95,10 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         
         // T-SQL 150 On/Off options
         DataRetention               = 67, 
-        Ledger                      = 68
+        Ledger                      = 68,
+
+        ManualCutover               = 69,
+        PerformCutover              = 70
     }
 
 #pragma warning restore 1591
