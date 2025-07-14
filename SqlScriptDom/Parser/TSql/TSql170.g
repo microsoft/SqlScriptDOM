@@ -21520,10 +21520,13 @@ xmlForClause returns [XmlForClause vResult = FragmentFactory.CreateFragment<XmlF
 {
     XmlForClauseOption vOption;
     XmlForClauseOptions encountered = XmlForClauseOptions.None;
+    int forTokenIndex = GetLastTokenIndex();  // Store the index of the FOR token before matching the next token
 }
     : tXml:Identifier vOption = xmlForClauseMode
         {
             Match(tXml, CodeGenerationSupporter.Xml);
+            // Explicitly set the FirstTokenIndex to the FOR token
+            UpdateTokenInfo(vResult, forTokenIndex, forTokenIndex);
             AddAndUpdateTokenInfo(vResult, vResult.Options, vOption);
         }
         (Comma vOption = xmlParam[encountered]
@@ -21610,10 +21613,13 @@ jsonForClause returns [JsonForClause vResult = FragmentFactory.CreateFragment<Js
 {
     JsonForClauseOption vOption;
     JsonForClauseOptions encountered = JsonForClauseOptions.None;
+    int forTokenIndex = GetLastTokenIndex();  // Store the index of the FOR token before matching the next token
 }
     : tJson:Identifier vOption = jsonForClauseMode
         {
             Match(tJson, CodeGenerationSupporter.Json);
+            // Explicitly set the FirstTokenIndex to the FOR token
+            UpdateTokenInfo(vResult, forTokenIndex, forTokenIndex);
             AddAndUpdateTokenInfo(vResult, vResult.Options, vOption);
         }
         (Comma vOption = jsonParam[encountered]
