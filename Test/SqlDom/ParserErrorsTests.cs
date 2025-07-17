@@ -6864,7 +6864,7 @@ WHEN NOT MATCHED BY SOURCE THEN DELETE OUTPUT inserted.*, deleted.*;";
                 WITH a;";
             ParserTestUtils.ErrorTest160(invalidWithClause3Syntax, new ParserErrorInfo(invalidWithClause3Syntax.IndexOf(@"a;"), "SQL46010", "a"));
         }
-        
+
         /// <summary>
         /// Negative tests for Scalar Functions in Fabric DW.
         /// </summary>
@@ -7030,6 +7030,120 @@ WHEN NOT MATCHED BY SOURCE THEN DELETE OUTPUT inserted.*, deleted.*;";
             // Incomplete WITH clause
             ParserTestUtils.ErrorTest170("CREATE VECTOR INDEX IX_Test ON dbo.Documents (VectorData) WITH",
                 new ParserErrorInfo(58, "SQL46010", "WITH"));
+        }
+
+        /// <summary>
+        /// Negative tests for AI_GENERATE_CHUNKS syntax
+        /// </summary>
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void GenerateChunksNegativeTest170()
+        {
+            // Missing required parameters
+            ParserTestUtils.ErrorTest170(
+                "SELECT * FROM AI_GENERATE_CHUNKS(source = 'text')",
+                new ParserErrorInfo(48, "SQL46010", ")"));
+
+            // Missing CHUNK_SIZE
+            ParserTestUtils.ErrorTest170(
+                "SELECT * FROM AI_GENERATE_CHUNKS(source = 'text', CHUNK_TYPE = fixed)",
+                new ParserErrorInfo(68, "SQL46010", ")"));
+
+            // Invalid order: CHUNK_SIZE before CHUNK_TYPE
+            ParserTestUtils.ErrorTest170(
+                "SELECT * FROM AI_GENERATE_CHUNKS(source = 'text', CHUNK_SIZE = 5, CHUNK_TYPE = fixed)",
+                new ParserErrorInfo(50, "SQL46005", "CHUNK_TYPE", "CHUNK_SIZE"));
+
+            // Invalid order: enable_chunk_set_id before overlap
+            ParserTestUtils.ErrorTest170(
+                "SELECT * FROM AI_GENERATE_CHUNKS(source = 'text', CHUNK_TYPE = fixed, CHUNK_SIZE = 5, enable_chunk_set_id = 1, overlap = 10)",
+                new ParserErrorInfo(86, "SQL46010", "enable_chunk_set_id"));
+
+            // Invalid order: enable_chunk_set_id before CHUNK_SIZE
+            ParserTestUtils.ErrorTest170(
+                "SELECT * FROM AI_GENERATE_CHUNKS(source = 'text', CHUNK_TYPE = fixed, enable_chunk_set_id = 1, CHUNK_SIZE = 5, overlap = 10)",
+                new ParserErrorInfo(70, "SQL46010", "enable_chunk_set_id"));
+
+            // Invalid value: CHUNK_TYPE = 'fixed' (should be keyword, not string)
+            ParserTestUtils.ErrorTest170(
+                "SELECT * FROM AI_GENERATE_CHUNKS(source = 'text', CHUNK_TYPE = 'fixed', CHUNK_SIZE = 5)",
+                new ParserErrorInfo(63, "SQL46010", "'fixed'"));
+
+            // Invalid expression: CHUNK_TYPE = @CHUNK_TYPE (should not be variable)
+            ParserTestUtils.ErrorTest170(
+                "SELECT * FROM AI_GENERATE_CHUNKS(source = 'text', CHUNK_TYPE = @CHUNK_TYPE, CHUNK_SIZE = 5)",
+                new ParserErrorInfo(63, "SQL46010", "@CHUNK_TYPE"));
+
+            // Invalid parameter: CHUNK_TYPE = t1.c1 (should not be column reference)
+            ParserTestUtils.ErrorTest170(
+                "SELECT * FROM t1 CROSS APPLY AI_GENERATE_CHUNKS(source = 'text', CHUNK_TYPE = t1.c1, CHUNK_SIZE = 5)",
+                new ParserErrorInfo(80, "SQL46010", "."));
+
+            // Missing value after equals
+            ParserTestUtils.ErrorTest170(
+                "SELECT * FROM AI_GENERATE_CHUNKS(source = , CHUNK_TYPE = fixed, CHUNK_SIZE = 5)",
+                new ParserErrorInfo(42, "SQL46010", ","));
+
+            // Missing value for CHUNK_SIZE
+            ParserTestUtils.ErrorTest170(
+                "SELECT * FROM AI_GENERATE_CHUNKS(source = 'text', CHUNK_TYPE = fixed, CHUNK_SIZE = )",
+                new ParserErrorInfo(83, "SQL46010", ")"));
+
+            // Unknown parameter
+            ParserTestUtils.ErrorTest170(
+                "SELECT * FROM AI_GENERATE_CHUNKS(source = 'text', CHUNK_TYPE = fixed, CHUNK_SIZE = 5, invalid_param = 123)",
+                new ParserErrorInfo(86, "SQL46010", "invalid_param"));
+
+            // Extra comma at end
+            ParserTestUtils.ErrorTest170(
+                "SELECT * FROM AI_GENERATE_CHUNKS(source = 'text', CHUNK_TYPE = fixed, CHUNK_SIZE = 5,)",
+                new ParserErrorInfo(85, "SQL46010", ")"));
+
+            // Too many parameters
+            ParserTestUtils.ErrorTest170(
+                "SELECT * FROM AI_GENERATE_CHUNKS(source = 'text', CHUNK_TYPE = fixed, CHUNK_SIZE = 5, overlap = 1, enable_chunk_set_id = 2, extra = 3)",
+                new ParserErrorInfo(122, "SQL46010", ","));
+
+            // Function call with constant input, not keyword params
+            ParserTestUtils.ErrorTest170(
+                "SELECT * FROM ai_generate_chunks(3)",
+                new ParserErrorInfo(33, "SQL46010", "3"));
+
+            // Missing paramter "source"
+            ParserTestUtils.ErrorTest170(
+                "SELECT source, target FROM userTable cross apply ai_generate_chunks(target)",
+                new ParserErrorInfo(68, "SQL46005", "SOURCE", "target"));
+
+            // Misuse of parameter "source"
+            ParserTestUtils.ErrorTest170(
+                "SELECT source, target FROM userTable cross apply ai_generate_chunks(source)",
+                new ParserErrorInfo(74, "SQL46010", ")"));
+
+            // Misuse of bracketed function name
+            ParserTestUtils.ErrorTest170(
+                "SELECT * FROM [ai_generate_chunks](source = 'something to chunk', chunk_type = fixed, chunk_size = 5)",
+                new ParserErrorInfo(42, "SQL46010", "="));
+
+            // Misuse of 2-part identifier
+            ParserTestUtils.ErrorTest170(
+                "SELECT * FROM dbo.ai_generate_chunks(source = 'something to chunk', chunk_type = fixed, chunk_size = 5)",
+                new ParserErrorInfo(36, "SQL46010", "("));
+
+            // 2-part identifier misuse in CROSS APPLY
+            ParserTestUtils.ErrorTest170(
+                "SELECT * FROM source CROSS APPLY dbo.ai_generate_chunks(source.c1)",
+                new ParserErrorInfo(55, "SQL46010", "("));
+
+            // 2-part identifier misuse in CROSS APPLY
+            ParserTestUtils.ErrorTest170(
+                "SELECT source, target FROM userTable cross apply dbo.ai_generate_chunks(source)",
+                new ParserErrorInfo(71, "SQL46010", "("));
+
+            // Invalid CHUNK_TYPE
+            ParserTestUtils.ErrorTest170(
+                "SELECT * FROM AI_GENERATE_CHUNKS (source = 'some text', chunk_type = other, chunk_size = 5)",
+                new ParserErrorInfo(69, "SQL46010", "other"));
         }
     }
 }

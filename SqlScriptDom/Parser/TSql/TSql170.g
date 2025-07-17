@@ -19122,6 +19122,8 @@ selectTableReferenceElementWithoutJoinParenthesis[SubDmlFlags subDmlFlags] retur
     :
         {NextTokenMatches(CodeGenerationSupporter.ChangeTable)}?
         vResult=changeTableTableReference
+    |   {NextTokenMatches(CodeGenerationSupporter.AiGenerateChunks)}?
+        vResult = aiGenerateChunksTableReference
     |   vResult=builtInFunctionTableReference
     |   {NextIdentifierMatchesOneOf(new string[] {CodeGenerationSupporter.StringSplit, CodeGenerationSupporter.GenerateSeries, CodeGenerationSupporter.RegexpMatches, CodeGenerationSupporter.RegexpSplitToTable})}?
         vResult=globalFunctionTableReference
@@ -19138,6 +19140,98 @@ selectTableReferenceElementWithoutJoinParenthesis[SubDmlFlags subDmlFlags] retur
     |   {NextTokenMatches(CodeGenerationSupporter.Predict)}?
         vResult=predictTableReference[subDmlFlags]
     |   vResult=schemaObjectOrFunctionTableReference
+    ;
+
+aiGenerateChunksTableReference returns [AIGenerateChunksTableReference vResult = null]
+{
+    ScalarExpression vSource;
+    Identifier vChunkType;
+}
+    :
+    {NextTokenMatches(CodeGenerationSupporter.AiGenerateChunks)}?
+    tFunc:Identifier
+    {
+        Match(tFunc, CodeGenerationSupporter.AiGenerateChunks);
+    }
+    LeftParenthesis
+        tSourceToken:Identifier
+        {
+            Match(tSourceToken, CodeGenerationSupporter.Source);
+        }
+        EqualsSign
+        vSource = expression
+        Comma
+        tChunkTypeToken:Identifier
+        {
+            Match(tChunkTypeToken, CodeGenerationSupporter.ChunkType);
+        }
+        EqualsSign
+        vChunkType = identifier
+        Comma
+        vResult = aiGenerateFixedChunksTableReference[vSource, vChunkType]
+    tRParen:RightParenthesis
+    {
+        if (vResult != null)
+        {
+            UpdateTokenInfo(vResult, tFunc);
+            UpdateTokenInfo(vResult, tRParen);
+        }
+    }
+    simpleTableReferenceAliasOpt[vResult]
+    ;
+
+aiGenerateFixedChunksTableReference [ScalarExpression vSource, Identifier vChunkType]
+    returns [AIGenerateFixedChunksTableReference vResult = FragmentFactory.CreateFragment<AIGenerateFixedChunksTableReference>()]
+{
+    Identifier vChunkSizeParam;
+    Identifier vOverlapParam = null;
+    Identifier vEnableChunkSetIdParam = null;
+
+    ScalarExpression vChunkSize = null;
+    ScalarExpression vOverlap = null;
+    ScalarExpression vEnableChunkSetId = null;
+}
+    :
+    {
+        Match(vChunkType, CodeGenerationSupporter.Fixed);
+        vResult.Source = vSource;
+        vResult.ChunkType = vChunkType;
+    }
+    vChunkSizeParam = identifier
+    {
+        Match(vChunkSizeParam, CodeGenerationSupporter.ChunkSize);
+    }
+    EqualsSign
+    vChunkSize = expression
+    {
+        vResult.ChunkSize = vChunkSize;
+    }
+
+    (
+        Comma
+        vOverlapParam = identifier
+        {
+            Match(vOverlapParam, CodeGenerationSupporter.Overlap);
+        }
+        EqualsSign
+        vOverlap = expression
+        {
+            vResult.Overlap = vOverlap;
+        }
+    )?
+
+    (
+        Comma
+        vEnableChunkSetIdParam = identifier
+        {
+            Match(vEnableChunkSetIdParam, CodeGenerationSupporter.EnableChunkSetId);
+        }
+        EqualsSign
+        vEnableChunkSetId = expression
+        {
+            vResult.EnableChunkSetId = vEnableChunkSetId;
+        }
+    )?
     ;
 
 predictTableReference[SubDmlFlags subDmlFlags] returns [PredictTableReference vResult]
@@ -20264,13 +20358,23 @@ schemaObjectTableDmlTarget [bool indexHintAllowed] returns [NamedTableReference 
         )?
     ;
 
-schemaObjectOrFunctionTableReference returns [TableReference vResult]
+schemaObjectOrFunctionTableReference returns [TableReference vResult = null]
 {
     SchemaObjectName vSchemaObjectName;
 }
     :
         vSchemaObjectName=schemaObjectFourPartName
         (
+           {
+                vSchemaObjectName.BaseIdentifier != null &&
+                vSchemaObjectName.BaseIdentifier.Value.Equals(CodeGenerationSupporter.AiGenerateChunks, StringComparison.OrdinalIgnoreCase) &&
+                vSchemaObjectName.BaseIdentifier.QuoteType == QuoteType.NotQuoted &&
+                LT(2).getText().Equals(CodeGenerationSupporter.Source, StringComparison.OrdinalIgnoreCase)
+            }?
+            {
+                vResult = aiGenerateChunksTableReference();
+            }
+            |
             {IsTableReference(false)}?
             vResult=schemaObjectTableReference[vSchemaObjectName]
             | vResult=schemaObjectFunctionTableReference[vSchemaObjectName]

@@ -14,7 +14,8 @@ namespace SqlStudio.Tests.UTSqlScriptDom
             new ParserTest170("VectorIndexTests170.sql", nErrors80: 2, nErrors90: 12, nErrors100: 12, nErrors110: 12, nErrors120: 12, nErrors130: 12, nErrors140: 12, nErrors150: 12, nErrors160: 12),
             new ParserTest170("AlterDatabaseManualCutoverTests170.sql", nErrors80: 4, nErrors90: 4, nErrors100: 4, nErrors110: 4, nErrors120: 4, nErrors130: 4, nErrors140: 4, nErrors150: 4, nErrors160: 4),
             new ParserTest170("CreateColumnStoreIndexTests170.sql", nErrors80: 3, nErrors90: 3, nErrors100: 3, nErrors110: 3, nErrors120: 3, nErrors130: 0, nErrors140: 0, nErrors150: 0, nErrors160: 0),
-            new ParserTest170("RegexpTests170.sql", nErrors80: 0, nErrors90: 0, nErrors100: 0, nErrors110: 0, nErrors120: 0, nErrors130: 0, nErrors140: 0, nErrors150: 0, nErrors160: 0)
+            new ParserTest170("RegexpTests170.sql", nErrors80: 0, nErrors90: 0, nErrors100: 0, nErrors110: 0, nErrors120: 0, nErrors130: 0, nErrors140: 0, nErrors150: 0, nErrors160: 0),
+            new ParserTest170("AiGenerateChunksTests170.sql", nErrors80: 21, nErrors90: 18, nErrors100: 17, nErrors110: 17, nErrors120: 17, nErrors130: 17, nErrors140: 17, nErrors150: 17, nErrors160: 17)
         };
 
         private static readonly ParserTest[] SqlAzure170_TestInfos =

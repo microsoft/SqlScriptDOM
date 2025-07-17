@@ -99,6 +99,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         internal const string Affinity = "AFFINITY";
         internal const string After = "AFTER";
         internal const string Aggregate = "AGGREGATE";
+        internal const string AiGenerateChunks = "AI_GENERATE_CHUNKS";
         internal const string Algorithm = "ALGORITHM";
         internal const string AlterColumn = "ALTERCOLUMN";
         internal const string All = "ALL";
@@ -198,6 +199,8 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         internal const string CheckPolicy = "CHECK_POLICY";
         internal const string Checksum = "CHECKSUM";
         internal const string ChecksumAgg = "CHECKSUM_AGG";
+        internal const string ChunkSize = "CHUNK_SIZE";
+        internal const string ChunkType = "CHUNK_TYPE";
         internal const string ModularSum = "MODULAR_SUM";
         internal const string Classifier = "CLASSIFIER";
         internal const string Classification = "CLASSIFICATION";
@@ -334,6 +337,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         internal const string Enable = "ENABLE";
         internal const string Enabled = "ENABLED";
         internal const string EnableBroker = "ENABLE_BROKER";
+        internal const string EnableChunkSetId = "ENABLE_CHUNK_SET_ID";
         internal const string EnclaveComputations = "ENCLAVE_COMPUTATIONS";
         internal const string Encoding = "ENCODING";
         internal const string Encrypted = "ENCRYPTED";
@@ -415,6 +419,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         internal const string FieldQuote = "FIELDQUOTE";
         internal const string FipsFlagger = "FIPS_FLAGGER";
         internal const string First = "FIRST";
+        internal const string Fixed = "FIXED";
         internal const string FlushIntervalSeconds = "FLUSH_INTERVAL_SECONDS";
         internal const string FlushIntervalSecondsAlt = "DATA_FLUSH_INTERVAL_SECONDS";
         internal const string Fn = "FN";
@@ -761,6 +766,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         internal const string Model = "MODEL";
         internal const string RunTime = "RUNTIME";
         internal const string Onnx = "ONNX";
+        internal const string Overlap = "OVERLAP";
 
         internal const string Process = "PROCESS";
         internal const string PropertySetGuid = "PROPERTY_SET_GUID";

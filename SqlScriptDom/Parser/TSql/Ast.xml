@@ -4713,4 +4713,15 @@
     <InheritedClass Name="DatabaseOption" />
     <Member Name="ElasticPoolName" Type="Identifier" Summary="The name of the elastic pool."/>
   </Class>
+  <Class Name="AIGenerateChunksTableReference" Base="TableReferenceWithAlias" Summary="Represents the AI_GENERATE_CHUNKS table-valued function call.">
+    <InheritedClass Name="TableReferenceWithAlias" />
+    <Member Name="Source" Type="ScalarExpression" Summary="The expression representing the input text or column to chunk." />
+    <Member Name="ChunkType" Type="Identifier" Summary="The chunking strategy, such as FIXED." />
+  </Class>
+  <Class Name="AIGenerateFixedChunksTableReference" Base="AIGenerateChunksTableReference" Summary="Represents a fixed-chunk configuration of AI_GENERATE_CHUNKS.">
+    <InheritedClass Name="AIGenerateChunksTableReference" />
+    <Member Name="ChunkSize" Type="ScalarExpression" Summary="The size of each generated chunk." />
+    <Member Name="Overlap" Type="ScalarExpression" Summary="Optional percentage of overlap between chunks." />
+    <Member Name="EnableChunkSetId" Type="ScalarExpression" Summary="Optional flag to include a chunk_set_id column in the result." />
+  </Class>
 </Types>
