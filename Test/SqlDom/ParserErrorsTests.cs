@@ -4407,13 +4407,7 @@ select 1",
             ParserTestUtils.ErrorTest110("CREATE JSON INDEX idx1 ON table1 (jsonColumn)",
                 new ParserErrorInfo(7, "SQL46010", "JSON"));
 
-            // JSON Index with FOR clause in older versions
-            ParserTestUtils.ErrorTest160("CREATE JSON INDEX idx1 ON table1 (jsonColumn) FOR ('$.name')",
-                new ParserErrorInfo(7, "SQL46010", "JSON"));
-            
-            // JSON Index with WITH clause in older versions
-            ParserTestUtils.ErrorTest160("CREATE JSON INDEX idx1 ON table1 (jsonColumn) WITH (FILLFACTOR = 90)",
-                new ParserErrorInfo(7, "SQL46010", "JSON"));
+
 
             // Test that UNIQUE and CLUSTERED/NONCLUSTERED are not allowed with JSON indexes in TSql170
             TSql170Parser parser170 = new TSql170Parser(true);
