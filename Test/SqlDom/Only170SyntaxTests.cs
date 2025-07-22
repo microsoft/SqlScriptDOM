@@ -10,7 +10,7 @@ namespace SqlStudio.Tests.UTSqlScriptDom
         private static readonly ParserTest[] Only170TestInfos =
         {
             new ParserTest170("RegexpTVFTests170.sql", nErrors80: 1, nErrors90: 1, nErrors100: 0, nErrors110: 0, nErrors120: 0, nErrors130: 0, nErrors140: 0, nErrors150: 0, nErrors160: 0),
-            new ParserTest170("JsonIndexTests170.sql", nErrors80: 1, nErrors90: 1, nErrors100: 1, nErrors110: 1, nErrors120: 1, nErrors130: 1, nErrors140: 1, nErrors150: 1, nErrors160: 1)
+            new ParserTest170("JsonIndexTests170.sql", nErrors80: 2, nErrors90: 10, nErrors100: 10, nErrors110: 10, nErrors120: 10, nErrors130: 10, nErrors140: 10, nErrors150: 10, nErrors160: 10)
         };
 
         private static readonly ParserTest[] SqlAzure170_TestInfos =
