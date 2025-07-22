@@ -1,0 +1,140 @@
+ANTLR Parser Generator   Version 2.7.5 (20050128)   1989-2005 jGuru.com
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:584: warning:nondeterminism between alts 4 and 29 of block upon
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:584:     k==1:Identifier
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:584:     k==2:"into"
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:304:5: warning:nondeterminism between alts 1 and 2 of block upon
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:304:5:     k==1:"with"
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:304:5:     k==2:LeftParenthesis
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:33392: warning:nondeterminism between alts 1 and 2 of block upon
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:33392:     k==1:Integer,Numeric,Real
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:33392:     k==2:RightParenthesis,Comma,Integer
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:26574:9: warning:nondeterminism between alts 2 and 3 of block upon
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:26574:9:     k==1:LeftParenthesis
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:26574:9:     k==2:Identifier,QuotedIdentifier
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:26574:9: warning:nondeterminism between alts 4 and 5 of block upon
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:26574:9:     k==1:"as"
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:26574:9:     k==2:Identifier
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:16824:17: warning:nondeterminism between alts 2 and 3 of block upon
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:16824:17:     k==1:Identifier
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:16824:17:     k==2:"index"
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:15924:9: warning:nondeterminism between alts 1 and 2 of block upon
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:15924:9:     k==1:"with"
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:15924:9:     k==2:LeftParenthesis
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:13862:9: warning:nondeterminism between alts 1 and 2 of block upon
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:13862:9:     k==1:"with"
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:13862:9:     k==2:LeftParenthesis
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:7544:9: warning:nondeterminism between alts 1 and 2 of block upon
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:7544:9:     k==1:Identifier
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:7544:9:     k==2:"by"
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:23440:9: warning:nondeterminism between alts 1 and 2 of block upon
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:23440:9:     k==1:"add"
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:23440:9:     k==2:Identifier
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:23446:9: warning:nondeterminism between alts 1 and 2 of block upon
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:23446:9:     k==1:"with"
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:23446:9:     k==2:LeftParenthesis
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:1722:9: warning:nondeterminism between alts 1 and 2 of block upon
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:1722:9:     k==1:Identifier
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:1722:9:     k==2:LeftParenthesis
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:2299:9: warning:nondeterminism between alts 1 and 2 of block upon
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:2299:9:     k==1:LeftParenthesis
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:2299:9:     k==2:Identifier
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:2403:9: warning:nondeterminism between alts 1 and 2 of block upon
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:2403:9:     k==1:LeftParenthesis
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:2403:9:     k==2:Identifier
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:3330:9: warning:nondeterminism between alts 1 and 2 of block upon
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:3330:9:     k==1:LeftParenthesis
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:3330:9:     k==2:Identifier
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:28923: warning:nondeterminism between alts 2 and 3 of block upon
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:28923:     k==1:Identifier
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:28923:     k==2:"not","null","rowguidcol",LeftParenthesis,Identifier,QuotedIdentifier
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:17133:21: warning:nondeterminism between alts 1 and 2 of block upon
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:17133:21:     k==1:"null"
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:17133:21:     k==2:EOF,"add","alter","and","backup","begin","break","bulk","check","checkpoint","close","commit","constraint","continue","create","dbcc","deallocate","declare","default","delete","deny","drop","else","end","exec","execute","fetch","foreign","goto","grant","identity","if","index","insert","kill","lineno","not","null","on","open","primary","print","raiserror","readtext","reconfigure","references","restore","return","revoke","rollback","rowguidcol","save","select","set","setuser","shutdown","truncate","unique","update","updatetext","use","waitfor","while","with","writetext",Revert,Merge,LeftParenthesis,RightParenthesis,Comma,Semicolon,Go,Label,Identifier
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:18212:9: warning:nondeterminism between alts 1 and 2 of block upon
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:18212:9:     k==1:"on"
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:18212:9:     k==2:Identifier,QuotedIdentifier
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:18249:9: warning:nondeterminism between alts 1 and 2 of block upon
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:18249:9:     k==1:Identifier
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:18249:9:     k==2:Identifier,QuotedIdentifier
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:19092:9: warning:nondeterminism between alts 1 and 2 of block upon
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:19092:9:     k==1:Identifier
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:19092:9:     k==2:EqualsSign
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:19117: warning:Syntactic predicate ignored for single alternative
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:20008:13: warning:nondeterminism between alts 1 and 2 of block upon
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:20008:13:     k==1:Identifier
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:20008:13:     k==2:"case","coalesce","convert","current_date","current_timestamp","current_user","identitycol","left","null","nullif","right","rowguidcol","session_user","system_user","user",TryConvert,LeftParenthesis,LeftCurly,Plus,Minus,Dot,Tilde,Integer,Numeric,Real,HexLiteral,Money,PseudoColumn,DollarPartition,AsciiStringLiteral,UnicodeStringLiteral,Identifier,QuotedIdentifier,Variable,OdbcInitiator
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:20246:9: warning:nondeterminism between alts 1 and 2 of block upon
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:20246:9:     k==1:LeftParenthesis
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:20246:9:     k==2:"holdlock","index",Identifier
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:20249:13: warning:nondeterminism between alts 1 and 2 of block upon
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:20249:13:     k==1:Identifier,QuotedIdentifier
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:20249:13:     k==2:EOF,"add","alter","backup","begin","break","bulk","checkpoint","close","commit","continue","create","cross","dbcc","deallocate","declare","delete","deny","drop","else","end","except","exec","execute","fetch","for","full","goto","grant","group","having","if","inner","insert","intersect","join","kill","left","lineno","on","open","option","order","outer","print","raiserror","readtext","reconfigure","restore","return","revoke","right","rollback","save","select","set","setuser","shutdown","truncate","union","update","updatetext","use","waitfor","where","while","with","writetext",Revert,Pivot,Unpivot,Merge,LeftParenthesis,RightParenthesis,RightCurly,Comma,Semicolon,Go,Label,Identifier,QuotedIdentifier
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:20282:13: warning:nondeterminism between alts 3 and 4 of block upon
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:20282:13:     k==1:LeftParenthesis
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:20282:13:     k==2:"holdlock","index",Identifier
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:20976:9: warning:nondeterminism between alts 1 and 2 of block upon
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:20976:9:     k==1:"with"
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:20976:9:     k==2:LeftParenthesis
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:20838:17: warning:nondeterminism between alts 1 and 2 of block upon
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:20838:17:     k==1:"with"
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:20838:17:     k==2:LeftParenthesis
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:20758:9: warning:nondeterminism between alts 1 and 2 of block upon
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:20758:9:     k==1:"with"
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:20758:9:     k==2:LeftParenthesis
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:23609:9: warning:nondeterminism between alts 1 and 2 of block upon
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:23609:9:     k==1:Identifier
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:23609:9:     k==2:"delete","insert","update"
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:23628:9: warning:nondeterminism between alts 1 and 2 of block upon
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:23628:9:     k==1:Identifier
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:23628:9:     k==2:"delete","insert","update"
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:26688:7: warning:Rule 'identifier' returns a value
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:27184: warning:nondeterminism upon
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:27184:     k==1:Comma
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:27184:     k==2:Identifier
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:27184:     between alt 1 and exit branch of block
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:28751:9: warning:nondeterminism between alts 1 and 2 of block upon
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:28751:9:     k==1:LeftParenthesis
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:28751:9:     k==2:Dot,PseudoColumn,Identifier,QuotedIdentifier
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:28852:9: warning:nondeterminism between alts 1 and 2 of block upon
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:28852:9:     k==1:"unique"
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:28852:9:     k==2:EOF,"add","alter","backup","begin","break","bulk","check","checkpoint","close","clustered","commit","constraint","continue","create","dbcc","deallocate","declare","default","delete","deny","drop","else","end","exec","execute","fetch","foreign","goto","grant","identity","if","index","insert","kill","lineno","nonclustered","not","null","on","open","primary","print","raiserror","readtext","reconfigure","references","restore","return","revoke","rollback","rowguidcol","save","select","set","setuser","shutdown","truncate","unique","update","updatetext","use","waitfor","where","while","with","writetext",Revert,Merge,LeftParenthesis,RightParenthesis,Comma,Semicolon,Go,Label,Identifier
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:29743:9: warning:nondeterminism between alts 1 and 2 of block upon
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:29743:9:     k==1:"not"
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:29743:9:     k==2:Identifier
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:29813:9: warning:nondeterminism between alts 2 and 3 of block upon
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:29813:9:     k==1:"nonclustered"
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:29813:9:     k==2:Identifier
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:29991:9: warning:nondeterminism between alts 1 and 2 of block upon
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:29991:9:     k==1:"not"
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:29991:9:     k==2:Identifier
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:30630:17: warning:nondeterminism between alts 1 and 2 of block upon
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:30630:17:     k==1:"null"
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:30630:17:     k==2:EOF,"add","alter","and","backup","begin","break","bulk","checkpoint","close","commit","continue","create","cross","dbcc","deallocate","declare","delete","deny","drop","else","end","except","exec","execute","fetch","for","full","goto","grant","group","having","if","inner","insert","intersect","join","kill","left","lineno","on","open","option","or","order","outer","print","raiserror","readtext","reconfigure","restore","return","revoke","right","rollback","save","select","set","setuser","shutdown","then","truncate","union","update","updatetext","use","waitfor","when","where","while","with","writetext",Revert,Pivot,Unpivot,Merge,LeftParenthesis,RightParenthesis,RightCurly,Comma,Semicolon,Go,Label,Identifier,QuotedIdentifier
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:30921:5: warning:nondeterminism between alts 1 and 2 of block upon
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:30921:5:     k==1:Identifier,QuotedIdentifier
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:30921:5:     k==2:LeftParenthesis
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:31369: warning:nondeterminism upon
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:31369:     k==1:Identifier
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:31369:     k==2:Identifier
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:31369:     between alt 7 and exit branch of block
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:31855:9: warning:nondeterminism between alts 1 and 2 of block upon
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:31855:9:     k==1:"null",Identifier
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:31855:9:     k==2:"collate","left","null","right","rowguidcol","select","when",PercentSign,Ampersand,LeftParenthesis,LeftCurly,Star,Plus,Minus,Dot,Divide,Colon,Circumflex,VerticalLine,LeftShift,RightShift,Concat,AsciiStringLiteral,UnicodeStringLiteral,Identifier,QuotedIdentifier
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:31954:9: warning:nondeterminism between alts 1 and 2 of block upon
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:31954:9:     k==1:Identifier
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:31954:9:     k==2:"order",RightParenthesis,Identifier
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:31960:9: warning:nondeterminism between alts 1 and 2 of block upon
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:31960:9:     k==1:Identifier
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:31960:9:     k==2:"by"
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:32046:9: warning:nondeterminism between alts 1 and 2 of block upon
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:32046:9:     k==1:Identifier
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:32046:9:     k==2:"order",RightParenthesis,Identifier
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:32052:9: warning:nondeterminism between alts 1 and 2 of block upon
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:32052:9:     k==1:Identifier
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:32052:9:     k==2:"by"
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:32219:9: warning:nondeterminism between alts 1 and 2 of block upon
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:32219:9:     k==1:"null",Identifier
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:32219:9:     k==2:"collate","left","null","right","rowguidcol","select","when",PercentSign,Ampersand,LeftParenthesis,RightParenthesis,LeftCurly,Star,Plus,Comma,Minus,Dot,Divide,Circumflex,VerticalLine,LeftShift,RightShift,Concat,AsciiStringLiteral,UnicodeStringLiteral,Identifier,QuotedIdentifier
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:32238:9: warning:nondeterminism between alts 1 and 2 of block upon
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:32238:9:     k==1:RightParenthesis
+/home/runner/work/SqlScriptDOM/SqlScriptDOM/SqlScriptDom/Parser/TSql/TSql170.g:32238:9:     k==2:EOF,"add","alter","and","as","asc","backup","begin","between","break","bulk","check","checkpoint","close","collate","commit","constraint","continue","create","cross","dbcc","deallocate","declare","default","delete","deny","desc","drop","else","end","escape","except","exec","execute","fetch","for","foreign","from","full","goto","grant","group","having","identity","if","in","index","inner","insert","intersect","into","is","join","kill","left","like","lineno","not","null","on","open","option","or","order","outer","percent","primary","print","raiserror","readtext","reconfigure","references","restore","return","revoke","right","rollback","rowguidcol","save","select","set","setuser","shutdown","then","to","truncate","union","unique","update","updatetext","use","values","waitfor","when","where","while","with","writetext",Revert,Pivot,Unpivot,Merge,Bang,PercentSign,Ampersand,LeftParenthesis,RightParenthesis,LeftCurly,RightCurly,Star,Plus,Comma,Minus,Dot,Divide,Colon,Semicolon,LessThan,EqualsSign,GreaterThan,Circumflex,VerticalLine,LeftShift,RightShift,Concat,Go,Label,AsciiStringLiteral,UnicodeStringLiteral,Identifier,QuotedIdentifier

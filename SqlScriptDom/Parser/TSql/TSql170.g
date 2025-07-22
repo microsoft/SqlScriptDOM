@@ -16824,6 +16824,7 @@ createIndexStatement returns [TSqlStatement vResult = null]
                 (
                     vResult=createRelationalIndexStatement[tUnique, isClustered]
                     | vResult=createColumnStoreIndexStatement[tUnique, isClustered]
+                    | vResult=createJsonIndexStatement[tUnique, isClustered]
                 )
             )
         |
@@ -16958,6 +16959,65 @@ createColumnStoreIndexStatement [IToken tUnique, bool? isClustered] returns [Cre
                 vResult.OnFileGroupOrPartitionScheme = vFileGroupOrPartitionScheme;
             }
         )?
+    ;
+
+createJsonIndexStatement [IToken tUnique, bool? isClustered] returns [CreateJsonIndexStatement vResult = FragmentFactory.CreateFragment<CreateJsonIndexStatement>()]
+{
+    Identifier vIdentifier;
+    SchemaObjectName vSchemaObjectName;
+    ColumnReferenceExpression vJsonColumn;
+    FileGroupOrPartitionScheme vFileGroupOrPartitionScheme;
+    StringLiteral vPath;
+    
+    if (tUnique != null)
+    {
+        ThrowIncorrectSyntaxErrorException(tUnique);
+    }
+    if (isClustered.HasValue)
+    {
+        ThrowIncorrectSyntaxErrorException(LT(1));
+    }
+}
+    : tJson:Identifier tIndex:Index vIdentifier=identifier
+    {
+        Match(tJson, CodeGenerationSupporter.Json);
+        vResult.Name = vIdentifier;
+    }
+    tOn:On vSchemaObjectName=schemaObjectThreePartName
+    {
+        vResult.OnName = vSchemaObjectName;
+    }
+    LeftParenthesis vJsonColumn=column tRParen:RightParenthesis
+    {
+        vResult.JsonColumn = vJsonColumn;
+        UpdateTokenInfo(vResult, tRParen);
+    }
+    (
+        tFor:For LeftParenthesis
+        vPath=stringLiteral
+        {
+            AddAndUpdateTokenInfo(vResult, vResult.JsonPaths, vPath);
+        }
+        (
+            Comma vPath=stringLiteral
+            {
+                AddAndUpdateTokenInfo(vResult, vResult.JsonPaths, vPath);
+            }
+        )*
+        RightParenthesis
+    )?
+    (
+        // Greedy due to conflict with withCommonTableExpressionsAndXmlNamespaces
+        options {greedy = true; } :
+        With
+        indexOptionList[IndexAffectingStatement.CreateIndex, vResult.IndexOptions, vResult]
+    )?
+    (
+        On vFileGroupOrPartitionScheme=filegroupOrPartitionScheme
+        {
+            vResult.OnFileGroupOrPartitionScheme = vFileGroupOrPartitionScheme;
+        }
+    )?
     ;
 
 indexKeyColumnList[CreateIndexStatement vParent]

@@ -4596,6 +4596,14 @@
     <Member Name="OnFileGroupOrPartitionScheme" Type="FileGroupOrPartitionScheme" Summary="The filegroup or partition scheme. Might be null."/>
     <Member Name="OrderedColumns" Type="ColumnReferenceExpression" Collection="true" Summary="The columns which ordered columnstore indexes should be ordered on." />
   </Class>
+  <Class Name="CreateJsonIndexStatement" Base="TSqlStatement" Summary="Represents the create JSON index statement.">
+    <Member Name="Name" Type="Identifier" Summary="The name of the index."/>
+    <Member Name="OnName" Type="SchemaObjectName" Summary="The table or view name that comes after the ON keyword."/>
+    <Member Name="JsonColumn" Type="ColumnReferenceExpression" Summary="The JSON column for the index."/>
+    <Member Name="JsonPaths" Type="StringLiteral" Collection="true" Summary="The JSON paths specified in the FOR clause. Optional may have zero elements."/>
+    <Member Name="IndexOptions" Type="IndexOption" Collection="true" Summary="The index options. Optional may have zero elements."/>
+    <Member Name="OnFileGroupOrPartitionScheme" Type="FileGroupOrPartitionScheme" Summary="The filegroup or partition scheme. Might be null."/>
+  </Class>
   <Class Name="WindowFrameClause" Summary="Represents the specification of window bounds for windowing aggregates.">
     <Member Name="Top" Type="WindowDelimiter" Summary="Top boundary of the window."/>
     <Member Name="Bottom" Type="WindowDelimiter" Summary="Bottom boundary of the window. Optional may be null."/>

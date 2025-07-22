@@ -9,7 +9,8 @@ namespace SqlStudio.Tests.UTSqlScriptDom
         // Note: These filenames are case sensitive, make sure they match the checked-in file exactly
         private static readonly ParserTest[] Only170TestInfos =
         {
-            new ParserTest170("RegexpTVFTests170.sql", nErrors80: 1, nErrors90: 1, nErrors100: 0, nErrors110: 0, nErrors120: 0, nErrors130: 0, nErrors140: 0, nErrors150: 0, nErrors160: 0)
+            new ParserTest170("RegexpTVFTests170.sql", nErrors80: 1, nErrors90: 1, nErrors100: 0, nErrors110: 0, nErrors120: 0, nErrors130: 0, nErrors140: 0, nErrors150: 0, nErrors160: 0),
+            new ParserTest170("JsonIndexTests170.sql", nErrors80: 1, nErrors90: 1, nErrors100: 1, nErrors110: 1, nErrors120: 1, nErrors130: 1, nErrors140: 1, nErrors150: 1, nErrors160: 1)
         };
 
         private static readonly ParserTest[] SqlAzure170_TestInfos =
