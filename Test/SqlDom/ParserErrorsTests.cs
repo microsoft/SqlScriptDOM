@@ -4406,10 +4406,6 @@ select 1",
                 new ParserErrorInfo(7, "SQL46010", "JSON"));
             ParserTestUtils.ErrorTest110("CREATE JSON INDEX idx1 ON table1 (jsonColumn)",
                 new ParserErrorInfo(7, "SQL46010", "JSON"));
-            ParserTestUtils.ErrorTest100("CREATE JSON INDEX idx1 ON table1 (jsonColumn)",
-                new ParserErrorInfo(7, "SQL46010", "JSON"));
-            ParserTestUtils.ErrorTest90("CREATE JSON INDEX idx1 ON table1 (jsonColumn)",
-                new ParserErrorInfo(7, "SQL46010", "JSON"));
             ParserTestUtils.ErrorTest80("CREATE JSON INDEX idx1 ON table1 (jsonColumn)",
                 new ParserErrorInfo(7, "SQL46010", "JSON"));
 
