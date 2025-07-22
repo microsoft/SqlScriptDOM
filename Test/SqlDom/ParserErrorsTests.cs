@@ -4416,11 +4416,11 @@ select 1",
             // Test that UNIQUE and CLUSTERED/NONCLUSTERED are not allowed with JSON indexes in TSql170
             TSql170Parser parser170 = new TSql170Parser(true);
             ParserTestUtils.ErrorTest(parser170, "CREATE UNIQUE JSON INDEX idx1 ON table1 (jsonColumn)",
-                new ParserErrorInfo(25, "SQL46010", "INDEX"));
+                new ParserErrorInfo(19, "SQL46010", "INDEX"));
             ParserTestUtils.ErrorTest(parser170, "CREATE CLUSTERED JSON INDEX idx1 ON table1 (jsonColumn)",
-                new ParserErrorInfo(28, "SQL46010", "INDEX"));
+                new ParserErrorInfo(22, "SQL46010", "INDEX"));
             ParserTestUtils.ErrorTest(parser170, "CREATE NONCLUSTERED JSON INDEX idx1 ON table1 (jsonColumn)",
-                new ParserErrorInfo(32, "SQL46010", "INDEX"));
+                new ParserErrorInfo(26, "SQL46010", "INDEX"));
 
             // Test malformed JSON Index syntax in TSql170
             // Missing column specification
@@ -4429,11 +4429,11 @@ select 1",
             
             // Empty FOR clause
             ParserTestUtils.ErrorTest(parser170, "CREATE JSON INDEX idx1 ON table1 (jsonColumn) FOR ()",
-                new ParserErrorInfo(55, "SQL46029"));
+                new ParserErrorInfo(51, "SQL46029"));
             
             // Invalid JSON path (missing quotes)
             ParserTestUtils.ErrorTest(parser170, "CREATE JSON INDEX idx1 ON table1 (jsonColumn) FOR ($.name)",
-                new ParserErrorInfo(55, "SQL46010", "$"));
+                new ParserErrorInfo(51, "SQL46010", "$"));
 
             // Missing table name
             ParserTestUtils.ErrorTest(parser170, "CREATE JSON INDEX idx1 ON (jsonColumn)",
