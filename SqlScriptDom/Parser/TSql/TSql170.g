@@ -884,6 +884,9 @@ create2005Statements returns [TSqlStatement vResult = null]
             {NextTokenMatches(CodeGenerationSupporter.ColumnStore)}?
             vResult=createColumnStoreIndexStatement[null, null]
         |
+            {NextTokenMatches(CodeGenerationSupporter.Json)}?
+            vResult=createJsonIndexStatement[null, null]
+        |
             {NextTokenMatches(CodeGenerationSupporter.Contract)}?
             vResult=createContractStatement
         |
