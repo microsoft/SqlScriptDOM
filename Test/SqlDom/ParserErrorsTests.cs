@@ -3524,9 +3524,17 @@ select 1",
                 new ParserErrorInfo(39, "SQL46010", "not"));
 
             // Column identity constraint
-            ParserTestUtils.ErrorTestAllParsers("declare @v1 table (c1 int identity(1,1) not for replication)",
+            ParserTestUtils.ErrorTestAllParsersUntil150("declare @v1 table (c1 int identity(1,1) not for replication)",
                 new ParserErrorInfo(40, "SQL46010", "not"));
-            ParserTestUtils.ErrorTestAllParsers("create function f1() returns @v1 table (c1 int identity(1,1) not for replication) begin return end",
+            ParserTestUtils.ErrorTest160("declare @v1 table (c1 int identity(1,1) not for replication)",
+                new ParserErrorInfo(40, "SQL46010", "not"));
+            ParserTestUtils.ErrorTest170("declare @v1 table (c1 int identity(1,1) not for replication)",
+                new ParserErrorInfo(40, "SQL46010", "not"));
+            ParserTestUtils.ErrorTestAllParsersUntil150("create function f1() returns @v1 table (c1 int identity(1,1) not for replication) begin return end",
+                new ParserErrorInfo(61, "SQL46010", "not"));
+            ParserTestUtils.ErrorTest160("create function f1() returns @v1 table (c1 int identity(1,1) not for replication) begin return end",
+                new ParserErrorInfo(61, "SQL46010", "not"));
+            ParserTestUtils.ErrorTest170("create function f1() returns @v1 table (c1 int identity(1,1) not for replication) begin return end",
                 new ParserErrorInfo(61, "SQL46010", "not"));
             ParserTestUtils.ErrorTest100("create type t1 as table (c1 int identity(1,1) not for replication)",
                 new ParserErrorInfo(46, "SQL46010", "not"));
@@ -6902,7 +6910,6 @@ WHEN NOT MATCHED BY SOURCE THEN DELETE OUTPUT inserted.*, deleted.*;";
                                                 RETURN @first + ' ' + @last
                                             END;";
             ParserTestUtils.ErrorTestFabricDW(scalarFunctionSyntax2, new ParserErrorInfo(scalarFunctionSyntax2.IndexOf("INLINE"), "SQL46010", "INLINE"));
-            
             string scalarFunctionSyntax3 = @"CREATE OR ALTER FUNCTION dbo.CountProducts
                                             (
                                                 @ProductTable AS dbo.ProductType READONLY
@@ -6931,6 +6938,29 @@ WHEN NOT MATCHED BY SOURCE THEN DELETE OUTPUT inserted.*, deleted.*;";
                                                 )
                                             END;";
             ParserTestUtils.ErrorTestFabricDW(scalarFunctionSyntax4, new ParserErrorInfo(scalarFunctionSyntax4.IndexOf("NULL"), "SQL46010", "NULL"));
+        }
+
+        /// <summary>
+        /// Negative tests for Scalar Functions in Fabric DW.
+        /// </summary>
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void IdentityColumnNegativeTestsFabricDW()
+        {
+            string identityColumnSyntax = @"CREATE TABLE TestTable1 (
+                                                ID INT IDENTITY(1,1),
+                                                Name VARCHAR(50)
+                                            );
+                                            ";
+            ParserTestUtils.ErrorTestFabricDW(identityColumnSyntax, new ParserErrorInfo(identityColumnSyntax.IndexOf("IDENTITY(") + 8, "SQL46010", "("));
+
+            string identityColumnSyntax2 = @"CREATE TABLE TestTable2 (
+                                                RecordID BIGINT IDENTITY(100,5),
+                                                Description NVARCHAR(200)
+                                            );
+                                            ";
+            ParserTestUtils.ErrorTestFabricDW(identityColumnSyntax2, new ParserErrorInfo(identityColumnSyntax2.IndexOf("IDENTITY(") + 8, "SQL46010", "("));
         }
     }
 }

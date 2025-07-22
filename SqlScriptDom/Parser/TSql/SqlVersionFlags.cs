@@ -35,6 +35,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         TSql140AndAbove = TSql140 | TSql150 | TSql160 | TSqlFabricDW | TSql170,
         TSql150AndAbove = TSql150 | TSql160 | TSqlFabricDW | TSql170,
         TSql160AndAbove = TSql160 | TSqlFabricDW | TSql170,
+        TSql170AndAbove = TSql170,
         TSqlFabricDWAndAbove = TSql160 | TSqlFabricDW | TSql170,
         TSqlUnder110 = TSql80 | TSql90 | TSql100,
         TSqlUnder120 = TSql80 | TSql90 | TSql100 | TSql110,

@@ -10,10 +10,11 @@ namespace SqlStudio.Tests.UTSqlScriptDom
         private static readonly ParserTest[] OnlyFabricDWTestInfos =
         {
             new ParserTestFabricDW("CloneTableTestsFabricDW.sql", nErrors80: 4, nErrors90: 4, nErrors100: 4, nErrors110: 4, nErrors120: 4, nErrors130: 4, nErrors140: 4, nErrors150: 4, nErrors160: 4, nErrors170: 4),
-            new ParserTestFabricDW("CreateProcedureCloneTableTestsFabricDW.sql", nErrors80: 4, nErrors90: 4, nErrors100: 4, nErrors110: 4, nErrors120: 4, nErrors130: 4, nErrors140: 4, nErrors150: 4, nErrors160: 4, nErrors170: 4),
-            new ParserTestFabricDW("ScalarFunctionTestsFabricDW.sql", nErrors80: 3, nErrors90: 2, nErrors100: 2, nErrors110: 2, nErrors120: 2, nErrors130: 0, nErrors140: 0, nErrors150: 0, nErrors160: 0, nErrors170: 0),
             new ParserTestFabricDW("CreateAlterTableClusterByTestsFabricDW.sql", nErrors80: 6, nErrors90: 6, nErrors100: 6, nErrors110: 6, nErrors120: 6, nErrors130: 6, nErrors140: 6, nErrors150: 6, nErrors160: 6, nErrors170: 6),
             new ParserTestFabricDW("CreateExternalTableStatementTestsFabricDW.sql", nErrors80: 2, nErrors90: 2, nErrors100: 2, nErrors110: 2, nErrors120: 2, nErrors130: 2, nErrors140: 2, nErrors150: 2, nErrors160: 0, nErrors170: 0),
+            new ParserTestFabricDW("CreateProcedureCloneTableTestsFabricDW.sql", nErrors80: 4, nErrors90: 4, nErrors100: 4, nErrors110: 4, nErrors120: 4, nErrors130: 4, nErrors140: 4, nErrors150: 4, nErrors160: 4, nErrors170: 4),
+            new ParserTestFabricDW("IdentityColumnTestsFabricDW.sql", nErrors80: 0, nErrors90: 0, nErrors100: 0, nErrors110: 0, nErrors120: 0, nErrors130: 0, nErrors140: 0, nErrors150: 0, nErrors160: 0, nErrors170: 0),
+            new ParserTestFabricDW("ScalarFunctionTestsFabricDW.sql", nErrors80: 3, nErrors90: 2, nErrors100: 2, nErrors110: 2, nErrors120: 2, nErrors130: 0, nErrors140: 0, nErrors150: 0, nErrors160: 0, nErrors170: 0)
         };
 
         [TestMethod]

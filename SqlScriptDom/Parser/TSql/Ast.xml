@@ -2404,6 +2404,7 @@
     <InheritedClass Name="AlterDatabaseStatement" />
     <Member Name="Termination" Type="AlterDatabaseTermination" Summary="Optional termination options"/>
     <Member Name="Options" Type="DatabaseOption" Collection="true" Summary="Options specified in this statement"/>
+    <Member Name="WithManualCutover" Type="bool" Summary="True if WITH MANUAL_CUTOVER is specified in the ALTER DATABASE MODIFY statement."/>
   </Class>
   <Class Name="DatabaseOption" Summary="Single option in ALTER DATABASE statement, SET case">
     <Member Name="OptionKind" Type="DatabaseOptionKind" GenerateUpdatePositionInfoCall="false" Summary="The option kind."/>
@@ -2575,6 +2576,9 @@
     <InheritedClass Name="DatabaseOption"/>
     <Member Name="MaxSize" Type="Literal" Summary="The maximum size."/>
     <Member Name="Units" Type="MemoryUnit" GenerateUpdatePositionInfoCall="false" Summary="Measurement units for size. Only GB is valid."/>
+  </Class>
+  <Class Name="AlterDatabasePerformCutoverStatement" Base="AlterDatabaseStatement" Summary="Represents ALTER DATABASE ... PERFORM_CUTOVER statement for Azure.">
+    <InheritedClass Name="AlterDatabaseStatement"/>
   </Class>
   <Interface Name="ICollationSetter">
     <Member Name="Collation" Type="Identifier" Summary="Collation identifier"  />

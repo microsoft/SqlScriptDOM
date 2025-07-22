@@ -32,6 +32,10 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
 
             // 140 Options
             AddOptionMapping(DatabaseOptionKind.AutomaticTuning, CodeGenerationSupporter.AutomaticTuning, SqlVersionFlags.TSql140AndAbove);
+
+            // 170 Options
+            AddOptionMapping(DatabaseOptionKind.ManualCutover, CodeGenerationSupporter.ManualCutover, SqlVersionFlags.TSql170AndAbove);
+            AddOptionMapping(DatabaseOptionKind.PerformCutover, CodeGenerationSupporter.PerformCutover, SqlVersionFlags.TSql170AndAbove);
         }
 
         internal static readonly DatabaseOptionKindHelper Instance = new DatabaseOptionKindHelper();

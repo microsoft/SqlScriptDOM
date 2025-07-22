@@ -7,6 +7,8 @@
 using Microsoft.SqlServer.TransactSql.ScriptDom;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SqlStudio.Tests.AssemblyTools.TestCategory;
+using System;
+using System.Collections.Generic;
 
 namespace SqlStudio.Tests.UTSqlScriptDom
 {
@@ -238,8 +240,23 @@ namespace SqlStudio.Tests.UTSqlScriptDom
             TSqlFabricDWParser parser = new TSqlFabricDWParser(true);
             SqlScriptGenerator scriptGen = ParserTestUtils.CreateScriptGen(SqlVersion.SqlFabricDW);
 
+            // Some syntaxes that are not supported in Fabric DW
+            var skippedTests = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+            {
+                "ColumnDefinitionTests.sql",
+                "IntegerTests.sql",
+                "TSqlParserTestScript1.sql",
+                "TSqlParserTestScript2.sql",
+                "ExpressionTests.sql"
+            };
+
             foreach (ParserTest ti in CommonTestInfos)
             {
+                if (skippedTests.Contains(ti._scriptFilename))
+                {
+                    continue; // Skip tests that are not applicable to Fabric DW
+                }
+
                 ParserTest.ParseAndVerify(parser, scriptGen, ti._scriptFilename, ti._resultFabricDW);
             }
         }
