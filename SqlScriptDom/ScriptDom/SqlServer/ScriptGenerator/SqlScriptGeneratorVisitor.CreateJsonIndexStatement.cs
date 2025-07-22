@@ -35,12 +35,12 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
             }
 
             // FOR clause with JSON paths
-            if (node.JsonPaths != null && node.JsonPaths.Count > 0)
+            if (node.ForJsonPaths != null && node.ForJsonPaths.Count > 0)
             {
                 NewLineAndIndent();
                 GenerateKeyword(TSqlTokenType.For);
                 GenerateSpace();
-                GenerateParenthesisedCommaSeparatedList(node.JsonPaths);
+                GenerateParenthesisedCommaSeparatedList(node.ForJsonPaths);
             }
 
             GenerateIndexOptions(node.IndexOptions);

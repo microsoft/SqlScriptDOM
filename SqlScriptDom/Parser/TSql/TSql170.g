@@ -16999,12 +16999,12 @@ createJsonIndexStatement [IToken tUnique, bool? isClustered] returns [CreateJson
         tFor:For LeftParenthesis
         vPath=stringLiteral
         {
-            AddAndUpdateTokenInfo(vResult, vResult.JsonPaths, vPath);
+            AddAndUpdateTokenInfo(vResult, vResult.ForJsonPaths, vPath);
         }
         (
             Comma vPath=stringLiteral
             {
-                AddAndUpdateTokenInfo(vResult, vResult.JsonPaths, vPath);
+                AddAndUpdateTokenInfo(vResult, vResult.ForJsonPaths, vPath);
             }
         )*
         RightParenthesis
