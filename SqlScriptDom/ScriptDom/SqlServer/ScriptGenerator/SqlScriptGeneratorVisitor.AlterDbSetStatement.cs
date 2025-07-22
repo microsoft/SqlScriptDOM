@@ -15,9 +15,11 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
 
             NewLineAndIndent();
             bool azureOnlyOption = true;
-            foreach(DatabaseOption option in node.Options)
+            foreach (DatabaseOption option in node.Options)
             {
-                if (option.OptionKind != DatabaseOptionKind.MaxSize && option.OptionKind != DatabaseOptionKind.Edition && option.OptionKind != DatabaseOptionKind.ServiceObjective)
+                if (option.OptionKind != DatabaseOptionKind.MaxSize &&
+                    option.OptionKind != DatabaseOptionKind.Edition &&
+                    option.OptionKind != DatabaseOptionKind.ServiceObjective)
                 {
                     azureOnlyOption = false;
                     break;
@@ -31,6 +33,13 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
                 MarkAndPushAlignmentPoint(items);
                 GenerateParenthesisedCommaSeparatedList(node.Options, true);
                 PopAlignmentPoint();
+
+                // Emit "WITH MANUAL_CUTOVER" if the statement includes the optional manual cutover clause
+                if (node.WithManualCutover)
+                {
+                    GenerateSpaceAndKeyword(TSqlTokenType.With);
+                    GenerateSpaceAndIdentifier(CodeGenerationSupporter.ManualCutover);
+                }
             }
             else
             {

@@ -2896,6 +2896,7 @@ alterDatabase [IToken tAlter] returns [AlterDatabaseStatement vResult = null]
         | vResult = alterDbSet
         | vResult = alterDbCollate
         | vResult = alterDbRebuild // Undocumented - for PSS only
+        | vResult = alterDbPerformCutover
         )
         {
             if(vUseCurrent)
@@ -3057,8 +3058,19 @@ alterDbModify returns [AlterDatabaseStatement vResult = null]
     ;
 
 alterDbModifyAzureOptions returns [AlterDatabaseSetStatement vResult = FragmentFactory.CreateFragment<AlterDatabaseSetStatement>()]
+{
+    bool hasManualCutover = false;
+}
     :
         azureOptions[vResult, vResult.Options]
+        (
+            With tManualCutover:Identifier
+            {
+                Match(tManualCutover, CodeGenerationSupporter.ManualCutover);
+                hasManualCutover = true;
+                vResult.WithManualCutover = true;
+            }
+        )?
     ;
 
 // MODIFY File syntax
@@ -3140,6 +3152,14 @@ toFilegroup returns [Identifier vResult]
     : To tFilegroup:Identifier vResult = identifier
         {
             Match(tFilegroup,CodeGenerationSupporter.Filegroup);
+        }
+    ;
+
+alterDbPerformCutover returns [AlterDatabasePerformCutoverStatement vResult = FragmentFactory.CreateFragment<AlterDatabasePerformCutoverStatement>()]
+    : tPerformCutover:Identifier
+        {
+            Match(tPerformCutover, CodeGenerationSupporter.PerformCutover);
+            UpdateTokenInfo(vResult, tPerformCutover);
         }
     ;
 
