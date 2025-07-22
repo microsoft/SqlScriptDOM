@@ -4420,11 +4420,11 @@ select 1",
             // Test that UNIQUE and CLUSTERED/NONCLUSTERED are not allowed with JSON indexes in TSql170
             TSql170Parser parser170 = new TSql170Parser(true);
             ParserTestUtils.ErrorTest(parser170, "CREATE UNIQUE JSON INDEX idx1 ON table1 (jsonColumn)",
-                new ParserErrorInfo(19, "SQL46010", "INDEX"));
+                new ParserErrorInfo(14, "SQL46010", "JSON"));
             ParserTestUtils.ErrorTest(parser170, "CREATE CLUSTERED JSON INDEX idx1 ON table1 (jsonColumn)",
-                new ParserErrorInfo(22, "SQL46010", "INDEX"));
+                new ParserErrorInfo(17, "SQL46010", "JSON"));
             ParserTestUtils.ErrorTest(parser170, "CREATE NONCLUSTERED JSON INDEX idx1 ON table1 (jsonColumn)",
-                new ParserErrorInfo(26, "SQL46010", "INDEX"));
+                new ParserErrorInfo(20, "SQL46010", "JSON"));
 
             // Test malformed JSON Index syntax in TSql170
             // Missing column specification
