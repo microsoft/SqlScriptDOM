@@ -16988,7 +16988,7 @@ createJsonIndexStatement [IToken tUnique, bool? isClustered] returns [CreateJson
 {
     Identifier vIdentifier;
     SchemaObjectName vSchemaObjectName;
-    ColumnReferenceExpression vJsonColumn;
+    Identifier vJsonColumn;
     FileGroupOrPartitionScheme vFileGroupOrPartitionScheme;
     StringLiteral vPath;
     
@@ -17010,7 +17010,7 @@ createJsonIndexStatement [IToken tUnique, bool? isClustered] returns [CreateJson
     {
         vResult.OnName = vSchemaObjectName;
     }
-    LeftParenthesis vJsonColumn=column tRParen:RightParenthesis
+    LeftParenthesis vJsonColumn=identifier tRParen:RightParenthesis
     {
         vResult.JsonColumn = vJsonColumn;
         UpdateTokenInfo(vResult, tRParen);
