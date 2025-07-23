@@ -4414,9 +4414,9 @@ select 1",
             ParserTestUtils.ErrorTest(parser170, "CREATE UNIQUE JSON INDEX idx1 ON table1 (jsonColumn)",
                 new ParserErrorInfo(14, "SQL46010", "JSON"));
             ParserTestUtils.ErrorTest(parser170, "CREATE CLUSTERED JSON INDEX idx1 ON table1 (jsonColumn)",
-                new ParserErrorInfo(17, "SQL46010", "JSON"));
+                new ParserErrorInfo(17, "SQL46005", "COLUMNSTORE", "JSON"));
             ParserTestUtils.ErrorTest(parser170, "CREATE NONCLUSTERED JSON INDEX idx1 ON table1 (jsonColumn)",
-                new ParserErrorInfo(20, "SQL46010", "JSON"));
+                new ParserErrorInfo(20, "SQL46005", "COLUMNSTORE", "JSON"));
 
             // Test malformed JSON Index syntax in TSql170
             // Missing column specification
@@ -4425,7 +4425,7 @@ select 1",
             
             // Empty FOR clause
             ParserTestUtils.ErrorTest(parser170, "CREATE JSON INDEX idx1 ON table1 (jsonColumn) FOR ()",
-                new ParserErrorInfo(51, "SQL46029"));
+                new ParserErrorInfo(51, "SQL46010", ")"));
             
             // Invalid JSON path (missing quotes)
             ParserTestUtils.ErrorTest(parser170, "CREATE JSON INDEX idx1 ON table1 (jsonColumn) FOR ($.name)",
