@@ -357,3 +357,6 @@ out/
 
 # Project packages folder
 .packages/
+
+# Temporary build artifacts
+tmp/
