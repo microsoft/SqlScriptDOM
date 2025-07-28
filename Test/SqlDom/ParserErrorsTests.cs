@@ -504,6 +504,51 @@ WITH
         }
 
         /// <summary>
+        /// Negative tests for JSON_OBJECTAGG syntax in functions
+        /// </summary>
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void JsonObjectAGGSyntaxNegativeTest()
+        {
+            // Incorrect key value parameter number
+            ParserTestUtils.ErrorTest170("SELECT JSON_OBJECTAGG('name':'value', 'type':1)",
+               new ParserErrorInfo(36, "SQL46010", ","));
+
+            // No closing quotation mark
+            ParserTestUtils.ErrorTest170("SELECT JSON_OBJECTAGG('name':'value)",
+               new ParserErrorInfo(29, "SQL46030", "'value)"));
+
+            // Incorrect placing of colon
+            ParserTestUtils.ErrorTest170("SELECT JSON_OBJECTAGG('name':'value''type':1)",
+               new ParserErrorInfo(42, "SQL46010", ":"));
+
+            // cannot use expression without colon
+            ParserTestUtils.ErrorTest170("SELECT JSON_OBJECTAGG('name')",
+                new ParserErrorInfo(22, "SQL46010", "'name'"));
+
+            // cannot use expression without colon
+            ParserTestUtils.ErrorTest170("SELECT JSON_OBJECTAGG('name' ABSENT ON NULL)",
+               new ParserErrorInfo(29, "SQL46010", "ABSENT"));
+
+            // Cannot use empty value
+            ParserTestUtils.ErrorTest170("SELECT JSON_OBJECTAGG('name':)",
+               new ParserErrorInfo(29, "SQL46010", ")"));
+
+            // Cannot use incomplete absent on null clause cases
+            ParserTestUtils.ErrorTest170("SELECT JSON_OBJECTAGG('name':NULL ABSENT ON)",
+                new ParserErrorInfo(43, "SQL46010", ")"));
+
+            // Cannot use Incomplete RETURNING clause
+            ParserTestUtils.ErrorTest170("SELECT JSON_OBJECTAGG('name':NULL RETURNING ON)",
+                    new ParserErrorInfo(46, "SQL46010", ")"));
+
+            // Cannot use anything other than JSON in RETURNING clause
+            ParserTestUtils.ErrorTest170("SELECT JSON_OBJECTAGG('name':NULL RETURNING INT)",
+                    new ParserErrorInfo(44, "SQL46005", "JSON", "INT"));
+        }
+
+        /// <summary>
         /// Negative tests for Data Masking Alter Column syntax.
         /// </summary>
         [TestMethod]

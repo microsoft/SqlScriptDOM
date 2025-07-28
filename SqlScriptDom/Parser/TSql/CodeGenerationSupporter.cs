@@ -519,6 +519,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         internal const string Json = "JSON";
         internal const string JsonArray = "JSON_ARRAY";
         internal const string JsonObject = "JSON_OBJECT";
+        internal const string JsonObjectAgg = "JSON_OBJECTAGG";
         internal const string Keep = "KEEP";
         internal const string KeepDefaults = "KEEPDEFAULTS";
         internal const string KeepFixed = "KEEPFIXED";
@@ -848,6 +849,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         internal const string RetentionDays = "RETENTION_DAYS";
         internal const string RetentionPeriod = "RETENTION_PERIOD";
         internal const string Returns = "RETURNS";
+        internal const string Returning = "RETURNING";
         internal const string RequestMaxCpuTimeSec = "REQUEST_MAX_CPU_TIME_SEC";
         internal const string RequestMaxMemoryGrantPercent = "REQUEST_MAX_MEMORY_GRANT_PERCENT";
         internal const string RequestMemoryGrantTimeoutSec = "REQUEST_MEMORY_GRANT_TIMEOUT_SEC";
