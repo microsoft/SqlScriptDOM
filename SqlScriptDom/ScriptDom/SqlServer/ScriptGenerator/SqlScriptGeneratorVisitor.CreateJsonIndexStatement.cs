@@ -44,14 +44,6 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
             }
 
             GenerateIndexOptions(node.IndexOptions);
-
-            if (node.OnFileGroupOrPartitionScheme != null)
-            {
-                NewLineAndIndent();
-                GenerateKeyword(TSqlTokenType.On);
-
-                GenerateSpaceAndFragmentIfNotNull(node.OnFileGroupOrPartitionScheme);
-            }
         }
     }
 }

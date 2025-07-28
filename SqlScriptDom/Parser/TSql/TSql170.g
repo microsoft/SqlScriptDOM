@@ -16989,7 +16989,6 @@ createJsonIndexStatement [IToken tUnique, bool? isClustered] returns [CreateJson
     Identifier vIdentifier;
     SchemaObjectName vSchemaObjectName;
     Identifier vJsonColumn;
-    FileGroupOrPartitionScheme vFileGroupOrPartitionScheme;
     StringLiteral vPath;
     
     if (tUnique != null)
@@ -17034,12 +17033,6 @@ createJsonIndexStatement [IToken tUnique, bool? isClustered] returns [CreateJson
         options {greedy = true; } :
         With
         indexOptionList[IndexAffectingStatement.CreateIndex, vResult.IndexOptions, vResult]
-    )?
-    (
-        On vFileGroupOrPartitionScheme=filegroupOrPartitionScheme
-        {
-            vResult.OnFileGroupOrPartitionScheme = vFileGroupOrPartitionScheme;
-        }
     )?
     ;
 

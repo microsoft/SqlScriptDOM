@@ -18,16 +18,6 @@ CREATE JSON INDEX IX_JSON_Complete ON dbo.Users (JsonData)
 FOR ('$.profile.name', '$.profile.email')
 WITH (MAXDOP = 4, DATA_COMPRESSION = ROW);
 
--- JSON index with ON filegroup
-CREATE JSON INDEX IX_JSON_Filegroup ON dbo.Users (JsonData)
-ON [PRIMARY];
-
--- JSON index with FOR clause, WITH options, and ON filegroup
-CREATE JSON INDEX IX_JSON_Full ON dbo.Users (JsonData)
-FOR ('$.orders[*].amount', '$.orders[*].date')
-WITH (DROP_EXISTING = OFF, ALLOW_ROW_LOCKS = ON)
-ON [JsonIndexes];
-
 -- JSON index on schema-qualified table
 CREATE JSON INDEX IX_JSON_Schema ON MySchema.MyTable (JsonColumn)
 FOR ('$.properties.value');
