@@ -4385,6 +4385,58 @@ select 1",
         }
 
         /// <summary>
+        /// JSON Index error tests - ensure JSON Index syntax is rejected in older versions and malformed syntax produces appropriate errors
+        /// </summary>
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void CreateJsonIndexStatementErrorTest()
+        {
+            // JSON Index syntax should not be supported in SQL Server versions prior to 2025 (TSql170)
+            // Test basic JSON Index syntax in older versions
+            ParserTestUtils.ErrorTest160("CREATE JSON INDEX idx1 ON table1 (jsonColumn)",
+                new ParserErrorInfo(7, "SQL46010", "JSON"));
+            ParserTestUtils.ErrorTest150("CREATE JSON INDEX idx1 ON table1 (jsonColumn)",
+                new ParserErrorInfo(7, "SQL46010", "JSON"));
+            ParserTestUtils.ErrorTest140("CREATE JSON INDEX idx1 ON table1 (jsonColumn)",
+                new ParserErrorInfo(7, "SQL46010", "JSON"));
+            ParserTestUtils.ErrorTest130("CREATE JSON INDEX idx1 ON table1 (jsonColumn)",
+                new ParserErrorInfo(7, "SQL46010", "JSON"));
+            ParserTestUtils.ErrorTest120("CREATE JSON INDEX idx1 ON table1 (jsonColumn)",
+                new ParserErrorInfo(7, "SQL46010", "JSON"));
+            ParserTestUtils.ErrorTest110("CREATE JSON INDEX idx1 ON table1 (jsonColumn)",
+                new ParserErrorInfo(7, "SQL46010", "JSON"));
+
+
+
+            // Test that UNIQUE and CLUSTERED/NONCLUSTERED are not allowed with JSON indexes in TSql170
+            TSql170Parser parser170 = new TSql170Parser(true);
+            ParserTestUtils.ErrorTest(parser170, "CREATE UNIQUE JSON INDEX idx1 ON table1 (jsonColumn)",
+                new ParserErrorInfo(14, "SQL46010", "JSON"));
+            ParserTestUtils.ErrorTest(parser170, "CREATE CLUSTERED JSON INDEX idx1 ON table1 (jsonColumn)",
+                new ParserErrorInfo(17, "SQL46005", "COLUMNSTORE", "JSON"));
+            ParserTestUtils.ErrorTest(parser170, "CREATE NONCLUSTERED JSON INDEX idx1 ON table1 (jsonColumn)",
+                new ParserErrorInfo(20, "SQL46005", "COLUMNSTORE", "JSON"));
+
+            // Test malformed JSON Index syntax in TSql170
+            // Missing column specification
+            ParserTestUtils.ErrorTest(parser170, "CREATE JSON INDEX idx1 ON table1",
+                new ParserErrorInfo(32, "SQL46029"));
+            
+            // Empty FOR clause
+            ParserTestUtils.ErrorTest(parser170, "CREATE JSON INDEX idx1 ON table1 (jsonColumn) FOR ()",
+                new ParserErrorInfo(51, "SQL46010", ")"));
+            
+            // Invalid JSON path (missing quotes)
+            ParserTestUtils.ErrorTest(parser170, "CREATE JSON INDEX idx1 ON table1 (jsonColumn) FOR ($.name)",
+                new ParserErrorInfo(51, "SQL46010", "$"));
+
+            // Missing table name
+            ParserTestUtils.ErrorTest(parser170, "CREATE JSON INDEX idx1 ON (jsonColumn)",
+                new ParserErrorInfo(26, "SQL46010", "("));
+        }
+
+        /// <summary>
         /// Check that the value of MAXDOP index option is within range
         /// </summary>
         [TestMethod]

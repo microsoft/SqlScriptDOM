@@ -4600,6 +4600,13 @@
     <Member Name="OnFileGroupOrPartitionScheme" Type="FileGroupOrPartitionScheme" Summary="The filegroup or partition scheme. Might be null."/>
     <Member Name="OrderedColumns" Type="ColumnReferenceExpression" Collection="true" Summary="The columns which ordered columnstore indexes should be ordered on." />
   </Class>
+  <Class Name="CreateJsonIndexStatement" Base="IndexStatement" Summary="Represents the create JSON index statement.">
+    <InheritedMember Name="Name" ContainerClass="IndexStatement" />
+    <InheritedMember Name="OnName" ContainerClass="IndexStatement" />
+    <Member Name="JsonColumn" Type="Identifier" Summary="The JSON column for the index."/>
+    <Member Name="ForJsonPaths" Type="StringLiteral" Collection="true" Summary="The JSON paths specified in the FOR clause. Optional may have zero elements."/>
+    <InheritedMember Name="IndexOptions" ContainerClass="IndexStatement" />
+  </Class>
   <Class Name="WindowFrameClause" Summary="Represents the specification of window bounds for windowing aggregates.">
     <Member Name="Top" Type="WindowDelimiter" Summary="Top boundary of the window."/>
     <Member Name="Bottom" Type="WindowDelimiter" Summary="Bottom boundary of the window. Optional may be null."/>

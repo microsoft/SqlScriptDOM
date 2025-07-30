@@ -884,6 +884,9 @@ create2005Statements returns [TSqlStatement vResult = null]
             {NextTokenMatches(CodeGenerationSupporter.ColumnStore)}?
             vResult=createColumnStoreIndexStatement[null, null]
         |
+            {NextTokenMatches(CodeGenerationSupporter.Json)}?
+            vResult=createJsonIndexStatement[null, null]
+        |
             {NextTokenMatches(CodeGenerationSupporter.Contract)}?
             vResult=createContractStatement
         |
@@ -16844,6 +16847,7 @@ createIndexStatement returns [TSqlStatement vResult = null]
                 (
                     vResult=createRelationalIndexStatement[tUnique, isClustered]
                     | vResult=createColumnStoreIndexStatement[tUnique, isClustered]
+                    | vResult=createJsonIndexStatement[tUnique, isClustered]
                 )
             )
         |
@@ -16978,6 +16982,58 @@ createColumnStoreIndexStatement [IToken tUnique, bool? isClustered] returns [Cre
                 vResult.OnFileGroupOrPartitionScheme = vFileGroupOrPartitionScheme;
             }
         )?
+    ;
+
+createJsonIndexStatement [IToken tUnique, bool? isClustered] returns [CreateJsonIndexStatement vResult = FragmentFactory.CreateFragment<CreateJsonIndexStatement>()]
+{
+    Identifier vIdentifier;
+    SchemaObjectName vSchemaObjectName;
+    Identifier vJsonColumn;
+    StringLiteral vPath;
+    
+    if (tUnique != null)
+    {
+        ThrowIncorrectSyntaxErrorException(tUnique);
+    }
+    if (isClustered.HasValue)
+    {
+        ThrowIncorrectSyntaxErrorException(LT(1));
+    }
+}
+    : tJson:Identifier tIndex:Index vIdentifier=identifier
+    {
+        Match(tJson, CodeGenerationSupporter.Json);
+        vResult.Name = vIdentifier;
+    }
+    tOn:On vSchemaObjectName=schemaObjectThreePartName
+    {
+        vResult.OnName = vSchemaObjectName;
+    }
+    LeftParenthesis vJsonColumn=identifier tRParen:RightParenthesis
+    {
+        vResult.JsonColumn = vJsonColumn;
+        UpdateTokenInfo(vResult, tRParen);
+    }
+    (
+        tFor:For LeftParenthesis
+        vPath=stringLiteral
+        {
+            AddAndUpdateTokenInfo(vResult, vResult.ForJsonPaths, vPath);
+        }
+        (
+            Comma vPath=stringLiteral
+            {
+                AddAndUpdateTokenInfo(vResult, vResult.ForJsonPaths, vPath);
+            }
+        )*
+        RightParenthesis
+    )?
+    (
+        // Greedy due to conflict with withCommonTableExpressionsAndXmlNamespaces
+        options {greedy = true; } :
+        With
+        indexOptionList[IndexAffectingStatement.CreateIndex, vResult.IndexOptions, vResult]
+    )?
     ;
 
 indexKeyColumnList[CreateIndexStatement vParent]
