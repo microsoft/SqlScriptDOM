@@ -43,6 +43,9 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
 
             AddOptionMapping(IndexOptionKind.XmlCompression, CodeGenerationSupporter.XmlCompression, SqlVersionFlags.TSql160AndAbove);
 
+            AddOptionMapping(IndexOptionKind.VectorMetric, CodeGenerationSupporter.Metric, SqlVersionFlags.TSql170AndAbove);
+            AddOptionMapping(IndexOptionKind.VectorType, CodeGenerationSupporter.Type, SqlVersionFlags.TSql170AndAbove);
+
         }
 
         internal static readonly IndexOptionHelper Instance = new IndexOptionHelper();

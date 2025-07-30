@@ -4607,6 +4607,13 @@
     <Member Name="ForJsonPaths" Type="StringLiteral" Collection="true" Summary="The JSON paths specified in the FOR clause. Optional may have zero elements."/>
     <InheritedMember Name="IndexOptions" ContainerClass="IndexStatement" />
   </Class>
+  <Class Name="CreateVectorIndexStatement" Base="IndexStatement" Summary="Represents the create vector index statement.">
+    <InheritedMember Name="Name" ContainerClass="IndexStatement" />
+    <InheritedMember Name="OnName" ContainerClass="IndexStatement" />
+    <Member Name="VectorColumn" Type="Identifier" Summary="The vector column for the index."/>
+    <InheritedMember Name="IndexOptions" ContainerClass="IndexStatement" />
+    <Member Name="OnFileGroupOrPartitionScheme" Type="FileGroupOrPartitionScheme" Summary="The filegroup or partition scheme. Might be null."/>
+  </Class>
   <Class Name="WindowFrameClause" Summary="Represents the specification of window bounds for windowing aggregates.">
     <Member Name="Top" Type="WindowDelimiter" Summary="Top boundary of the window."/>
     <Member Name="Bottom" Type="WindowDelimiter" Summary="Bottom boundary of the window. Optional may be null."/>
@@ -4638,6 +4645,14 @@
     <InheritedClass Name="IndexOption" />
     <Member Name="Expression" Type="ScalarExpression" Summary="Can be an integer in the range 0 - 10080."/>
     <Member Name="TimeUnit" Type="CompressionDelayTimeUnit" GenerateUpdatePositionInfoCall="false" Summary="The optional unit of measure for the compression delay (it can be MINUTE or MINUTES)."/>
+  </Class>
+  <Class Name="VectorMetricIndexOption" Base="IndexOption" Summary="Represents the vector metric index option.">
+    <InheritedClass Name="IndexOption" />
+    <Member Name="MetricType" Type="VectorMetricType" GenerateUpdatePositionInfoCall="false" Summary="The vector metric type (cosine, dot, euclidean)."/>
+  </Class>
+  <Class Name="VectorTypeIndexOption" Base="IndexOption" Summary="Represents the vector type index option.">
+    <InheritedClass Name="IndexOption" />
+    <Member Name="VectorType" Type="VectorIndexType" GenerateUpdatePositionInfoCall="false" Summary="The vector index type (DiskANN)."/>
   </Class>
   <Class Name="ExternalLibraryStatement" Abstract="true" Base="TSqlStatement" Summary="Represents common parts in create and alter external library statements.">
     <Member Name="Name" Type="Identifier" Summary="The name of the external library."/>
