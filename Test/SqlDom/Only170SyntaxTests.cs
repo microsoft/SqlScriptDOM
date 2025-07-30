@@ -17,6 +17,7 @@ namespace SqlStudio.Tests.UTSqlScriptDom
             new ParserTest170("RegexpTests170.sql", nErrors80: 0, nErrors90: 0, nErrors100: 0, nErrors110: 0, nErrors120: 0, nErrors130: 0, nErrors140: 0, nErrors150: 0, nErrors160: 0),
             new ParserTest170("AiGenerateChunksTests170.sql", nErrors80: 21, nErrors90: 18, nErrors100: 17, nErrors110: 17, nErrors120: 17, nErrors130: 17, nErrors140: 17, nErrors150: 17, nErrors160: 17),
             new ParserTest170("JsonFunctionTests170.sql", nErrors80: 9, nErrors90: 8, nErrors100: 30, nErrors110: 30, nErrors120: 30, nErrors130: 30, nErrors140: 30, nErrors150: 30, nErrors160: 30),
+            new ParserTest170("AiGenerateEmbeddingsTests170.sql", nErrors80: 12, nErrors90: 9, nErrors100: 9, nErrors110: 9, nErrors120: 9, nErrors130: 9, nErrors140: 9, nErrors150: 9, nErrors160: 9)
         };
 
         private static readonly ParserTest[] SqlAzure170_TestInfos =

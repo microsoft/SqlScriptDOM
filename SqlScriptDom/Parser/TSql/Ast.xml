@@ -4725,4 +4725,10 @@
     <Member Name="Overlap" Type="ScalarExpression" Summary="Optional percentage of overlap between chunks." />
     <Member Name="EnableChunkSetId" Type="ScalarExpression" Summary="Optional flag to include a chunk_set_id column in the result." />
   </Class>
+  <Class Name="AIGenerateEmbeddingsFunctionCall" Base="PrimaryExpression" Summary="Represents the ai_generate_embeddings built-in.">
+    <InheritedClass Name="PrimaryExpression" />
+    <Member Name="Input" Type="ScalarExpression" Summary="Input text to generate embeddings for." />
+    <Member Name="ModelName" Type="SchemaObjectName" Summary="Model name used in USE MODEL clause." />
+    <Member Name="OptionalParameters" Type="ScalarExpression" Summary="Optional PARAMETERS clause, must evaluate to JSON." />
+  </Class>
 </Types>

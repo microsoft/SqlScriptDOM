@@ -7190,5 +7190,70 @@ WHEN NOT MATCHED BY SOURCE THEN DELETE OUTPUT inserted.*, deleted.*;";
                 "SELECT * FROM AI_GENERATE_CHUNKS (source = 'some text', chunk_type = other, chunk_size = 5)",
                 new ParserErrorInfo(69, "SQL46010", "other"));
         }
+
+        
+        /// <summary>
+        /// Negative tests for AI_GENERATE_EMBEDDINGS syntax
+        /// </summary>
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void GenerateEmbeddingsNegativeTest170()
+        {
+            // Missing required USE MODEL clause
+            ParserTestUtils.ErrorTest170(
+                "SELECT AI_GENERATE_EMBEDDINGS('My Default Input Text')",
+                new ParserErrorInfo(53, "SQL46010", ")"));
+
+            // Missing model name after USE MODEL
+            ParserTestUtils.ErrorTest170(
+                "SELECT AI_GENERATE_EMBEDDINGS('My Default Input Text' USE MODEL)",
+                new ParserErrorInfo(63, "SQL46010", ")"));
+
+            // Missing USE keyword before MODEL
+            ParserTestUtils.ErrorTest170(
+                "SELECT AI_GENERATE_EMBEDDINGS('My Default Input Text' MODEL MyModel)",
+                new ParserErrorInfo(54, "SQL46010", "MODEL"));
+
+            // USE keyword misplaced before input expression
+            ParserTestUtils.ErrorTest170(
+                "SELECT AI_GENERATE_EMBEDDINGS(USE MODEL MyModel 'My Default Input Text')",
+                new ParserErrorInfo(30, "SQL46010", "USE"));
+
+            // PARAMETERS specified without USE MODEL
+            ParserTestUtils.ErrorTest170(
+                "SELECT AI_GENERATE_EMBEDDINGS('My Default Input Text' PARAMETERS (TRY_CONVERT(JSON, N'{}')))",
+                new ParserErrorInfo(54, "SQL46010", "PARAMETERS"));
+
+            // PARAMETERS missing parentheses
+            ParserTestUtils.ErrorTest170(
+                "SELECT AI_GENERATE_EMBEDDINGS('My Default Input Text' USE MODEL MyModel PARAMETERS TRY_CONVERT(JSON, N'{}'))",
+                new ParserErrorInfo(83, "SQL46010", "TRY_CONVERT"));
+
+            // Invalid expression inside PARAMETERS (missing closing parenthesis)
+            ParserTestUtils.ErrorTest170(
+                "SELECT AI_GENERATE_EMBEDDINGS('My Default Input Text' USE MODEL MyModel PARAMETERS (TRY_CONVERT(JSON, N'{}')",
+                new ParserErrorInfo(108, "SQL46029", "EOF"));
+
+            // Extra comma at end inside PARAMETERS
+            ParserTestUtils.ErrorTest170(
+                "SELECT AI_GENERATE_EMBEDDINGS('My Default Input Text' USE MODEL MyModel PARAMETERS (TRY_CONVERT(JSON, N'{}'),))",
+                new ParserErrorInfo(108, "SQL46010", ","));
+
+            // PARAMETERS misplaced before input
+            ParserTestUtils.ErrorTest170(
+                "SELECT AI_GENERATE_EMBEDDINGS(PARAMETERS (TRY_CONVERT(JSON, N'{}') 'My Default Input Text'))",
+                new ParserErrorInfo(67, "SQL46010", "'My Default Input Text'"));
+
+            // Missing MODEL keyword after USE
+            ParserTestUtils.ErrorTest170(
+                "SELECT AI_GENERATE_EMBEDDINGS('My Default Input Text' USE MyModel)",
+                new ParserErrorInfo(58, "SQL46005", "MODEL", "MyModel"));
+
+            // NULL model name after USE MODEL
+            ParserTestUtils.ErrorTest170(
+                "SELECT AI_GENERATE_EMBEDDINGS('My Default Input Text' USE MODEL NULL)",
+                new ParserErrorInfo(64, "SQL46010", "NULL"));
+        }
     }
 }

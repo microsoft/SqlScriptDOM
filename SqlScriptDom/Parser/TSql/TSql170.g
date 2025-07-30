@@ -31734,6 +31734,9 @@ expressionPrimary [ExpressionFlags expressionFlags] returns [PrimaryExpression v
             {NextTokenMatches(CodeGenerationSupporter.IIf) && (LA(2) == LeftParenthesis)}?
             vResult=iIfCall
         |
+            {NextTokenMatches(CodeGenerationSupporter.AIGenerateEmbeddings) && LA(2) == LeftParenthesis}?
+            vResult = aiGenerateEmbeddingsFunctionCall
+        |
             (Identifier LeftParenthesis)=>
             vResult=builtInFunctionCall
         |
@@ -31765,6 +31768,58 @@ expressionPrimary [ExpressionFlags expressionFlags] returns [PrimaryExpression v
             vResult=parenthesisDisambiguatorForExpressions[expressionFlags]
         )
         collationOpt[vResult]
+    ;
+
+aiGenerateEmbeddingsFunctionCall
+    returns [AIGenerateEmbeddingsFunctionCall vResult = this.FragmentFactory.CreateFragment<AIGenerateEmbeddingsFunctionCall>()]
+{
+    ScalarExpression vInput;
+    SchemaObjectName vModelName;
+    ScalarExpression vParams = null;
+}
+    :
+        tFunc:Identifier LeftParenthesis
+        {
+            Match(tFunc, CodeGenerationSupporter.AIGenerateEmbeddings);
+            UpdateTokenInfo(vResult, tFunc);
+        }
+        vInput=expression
+        {
+            vResult.Input = vInput;
+        }
+
+        tUse:Use                         // ← your reserved keyword
+        {
+            UpdateTokenInfo(vResult, tUse);
+        }
+
+        tModel:Identifier
+        {
+            Match(tModel, CodeGenerationSupporter.Model);
+        }
+
+        vModelName=schemaObjectThreePartName
+        {
+            vResult.ModelName = vModelName;
+        }
+
+        (
+            tParams:Identifier
+            {
+                Match(tParams, CodeGenerationSupporter.Parameters);
+            }
+            LeftParenthesis
+                vParams=expression
+            RightParenthesis
+            {
+                vResult.OptionalParameters = vParams;
+            }
+        )?
+
+        tRParen:RightParenthesis
+        {
+            UpdateTokenInfo(vResult, tRParen);
+        }
     ;
 
 parenthesisDisambiguatorForExpressions [ExpressionFlags expressionFlags] returns [PrimaryExpression vResult]
@@ -33916,6 +33971,7 @@ securityStatementPermission returns [Identifier vResult = this.FragmentFactory.C
 }
     :
         tId:Identifier
+    |   AiGenerateEmbeddings
     |   Add
     |   All
     |   Alter

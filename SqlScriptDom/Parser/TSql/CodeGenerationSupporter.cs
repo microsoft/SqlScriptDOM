@@ -100,6 +100,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         internal const string After = "AFTER";
         internal const string Aggregate = "AGGREGATE";
         internal const string AiGenerateChunks = "AI_GENERATE_CHUNKS";
+        internal const string AIGenerateEmbeddings = "AI_GENERATE_EMBEDDINGS";
         internal const string Algorithm = "ALGORITHM";
         internal const string AlterColumn = "ALTERCOLUMN";
         internal const string All = "ALL";
@@ -1067,6 +1068,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         internal const string Unpivot = "UNPIVOT";
         internal const string UpdLock = "UPDLOCK";
         internal const string Url = "URL";
+        internal const string Use = "USE";
         internal const string Used = "USED";
         internal const string UseIdentity = "USE_IDENTITY";
         internal const string UseTypeDefault = "USE_TYPE_DEFAULT";
