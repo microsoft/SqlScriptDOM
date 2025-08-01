@@ -4646,9 +4646,12 @@
     <Member Name="Expression" Type="ScalarExpression" Summary="Can be an integer in the range 0 - 10080."/>
     <Member Name="TimeUnit" Type="CompressionDelayTimeUnit" GenerateUpdatePositionInfoCall="false" Summary="The optional unit of measure for the compression delay (it can be MINUTE or MINUTES)."/>
   </Class>
-  <Class Name="VectorIndexOption" Base="IndexOption" Summary="Represents the vector index option that includes both metric type and vector type.">
+  <Class Name="VectorMetricIndexOption" Base="IndexOption" Summary="Represents the vector metric index option.">
     <InheritedClass Name="IndexOption" />
     <Member Name="MetricType" Type="VectorMetricType" GenerateUpdatePositionInfoCall="false" Summary="The vector metric type (cosine, dot, euclidean)."/>
+  </Class>
+  <Class Name="VectorTypeIndexOption" Base="IndexOption" Summary="Represents the vector type index option.">
+    <InheritedClass Name="IndexOption" />
     <Member Name="VectorType" Type="VectorIndexType" GenerateUpdatePositionInfoCall="false" Summary="The vector index type (DiskANN)."/>
   </Class>
   <Class Name="ExternalLibraryStatement" Abstract="true" Base="TSqlStatement" Summary="Represents common parts in create and alter external library statements.">

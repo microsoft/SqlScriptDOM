@@ -17730,10 +17730,10 @@ indexOption returns [IndexOption vResult = null]
         vResult=waitAtLowPriorityOption
     |
         {NextTokenMatches(CodeGenerationSupporter.Metric)}?
-        vResult=vectorIndexOption
+        vResult=vectorMetricOption
     |
         {NextTokenMatches(CodeGenerationSupporter.Type)}?
-        vResult=vectorIndexOption
+        vResult=vectorTypeOption
     |
         vResult=indexStateOption
     ;
@@ -27723,25 +27723,24 @@ xmlCompressionOption returns [XmlCompressionOption vResult = FragmentFactory.Cre
         )?
     ;
 
-vectorIndexOption returns [VectorIndexOption vResult = FragmentFactory.CreateFragment<VectorIndexOption>()]
-    : 
-        (
-            tMetric:Identifier EqualsSign tMetricValue:StringLiteral
-            {
-                Match(tMetric, CodeGenerationSupporter.Metric);
-                vResult.OptionKind = IndexOptionKind.VectorMetric;
-                vResult.MetricType = VectorMetricTypeHelper.Instance.ParseOption(tMetricValue);
-                UpdateTokenInfo(vResult, tMetricValue);
-            }
-        |
-            tType:Identifier EqualsSign tTypeValue:StringLiteral
-            {
-                Match(tType, CodeGenerationSupporter.Type);
-                vResult.OptionKind = IndexOptionKind.VectorType;
-                vResult.VectorType = VectorIndexTypeHelper.Instance.ParseOption(tTypeValue);
-                UpdateTokenInfo(vResult, tTypeValue);
-            }
-        )
+vectorMetricOption returns [VectorMetricIndexOption vResult = FragmentFactory.CreateFragment<VectorMetricIndexOption>()]
+    : tMetric:Identifier EqualsSign tMetricValue:StringLiteral
+        {
+            Match(tMetric, CodeGenerationSupporter.Metric);
+            vResult.OptionKind = IndexOptionKind.VectorMetric;
+            vResult.MetricType = VectorMetricTypeHelper.Instance.ParseOption(tMetricValue);
+            UpdateTokenInfo(vResult, tMetricValue);
+        }
+    ;
+
+vectorTypeOption returns [VectorTypeIndexOption vResult = FragmentFactory.CreateFragment<VectorTypeIndexOption>()]
+    : tType:Identifier EqualsSign tTypeValue:StringLiteral
+        {
+            Match(tType, CodeGenerationSupporter.Type);
+            vResult.OptionKind = IndexOptionKind.VectorType;
+            vResult.VectorType = VectorIndexTypeHelper.Instance.ParseOption(tTypeValue);
+            UpdateTokenInfo(vResult, tTypeValue);
+        }
     ;
 
 compressionPartitionRange returns [CompressionPartitionRange vResult = FragmentFactory.CreateFragment<CompressionPartitionRange>()]
