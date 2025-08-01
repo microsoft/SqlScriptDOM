@@ -13,9 +13,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
             IndexOptionHelper.Instance.GenerateSourceForOption(_writer, node.OptionKind);
             GenerateSpaceAndSymbol(TSqlTokenType.EqualsSign);
             GenerateSpace();
-            GenerateSymbol(TSqlTokenType.SingleQuote);
             VectorIndexTypeHelper.Instance.GenerateSourceForOption(_writer, node.VectorType);
-            GenerateSymbol(TSqlTokenType.SingleQuote);
         }
     }
 }

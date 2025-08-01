@@ -27724,22 +27724,23 @@ xmlCompressionOption returns [XmlCompressionOption vResult = FragmentFactory.Cre
     ;
 
 vectorMetricOption returns [VectorMetricIndexOption vResult = FragmentFactory.CreateFragment<VectorMetricIndexOption>()]
-    : tMetric:Identifier EqualsSign tMetricValue:StringLiteral
+    : tMetric:Identifier EqualsSign tMetricValue:AsciiStringLiteral
         {
             Match(tMetric, CodeGenerationSupporter.Metric);
             vResult.OptionKind = IndexOptionKind.VectorMetric;
             vResult.MetricType = VectorMetricTypeHelper.Instance.ParseOption(tMetricValue);
-            UpdateTokenInfo(vResult, tMetricValue);
+
+            UpdateTokenInfo(vResult, tMetric);
         }
     ;
 
 vectorTypeOption returns [VectorTypeIndexOption vResult = FragmentFactory.CreateFragment<VectorTypeIndexOption>()]
-    : tType:Identifier EqualsSign tTypeValue:StringLiteral
+    : tType:Identifier EqualsSign tTypeValue:AsciiStringLiteral
         {
             Match(tType, CodeGenerationSupporter.Type);
             vResult.OptionKind = IndexOptionKind.VectorType;
             vResult.VectorType = VectorIndexTypeHelper.Instance.ParseOption(tTypeValue);
-            UpdateTokenInfo(vResult, tTypeValue);
+            UpdateTokenInfo(vResult, tType);
         }
     ;
 

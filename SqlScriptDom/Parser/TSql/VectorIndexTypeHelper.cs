@@ -13,7 +13,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
     {
         private VectorIndexTypeHelper()
         {
-            AddOptionMapping(VectorIndexType.DiskANN, CodeGenerationSupporter.DiskANN);
+            AddOptionMapping(VectorIndexType.DiskANN, "'" + CodeGenerationSupporter.DiskANN + "'");
         }
 
         public static readonly VectorIndexTypeHelper Instance = new VectorIndexTypeHelper();

@@ -6,6 +6,8 @@
 
 
 
+using static Microsoft.SqlServer.TransactSql.ScriptDom.SensitivityClassification;
+
 namespace Microsoft.SqlServer.TransactSql.ScriptDom
 {
     
@@ -13,9 +15,9 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
     {
         private VectorMetricTypeHelper()
         {
-            AddOptionMapping(VectorMetricType.Cosine, CodeGenerationSupporter.Cosine);
-            AddOptionMapping(VectorMetricType.Dot, CodeGenerationSupporter.Dot);
-            AddOptionMapping(VectorMetricType.Euclidean, CodeGenerationSupporter.Euclidean);
+            AddOptionMapping(VectorMetricType.Cosine, "'" + CodeGenerationSupporter.Cosine + "'");
+            AddOptionMapping(VectorMetricType.Dot, "'" + CodeGenerationSupporter.Dot + "'");
+            AddOptionMapping(VectorMetricType.Euclidean, "'" + CodeGenerationSupporter.Euclidean + "'");
         }
 
         public static readonly VectorMetricTypeHelper Instance = new VectorMetricTypeHelper();

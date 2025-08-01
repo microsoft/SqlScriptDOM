@@ -135,7 +135,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
             }
         }
 
-        internal OptionType ParseOption(antlr.IToken token, SqlVersionFlags version)
+        internal virtual OptionType ParseOption(antlr.IToken token, SqlVersionFlags version)
         {
             OptionInfo optionInfo;
             if (_stringToOptionInfo.TryGetValue(token.getText(), out optionInfo) &&
