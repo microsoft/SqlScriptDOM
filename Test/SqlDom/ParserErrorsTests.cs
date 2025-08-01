@@ -6950,5 +6950,98 @@ WHEN NOT MATCHED BY SOURCE THEN DELETE OUTPUT inserted.*, deleted.*;";
                                             ";
             ParserTestUtils.ErrorTestFabricDW(identityColumnSyntax2, new ParserErrorInfo(identityColumnSyntax2.IndexOf("IDENTITY(") + 8, "SQL46010", "("));
         }
+
+        /// <summary>
+        /// Negative tests for VECTOR INDEX syntax
+        /// </summary>
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void VectorIndexNegativeTests()
+        {
+            // Missing VECTOR keyword
+            ParserTestUtils.ErrorTest170("CREATE INDEX IX_Test ON dbo.Documents (VectorData)",
+                new ParserErrorInfo(7, "SQL46010", "INDEX"));
+
+            // Missing INDEX keyword
+            ParserTestUtils.ErrorTest170("CREATE VECTOR IX_Test ON dbo.Documents (VectorData)",
+                new ParserErrorInfo(14, "SQL46010", "IX_Test"));
+
+            // Missing table name
+            ParserTestUtils.ErrorTest170("CREATE VECTOR INDEX IX_Test ON (VectorData)",
+                new ParserErrorInfo(35, "SQL46010", "("));
+
+            // Missing column specification
+            ParserTestUtils.ErrorTest170("CREATE VECTOR INDEX IX_Test ON dbo.Documents",
+                new ParserErrorInfo(45, "SQL46029", ""));
+
+            // Empty column list
+            ParserTestUtils.ErrorTest170("CREATE VECTOR INDEX IX_Test ON dbo.Documents ()",
+                new ParserErrorInfo(46, "SQL46010", ")"));
+
+            // Multiple columns (not supported for vector indexes)
+            ParserTestUtils.ErrorTest170("CREATE VECTOR INDEX IX_Test ON dbo.Documents (VectorData, OtherColumn)",
+                new ParserErrorInfo(57, "SQL46010", ","));
+
+            // Invalid metric value
+            ParserTestUtils.ErrorTest170("CREATE VECTOR INDEX IX_Test ON dbo.Documents (VectorData) WITH (METRIC = 'invalid')",
+                new ParserErrorInfo(76, "SQL46010", "'invalid'"));
+
+            // Invalid type value
+            ParserTestUtils.ErrorTest170("CREATE VECTOR INDEX IX_Test ON dbo.Documents (VectorData) WITH (TYPE = 'invalid')",
+                new ParserErrorInfo(74, "SQL46010", "'invalid'"));
+
+            // Missing option value
+            ParserTestUtils.ErrorTest170("CREATE VECTOR INDEX IX_Test ON dbo.Documents (VectorData) WITH (METRIC = )",
+                new ParserErrorInfo(76, "SQL46010", ")"));
+
+            // Empty option value
+            ParserTestUtils.ErrorTest170("CREATE VECTOR INDEX IX_Test ON dbo.Documents (VectorData) WITH (METRIC = '')",
+                new ParserErrorInfo(76, "SQL46063", "METRIC"));
+
+            // Duplicate METRIC options
+            ParserTestUtils.ErrorTest170("CREATE VECTOR INDEX IX_Test ON dbo.Documents (VectorData) WITH (METRIC = 'cosine', METRIC = 'dot')",
+                new ParserErrorInfo(80, "SQL46049", "METRIC"));
+
+            // Duplicate TYPE options
+            ParserTestUtils.ErrorTest170("CREATE VECTOR INDEX IX_Test ON dbo.Documents (VectorData) WITH (TYPE = 'DiskANN', TYPE = 'DiskANN')",
+                new ParserErrorInfo(78, "SQL46049", "TYPE"));
+
+            // Missing WITH keyword when options are present
+            ParserTestUtils.ErrorTest170("CREATE VECTOR INDEX IX_Test ON dbo.Documents (VectorData) (METRIC = 'cosine')",
+                new ParserErrorInfo(63, "SQL46010", "("));
+
+            // Missing parentheses around options
+            ParserTestUtils.ErrorTest170("CREATE VECTOR INDEX IX_Test ON dbo.Documents (VectorData) WITH METRIC = 'cosine'",
+                new ParserErrorInfo(68, "SQL46010", "METRIC"));
+
+            // Invalid option name
+            ParserTestUtils.ErrorTest170("CREATE VECTOR INDEX IX_Test ON dbo.Documents (VectorData) WITH (INVALID_OPTION = 'value')",
+                new ParserErrorInfo(68, "SQL46010", "INVALID_OPTION"));
+
+            // Metric value without quotes
+            ParserTestUtils.ErrorTest170("CREATE VECTOR INDEX IX_Test ON dbo.Documents (VectorData) WITH (METRIC = cosine)",
+                new ParserErrorInfo(76, "SQL46010", "cosine"));
+
+            // Type value without quotes
+            ParserTestUtils.ErrorTest170("CREATE VECTOR INDEX IX_Test ON dbo.Documents (VectorData) WITH (TYPE = DiskANN)",
+                new ParserErrorInfo(74, "SQL46010", "DiskANN"));
+
+            // MAXDOP with invalid value
+            ParserTestUtils.ErrorTest170("CREATE VECTOR INDEX IX_Test ON dbo.Documents (VectorData) WITH (MAXDOP = 'invalid')",
+                new ParserErrorInfo(76, "SQL46010", "'invalid'"));
+
+            // MAXDOP with negative value
+            ParserTestUtils.ErrorTest170("CREATE VECTOR INDEX IX_Test ON dbo.Documents (VectorData) WITH (MAXDOP = -1)",
+                new ParserErrorInfo(76, "SQL46010", "-"));
+
+            // Missing equals sign in option
+            ParserTestUtils.ErrorTest170("CREATE VECTOR INDEX IX_Test ON dbo.Documents (VectorData) WITH (METRIC 'cosine')",
+                new ParserErrorInfo(74, "SQL46010", "'cosine'"));
+
+            // Incomplete WITH clause
+            ParserTestUtils.ErrorTest170("CREATE VECTOR INDEX IX_Test ON dbo.Documents (VectorData) WITH",
+                new ParserErrorInfo(63, "SQL46029", "WITH"));
+        }
     }
 }
