@@ -7191,7 +7191,6 @@ WHEN NOT MATCHED BY SOURCE THEN DELETE OUTPUT inserted.*, deleted.*;";
                 new ParserErrorInfo(69, "SQL46010", "other"));
         }
 
-        
         /// <summary>
         /// Negative tests for AI_GENERATE_EMBEDDINGS syntax
         /// </summary>
@@ -7254,6 +7253,109 @@ WHEN NOT MATCHED BY SOURCE THEN DELETE OUTPUT inserted.*, deleted.*;";
             ParserTestUtils.ErrorTest170(
                 "SELECT AI_GENERATE_EMBEDDINGS('My Default Input Text' USE MODEL NULL)",
                 new ParserErrorInfo(64, "SQL46010", "NULL"));
+        }
+
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void CreateExternalModelNegativeTest()
+        {
+            // Keyword typos
+            //
+            ParserTestUtils.ErrorTest170(
+                "CREATE EXTERNAL MODLE abc WITH (LOCATION = 'www.somemodellocation.235',API_FORMAT = 'Ollama',MODEL_TYPE = EMBEDDIGS,MODEL = 'shghfh',PARAMETERS = '{\"key\":\"value\"}');",
+                new ParserErrorInfo(16, "SQL46010", "MODLE"));
+
+            // Invalid Model type
+            //
+            ParserTestUtils.ErrorTest170(
+                "CREATE EXTERNAL MODEL abc WITH (LOCATION = 'www.somemodellocation.235',API_FORMAT = 'Ollama',MODEL_TYPE = EMBEDDIGS,MODEL = 'shghfh',PARAMETERS = '{\"key\":\"value\"}');",
+                new ParserErrorInfo(106, "SQL46010", "EMBEDDIGS"));
+
+            // Model type not identifier
+            //
+            ParserTestUtils.ErrorTest170(
+                "CREATE EXTERNAL MODEL abc WITH (LOCATION = 'www.somemodellocation.235',API_FORMAT = 'Ollama',MODEL_TYPE = 'EMBEDDINGS',MODEL = 'shghfh',PARAMETERS = '{\"key\":\"value\"}');",
+                new ParserErrorInfo(106, "SQL46010", "'EMBEDDINGS'"));
+
+            // Missing With Clause
+            //
+            ParserTestUtils.ErrorTest170(
+                "CREATE EXTERNAL MODEL abc (LOCATION = 'www.somemodellocation.235',API_FORMAT = 'Ollama',MODEL_TYPE = EMBEDDINGS,MODEL = 'shghfh',PARAMETERS = '{\"key\":\"value\"}');",
+                new ParserErrorInfo(26, "SQL46010", "("));
+
+            // Missing Model Name
+            //
+            ParserTestUtils.ErrorTest170(
+                "CREATE EXTERNAL MODEL WITH (LOCATION = 'www.somemodellocation.235',API_FORMAT = 'Ollama',MODEL_TYPE = EMBEDDINGS,MODEL = 'shghfh',PARAMETERS = '{\"key\":\"value\"}');",
+                new ParserErrorInfo(16, "SQL46010", "MODEL"));
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void AlterExternalModelNegativeTest()
+        {
+            // Keyword typos
+            //
+            ParserTestUtils.ErrorTest170(
+                "ALTER EXTERNAL MODLE abc SET (LOCATION = 'www.somemodellocation.235',API_FORMAT = 'Ollama',MODEL_TYPE = EMBEDDINGS,MODEL = 'shghfh',PARAMETERS = '{\"key\":\"value\"}');",
+                new ParserErrorInfo(15, "SQL46010", "MODLE"));
+
+            // Invalid Model type
+            //
+            ParserTestUtils.ErrorTest170(
+                "ALTER EXTERNAL MODEL abc SET (MODEL_TYPE = EMBEDDINS);",
+                new ParserErrorInfo(43, "SQL46010", "EMBEDDINS"));
+
+            // Model type not identifier
+            //
+            ParserTestUtils.ErrorTest170(
+                "ALTER EXTERNAL MODEL abc SET (LOCATION = 'www.somemodellocation.235',API_FORMAT = 'Ollama',MODEL_TYPE = 'EMBEDDINGS',MODEL = 'shghfh',PARAMETERS = '{\"key\":\"value\"}');",
+                new ParserErrorInfo(104, "SQL46010", "'EMBEDDINGS'"));
+
+            // Missing SET Clause
+            //
+            ParserTestUtils.ErrorTest170(
+                "ALTER EXTERNAL MODEL abc (MODEL = 'shghfh');",
+                new ParserErrorInfo(25, "SQL46010", "("));
+
+            // WITH instead of SET clause
+            //
+            ParserTestUtils.ErrorTest170(
+                "ALTER EXTERNAL MODEL abc WITH (LOCATION = 'www.somemodellocation.235',API_FORMAT = 'Ollama',MODEL_TYPE = EMBEDDINGS,MODEL = 'shghfh',PARAMETERS = '{\"key\":\"value\"}');",
+                new ParserErrorInfo(25, "SQL46010", "WITH"));
+
+            // Missing Model Name
+            //
+            ParserTestUtils.ErrorTest170(
+                "ALTER EXTERNAL MODEL SET (LOCATION = 'www.somemodellocation.235',API_FORMAT = 'Ollama',MODEL_TYPE = EMBEDDINGS,MODEL = 'shghfh',PARAMETERS = '{\"key\":\"value\"}');",
+                new ParserErrorInfo(15, "SQL46010", "MODEL"));
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void DropExternalModelNegativeTest()
+        {
+            // Keyword typos
+            //
+            ParserTestUtils.ErrorTest170(
+                "DROP EXTERNAL MODLE abc;",
+                new ParserErrorInfo(14, "SQL46010", "MODLE"));
+
+            // Missing Model Name
+            //
+            ParserTestUtils.ErrorTest170(
+                "DROP EXTERNAL MODEL;",
+                new ParserErrorInfo(14, "SQL46010", "MODEL"));
+
+            // Extra keyword
+            //
+            ParserTestUtils.ErrorTest170(
+                "DROP EXTERNAL MODEL abc WITH (LOCATION = 'www.somemodellocation.235');",
+                new ParserErrorInfo(29, "SQL46010", "("));
         }
     }
 }

@@ -403,8 +403,8 @@
             Summary="Actual JSON for clause options. First one is always present (JSON mode)."/>
   </Class>
   <Class Name="JsonKeyValue" Base="ScalarExpression" Summary ="Represent a key value Pair">
-		<Member Name="JsonKeyName" Type="ScalarExpression" Summary="Key name" />
-		<Member Name="JsonValue" Type="ScalarExpression" Summary="scalar expression" />
+        <Member Name="JsonKeyName" Type="ScalarExpression" Summary="Key name" />
+        <Member Name="JsonValue" Type="ScalarExpression" Summary="scalar expression" />
   </Class>	
   <Class Name="JsonForClauseOption" Base="ForClause" Summary="Represents FOR JSON (options) case">
     <Member Name="OptionKind" Type="JsonForClauseOptions" GenerateUpdatePositionInfoCall="false" Summary="Option kind"/>
@@ -1345,6 +1345,27 @@
   </Class>
   <Class Name="DropExternalStreamStatement" Base="DropUnownedObjectStatement" Summary="Represents a DROP EXTERNAL STREAM statement.">
     <InheritedClass Name="DropUnownedObjectStatement"/>
+  </Class>
+
+  <Class Name="ExternalModelStatement" Abstract="true" Base="TSqlStatement" Summary="Base class for all external model statement objects.">
+    <Member Name="Name" Type="Identifier" Summary="The external model name."/>
+    <Member Name="Location" Type="Literal" Summary="The external model location name."/>
+    <Member Name="ApiFormat" Type="Literal" Summary="The external model api format name."/>
+    <Member Name="ModelType" Type="ExternalModelTypeOption?" GenerateUpdatePositionInfoCall="false" Summary="The external model type name."/>
+    <Member Name="ModelName" Type="Literal" Summary="The external model name to be used to generate embeddings."/>
+    <Member Name="Credential" Type="Identifier" Summary="The external model credentials name."/>
+    <Member Name="Parameters" Type="Literal" Summary="The external model parameters as key-value pairs."/>
+    <Member Name="LocalRuntimePath" Type="Literal" Summary="The local runtime path for the model."/>
+  </Class>
+  <Class Name="CreateExternalModelStatement" Base="ExternalModelStatement" Summary="Represents a CREATE EXTERNAL MODEL statement.">
+    <InheritedClass Name="ExternalModelStatement"/>
+    <Implements Interface="IAuthorization"/>
+  </Class>
+  <Class Name="DropExternalModelStatement" Base="DropUnownedObjectStatement" Summary="Represents a DROP EXTERNAL MODEL statement.">
+    <InheritedClass Name="DropUnownedObjectStatement"/>
+  </Class>
+  <Class Name="AlterExternalModelStatement" Base="ExternalModelStatement" Summary="Represents a ALTER EXTERNAL MODEL statement.">
+    <InheritedClass Name="ExternalModelStatement"/>
   </Class>
 
   <Class Name="ExternalFileFormatStatement" Abstract="true" Base="TSqlStatement" Summary="Base class for all external file format statement objects.">
@@ -3559,7 +3580,7 @@
   </Class>
   <Class Name="TableReferenceWithAlias" Abstract="true" Base="TableReference" Summary="This represents a table reference that can have an alias.">
     <Member Name="Alias" Type="Identifier" Summary="Optional table alias. May be null."/>
-	<Member Name="ForPath" Type="bool" Summary="Whether this table reference is marked as graph FOR PATH."/>
+    <Member Name="ForPath" Type="bool" Summary="Whether this table reference is marked as graph FOR PATH."/>
   </Class>
   <Class Name="TableReferenceWithAliasAndColumns" Abstract="true" Base="TableReferenceWithAlias" Summary="Represents a table reference that can specify column aliases.">
     <InheritedClass Name="TableReferenceWithAlias" />

@@ -120,6 +120,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         internal const string Always = "ALWAYS";
         internal const string Anonymous = "ANONYMOUS";
         internal const string AnsiNullDefault = "ANSI_NULL_DEFAULT";
+        internal const string ApiFormat = "API_FORMAT";
         internal const string Application = "APPLICATION";
         internal const string ApplicationLog = "APPLICATION_LOG";
         internal const string Apply = "APPLY";
@@ -333,6 +334,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         internal const string Edition = "EDITION";
         internal const string ElasticPool = "ELASTIC_POOL";
         internal const string Elements = "ELEMENTS";
+        internal const string Embeddings = "EMBEDDINGS";
         internal const string Emergency = "EMERGENCY";
         internal const string Empty = "EMPTY";
         internal const string Enable = "ENABLE";
@@ -562,6 +564,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         internal const string LoadHistory = "LOADHISTORY";
         internal const string LobCompaction = "LOB_COMPACTION";
         internal const string Local = "LOCAL";
+        internal const string LocalRuntimePath = "LOCAL_RUNTIME_PATH";
         internal const string Location = "LOCATION";
         internal const string LocationUserDB = "USER_DB";
         internal const string LocalServiceName = "LOCAL_SERVICE_NAME";
@@ -635,6 +638,8 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         internal const string Mirror = "MIRROR";
         internal const string Mixed = "MIXED";
         internal const string MixedPageAllocation = "MIXED_PAGE_ALLOCATION";
+        internal const string ModelType = "MODEL_TYPE";
+        internal const string ModelName = "MODEL";
         internal const string Modify = "MODIFY";
         internal const string Money = "MONEY";
         internal const string Move = "MOVE";
