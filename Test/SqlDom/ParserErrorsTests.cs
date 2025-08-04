@@ -6959,10 +6959,6 @@ WHEN NOT MATCHED BY SOURCE THEN DELETE OUTPUT inserted.*, deleted.*;";
         [SqlStudioTestCategory(Category.UnitTest)]
         public void VectorIndexNegativeTests()
         {
-            // Missing VECTOR keyword
-            ParserTestUtils.ErrorTest170("CREATE INDEX IX_Test ON dbo.Documents (VectorData)",
-                new ParserErrorInfo(7, "SQL46010", "INDEX"));
-
             // Missing INDEX keyword
             ParserTestUtils.ErrorTest170("CREATE VECTOR IX_Test ON dbo.Documents (VectorData)",
                 new ParserErrorInfo(14, "SQL46010", "IX_Test"));
