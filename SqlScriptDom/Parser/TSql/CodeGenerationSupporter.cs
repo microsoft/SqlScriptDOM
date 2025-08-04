@@ -225,6 +225,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         internal const string CompressionDelay = "COMPRESSION_DELAY";
         internal const string CompressAllRowGroups = "COMPRESS_ALL_ROW_GROUPS";
         internal const string Concat = "CONCAT";
+        internal const string Cosine = "COSINE";
         internal const string Configuration = "CONFIGURATION";
         internal const string ConnectionOptions = "CONNECTION_OPTIONS";
         internal const string Contained = "CONTAINED";
@@ -299,6 +300,8 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         internal const string Dependents = "DEPENDENTS";
         internal const string Description = "DESCRIPTION";
         internal const string DesiredState = "DESIRED_STATE";
+        internal const string DiskANN = "DISKANN";
+        internal const string Dot = "DOT";
         internal const string Delay = "DELAY";
         internal const string DelayedDurability = "DELAYED_DURABILITY";
         internal const string DelimitedText = "DELIMITEDTEXT";
@@ -347,6 +350,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         internal const string EnvironmentVariables = "ENVIRONMENT_VARIABLES";
         internal const string Equal = "=";
         internal const string Error = "ERROR";
+        internal const string Euclidean = "EUCLIDEAN";
         internal const string ErrorBrokerConversations = "ERROR_BROKER_CONVERSATIONS";
         internal const string ErrorDataSource = "ERRORFILE_DATA_SOURCE";
         internal const string ErrorFile = "ERRORFILE";
@@ -612,6 +616,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         internal const string MessageForwarding = "MESSAGE_FORWARDING";
         internal const string MessageForwardSize = "MESSAGE_FORWARD_SIZE";
         internal const string MigrationState = "MIGRATION_STATE";
+        internal const string Metric = "METRIC";
         internal const string Min = "MIN";
         internal const string MinGrantPercent = "MIN_GRANT_PERCENT";
         internal const string MinCpuPercent = "MIN_CPU_PERCENT";

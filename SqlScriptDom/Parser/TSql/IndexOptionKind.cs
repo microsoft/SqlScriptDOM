@@ -38,6 +38,8 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         WaitAtLowPriority   = 21,
         OptimizeForSequentialKey = 22,
         XmlCompression      = 23,
+        VectorMetric        = 24,
+        VectorType          = 25,
     }
 
 #pragma warning restore 1591

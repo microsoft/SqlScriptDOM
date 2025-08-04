@@ -887,6 +887,9 @@ create2005Statements returns [TSqlStatement vResult = null]
             {NextTokenMatches(CodeGenerationSupporter.Json)}?
             vResult=createJsonIndexStatement[null, null]
         |
+            {NextTokenMatches(CodeGenerationSupporter.Vector)}?
+            vResult=createVectorIndexStatement[null, null]
+        |
             {NextTokenMatches(CodeGenerationSupporter.Contract)}?
             vResult=createContractStatement
         |
@@ -16848,6 +16851,7 @@ createIndexStatement returns [TSqlStatement vResult = null]
                     vResult=createRelationalIndexStatement[tUnique, isClustered]
                     | vResult=createColumnStoreIndexStatement[tUnique, isClustered]
                     | vResult=createJsonIndexStatement[tUnique, isClustered]
+                    | vResult=createVectorIndexStatement[tUnique, isClustered]
                 )
             )
         |
@@ -17033,6 +17037,50 @@ createJsonIndexStatement [IToken tUnique, bool? isClustered] returns [CreateJson
         options {greedy = true; } :
         With
         indexOptionList[IndexAffectingStatement.CreateIndex, vResult.IndexOptions, vResult]
+    )?
+    ;
+
+createVectorIndexStatement [IToken tUnique, bool? isClustered] returns [CreateVectorIndexStatement vResult = FragmentFactory.CreateFragment<CreateVectorIndexStatement>()]
+{
+    Identifier vIdentifier;
+    SchemaObjectName vSchemaObjectName;
+    Identifier vVectorColumn;
+    FileGroupOrPartitionScheme vFileGroupOrPartitionScheme;
+    
+    if (tUnique != null)
+    {
+        ThrowIncorrectSyntaxErrorException(tUnique);
+    }
+    if (isClustered.HasValue)
+    {
+        ThrowIncorrectSyntaxErrorException(LT(1));
+    }
+}
+    : tVector:Identifier tIndex:Index vIdentifier=identifier
+    {
+        Match(tVector, CodeGenerationSupporter.Vector);
+        vResult.Name = vIdentifier;
+    }
+    tOn:On vSchemaObjectName=schemaObjectThreePartName
+    {
+        vResult.OnName = vSchemaObjectName;
+    }
+    LeftParenthesis vVectorColumn=identifier tRParen:RightParenthesis
+    {
+        vResult.VectorColumn = vVectorColumn;
+        UpdateTokenInfo(vResult, tRParen);
+    }
+    (
+        // Greedy due to conflict with withCommonTableExpressionsAndXmlNamespaces
+        options {greedy = true; } :
+        With
+        indexOptionList[IndexAffectingStatement.CreateIndex, vResult.IndexOptions, vResult]
+    )?
+    (
+        On vFileGroupOrPartitionScheme=filegroupOrPartitionScheme
+        {
+            vResult.OnFileGroupOrPartitionScheme = vFileGroupOrPartitionScheme;
+        }
     )?
     ;
 
@@ -17680,6 +17728,12 @@ indexOption returns [IndexOption vResult = null]
     |
         {NextTokenMatches(CodeGenerationSupporter.WaitAtLowPriority)}?
         vResult=waitAtLowPriorityOption
+    |
+        {NextTokenMatches(CodeGenerationSupporter.Metric)}?
+        vResult=vectorMetricOption
+    |
+        {NextTokenMatches(CodeGenerationSupporter.Type)}?
+        vResult=vectorTypeOption
     |
         vResult=indexStateOption
     ;
@@ -27667,6 +27721,27 @@ xmlCompressionOption returns [XmlCompressionOption vResult = FragmentFactory.Cre
                 UpdateTokenInfo(vResult, tRParen);
             }
         )?
+    ;
+
+vectorMetricOption returns [VectorMetricIndexOption vResult = FragmentFactory.CreateFragment<VectorMetricIndexOption>()]
+    : tMetric:Identifier EqualsSign tMetricValue:AsciiStringLiteral
+        {
+            Match(tMetric, CodeGenerationSupporter.Metric);
+            vResult.OptionKind = IndexOptionKind.VectorMetric;
+            vResult.MetricType = VectorMetricTypeHelper.Instance.ParseOption(tMetricValue);
+
+            UpdateTokenInfo(vResult, tMetric);
+        }
+    ;
+
+vectorTypeOption returns [VectorTypeIndexOption vResult = FragmentFactory.CreateFragment<VectorTypeIndexOption>()]
+    : tType:Identifier EqualsSign tTypeValue:AsciiStringLiteral
+        {
+            Match(tType, CodeGenerationSupporter.Type);
+            vResult.OptionKind = IndexOptionKind.VectorType;
+            vResult.VectorType = VectorIndexTypeHelper.Instance.ParseOption(tTypeValue);
+            UpdateTokenInfo(vResult, tType);
+        }
     ;
 
 compressionPartitionRange returns [CompressionPartitionRange vResult = FragmentFactory.CreateFragment<CompressionPartitionRange>()]
