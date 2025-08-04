@@ -4752,4 +4752,12 @@
     <Member Name="ModelName" Type="SchemaObjectName" Summary="Model name used in USE MODEL clause." />
     <Member Name="OptionalParameters" Type="ScalarExpression" Summary="Optional PARAMETERS clause, must evaluate to JSON." />
   </Class>
+  <Class Name="VectorSearchTableReference" Base="TableReferenceWithAlias" Summary="Represents the VECTOR_SEARCH table-valued function call.">
+    <InheritedClass Name="TableReferenceWithAlias" />
+    <Member Name="Table" Type="TableReferenceWithAlias" Summary="Table on which perform the search." />
+    <Member Name="Column" Type="ColumnReferenceExpression" Summary="The vector column in which search is performed." />
+    <Member Name="SimilarTo" Type="ScalarExpression" Summary="The vector used for search." />
+    <Member Name="Metric" Type="StringLiteral" Summary="The distance metric to use for the search." />
+    <Member Name="TopN" Type="IntegerLiteral" Summary="The maximum number of similar vectors that must be returned." />
+  </Class>
 </Types>

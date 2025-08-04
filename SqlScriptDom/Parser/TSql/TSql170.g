@@ -19148,6 +19148,8 @@ selectTableReferenceElementWithoutJoinParenthesis[SubDmlFlags subDmlFlags] retur
     |   vResult=subDmlTableReference[subDmlFlags]
     |   {NextTokenMatches(CodeGenerationSupporter.Predict)}?
         vResult=predictTableReference[subDmlFlags]
+    |   {NextTokenMatches(CodeGenerationSupporter.VectorSearch)}?
+        vResult=vectorSearchTableReference
     |   vResult=schemaObjectOrFunctionTableReference
     ;
 
@@ -19241,6 +19243,47 @@ aiGenerateFixedChunksTableReference [ScalarExpression vSource, Identifier vChunk
             vResult.EnableChunkSetId = vEnableChunkSetId;
         }
     )?
+    ;
+
+vectorSearchTableReference returns [VectorSearchTableReference vResult = FragmentFactory.CreateFragment<VectorSearchTableReference>()]
+{
+    TableReferenceWithAlias vTable;
+    ColumnReferenceExpression vColumn;
+    ScalarExpression vSimilarTo;
+    StringLiteral vMetric;
+    IntegerLiteral vTopN;
+}
+    :
+        tVectorSearch:Identifier LeftParenthesis
+        {
+            Match(tVectorSearch, CodeGenerationSupporter.VectorSearch);
+            UpdateTokenInfo(vResult, tVectorSearch);
+        }
+        Table EqualsSign vTable = mergeTarget[false]
+        {
+            vResult.Table = vTable;
+        }
+        Comma Column EqualsSign vColumn = fixedColumn
+        {
+            vResult.Column = vColumn;
+        }
+        Comma tSimilarTo:Identifier EqualsSign vSimilarTo = expression
+        {
+            Match(tSimilarTo, CodeGenerationSupporter.SimilarTo);
+            vResult.SimilarTo = vSimilarTo;
+        }
+        Comma tMetric:Identifier EqualsSign vMetric = stringLiteral
+        {
+            Match(tMetric, CodeGenerationSupporter.Metric);
+            MatchString(vMetric, CodeGenerationSupporter.Cosine, CodeGenerationSupporter.Dot, CodeGenerationSupporter.Euclidean);
+            vResult.Metric = vMetric;
+        }
+        Comma tTopN:Identifier EqualsSign vTopN = integer
+        {
+            Match(tTopN, CodeGenerationSupporter.TopN);
+            vResult.TopN = vTopN;
+        }
+        RightParenthesis simpleTableReferenceAliasOpt[vResult]
     ;
 
 predictTableReference[SubDmlFlags subDmlFlags] returns [PredictTableReference vResult]

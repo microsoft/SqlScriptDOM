@@ -249,6 +249,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         internal const string CopyCommand = "COPY";
         internal const string CopyOnly = "COPY_ONLY";
         internal const string Correlated = "CORRELATED";
+        internal const string Cosine = "COSINE";
         internal const string Count = "COUNT";
         internal const string CountBig = "COUNT_BIG";
         internal const string Counter = "COUNTER";
@@ -325,6 +326,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         internal const string Document = "DOCUMENT";
         internal const string DollarSign = "$";
         internal const string DollarPartition = "$PARTITION";
+        internal const string Dot = "DOT";
         internal const string Drop = "DROP";
         internal const string DropExisting = "DROP_EXISTING";
         internal const string DTSBuffers = "DTS_BUFFERS";
@@ -364,6 +366,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         internal const string ErrorFileCredential = "ERRORFILE_CREDENTIAL";
         internal const string EscapeChar = "ESCAPECHAR";
         internal const string EstimateOnly = "ESTIMATEONLY";
+        internal const string Euclidean = "EUCLIDEAN";
         internal const string Event = "EVENT";
         internal const string EventRetentionMode = "EVENT_RETENTION_MODE";
         internal const string Exclamation = "!";
@@ -625,6 +628,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         internal const string Message = "MESSAGE";
         internal const string MessageForwarding = "MESSAGE_FORWARDING";
         internal const string MessageForwardSize = "MESSAGE_FORWARD_SIZE";
+        internal const string Metric = "METRIC";
         internal const string MigrationState = "MIGRATION_STATE";
         internal const string Metric = "METRIC";
         internal const string Min = "MIN";
@@ -930,6 +934,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         internal const string ShrinkDb = "SHRINKDB";
         internal const string Sid = "SID";
         internal const string Signature = "SIGNATURE";
+        internal const string SimilarTo = "SIMILAR_TO";
         internal const string Simple = "SIMPLE";
         internal const string SingleBlob = "SINGLE_BLOB";
         internal const string SingleClob = "SINGLE_CLOB";
@@ -1039,6 +1044,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         internal const string Timer = "TIMER";
         internal const string TimeStamp = "TIMESTAMP";
         internal const string TinyInt = "TINYINT";
+        internal const string TopN = "TOP_N";
         internal const string TornPageDetection = "TORN_PAGE_DETECTION";
         internal const string TrackCausality = "TRACK_CAUSALITY";
         internal const string TrackColumnsUpdated = "TRACK_COLUMNS_UPDATED";
@@ -1091,6 +1097,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         internal const string Varp = "VARP";
         internal const string VDevNo = "VDEVNO";
         internal const string Vector = "Vector";
+        internal const string VectorSearch = "VECTOR_SEARCH";
         internal const string Verbose = "VERBOSE";
         internal const string VerboseLogging = "VerboseLogging";
         internal const string VerifyOnly = "VERIFYONLY";

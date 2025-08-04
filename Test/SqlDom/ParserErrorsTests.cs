@@ -7357,5 +7357,131 @@ WHEN NOT MATCHED BY SOURCE THEN DELETE OUTPUT inserted.*, deleted.*;";
                 "DROP EXTERNAL MODEL abc WITH (LOCATION = 'www.somemodellocation.235');",
                 new ParserErrorInfo(29, "SQL46010", "("));
         }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void VectorSearchErrorTest170()
+        {
+            // Missing required parameters: TABLE
+            ParserTestUtils.ErrorTest170(
+                "SELECT * FROM VECTOR_SEARCH()",
+                new ParserErrorInfo(28, "SQL46010", ")"));
+
+            // Missing required parameters: COLUMN
+            ParserTestUtils.ErrorTest170(
+                "SELECT * FROM VECTOR_SEARCH(TABLE = tbl1)",
+                new ParserErrorInfo(40, "SQL46010", ")"));
+
+            // Missing required parameters: SIMILAR_TO
+            ParserTestUtils.ErrorTest170(
+                "SELECT * FROM VECTOR_SEARCH(TABLE = tbl1, COLUMN = col1)",
+                new ParserErrorInfo(55, "SQL46010", ")"));
+
+            // Missing required parameters: METRIC
+            ParserTestUtils.ErrorTest170(
+                "SELECT * FROM VECTOR_SEARCH(TABLE = tbl1, COLUMN = col1, SIMILAR_TO = query_vector)",
+                new ParserErrorInfo(82, "SQL46010", ")"));
+
+            // Missing required parameters: TOP_N
+            ParserTestUtils.ErrorTest170(
+                "SELECT * FROM VECTOR_SEARCH(TABLE = tbl1, COLUMN = col1, SIMILAR_TO = query_vector, METRIC = 'dot')",
+                new ParserErrorInfo(98, "SQL46010", ")"));
+
+            // Invalid order: COLUMN before TABLE
+            ParserTestUtils.ErrorTest170(
+                "SELECT * FROM VECTOR_SEARCH(COLUMN = col1, TABLE = tbl1, SIMILAR_TO = query_vector, METRIC = 'dot', TOP_N = 5)",
+                new ParserErrorInfo(28, "SQL46010", "COLUMN"));
+
+            // Invalid order: SIMILAR_TO before COLUMN
+            ParserTestUtils.ErrorTest170(
+                "SELECT * FROM VECTOR_SEARCH(TABLE = tbl1, SIMILAR_TO = query_vector, COLUMN = col1, METRIC = 'dot', TOP_N = 5)",
+                new ParserErrorInfo(42, "SQL46010", "SIMILAR_TO"));
+
+            // Invalid order: METRIC before SIMILAR_TO
+            ParserTestUtils.ErrorTest170(
+                "SELECT * FROM VECTOR_SEARCH(TABLE = tbl1, COLUMN = col1, METRIC = 'dot', SIMILAR_TO = query_vector, TOP_N = 5)",
+                new ParserErrorInfo(57, "SQL46005", "SIMILAR_TO", "METRIC"));
+
+            // Invalid value: TABLE = 'tbl1' (should be identifier, not string)
+            ParserTestUtils.ErrorTest170(
+                "SELECT * FROM VECTOR_SEARCH(TABLE = 'tbl1', COLUMN = col1, SIMILAR_TO = query_vector, METRIC = 'dot', TOP_N = 5)",
+                new ParserErrorInfo(36, "SQL46010", "'tbl1'"));
+
+            // Invalid value: TABLE = 123 (should be identifier, not integer)
+            ParserTestUtils.ErrorTest170(
+                "SELECT * FROM VECTOR_SEARCH(TABLE = 123, COLUMN = col1, SIMILAR_TO = query_vector, METRIC = 'dot', TOP_N = 5)",
+                new ParserErrorInfo(36, "SQL46010", "123"));
+
+            // Invalid value: COLUMN = 'col1' (should be identifier, not string)
+            ParserTestUtils.ErrorTest170(
+                "SELECT * FROM VECTOR_SEARCH(TABLE = tbl1, COLUMN = 'col1', SIMILAR_TO = query_vector, METRIC = 'dot', TOP_N = 5)",
+                new ParserErrorInfo(51, "SQL46010", "'col1'"));
+
+            // Invalid value: COLUMN = 123 (should be identifier, not integer)
+            ParserTestUtils.ErrorTest170(
+                "SELECT * FROM VECTOR_SEARCH(TABLE = tbl1, COLUMN = 123, SIMILAR_TO = query_vector, METRIC = 'dot', TOP_N = 5)",
+                new ParserErrorInfo(51, "SQL46010", "123"));
+
+            // Invalid value: METRIC = dot (should be string literal)
+            ParserTestUtils.ErrorTest170(
+                "SELECT * FROM VECTOR_SEARCH(TABLE = tbl1, COLUMN = col1, SIMILAR_TO = query_vector, METRIC = dot, TOP_N = 5)",
+                new ParserErrorInfo(93, "SQL46010", "dot"));
+
+            // Invalid value: METRIC = 'invalid_value' (should be either 'cosine', 'dot', or 'euclidean')
+            ParserTestUtils.ErrorTest170(
+                "SELECT * FROM VECTOR_SEARCH(TABLE = tbl1, COLUMN = col1, SIMILAR_TO = query_vector, METRIC = 'invalid_value', TOP_N = 5)",
+                new ParserErrorInfo(93, "SQL46010", "'invalid_value'"));
+
+            // Invalid value: TOP_N = '5' (should be integer, not string)
+            ParserTestUtils.ErrorTest170(
+                "SELECT * FROM VECTOR_SEARCH(TABLE = tbl1, COLUMN = col1, SIMILAR_TO = query_vector, METRIC = 'dot', TOP_N = '5')",
+                new ParserErrorInfo(108, "SQL46010", "'5'"));
+
+            // Invalid value: TOP_N = -5 (should be positive integer)
+            ParserTestUtils.ErrorTest170(
+                "SELECT * FROM VECTOR_SEARCH(TABLE = tbl1, COLUMN = col1, SIMILAR_TO = query_vector, METRIC = 'dot', TOP_N = -5)",
+                new ParserErrorInfo(108, "SQL46010", "-"));
+
+            // Missing value after equals for TABLE
+            ParserTestUtils.ErrorTest170(
+                "SELECT * FROM VECTOR_SEARCH(TABLE = , COLUMN = col1, SIMILAR_TO = query_vector, METRIC = 'dot', TOP_N = 5)",
+                new ParserErrorInfo(36, "SQL46010", ","));
+
+            // Missing value after equals for COLUMN
+            ParserTestUtils.ErrorTest170(
+                "SELECT * FROM VECTOR_SEARCH(TABLE = tbl1, COLUMN = , SIMILAR_TO = query_vector, METRIC = 'dot', TOP_N = 5)",
+                new ParserErrorInfo(51, "SQL46010", ","));
+
+            // Missing value after equals for SIMILAR_TO
+            ParserTestUtils.ErrorTest170(
+                "SELECT * FROM VECTOR_SEARCH(TABLE = tbl1, COLUMN = col1, SIMILAR_TO = , METRIC = 'dot', TOP_N = 5)",
+                new ParserErrorInfo(70, "SQL46010", ","));
+
+            // Missing value after equals for METRIC
+            ParserTestUtils.ErrorTest170(
+                "SELECT * FROM VECTOR_SEARCH(TABLE = tbl1, COLUMN = col1, SIMILAR_TO = query_vector, METRIC = , TOP_N = 5)",
+                new ParserErrorInfo(93, "SQL46010", ","));
+
+            // Missing value after equals for TOP_N
+            ParserTestUtils.ErrorTest170(
+                "SELECT * FROM VECTOR_SEARCH(TABLE = tbl1, COLUMN = col1, SIMILAR_TO = query_vector, METRIC = 'dot', TOP_N = )",
+                new ParserErrorInfo(108, "SQL46010", ")"));
+
+            // Extra parameter
+            ParserTestUtils.ErrorTest170(
+                "SELECT * FROM VECTOR_SEARCH(TABLE = tbl1, COLUMN = col1, SIMILAR_TO = query_vector, METRIC = 'dot', TOP_N = 5, EXTRA_PARAM = 'value')",
+                new ParserErrorInfo(109, "SQL46010", ","));
+
+            // Extra comma at end
+            ParserTestUtils.ErrorTest170(
+                "SELECT * FROM VECTOR_SEARCH(TABLE = tbl1, COLUMN = col1, SIMILAR_TO = query_vector, METRIC = 'dot', TOP_N = 5,)",
+                new ParserErrorInfo(109, "SQL46010", ","));
+
+            // Function call with constant input, not keyword params
+            ParserTestUtils.ErrorTest170(
+                "SELECT * FROM VECTOR_SEARCH('tbl1', 'col1', 'query_vector', 'dot', 5)",
+                new ParserErrorInfo(28, "SQL46010", "'tbl1'"));
+        }
     }
 }
