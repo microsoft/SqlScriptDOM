@@ -13951,7 +13951,7 @@ securityTargetObjectCommon[SecurityTargetObject vParent]
                 (
                     vIdentifier2=securityStatementPermission
                     {
-                        vParent.ObjectKind = ParseSecurityObjectKind(vIdentifier1, vIdentifier2);
+                        vParent.ObjectKind = ParseSecurityObjectKindTSql170(vIdentifier1, vIdentifier2);
                     }
                 |
                     vIdentifier2=securityStatementPermission vIdentifier3=securityStatementPermission

@@ -42,6 +42,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         SearchPropertyList = 23,
         ServerRole = 24,
         AvailabilityGroup = 25,
+        ExternalModel = 26,
     }
 
 #pragma warning restore 1591
