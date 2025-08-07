@@ -32081,7 +32081,7 @@ aiGenerateEmbeddingsFunctionCall
             vResult.Input = vInput;
         }
 
-        tUse:Use                         // ← your reserved keyword
+        tUse:Use                         // your reserved keyword
         {
             UpdateTokenInfo(vResult, tUse);
         }
