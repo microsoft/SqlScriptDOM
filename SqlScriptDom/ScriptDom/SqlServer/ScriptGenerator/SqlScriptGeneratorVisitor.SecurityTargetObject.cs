@@ -13,7 +13,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
         protected static Dictionary<SecurityObjectKind, List<TokenGenerator>> _securityObjectKindGenerators =
             new Dictionary<SecurityObjectKind, List<TokenGenerator>>()
         {
-			    { SecurityObjectKind.AvailabilityGroup, new List<TokenGenerator>() {
+                { SecurityObjectKind.AvailabilityGroup, new List<TokenGenerator>() {
                     new IdentifierGenerator(CodeGenerationSupporter.Availability, true),
                     new IdentifierGenerator(CodeGenerationSupporter.Group) }},
 
@@ -96,11 +96,15 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
                 { SecurityObjectKind.FullTextStopList, new List<TokenGenerator>() {
                     new IdentifierGenerator(CodeGenerationSupporter.Fulltext, true),
                     new KeywordGenerator(TSqlTokenType.StopList)}},
-                
+
                 { SecurityObjectKind.SearchPropertyList, new List<TokenGenerator>() {
                     new IdentifierGenerator(CodeGenerationSupporter.Search, true),
                     new IdentifierGenerator(CodeGenerationSupporter.Property, true),
                     new IdentifierGenerator(CodeGenerationSupporter.List)}},
+
+                { SecurityObjectKind.ExternalModel, new List<TokenGenerator>() {
+                    new IdentifierGenerator(CodeGenerationSupporter.External, true),
+                    new IdentifierGenerator(CodeGenerationSupporter.Model) }},
                 
         };
 

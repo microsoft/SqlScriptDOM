@@ -906,7 +906,7 @@ create2005Statements returns [TSqlStatement vResult = null]
             vResult=createEventStatement // NOTIFICATION or SESSION
         |
             {NextTokenMatches(CodeGenerationSupporter.External)}?
-            vResult=createExternalStatements // EXTERNAL DATA SOURCE, FILE FORMAT, STREAM, TABLE, RESOURCE POOL, LIBRARY, LANGUAGE
+            vResult=createExternalStatements // EXTERNAL DATA SOURCE, FILE FORMAT, STREAM, TABLE, RESOURCE POOL, LIBRARY, LANGUAGE, MODEL
         |
             {NextTokenMatches(CodeGenerationSupporter.Fulltext)}?
             vResult=createFulltextStatement // Index or CATALOG
@@ -4299,8 +4299,8 @@ alterDatabaseEncryptionKey [IToken tAlter] returns [AlterDatabaseEncryptionKeySt
 addSensitivityClassificationStatement returns [AddSensitivityClassificationStatement vResult = this.FragmentFactory.CreateFragment<AddSensitivityClassificationStatement>()]
 {
     ColumnReferenceExpression vColumn;
-	SensitivityClassificationOption vOption;
-	long encounteredOptions = 0;
+    SensitivityClassificationOption vOption;
+    long encounteredOptions = 0;
 }
     : tSensitivity:Identifier tClassification:Identifier To
         {
@@ -4309,24 +4309,24 @@ addSensitivityClassificationStatement returns [AddSensitivityClassificationState
         }
         (vColumn = column
             {
-			    CheckTableNameExistsForColumn(vColumn, true);
+                CheckTableNameExistsForColumn(vColumn, true);
                 AddAndUpdateTokenInfo(vResult, vResult.Columns, vColumn);
             }
             (Comma vColumn = column
                 {
-				    CheckTableNameExistsForColumn(vColumn, true);
+                    CheckTableNameExistsForColumn(vColumn, true);
                     AddAndUpdateTokenInfo(vResult, vResult.Columns, vColumn);
                 }
             )*
         )
-		With LeftParenthesis vOption = sensitivityClassificationOption
+        With LeftParenthesis vOption = sensitivityClassificationOption
         {
-		    CheckOptionDuplication(ref encounteredOptions, (int)vOption.Type, vOption);
+            CheckOptionDuplication(ref encounteredOptions, (int)vOption.Type, vOption);
             AddAndUpdateTokenInfo(vResult, vResult.Options, vOption);
         }
         (Comma vOption = sensitivityClassificationOption
             {
-			    CheckOptionDuplication(ref encounteredOptions, (int)vOption.Type, vOption);
+                CheckOptionDuplication(ref encounteredOptions, (int)vOption.Type, vOption);
                 AddAndUpdateTokenInfo(vResult, vResult.Options, vOption);
             }
         )*
@@ -4357,10 +4357,10 @@ sensitivityClassificationOption returns [SensitivityClassificationOption vResult
                     break;
             }
 
-			vResult = FragmentFactory.CreateFragment<SensitivityClassificationOption>();
+            vResult = FragmentFactory.CreateFragment<SensitivityClassificationOption>();
 
             vResult.Value = vSensitivityValue;
-			vResult.Type = optionType;
+            vResult.Type = optionType;
 
             UpdateTokenInfo(vResult, tOption);
         }
@@ -4409,17 +4409,17 @@ dropSensitivityClassificationStatement returns [DropSensitivityClassificationSta
         }
         (vColumn = column
             {
-			    CheckTableNameExistsForColumn(vColumn, true);
+                CheckTableNameExistsForColumn(vColumn, true);
                 AddAndUpdateTokenInfo(vResult, vResult.Columns, vColumn);
             }
             (Comma vColumn = column
                 {
-				    CheckTableNameExistsForColumn(vColumn, true);
+                    CheckTableNameExistsForColumn(vColumn, true);
                     AddAndUpdateTokenInfo(vResult, vResult.Columns, vColumn);
                 }
             )*
         )
-	;
+    ;
 
 //////////////////////////////////////////////////////////////////////
 // Create Database
@@ -6266,7 +6266,7 @@ simpleBulkInsertOptionWithValue returns [LiteralBulkInsertOption vResult = Fragm
         | iValue = identifier
             {
                 vResult.OptionKind = BulkInsertStringOptionsHelper.Instance.ParseOption(tOption, SqlVersionFlags.TSql150);
-				UpdateTokenInfo(vResult, tOption);
+                UpdateTokenInfo(vResult, tOption);
                 if (vResult.OptionKind == BulkInsertOptionKind.HeaderRow)
                     if(!TryMatch(iValue, CodeGenerationSupporter.True))
                             Match(iValue, CodeGenerationSupporter.False);
@@ -8947,6 +8947,9 @@ createExternalStatements returns [TSqlStatement vResult = null]
         |
             {NextTokenMatches(CodeGenerationSupporter.Stream)}?
             vResult = createExternalStreamStatement
+        |
+            {NextTokenMatches(CodeGenerationSupporter.Model)}?
+            vResult = createExternalModelStatement
         )
     ;
 
@@ -8964,6 +8967,9 @@ alterExternalStatements returns [TSqlStatement vResult = null]
         |
             {NextTokenMatches(CodeGenerationSupporter.Language)}?
             vResult = alterExternalLanguageStatement
+        |
+            {NextTokenMatches(CodeGenerationSupporter.Model)}?
+            vResult = alterExternalModelStatement
         )
     ;
 
@@ -13945,7 +13951,7 @@ securityTargetObjectCommon[SecurityTargetObject vParent]
                 (
                     vIdentifier2=securityStatementPermission
                     {
-                        vParent.ObjectKind = ParseSecurityObjectKind(vIdentifier1, vIdentifier2);
+                        vParent.ObjectKind = ParseSecurityObjectKindTSql170(vIdentifier1, vIdentifier2);
                     }
                 |
                     vIdentifier2=securityStatementPermission vIdentifier3=securityStatementPermission
@@ -14768,9 +14774,9 @@ dropStatements returns [TSqlStatement vResult]
             | {NextTokenMatches(CodeGenerationSupporter.Column)}?
               vResult = dropColumnStatements
             | {NextTokenMatches(CodeGenerationSupporter.External)}?
-              vResult = dropExternalStatement // EXTERNAL DATA SOURCE, FILE FORMAT, TABLE or RESOURCE POOL
-			| {NextTokenMatches(CodeGenerationSupporter.Sensitivity)}?
-			  vResult = dropSensitivityClassificationStatement
+              vResult = dropExternalStatement // EXTERNAL DATA SOURCE, FILE FORMAT, TABLE , MODEL or RESOURCE POOL
+            | {NextTokenMatches(CodeGenerationSupporter.Sensitivity)}?
+              vResult = dropSensitivityClassificationStatement
             | vResult = dropServerStatements
             | vResult = dropUserStatement
         )
@@ -15662,6 +15668,9 @@ dropExternalStatement returns [TSqlStatement vResult = null]
         |
             {NextTokenMatches(CodeGenerationSupporter.Resource)}?
             vResult = dropExternalResourcePoolStatement
+        |
+            {NextTokenMatches(CodeGenerationSupporter.Model)}?
+            vResult = dropExternalModelStatement
         )
     ;
 
@@ -16952,13 +16961,13 @@ createColumnStoreIndexStatement [IToken tUnique, bool? isClustered] returns [Cre
             (
                 identifierColumnList[vResult, vResult.OrderedColumns]
                 {
-					foreach (var col in vResult.OrderedColumns)
-					{
-						if (PseudoColumnHelper.IsGraphPseudoColumn(col))
-						{
+                    foreach (var col in vResult.OrderedColumns)
+                    {
+                        if (PseudoColumnHelper.IsGraphPseudoColumn(col))
+                        {
                             ThrowIncorrectSyntaxErrorException(col);
                         }
-					}
+                    }
                 }
             )
         )?
@@ -17184,9 +17193,9 @@ filterExpressionPrimary returns [BooleanExpression vResult]
             vExpression = filterColumn
             (
                  Is
-				 (
-					vResult = filterNullPredicate[vExpression]
-				|
+                 (
+                    vResult = filterNullPredicate[vExpression]
+                |
                     (
                         Not
                             {
@@ -17199,7 +17208,7 @@ filterExpressionPrimary returns [BooleanExpression vResult]
                     |
                         vResult = filterDistinctPredicate[vExpression, vNotDefined]
                     )
-				 )
+                 )
                 | vResult = filterComparisonPredicate[vExpression]
                 | vResult = filterInPredicate[vExpression]
             )
@@ -17252,9 +17261,9 @@ filterDistinctPredicate[ScalarExpression vColumn, bool vNotDefined] returns [Dis
     ScalarExpression vExpression;
 }
     :
-		vExpression = expression
+        vExpression = expression
         {
-			vResult.FirstExpression = vColumn;
+            vResult.FirstExpression = vColumn;
             vResult.SecondExpression = vExpression;
             vResult.IsNot = vNotDefined;
         }
@@ -17262,9 +17271,9 @@ filterDistinctPredicate[ScalarExpression vColumn, bool vNotDefined] returns [Dis
 
 filterNullPredicateFromDistinctPredicate[ScalarExpression vColumn, bool vNotDefined] returns [BooleanIsNullExpression vResult = this.FragmentFactory.CreateFragment<BooleanIsNullExpression>()]
     :
-		tNull:Null
+        tNull:Null
         {
-			vResult.IsNot = vNotDefined;
+            vResult.IsNot = vNotDefined;
             vResult.Expression = vColumn;
             UpdateTokenInfo(vResult,tNull);
         }
@@ -19122,6 +19131,8 @@ selectTableReferenceElementWithoutJoinParenthesis[SubDmlFlags subDmlFlags] retur
     :
         {NextTokenMatches(CodeGenerationSupporter.ChangeTable)}?
         vResult=changeTableTableReference
+    |   {NextTokenMatches(CodeGenerationSupporter.AiGenerateChunks)}?
+        vResult = aiGenerateChunksTableReference
     |   vResult=builtInFunctionTableReference
     |   {NextIdentifierMatchesOneOf(new string[] {CodeGenerationSupporter.StringSplit, CodeGenerationSupporter.GenerateSeries, CodeGenerationSupporter.RegexpMatches, CodeGenerationSupporter.RegexpSplitToTable})}?
         vResult=globalFunctionTableReference
@@ -19137,124 +19148,259 @@ selectTableReferenceElementWithoutJoinParenthesis[SubDmlFlags subDmlFlags] retur
     |   vResult=subDmlTableReference[subDmlFlags]
     |   {NextTokenMatches(CodeGenerationSupporter.Predict)}?
         vResult=predictTableReference[subDmlFlags]
+    |   {NextTokenMatches(CodeGenerationSupporter.VectorSearch)}?
+        vResult=vectorSearchTableReference
     |   vResult=schemaObjectOrFunctionTableReference
     ;
 
+aiGenerateChunksTableReference returns [AIGenerateChunksTableReference vResult = null]
+{
+    ScalarExpression vSource;
+    Identifier vChunkType;
+}
+    :
+    {NextTokenMatches(CodeGenerationSupporter.AiGenerateChunks)}?
+    tFunc:Identifier
+    {
+        Match(tFunc, CodeGenerationSupporter.AiGenerateChunks);
+    }
+    LeftParenthesis
+        tSourceToken:Identifier
+        {
+            Match(tSourceToken, CodeGenerationSupporter.Source);
+        }
+        EqualsSign
+        vSource = expression
+        Comma
+        tChunkTypeToken:Identifier
+        {
+            Match(tChunkTypeToken, CodeGenerationSupporter.ChunkType);
+        }
+        EqualsSign
+        vChunkType = identifier
+        Comma
+        vResult = aiGenerateFixedChunksTableReference[vSource, vChunkType]
+    tRParen:RightParenthesis
+    {
+        if (vResult != null)
+        {
+            UpdateTokenInfo(vResult, tFunc);
+            UpdateTokenInfo(vResult, tRParen);
+        }
+    }
+    simpleTableReferenceAliasOpt[vResult]
+    ;
+
+aiGenerateFixedChunksTableReference [ScalarExpression vSource, Identifier vChunkType]
+    returns [AIGenerateFixedChunksTableReference vResult = FragmentFactory.CreateFragment<AIGenerateFixedChunksTableReference>()]
+{
+    Identifier vChunkSizeParam;
+    Identifier vOverlapParam = null;
+    Identifier vEnableChunkSetIdParam = null;
+
+    ScalarExpression vChunkSize = null;
+    ScalarExpression vOverlap = null;
+    ScalarExpression vEnableChunkSetId = null;
+}
+    :
+    {
+        Match(vChunkType, CodeGenerationSupporter.Fixed);
+        vResult.Source = vSource;
+        vResult.ChunkType = vChunkType;
+    }
+    vChunkSizeParam = identifier
+    {
+        Match(vChunkSizeParam, CodeGenerationSupporter.ChunkSize);
+    }
+    EqualsSign
+    vChunkSize = expression
+    {
+        vResult.ChunkSize = vChunkSize;
+    }
+
+    (
+        Comma
+        vOverlapParam = identifier
+        {
+            Match(vOverlapParam, CodeGenerationSupporter.Overlap);
+        }
+        EqualsSign
+        vOverlap = expression
+        {
+            vResult.Overlap = vOverlap;
+        }
+    )?
+
+    (
+        Comma
+        vEnableChunkSetIdParam = identifier
+        {
+            Match(vEnableChunkSetIdParam, CodeGenerationSupporter.EnableChunkSetId);
+        }
+        EqualsSign
+        vEnableChunkSetId = expression
+        {
+            vResult.EnableChunkSetId = vEnableChunkSetId;
+        }
+    )?
+    ;
+
+vectorSearchTableReference returns [VectorSearchTableReference vResult = FragmentFactory.CreateFragment<VectorSearchTableReference>()]
+{
+    TableReferenceWithAlias vTable;
+    ColumnReferenceExpression vColumn;
+    ScalarExpression vSimilarTo;
+    StringLiteral vMetric;
+    IntegerLiteral vTopN;
+}
+    :
+        tVectorSearch:Identifier LeftParenthesis
+        {
+            Match(tVectorSearch, CodeGenerationSupporter.VectorSearch);
+            UpdateTokenInfo(vResult, tVectorSearch);
+        }
+        Table EqualsSign vTable = mergeTarget[false]
+        {
+            vResult.Table = vTable;
+        }
+        Comma Column EqualsSign vColumn = fixedColumn
+        {
+            vResult.Column = vColumn;
+        }
+        Comma tSimilarTo:Identifier EqualsSign vSimilarTo = expression
+        {
+            Match(tSimilarTo, CodeGenerationSupporter.SimilarTo);
+            vResult.SimilarTo = vSimilarTo;
+        }
+        Comma tMetric:Identifier EqualsSign vMetric = stringLiteral
+        {
+            Match(tMetric, CodeGenerationSupporter.Metric);
+            MatchString(vMetric, CodeGenerationSupporter.Cosine, CodeGenerationSupporter.Dot, CodeGenerationSupporter.Euclidean);
+            vResult.Metric = vMetric;
+        }
+        Comma tTopN:Identifier EqualsSign vTopN = integer
+        {
+            Match(tTopN, CodeGenerationSupporter.TopN);
+            vResult.TopN = vTopN;
+        }
+        RightParenthesis simpleTableReferenceAliasOpt[vResult]
+    ;
+
 predictTableReference[SubDmlFlags subDmlFlags] returns [PredictTableReference vResult]
-	:
-		{NextTokenMatches(CodeGenerationSupporter.Predict)}?
-		tPredict:Identifier LeftParenthesis vResult = predictParams[subDmlFlags, ExpressionFlags.None] tRParen:RightParenthesis predictWithClauseOpt[vResult] simpleTableReferenceAliasOpt[vResult]
-		{
-			Match(tPredict, CodeGenerationSupporter.Predict);
-			UpdateTokenInfo(vResult, tPredict);
-			UpdateTokenInfo(vResult, tRParen);
-		}
-	;
+    :
+        {NextTokenMatches(CodeGenerationSupporter.Predict)}?
+        tPredict:Identifier LeftParenthesis vResult = predictParams[subDmlFlags, ExpressionFlags.None] tRParen:RightParenthesis predictWithClauseOpt[vResult] simpleTableReferenceAliasOpt[vResult]
+        {
+            Match(tPredict, CodeGenerationSupporter.Predict);
+            UpdateTokenInfo(vResult, tPredict);
+            UpdateTokenInfo(vResult, tRParen);
+        }
+    ;
 
 predictParams[SubDmlFlags subDmlFlags, ExpressionFlags expressionFlags] returns [PredictTableReference vResult = FragmentFactory.CreateFragment<PredictTableReference>()]
 {
-	ScalarExpression vModelVariable;
-	ScalarSubquery vModelSubquery;
-	TableReferenceWithAlias vDataSource;
-	Identifier vRuntime;
+    ScalarExpression vModelVariable;
+    ScalarSubquery vModelSubquery;
+    TableReferenceWithAlias vDataSource;
+    Identifier vRuntime;
 }
-	:
-	(
-		tModelVariable:Identifier EqualsSign vModelVariable = expression
-		{
-		        Match(tModelVariable, CodeGenerationSupporter.Model);
-				vResult.ModelVariable = vModelVariable;
-				UpdateTokenInfo(vResult, tModelVariable);
-		}
-	|	tModelSubquery:Identifier EqualsSign vModelSubquery = subquery[SubDmlFlags.SelectNotForInsert, expressionFlags]
-		{
-				vResult.ModelSubquery = vModelSubquery;
-		}
-	)
-		Comma tData:Identifier EqualsSign vDataSource = mergeTarget[false]
-		{
-			vResult.DataSource = vDataSource;
-		}
-		(
-		Comma tRunTime:Identifier EqualsSign vRuntime = identifier
-		{
-			vResult.RunTime = vRuntime;
-		}
-		)?
-	;
+    :
+    (
+        tModelVariable:Identifier EqualsSign vModelVariable = expression
+        {
+                Match(tModelVariable, CodeGenerationSupporter.Model);
+                vResult.ModelVariable = vModelVariable;
+                UpdateTokenInfo(vResult, tModelVariable);
+        }
+    |	tModelSubquery:Identifier EqualsSign vModelSubquery = subquery[SubDmlFlags.SelectNotForInsert, expressionFlags]
+        {
+                vResult.ModelSubquery = vModelSubquery;
+        }
+    )
+        Comma tData:Identifier EqualsSign vDataSource = mergeTarget[false]
+        {
+            vResult.DataSource = vDataSource;
+        }
+        (
+        Comma tRunTime:Identifier EqualsSign vRuntime = identifier
+        {
+            vResult.RunTime = vRuntime;
+        }
+        )?
+    ;
 
 predictWithClauseOpt [PredictTableReference vParent]
-	:	(With) =>
-		(
-			(With LeftParenthesis predictSchemaItemList[vParent] tRParen:RightParenthesis
-				{
-					UpdateTokenInfo(vParent,tRParen);
-				}
-			)
-		)
-	;
+    :	(With) =>
+        (
+            (With LeftParenthesis predictSchemaItemList[vParent] tRParen:RightParenthesis
+                {
+                    UpdateTokenInfo(vParent,tRParen);
+                }
+            )
+        )
+    ;
 
 predictSchemaItemList [PredictTableReference vParent]
 {
-	SchemaDeclarationItem vItem;
+    SchemaDeclarationItem vItem;
 }
-	: vItem = predictSchemaItem
-		{
-			AddAndUpdateTokenInfo(vParent, vParent.SchemaDeclarationItems, vItem);
-		}
-		(Comma vItem = predictSchemaItem
-			{
-				AddAndUpdateTokenInfo(vParent, vParent.SchemaDeclarationItems, vItem);
-			}
-		)*
-	;
+    : vItem = predictSchemaItem
+        {
+            AddAndUpdateTokenInfo(vParent, vParent.SchemaDeclarationItems, vItem);
+        }
+        (Comma vItem = predictSchemaItem
+            {
+                AddAndUpdateTokenInfo(vParent, vParent.SchemaDeclarationItems, vItem);
+            }
+        )*
+    ;
 
 predictSchemaItem returns [SchemaDeclarationItem vResult = FragmentFactory.CreateFragment<SchemaDeclarationItem>()]
 {
-	ValueExpression vMapping;
-	ColumnDefinitionBase vColumn;
+    ValueExpression vMapping;
+    ColumnDefinitionBase vColumn;
 }
-	: vColumn = columnDefinitionBasic
-		{
-			vResult.ColumnDefinition = vColumn;
-		}
-		(vMapping = stringLiteral
-			{
-				vResult.Mapping = vMapping;
-			}
-		)?
-		(As tPredict:Identifier
-			{
-				Match(tPredict, CodeGenerationSupporter.Predict);
-			}
-		)?
-	;
+    : vColumn = columnDefinitionBasic
+        {
+            vResult.ColumnDefinition = vColumn;
+        }
+        (vMapping = stringLiteral
+            {
+                vResult.Mapping = vMapping;
+            }
+        )?
+        (As tPredict:Identifier
+            {
+                Match(tPredict, CodeGenerationSupporter.Predict);
+            }
+        )?
+    ;
 
 mergeTarget[bool indexHintAllowed] returns [TableReferenceWithAlias vResult]
 {
-	Identifier vAlias;
+    Identifier vAlias;
 }
-	:
-		vResult=dmlTarget[indexHintAllowed]
-		(
-			(
-				As vAlias = identifier
-				{
-					vResult.Alias = vAlias;
-				}
-			)
-			|
-			{!NextTokenMatches(CodeGenerationSupporter.Using)}?
-			(
-				vAlias = identifier
-				{
-					vResult.Alias = vAlias;
-				}
-			)
-			|
-			/* empty */
-		)
-	;
+    :
+        vResult=dmlTarget[indexHintAllowed]
+        (
+            (
+                As vAlias = identifier
+                {
+                    vResult.Alias = vAlias;
+                }
+            )
+            |
+            {!NextTokenMatches(CodeGenerationSupporter.Using)}?
+            (
+                vAlias = identifier
+                {
+                    vResult.Alias = vAlias;
+                }
+            )
+            |
+            /* empty */
+        )
+    ;
 
 changeTableTableReference returns [TableReferenceWithAliasAndColumns vResult]
 {
@@ -20158,20 +20304,20 @@ insertColumn returns [ColumnReferenceExpression vResult = FragmentFactory.Create
 openRowsetColumn returns [OpenRowsetColumnDefinition vResult = FragmentFactory.CreateFragment<OpenRowsetColumnDefinition>()]
 {
     ColumnDefinitionBase vColumn;
-	IntegerLiteral vColumnOrdinal;
-	StringLiteral vStringLiteral;
+    IntegerLiteral vColumnOrdinal;
+    StringLiteral vStringLiteral;
 }
     :   vColumn = columnDefinitionBasic
-		{
-			vResult.ColumnIdentifier = vColumn.ColumnIdentifier;
-			vResult.DataType = vColumn.DataType;
-			vResult.Collation = vColumn.Collation;
-		}
-		(vColumnOrdinal=integer
+        {
+            vResult.ColumnIdentifier = vColumn.ColumnIdentifier;
+            vResult.DataType = vColumn.DataType;
+            vResult.Collation = vColumn.Collation;
+        }
+        (vColumnOrdinal=integer
         {
             vResult.ColumnOrdinal = vColumnOrdinal;
         }
-	|	vStringLiteral=stringLiteral
+    |	vStringLiteral=stringLiteral
         {
             vResult.JsonPath = vStringLiteral;
         })?
@@ -20264,13 +20410,23 @@ schemaObjectTableDmlTarget [bool indexHintAllowed] returns [NamedTableReference 
         )?
     ;
 
-schemaObjectOrFunctionTableReference returns [TableReference vResult]
+schemaObjectOrFunctionTableReference returns [TableReference vResult = null]
 {
     SchemaObjectName vSchemaObjectName;
 }
     :
         vSchemaObjectName=schemaObjectFourPartName
         (
+           {
+                vSchemaObjectName.BaseIdentifier != null &&
+                vSchemaObjectName.BaseIdentifier.Value.Equals(CodeGenerationSupporter.AiGenerateChunks, StringComparison.OrdinalIgnoreCase) &&
+                vSchemaObjectName.BaseIdentifier.QuoteType == QuoteType.NotQuoted &&
+                LT(2).getText().Equals(CodeGenerationSupporter.Source, StringComparison.OrdinalIgnoreCase)
+            }?
+            {
+                vResult = aiGenerateChunksTableReference();
+            }
+            |
             {IsTableReference(false)}?
             vResult=schemaObjectTableReference[vSchemaObjectName]
             | vResult=schemaObjectFunctionTableReference[vSchemaObjectName]
@@ -20806,7 +20962,7 @@ openRowsetCosmos returns [OpenRowsetCosmos vResult = FragmentFactory.CreateFragm
 {
     long encountered = 0;
     OpenRowsetCosmosOption vOption;
-	OpenRowsetColumnDefinition vColumn;
+    OpenRowsetColumnDefinition vColumn;
 }
 
 :   vOption = openRowsetCosmosOptionHint
@@ -20867,7 +21023,7 @@ openRowsetBulk returns [BulkOpenRowset vResult = FragmentFactory.CreateFragment<
 
     BulkInsertOption vOption;
     StringLiteral vDataFile;
-	OpenRowsetColumnDefinition vColumn;
+    OpenRowsetColumnDefinition vColumn;
 }
     : Bulk 
         ((
@@ -20902,10 +21058,10 @@ openRowsetBulk returns [BulkOpenRowset vResult = FragmentFactory.CreateFragment<
         tRParen:RightParenthesis
         {
             CheckForDataFileFormatProhibitedOptionsInOpenRowsetBulk(encountered, vDataFile);
-			CheckForParquetFormatProhibitedOptionsInOpenRowsetBulk(encountered, vResult);
+            CheckForParquetFormatProhibitedOptionsInOpenRowsetBulk(encountered, vResult);
             UpdateTokenInfo(vResult,tRParen);
         }
-		(tWith:With
+        (tWith:With
         {
             UpdateTokenInfo(vResult,tWith);
         }
@@ -21541,23 +21697,23 @@ simpleGroupByItem [ref bool alreadyEncounteredDistributedAggHint] returns [Expre
         {
             vResult.Expression = vExpression;
         }
-		(
-			// Greedy due to conflict with withCommonTableExpressionsAndXmlNamespaces
-			options { greedy = true; } :
-			With LeftParenthesis tDistributedAgg:Identifier tRParen:RightParenthesis
-			{
-				Match(tDistributedAgg, CodeGenerationSupporter.DistributedAgg);
+        (
+            // Greedy due to conflict with withCommonTableExpressionsAndXmlNamespaces
+            options { greedy = true; } :
+            With LeftParenthesis tDistributedAgg:Identifier tRParen:RightParenthesis
+            {
+                Match(tDistributedAgg, CodeGenerationSupporter.DistributedAgg);
 
-				if (alreadyEncounteredDistributedAggHint)
-					ThrowParseErrorException("SQL46129", tDistributedAgg, TSqlParserResource.SQL46129Message);
+                if (alreadyEncounteredDistributedAggHint)
+                    ThrowParseErrorException("SQL46129", tDistributedAgg, TSqlParserResource.SQL46129Message);
 
-				vResult.DistributedAggregation = true;
-				UpdateTokenInfo(vResult, tDistributedAgg);
-				UpdateTokenInfo(vResult, tRParen);
+                vResult.DistributedAggregation = true;
+                UpdateTokenInfo(vResult, tDistributedAgg);
+                UpdateTokenInfo(vResult, tRParen);
 
-				alreadyEncounteredDistributedAggHint = true;
-			}
-		)?
+                alreadyEncounteredDistributedAggHint = true;
+            }
+        )?
     ;
 
 // End of Group By clause
@@ -23281,9 +23437,9 @@ createColumnMasterKeyStatement returns [CreateColumnMasterKeyStatement vResult =
 columnMasterkeyParameter returns [ColumnMasterKeyParameter vResult]
     :	{NextTokenMatches(CodeGenerationSupporter.KeyStoreProviderName)}?
         vResult = columnMasterKeyStoreProviderNameParameter
-		| {NextTokenMatches(CodeGenerationSupporter.KeyPath)}?
+        | {NextTokenMatches(CodeGenerationSupporter.KeyPath)}?
         vResult = columnMasterKeyPathParameter
-		| {NextTokenMatches(CodeGenerationSupporter.EnclaveComputations)}?
+        | {NextTokenMatches(CodeGenerationSupporter.EnclaveComputations)}?
         vResult = columnMasterKeyEnclaveComputationsParameter
     ;
 
@@ -23311,14 +23467,14 @@ columnMasterKeyPathParameter returns [ColumnMasterKeyPathParameter vResult = Fra
         }
     ;
 
-	columnMasterKeyEnclaveComputationsParameter returns [ColumnMasterKeyEnclaveComputationsParameter vResult = FragmentFactory.CreateFragment<ColumnMasterKeyEnclaveComputationsParameter>()]
+    columnMasterKeyEnclaveComputationsParameter returns [ColumnMasterKeyEnclaveComputationsParameter vResult = FragmentFactory.CreateFragment<ColumnMasterKeyEnclaveComputationsParameter>()]
 {
     BinaryLiteral vSignature;
 }
     :	tEnclaveComputations:Identifier tLeftParens:LeftParenthesis tSignature:Identifier tEquals3:EqualsSign vSignature=binary tRightParens:RightParenthesis
         {
             Match(tEnclaveComputations, CodeGenerationSupporter.EnclaveComputations);
-			Match(tSignature, CodeGenerationSupporter.Signature);
+            Match(tSignature, CodeGenerationSupporter.Signature);
             vResult.ParameterKind = ColumnMasterKeyParameterKind.Signature;
             vResult.Signature = vSignature;
         }
@@ -23763,6 +23919,247 @@ dropSecurityPolicyStatement returns [DropSecurityPolicyStatement vResult = Fragm
         }
     ;
 
+createExternalModelStatement returns [CreateExternalModelStatement vResult = FragmentFactory.CreateFragment<CreateExternalModelStatement>()]
+{
+    Identifier vName;
+    long encounteredOptions = 0;
+}
+    :   tModel:Identifier vName = identifier
+        {
+            Match(tModel, CodeGenerationSupporter.Model);
+            vResult.Name = vName;
+            ThrowPartialAstIfPhaseOne(vResult);
+        }
+        authorizationOpt[vResult]
+        tWith:With LeftParenthesis
+        (
+            {NextTokenMatches(CodeGenerationSupporter.Location)}?
+            externalModelLocation[vResult]
+        |
+            {NextTokenMatches(CodeGenerationSupporter.ApiFormat)}?
+            externalModelApiFormat[vResult]
+        |
+            {NextTokenMatches(CodeGenerationSupporter.ModelType)}?
+            externalModelModelType[vResult]
+        |
+            {NextTokenMatches(CodeGenerationSupporter.ModelName)}?
+            externalModelModelName[vResult]
+        |
+            {NextTokenMatches(CodeGenerationSupporter.Credential)}?
+            externalModelCredential[vResult]
+        |
+            {NextTokenMatches(CodeGenerationSupporter.LocalRuntimePath)}?
+            externalModelLocalRuntimePath[vResult]
+        |
+            {NextTokenMatches(CodeGenerationSupporter.Parameters)}?
+            externalModelParameters[vResult]
+        )
+
+        (
+            tComma:Comma
+            (
+            {NextTokenMatches(CodeGenerationSupporter.Location)}?
+            externalModelLocation[vResult]
+        |
+            {NextTokenMatches(CodeGenerationSupporter.ApiFormat)}?
+            externalModelApiFormat[vResult]
+        |
+            {NextTokenMatches(CodeGenerationSupporter.ModelType)}?
+            externalModelModelType[vResult]
+        |
+            {NextTokenMatches(CodeGenerationSupporter.ModelName)}?
+            externalModelModelName[vResult]
+        |
+            {NextTokenMatches(CodeGenerationSupporter.Credential)}?
+            externalModelCredential[vResult]
+        |
+            {NextTokenMatches(CodeGenerationSupporter.LocalRuntimePath)}?
+            externalModelLocalRuntimePath[vResult]
+        |
+            {NextTokenMatches(CodeGenerationSupporter.Parameters)}?
+            externalModelParameters[vResult]
+            )
+        )*
+
+        tRParen:RightParenthesis
+        {
+            UpdateTokenInfo(vResult,tRParen);
+        }
+    ;
+
+externalModelLocation[ExternalModelStatement vParent]
+{
+    StringLiteral vLocation;
+}
+    :
+        tLocation:Identifier EqualsSign vLocation = stringLiteral
+        {
+            Match(tLocation, CodeGenerationSupporter.Location);
+            vParent.Location = vLocation;
+        }
+    ;
+
+externalModelApiFormat[ExternalModelStatement vParent]
+{
+StringLiteral vApiFormat;
+}
+:
+    tApiFormat:Identifier EqualsSign vApiFormat = stringLiteral
+    {
+        Match(tApiFormat, CodeGenerationSupporter.ApiFormat);
+        vParent.ApiFormat = vApiFormat;
+    }
+;
+
+externalModelModelType[ExternalModelStatement vParent]
+  :
+        tModelType:Identifier
+        {
+            Match(tModelType, CodeGenerationSupporter.ModelType);
+            UpdateTokenInfo(vParent, tModelType);
+        }
+        EqualsSign
+        (
+            tEmbeddings:Identifier
+            {
+                if (TryMatch(tEmbeddings, CodeGenerationSupporter.Embeddings))
+                {
+                    vParent.ModelType = ExternalModelTypeOption.EMBEDDINGS;
+                    UpdateTokenInfo(vParent, tEmbeddings);
+                }
+                else
+                {
+                    ThrowIncorrectSyntaxErrorException(tEmbeddings);
+                }
+            }
+        )
+    ;
+
+externalModelModelName[ExternalModelStatement vParent]
+{
+    StringLiteral vModelName;
+}
+    :
+        tModelName:Identifier EqualsSign vModelName = stringLiteral
+        {
+            Match(tModelName, CodeGenerationSupporter.ModelName);
+            vParent.ModelName = vModelName;
+        }
+    ;
+
+externalModelCredential[ExternalModelStatement vParent]
+{
+Identifier vCredential;
+}
+:
+    tCredential:Identifier EqualsSign vCredential = identifier
+    {
+        Match(tCredential, CodeGenerationSupporter.Credential);
+        vParent.Credential = vCredential;
+    }
+;
+externalModelLocalRuntimePath[ExternalModelStatement vParent]
+{
+StringLiteral vLocalRuntimePath;
+}
+    :
+    tLocalRuntimePath:Identifier EqualsSign vLocalRuntimePath = stringLiteral
+    {
+        Match(tLocalRuntimePath, CodeGenerationSupporter.LocalRuntimePath);
+        vParent.LocalRuntimePath = vLocalRuntimePath;
+    }
+    ;
+externalModelParameters[ExternalModelStatement vParent]
+{
+    StringLiteral vParameters;
+}
+    :
+    tParameters:Identifier EqualsSign vParameters = stringLiteral
+    {
+        Match(tParameters, CodeGenerationSupporter.Parameters);
+        vParent.Parameters = vParameters;
+    }
+    ;
+
+alterExternalModelStatement returns [AlterExternalModelStatement vResult = FragmentFactory.CreateFragment<AlterExternalModelStatement>()]
+{
+    Identifier vName;
+    long encounteredOptions = 0;
+}
+    :   tModel:Identifier vName = identifier
+        {
+            Match(tModel, CodeGenerationSupporter.Model);
+            vResult.Name = vName;
+            ThrowPartialAstIfPhaseOne(vResult);
+        }
+        tSet:Set LeftParenthesis
+        (
+            {NextTokenMatches(CodeGenerationSupporter.Location)}?
+            externalModelLocation[vResult]
+        |
+            {NextTokenMatches(CodeGenerationSupporter.ApiFormat)}?
+            externalModelApiFormat[vResult]
+        |
+            {NextTokenMatches(CodeGenerationSupporter.ModelType)}?
+            externalModelModelType[vResult]
+        |
+            {NextTokenMatches(CodeGenerationSupporter.ModelName)}?
+            externalModelModelName[vResult]
+        |
+            {NextTokenMatches(CodeGenerationSupporter.Credential)}?
+            externalModelCredential[vResult]
+        |
+            {NextTokenMatches(CodeGenerationSupporter.LocalRuntimePath)}?
+            externalModelLocalRuntimePath[vResult]
+        |
+            {NextTokenMatches(CodeGenerationSupporter.Parameters)}?
+            externalModelParameters[vResult]
+        )
+
+        (
+            tComma:Comma
+            (
+            {NextTokenMatches(CodeGenerationSupporter.Location)}?
+            externalModelLocation[vResult]
+        |
+            {NextTokenMatches(CodeGenerationSupporter.ApiFormat)}?
+            externalModelApiFormat[vResult]
+        |
+            {NextTokenMatches(CodeGenerationSupporter.ModelType)}?
+            externalModelModelType[vResult]
+        |
+            {NextTokenMatches(CodeGenerationSupporter.ModelName)}?
+            externalModelModelName[vResult]
+        |
+            {NextTokenMatches(CodeGenerationSupporter.Credential)}?
+            externalModelCredential[vResult]
+        |
+            {NextTokenMatches(CodeGenerationSupporter.LocalRuntimePath)}?
+            externalModelLocalRuntimePath[vResult]
+        |
+            {NextTokenMatches(CodeGenerationSupporter.Parameters)}?
+            externalModelParameters[vResult]
+            )
+        )*
+
+        tRParen:RightParenthesis
+        {
+            UpdateTokenInfo(vResult,tRParen);
+        }
+    ;
+
+dropExternalModelStatement returns [DropExternalModelStatement vResult = FragmentFactory.CreateFragment<DropExternalModelStatement>()]
+{
+    Identifier vName;
+}
+    :   tModel:Identifier vName = identifier
+        {
+            Match(tModel, CodeGenerationSupporter.Model);
+            vResult.Name = vName;
+            ThrowPartialAstIfPhaseOne(vResult);
+        }
+    ;
+
 createExternalDataSourceStatement returns [CreateExternalDataSourceStatement vResult = FragmentFactory.CreateFragment<CreateExternalDataSourceStatement>()]
 {
     Identifier vName;
@@ -23852,11 +24249,11 @@ externalDataSourceType[CreateExternalDataSourceStatement vParent]
                     UpdateTokenInfo(vParent, tExternalDataSourceType);
                     vParent.DataSourceType = ExternalDataSourceType.BLOB_STORAGE;
                 }
-				else
-				{
-					UpdateTokenInfo(vParent, tExternalDataSourceType);
+                else
+                {
+                    UpdateTokenInfo(vParent, tExternalDataSourceType);
                     vParent.DataSourceType = ExternalDataSourceType.EXTERNAL_GENERICS;
-				}
+                }
             }
         )
     ;
@@ -24026,7 +24423,7 @@ createExternalStreamStatement returns [CreateExternalStreamStatement vResult = F
                 {NextTokenMatches(CodeGenerationSupporter.Location)}?
                 externalStreamLocation[vResult]
             |
-			    {NextTokenMatches(CodeGenerationSupporter.InputOptions)}?
+                {NextTokenMatches(CodeGenerationSupporter.InputOptions)}?
                 externalStreamInputOptions[vResult]
             |
                {NextTokenMatches(CodeGenerationSupporter.OutputOptions)}?
@@ -29393,11 +29790,11 @@ generatedAlwaysClause [ColumnDefinition vResult]
                 }
                 else if (TryMatch(tGeneratedType, CodeGenerationSupporter.TransactionId))
                 {
-				    vResult.GeneratedAlways = GeneratedAlwaysType.TransactionIdStart;
+                    vResult.GeneratedAlways = GeneratedAlwaysType.TransactionIdStart;
                 }
                 else if (TryMatch(tGeneratedType, CodeGenerationSupporter.SequenceNumber))
-				{
-				    vResult.GeneratedAlways = GeneratedAlwaysType.SequenceNumberStart;
+                {
+                    vResult.GeneratedAlways = GeneratedAlwaysType.SequenceNumberStart;
                 }
                 else
                 {
@@ -29861,7 +30258,7 @@ uniqueTableConstraint [IndexAffectingStatement statementType] returns [UniqueCon
         (
             uniqueConstraintEnforcement[vResult]
             |
-			uniqueConstraintTailOpt[statementType, vResult]
+            uniqueConstraintTailOpt[statementType, vResult]
         )
     ;
 
@@ -31630,6 +32027,9 @@ expressionPrimary [ExpressionFlags expressionFlags] returns [PrimaryExpression v
             {NextTokenMatches(CodeGenerationSupporter.IIf) && (LA(2) == LeftParenthesis)}?
             vResult=iIfCall
         |
+            {NextTokenMatches(CodeGenerationSupporter.AIGenerateEmbeddings) && LA(2) == LeftParenthesis}?
+            vResult = aiGenerateEmbeddingsFunctionCall
+        |
             (Identifier LeftParenthesis)=>
             vResult=builtInFunctionCall
         |
@@ -31661,6 +32061,58 @@ expressionPrimary [ExpressionFlags expressionFlags] returns [PrimaryExpression v
             vResult=parenthesisDisambiguatorForExpressions[expressionFlags]
         )
         collationOpt[vResult]
+    ;
+
+aiGenerateEmbeddingsFunctionCall
+    returns [AIGenerateEmbeddingsFunctionCall vResult = this.FragmentFactory.CreateFragment<AIGenerateEmbeddingsFunctionCall>()]
+{
+    ScalarExpression vInput;
+    SchemaObjectName vModelName;
+    ScalarExpression vParams = null;
+}
+    :
+        tFunc:Identifier LeftParenthesis
+        {
+            Match(tFunc, CodeGenerationSupporter.AIGenerateEmbeddings);
+            UpdateTokenInfo(vResult, tFunc);
+        }
+        vInput=expression
+        {
+            vResult.Input = vInput;
+        }
+
+        tUse:Use                         // your reserved keyword
+        {
+            UpdateTokenInfo(vResult, tUse);
+        }
+
+        tModel:Identifier
+        {
+            Match(tModel, CodeGenerationSupporter.Model);
+        }
+
+        vModelName=schemaObjectThreePartName
+        {
+            vResult.ModelName = vModelName;
+        }
+
+        (
+            tParams:Identifier
+            {
+                Match(tParams, CodeGenerationSupporter.Parameters);
+            }
+            LeftParenthesis
+                vParams=expression
+            RightParenthesis
+            {
+                vResult.OptionalParameters = vParams;
+            }
+        )?
+
+        tRParen:RightParenthesis
+        {
+            UpdateTokenInfo(vResult, tRParen);
+        }
     ;
 
 parenthesisDisambiguatorForExpressions [ExpressionFlags expressionFlags] returns [PrimaryExpression vResult]
@@ -31962,6 +32414,36 @@ expressionList [TSqlFragment vParent, IList<ScalarExpression> expressions]
         |
             /* empty */
         )
+        (
+            jsonReturningClause[vParent]
+        |
+            /* empty */
+        )
+    ;
+
+    jsonObjectAggExpressionList [FunctionCall vParent]
+    {
+        JsonKeyValue vExpression;
+    }
+        :
+        (
+            vExpression=jsonKeyValueExpression
+        {
+            AddAndUpdateTokenInfo(vParent, vParent.JsonParameters, vExpression);
+        }
+        |
+            /* empty */
+        )
+        (
+            jsonNullClauseFunction[vParent]
+        |
+            /* empty */
+        )
+        (
+            jsonReturningClause[vParent]
+        |
+            /* empty */
+        )
     ;
 
     jsonNullClauseFunction [FunctionCall vParent]
@@ -31970,7 +32452,7 @@ expressionList [TSqlFragment vParent, IList<ScalarExpression> expressions]
         Identifier vAbsent;
     }
     :
-	    (
+        (
             Null On Null
             {
                 vNull = FragmentFactory.CreateFragment<Identifier>();
@@ -31988,24 +32470,40 @@ expressionList [TSqlFragment vParent, IList<ScalarExpression> expressions]
             }
         )
     ;
-    
+
+jsonReturningClause [FunctionCall vParent]
+{
+    Identifier vJson;
+}
+:
+    tReturning:Identifier tJson:Identifier
+    {
+        Match(tReturning, CodeGenerationSupporter.Returning);
+        Match(tJson, CodeGenerationSupporter.Json);
+        UpdateTokenInfo(vParent,tJson);
+        vJson = FragmentFactory.CreateFragment<Identifier>();
+        AddAndUpdateTokenInfo(vParent, vParent.ReturnType, vJson);
+        vJson.SetUnquotedIdentifier(tJson.getText());
+    }
+;
+
 jsonKeyValueExpression returns [JsonKeyValue vResult = FragmentFactory.CreateFragment<JsonKeyValue>()]
 {
     ScalarExpression vKey;
     ScalarExpression vValue;
 }
-	: 
+    : 
         (
             vKey=expression
-		    {           
-		        vResult.JsonKeyName=vKey;
-		    }
-            Colon vValue=expression 
-			{            
-			    vResult.JsonValue=vValue;
+            {           
+                vResult.JsonKeyName=vKey;
             }
-		)
-	;
+            Colon vValue=expression 
+            {            
+                vResult.JsonValue=vValue;
+            }
+        )
+    ;
 
 windowClause returns [WindowClause vResult = FragmentFactory.CreateFragment<WindowClause>()]
 {
@@ -32285,6 +32783,9 @@ builtInFunctionCall returns [FunctionCall vResult = FragmentFactory.CreateFragme
         {(vResult.FunctionName != null && vResult.FunctionName.Value.ToUpper(CultureInfo.InvariantCulture) == CodeGenerationSupporter.JsonObject)}?
             jsonObjectBuiltInFunctionCall[vResult]
         |
+         {(vResult.FunctionName != null && vResult.FunctionName.Value.ToUpper(CultureInfo.InvariantCulture) == CodeGenerationSupporter.JsonObjectAgg)}?
+            jsonObjectAggBuiltInFunctionCall[vResult]
+        |
          {(vResult.FunctionName != null && vResult.FunctionName.Value.ToUpper(CultureInfo.InvariantCulture) == CodeGenerationSupporter.Trim) && 
           (NextTokenMatches(CodeGenerationSupporter.Leading) | NextTokenMatches(CodeGenerationSupporter.Trailing) | NextTokenMatches(CodeGenerationSupporter.Both))}?
             trim3ArgsBuiltInFunctionCall[vResult]
@@ -32317,6 +32818,11 @@ jsonArrayBuiltInFunctionCall [FunctionCall vParent]
         |
             /* empty */
         )
+        (
+            jsonReturningClause[vParent]
+        |
+            /* empty */
+        )
         tRParen:RightParenthesis
         {
             UpdateTokenInfo(vParent, tRParen);
@@ -32333,6 +32839,20 @@ jsonObjectBuiltInFunctionCall [FunctionCall vParent]
             /* empty */
         )
         
+        tRParen:RightParenthesis
+        {
+            UpdateTokenInfo(vParent, tRParen);
+        }
+    ;
+
+jsonObjectAggBuiltInFunctionCall [FunctionCall vParent]
+{
+}
+    :   (
+            jsonObjectAggExpressionList[vParent]
+        |
+            /* empty */
+        )
         tRParen:RightParenthesis
         {
             UpdateTokenInfo(vParent, tRParen);
@@ -32402,19 +32922,19 @@ ignoreRespectNulls [FunctionCall vParent]
     Identifier vNulls;
 }
     :
-	    tIgnoreOrRespect:Identifier
+        tIgnoreOrRespect:Identifier
         {
-		    Match(tIgnoreOrRespect, CodeGenerationSupporter.Ignore, CodeGenerationSupporter.Respect);
+            Match(tIgnoreOrRespect, CodeGenerationSupporter.Ignore, CodeGenerationSupporter.Respect);
             vIgnoreOrRespect = FragmentFactory.CreateFragment<Identifier>();
-			AddAndUpdateTokenInfo(vParent, vParent.IgnoreRespectNulls, vIgnoreOrRespect);
-			vIgnoreOrRespect.SetUnquotedIdentifier(tIgnoreOrRespect.getText());
+            AddAndUpdateTokenInfo(vParent, vParent.IgnoreRespectNulls, vIgnoreOrRespect);
+            vIgnoreOrRespect.SetUnquotedIdentifier(tIgnoreOrRespect.getText());
         }
         tNulls:Identifier
         {
-		    Match(tNulls, CodeGenerationSupporter.Nulls);
+            Match(tNulls, CodeGenerationSupporter.Nulls);
             vNulls = FragmentFactory.CreateFragment<Identifier>();
-			AddAndUpdateTokenInfo(vParent, vParent.IgnoreRespectNulls, vNulls);
-			vNulls.SetUnquotedIdentifier(tNulls.getText());
+            AddAndUpdateTokenInfo(vParent, vParent.IgnoreRespectNulls, vNulls);
+            vNulls.SetUnquotedIdentifier(tNulls.getText());
         }
     ;
 
@@ -33480,9 +34000,9 @@ nonEmptyString returns [StringLiteral vResult]
         }
     ;
 
-	defaultValueLiteral returns [ScalarExpression vResult]
-	: vResult = literal
-	| vResult = signedIntegerOrReal;
+    defaultValueLiteral returns [ScalarExpression vResult]
+    : vResult = literal
+    | vResult = signedIntegerOrReal;
 
 stringLiteral returns [StringLiteral vResult = this.FragmentFactory.CreateFragment<StringLiteral>()]
     : tAsciiStringLiteral:AsciiStringLiteral
@@ -33744,6 +34264,7 @@ securityStatementPermission returns [Identifier vResult = this.FragmentFactory.C
 }
     :
         tId:Identifier
+    |   AiGenerateEmbeddings
     |   Add
     |   All
     |   Alter

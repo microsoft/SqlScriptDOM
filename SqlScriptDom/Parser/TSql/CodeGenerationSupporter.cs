@@ -99,6 +99,8 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         internal const string Affinity = "AFFINITY";
         internal const string After = "AFTER";
         internal const string Aggregate = "AGGREGATE";
+        internal const string AiGenerateChunks = "AI_GENERATE_CHUNKS";
+        internal const string AIGenerateEmbeddings = "AI_GENERATE_EMBEDDINGS";
         internal const string Algorithm = "ALGORITHM";
         internal const string AlterColumn = "ALTERCOLUMN";
         internal const string All = "ALL";
@@ -118,6 +120,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         internal const string Always = "ALWAYS";
         internal const string Anonymous = "ANONYMOUS";
         internal const string AnsiNullDefault = "ANSI_NULL_DEFAULT";
+        internal const string ApiFormat = "API_FORMAT";
         internal const string Application = "APPLICATION";
         internal const string ApplicationLog = "APPLICATION_LOG";
         internal const string Apply = "APPLY";
@@ -198,6 +201,8 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         internal const string CheckPolicy = "CHECK_POLICY";
         internal const string Checksum = "CHECKSUM";
         internal const string ChecksumAgg = "CHECKSUM_AGG";
+        internal const string ChunkSize = "CHUNK_SIZE";
+        internal const string ChunkType = "CHUNK_TYPE";
         internal const string ModularSum = "MODULAR_SUM";
         internal const string Classifier = "CLASSIFIER";
         internal const string Classification = "CLASSIFICATION";
@@ -225,7 +230,6 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         internal const string CompressionDelay = "COMPRESSION_DELAY";
         internal const string CompressAllRowGroups = "COMPRESS_ALL_ROW_GROUPS";
         internal const string Concat = "CONCAT";
-        internal const string Cosine = "COSINE";
         internal const string Configuration = "CONFIGURATION";
         internal const string ConnectionOptions = "CONNECTION_OPTIONS";
         internal const string Contained = "CONTAINED";
@@ -244,6 +248,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         internal const string CopyCommand = "COPY";
         internal const string CopyOnly = "COPY_ONLY";
         internal const string Correlated = "CORRELATED";
+        internal const string Cosine = "COSINE";
         internal const string Count = "COUNT";
         internal const string CountBig = "COUNT_BIG";
         internal const string Counter = "COUNTER";
@@ -301,7 +306,6 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         internal const string Description = "DESCRIPTION";
         internal const string DesiredState = "DESIRED_STATE";
         internal const string DiskANN = "DISKANN";
-        internal const string Dot = "DOT";
         internal const string Delay = "DELAY";
         internal const string DelayedDurability = "DELAYED_DURABILITY";
         internal const string DelimitedText = "DELIMITEDTEXT";
@@ -320,6 +324,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         internal const string Document = "DOCUMENT";
         internal const string DollarSign = "$";
         internal const string DollarPartition = "$PARTITION";
+        internal const string Dot = "DOT";
         internal const string Drop = "DROP";
         internal const string DropExisting = "DROP_EXISTING";
         internal const string DTSBuffers = "DTS_BUFFERS";
@@ -329,11 +334,13 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         internal const string Edition = "EDITION";
         internal const string ElasticPool = "ELASTIC_POOL";
         internal const string Elements = "ELEMENTS";
+        internal const string Embeddings = "EMBEDDINGS";
         internal const string Emergency = "EMERGENCY";
         internal const string Empty = "EMPTY";
         internal const string Enable = "ENABLE";
         internal const string Enabled = "ENABLED";
         internal const string EnableBroker = "ENABLE_BROKER";
+        internal const string EnableChunkSetId = "ENABLE_CHUNK_SET_ID";
         internal const string EnclaveComputations = "ENCLAVE_COMPUTATIONS";
         internal const string Encoding = "ENCODING";
         internal const string Encrypted = "ENCRYPTED";
@@ -350,13 +357,13 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         internal const string EnvironmentVariables = "ENVIRONMENT_VARIABLES";
         internal const string Equal = "=";
         internal const string Error = "ERROR";
-        internal const string Euclidean = "EUCLIDEAN";
         internal const string ErrorBrokerConversations = "ERROR_BROKER_CONVERSATIONS";
         internal const string ErrorDataSource = "ERRORFILE_DATA_SOURCE";
         internal const string ErrorFile = "ERRORFILE";
         internal const string ErrorFileCredential = "ERRORFILE_CREDENTIAL";
         internal const string EscapeChar = "ESCAPECHAR";
         internal const string EstimateOnly = "ESTIMATEONLY";
+        internal const string Euclidean = "EUCLIDEAN";
         internal const string Event = "EVENT";
         internal const string EventRetentionMode = "EVENT_RETENTION_MODE";
         internal const string Exclamation = "!";
@@ -415,6 +422,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         internal const string FieldQuote = "FIELDQUOTE";
         internal const string FipsFlagger = "FIPS_FLAGGER";
         internal const string First = "FIRST";
+        internal const string Fixed = "FIXED";
         internal const string FlushIntervalSeconds = "FLUSH_INTERVAL_SECONDS";
         internal const string FlushIntervalSecondsAlt = "DATA_FLUSH_INTERVAL_SECONDS";
         internal const string Fn = "FN";
@@ -514,6 +522,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         internal const string Json = "JSON";
         internal const string JsonArray = "JSON_ARRAY";
         internal const string JsonObject = "JSON_OBJECT";
+        internal const string JsonObjectAgg = "JSON_OBJECTAGG";
         internal const string Keep = "KEEP";
         internal const string KeepDefaults = "KEEPDEFAULTS";
         internal const string KeepFixed = "KEEPFIXED";
@@ -555,6 +564,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         internal const string LoadHistory = "LOADHISTORY";
         internal const string LobCompaction = "LOB_COMPACTION";
         internal const string Local = "LOCAL";
+        internal const string LocalRuntimePath = "LOCAL_RUNTIME_PATH";
         internal const string Location = "LOCATION";
         internal const string LocationUserDB = "USER_DB";
         internal const string LocalServiceName = "LOCAL_SERVICE_NAME";
@@ -615,8 +625,8 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         internal const string Message = "MESSAGE";
         internal const string MessageForwarding = "MESSAGE_FORWARDING";
         internal const string MessageForwardSize = "MESSAGE_FORWARD_SIZE";
-        internal const string MigrationState = "MIGRATION_STATE";
         internal const string Metric = "METRIC";
+        internal const string MigrationState = "MIGRATION_STATE";
         internal const string Min = "MIN";
         internal const string MinGrantPercent = "MIN_GRANT_PERCENT";
         internal const string MinCpuPercent = "MIN_CPU_PERCENT";
@@ -628,6 +638,8 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         internal const string Mirror = "MIRROR";
         internal const string Mixed = "MIXED";
         internal const string MixedPageAllocation = "MIXED_PAGE_ALLOCATION";
+        internal const string ModelType = "MODEL_TYPE";
+        internal const string ModelName = "MODEL";
         internal const string Modify = "MODIFY";
         internal const string Money = "MONEY";
         internal const string Move = "MOVE";
@@ -761,6 +773,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         internal const string Model = "MODEL";
         internal const string RunTime = "RUNTIME";
         internal const string Onnx = "ONNX";
+        internal const string Overlap = "OVERLAP";
 
         internal const string Process = "PROCESS";
         internal const string PropertySetGuid = "PROPERTY_SET_GUID";
@@ -842,6 +855,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         internal const string RetentionDays = "RETENTION_DAYS";
         internal const string RetentionPeriod = "RETENTION_PERIOD";
         internal const string Returns = "RETURNS";
+        internal const string Returning = "RETURNING";
         internal const string RequestMaxCpuTimeSec = "REQUEST_MAX_CPU_TIME_SEC";
         internal const string RequestMaxMemoryGrantPercent = "REQUEST_MAX_MEMORY_GRANT_PERCENT";
         internal const string RequestMemoryGrantTimeoutSec = "REQUEST_MEMORY_GRANT_TIMEOUT_SEC";
@@ -916,6 +930,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         internal const string ShrinkDb = "SHRINKDB";
         internal const string Sid = "SID";
         internal const string Signature = "SIGNATURE";
+        internal const string SimilarTo = "SIMILAR_TO";
         internal const string Simple = "SIMPLE";
         internal const string SingleBlob = "SINGLE_BLOB";
         internal const string SingleClob = "SINGLE_CLOB";
@@ -1025,6 +1040,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         internal const string Timer = "TIMER";
         internal const string TimeStamp = "TIMESTAMP";
         internal const string TinyInt = "TINYINT";
+        internal const string TopN = "TOP_N";
         internal const string TornPageDetection = "TORN_PAGE_DETECTION";
         internal const string TrackCausality = "TRACK_CAUSALITY";
         internal const string TrackColumnsUpdated = "TRACK_COLUMNS_UPDATED";
@@ -1059,6 +1075,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         internal const string Unpivot = "UNPIVOT";
         internal const string UpdLock = "UPDLOCK";
         internal const string Url = "URL";
+        internal const string Use = "USE";
         internal const string Used = "USED";
         internal const string UseIdentity = "USE_IDENTITY";
         internal const string UseTypeDefault = "USE_TYPE_DEFAULT";
@@ -1076,6 +1093,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         internal const string Varp = "VARP";
         internal const string VDevNo = "VDEVNO";
         internal const string Vector = "Vector";
+        internal const string VectorSearch = "VECTOR_SEARCH";
         internal const string Verbose = "VERBOSE";
         internal const string VerboseLogging = "VerboseLogging";
         internal const string VerifyOnly = "VERIFYONLY";

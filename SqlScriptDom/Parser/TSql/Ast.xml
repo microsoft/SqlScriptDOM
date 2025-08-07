@@ -403,8 +403,8 @@
             Summary="Actual JSON for clause options. First one is always present (JSON mode)."/>
   </Class>
   <Class Name="JsonKeyValue" Base="ScalarExpression" Summary ="Represent a key value Pair">
-		<Member Name="JsonKeyName" Type="ScalarExpression" Summary="Key name" />
-		<Member Name="JsonValue" Type="ScalarExpression" Summary="scalar expression" />
+        <Member Name="JsonKeyName" Type="ScalarExpression" Summary="Key name" />
+        <Member Name="JsonValue" Type="ScalarExpression" Summary="scalar expression" />
   </Class>	
   <Class Name="JsonForClauseOption" Base="ForClause" Summary="Represents FOR JSON (options) case">
     <Member Name="OptionKind" Type="JsonForClauseOptions" GenerateUpdatePositionInfoCall="false" Summary="Option kind"/>
@@ -642,6 +642,7 @@
     <Member Name="TrimOptions" Type="Identifier" Summary="TRIM intrinsic can take optional arguments like 'Leading', 'Trailing' or 'Both'."/>
     <Member Name="JsonParameters" Type="JsonKeyValue" Collection="true" Summary="The Json parameters to the function."/>
     <Member Name="AbsentOrNullOnNull" Type="Identifier"  Collection="true" Summary="The Absent or Null on Null will convert or remove sql null to json null"/>
+    <Member Name="ReturnType" Type="Identifier"  Collection="true" Summary="Return type of function. Used by json_arrayagg, json_objectagg, json_array, json_object and json_value"/>
   </Class>
   <Class Name="CallTarget" Abstract="true" Summary="Represents a target of a function call.">
   </Class>
@@ -1344,6 +1345,27 @@
   </Class>
   <Class Name="DropExternalStreamStatement" Base="DropUnownedObjectStatement" Summary="Represents a DROP EXTERNAL STREAM statement.">
     <InheritedClass Name="DropUnownedObjectStatement"/>
+  </Class>
+
+  <Class Name="ExternalModelStatement" Abstract="true" Base="TSqlStatement" Summary="Base class for all external model statement objects.">
+    <Member Name="Name" Type="Identifier" Summary="The external model name."/>
+    <Member Name="Location" Type="Literal" Summary="The external model location name."/>
+    <Member Name="ApiFormat" Type="Literal" Summary="The external model api format name."/>
+    <Member Name="ModelType" Type="ExternalModelTypeOption?" GenerateUpdatePositionInfoCall="false" Summary="The external model type name."/>
+    <Member Name="ModelName" Type="Literal" Summary="The external model name to be used to generate embeddings."/>
+    <Member Name="Credential" Type="Identifier" Summary="The external model credentials name."/>
+    <Member Name="Parameters" Type="Literal" Summary="The external model parameters as key-value pairs."/>
+    <Member Name="LocalRuntimePath" Type="Literal" Summary="The local runtime path for the model."/>
+  </Class>
+  <Class Name="CreateExternalModelStatement" Base="ExternalModelStatement" Summary="Represents a CREATE EXTERNAL MODEL statement.">
+    <InheritedClass Name="ExternalModelStatement"/>
+    <Implements Interface="IAuthorization"/>
+  </Class>
+  <Class Name="DropExternalModelStatement" Base="DropUnownedObjectStatement" Summary="Represents a DROP EXTERNAL MODEL statement.">
+    <InheritedClass Name="DropUnownedObjectStatement"/>
+  </Class>
+  <Class Name="AlterExternalModelStatement" Base="ExternalModelStatement" Summary="Represents a ALTER EXTERNAL MODEL statement.">
+    <InheritedClass Name="ExternalModelStatement"/>
   </Class>
 
   <Class Name="ExternalFileFormatStatement" Abstract="true" Base="TSqlStatement" Summary="Base class for all external file format statement objects.">
@@ -3558,7 +3580,7 @@
   </Class>
   <Class Name="TableReferenceWithAlias" Abstract="true" Base="TableReference" Summary="This represents a table reference that can have an alias.">
     <Member Name="Alias" Type="Identifier" Summary="Optional table alias. May be null."/>
-	<Member Name="ForPath" Type="bool" Summary="Whether this table reference is marked as graph FOR PATH."/>
+    <Member Name="ForPath" Type="bool" Summary="Whether this table reference is marked as graph FOR PATH."/>
   </Class>
   <Class Name="TableReferenceWithAliasAndColumns" Abstract="true" Base="TableReferenceWithAlias" Summary="Represents a table reference that can specify column aliases.">
     <InheritedClass Name="TableReferenceWithAlias" />
@@ -4712,5 +4734,30 @@
   <Class Name="ElasticPoolSpecification" Base="DatabaseOption" Summary="Represents the ELASTIC_POOL service objective specification.">
     <InheritedClass Name="DatabaseOption" />
     <Member Name="ElasticPoolName" Type="Identifier" Summary="The name of the elastic pool."/>
+  </Class>
+  <Class Name="AIGenerateChunksTableReference" Base="TableReferenceWithAlias" Summary="Represents the AI_GENERATE_CHUNKS table-valued function call.">
+    <InheritedClass Name="TableReferenceWithAlias" />
+    <Member Name="Source" Type="ScalarExpression" Summary="The expression representing the input text or column to chunk." />
+    <Member Name="ChunkType" Type="Identifier" Summary="The chunking strategy, such as FIXED." />
+  </Class>
+  <Class Name="AIGenerateFixedChunksTableReference" Base="AIGenerateChunksTableReference" Summary="Represents a fixed-chunk configuration of AI_GENERATE_CHUNKS.">
+    <InheritedClass Name="AIGenerateChunksTableReference" />
+    <Member Name="ChunkSize" Type="ScalarExpression" Summary="The size of each generated chunk." />
+    <Member Name="Overlap" Type="ScalarExpression" Summary="Optional percentage of overlap between chunks." />
+    <Member Name="EnableChunkSetId" Type="ScalarExpression" Summary="Optional flag to include a chunk_set_id column in the result." />
+  </Class>
+  <Class Name="AIGenerateEmbeddingsFunctionCall" Base="PrimaryExpression" Summary="Represents the ai_generate_embeddings built-in.">
+    <InheritedClass Name="PrimaryExpression" />
+    <Member Name="Input" Type="ScalarExpression" Summary="Input text to generate embeddings for." />
+    <Member Name="ModelName" Type="SchemaObjectName" Summary="Model name used in USE MODEL clause." />
+    <Member Name="OptionalParameters" Type="ScalarExpression" Summary="Optional PARAMETERS clause, must evaluate to JSON." />
+  </Class>
+  <Class Name="VectorSearchTableReference" Base="TableReferenceWithAlias" Summary="Represents the VECTOR_SEARCH table-valued function call.">
+    <InheritedClass Name="TableReferenceWithAlias" />
+    <Member Name="Table" Type="TableReferenceWithAlias" Summary="Table on which perform the search." />
+    <Member Name="Column" Type="ColumnReferenceExpression" Summary="The vector column in which search is performed." />
+    <Member Name="SimilarTo" Type="ScalarExpression" Summary="The vector used for search." />
+    <Member Name="Metric" Type="StringLiteral" Summary="The distance metric to use for the search." />
+    <Member Name="TopN" Type="IntegerLiteral" Summary="The maximum number of similar vectors that must be returned." />
   </Class>
 </Types>

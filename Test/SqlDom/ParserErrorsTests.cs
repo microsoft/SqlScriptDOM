@@ -504,6 +504,51 @@ WITH
         }
 
         /// <summary>
+        /// Negative tests for JSON_OBJECTAGG syntax in functions
+        /// </summary>
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void JsonObjectAGGSyntaxNegativeTest()
+        {
+            // Incorrect key value parameter number
+            ParserTestUtils.ErrorTest170("SELECT JSON_OBJECTAGG('name':'value', 'type':1)",
+               new ParserErrorInfo(36, "SQL46010", ","));
+
+            // No closing quotation mark
+            ParserTestUtils.ErrorTest170("SELECT JSON_OBJECTAGG('name':'value)",
+               new ParserErrorInfo(29, "SQL46030", "'value)"));
+
+            // Incorrect placing of colon
+            ParserTestUtils.ErrorTest170("SELECT JSON_OBJECTAGG('name':'value''type':1)",
+               new ParserErrorInfo(42, "SQL46010", ":"));
+
+            // cannot use expression without colon
+            ParserTestUtils.ErrorTest170("SELECT JSON_OBJECTAGG('name')",
+                new ParserErrorInfo(22, "SQL46010", "'name'"));
+
+            // cannot use expression without colon
+            ParserTestUtils.ErrorTest170("SELECT JSON_OBJECTAGG('name' ABSENT ON NULL)",
+               new ParserErrorInfo(29, "SQL46010", "ABSENT"));
+
+            // Cannot use empty value
+            ParserTestUtils.ErrorTest170("SELECT JSON_OBJECTAGG('name':)",
+               new ParserErrorInfo(29, "SQL46010", ")"));
+
+            // Cannot use incomplete absent on null clause cases
+            ParserTestUtils.ErrorTest170("SELECT JSON_OBJECTAGG('name':NULL ABSENT ON)",
+                new ParserErrorInfo(43, "SQL46010", ")"));
+
+            // Cannot use Incomplete RETURNING clause
+            ParserTestUtils.ErrorTest170("SELECT JSON_OBJECTAGG('name':NULL RETURNING ON)",
+                    new ParserErrorInfo(46, "SQL46010", ")"));
+
+            // Cannot use anything other than JSON in RETURNING clause
+            ParserTestUtils.ErrorTest170("SELECT JSON_OBJECTAGG('name':NULL RETURNING INT)",
+                    new ParserErrorInfo(44, "SQL46005", "JSON", "INT"));
+        }
+
+        /// <summary>
         /// Negative tests for Data Masking Alter Column syntax.
         /// </summary>
         [TestMethod]
@@ -6864,7 +6909,7 @@ WHEN NOT MATCHED BY SOURCE THEN DELETE OUTPUT inserted.*, deleted.*;";
                 WITH a;";
             ParserTestUtils.ErrorTest160(invalidWithClause3Syntax, new ParserErrorInfo(invalidWithClause3Syntax.IndexOf(@"a;"), "SQL46010", "a"));
         }
-        
+
         /// <summary>
         /// Negative tests for Scalar Functions in Fabric DW.
         /// </summary>
@@ -7030,6 +7075,413 @@ WHEN NOT MATCHED BY SOURCE THEN DELETE OUTPUT inserted.*, deleted.*;";
             // Incomplete WITH clause
             ParserTestUtils.ErrorTest170("CREATE VECTOR INDEX IX_Test ON dbo.Documents (VectorData) WITH",
                 new ParserErrorInfo(58, "SQL46010", "WITH"));
+        }
+
+        /// <summary>
+        /// Negative tests for AI_GENERATE_CHUNKS syntax
+        /// </summary>
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void GenerateChunksNegativeTest170()
+        {
+            // Missing required parameters
+            ParserTestUtils.ErrorTest170(
+                "SELECT * FROM AI_GENERATE_CHUNKS(source = 'text')",
+                new ParserErrorInfo(48, "SQL46010", ")"));
+
+            // Missing CHUNK_SIZE
+            ParserTestUtils.ErrorTest170(
+                "SELECT * FROM AI_GENERATE_CHUNKS(source = 'text', CHUNK_TYPE = fixed)",
+                new ParserErrorInfo(68, "SQL46010", ")"));
+
+            // Invalid order: CHUNK_SIZE before CHUNK_TYPE
+            ParserTestUtils.ErrorTest170(
+                "SELECT * FROM AI_GENERATE_CHUNKS(source = 'text', CHUNK_SIZE = 5, CHUNK_TYPE = fixed)",
+                new ParserErrorInfo(50, "SQL46005", "CHUNK_TYPE", "CHUNK_SIZE"));
+
+            // Invalid order: enable_chunk_set_id before overlap
+            ParserTestUtils.ErrorTest170(
+                "SELECT * FROM AI_GENERATE_CHUNKS(source = 'text', CHUNK_TYPE = fixed, CHUNK_SIZE = 5, enable_chunk_set_id = 1, overlap = 10)",
+                new ParserErrorInfo(86, "SQL46010", "enable_chunk_set_id"));
+
+            // Invalid order: enable_chunk_set_id before CHUNK_SIZE
+            ParserTestUtils.ErrorTest170(
+                "SELECT * FROM AI_GENERATE_CHUNKS(source = 'text', CHUNK_TYPE = fixed, enable_chunk_set_id = 1, CHUNK_SIZE = 5, overlap = 10)",
+                new ParserErrorInfo(70, "SQL46010", "enable_chunk_set_id"));
+
+            // Invalid value: CHUNK_TYPE = 'fixed' (should be keyword, not string)
+            ParserTestUtils.ErrorTest170(
+                "SELECT * FROM AI_GENERATE_CHUNKS(source = 'text', CHUNK_TYPE = 'fixed', CHUNK_SIZE = 5)",
+                new ParserErrorInfo(63, "SQL46010", "'fixed'"));
+
+            // Invalid expression: CHUNK_TYPE = @CHUNK_TYPE (should not be variable)
+            ParserTestUtils.ErrorTest170(
+                "SELECT * FROM AI_GENERATE_CHUNKS(source = 'text', CHUNK_TYPE = @CHUNK_TYPE, CHUNK_SIZE = 5)",
+                new ParserErrorInfo(63, "SQL46010", "@CHUNK_TYPE"));
+
+            // Invalid parameter: CHUNK_TYPE = t1.c1 (should not be column reference)
+            ParserTestUtils.ErrorTest170(
+                "SELECT * FROM t1 CROSS APPLY AI_GENERATE_CHUNKS(source = 'text', CHUNK_TYPE = t1.c1, CHUNK_SIZE = 5)",
+                new ParserErrorInfo(80, "SQL46010", "."));
+
+            // Missing value after equals
+            ParserTestUtils.ErrorTest170(
+                "SELECT * FROM AI_GENERATE_CHUNKS(source = , CHUNK_TYPE = fixed, CHUNK_SIZE = 5)",
+                new ParserErrorInfo(42, "SQL46010", ","));
+
+            // Missing value for CHUNK_SIZE
+            ParserTestUtils.ErrorTest170(
+                "SELECT * FROM AI_GENERATE_CHUNKS(source = 'text', CHUNK_TYPE = fixed, CHUNK_SIZE = )",
+                new ParserErrorInfo(83, "SQL46010", ")"));
+
+            // Unknown parameter
+            ParserTestUtils.ErrorTest170(
+                "SELECT * FROM AI_GENERATE_CHUNKS(source = 'text', CHUNK_TYPE = fixed, CHUNK_SIZE = 5, invalid_param = 123)",
+                new ParserErrorInfo(86, "SQL46010", "invalid_param"));
+
+            // Extra comma at end
+            ParserTestUtils.ErrorTest170(
+                "SELECT * FROM AI_GENERATE_CHUNKS(source = 'text', CHUNK_TYPE = fixed, CHUNK_SIZE = 5,)",
+                new ParserErrorInfo(85, "SQL46010", ")"));
+
+            // Too many parameters
+            ParserTestUtils.ErrorTest170(
+                "SELECT * FROM AI_GENERATE_CHUNKS(source = 'text', CHUNK_TYPE = fixed, CHUNK_SIZE = 5, overlap = 1, enable_chunk_set_id = 2, extra = 3)",
+                new ParserErrorInfo(122, "SQL46010", ","));
+
+            // Function call with constant input, not keyword params
+            ParserTestUtils.ErrorTest170(
+                "SELECT * FROM ai_generate_chunks(3)",
+                new ParserErrorInfo(33, "SQL46010", "3"));
+
+            // Missing paramter "source"
+            ParserTestUtils.ErrorTest170(
+                "SELECT source, target FROM userTable cross apply ai_generate_chunks(target)",
+                new ParserErrorInfo(68, "SQL46005", "SOURCE", "target"));
+
+            // Misuse of parameter "source"
+            ParserTestUtils.ErrorTest170(
+                "SELECT source, target FROM userTable cross apply ai_generate_chunks(source)",
+                new ParserErrorInfo(74, "SQL46010", ")"));
+
+            // Misuse of bracketed function name
+            ParserTestUtils.ErrorTest170(
+                "SELECT * FROM [ai_generate_chunks](source = 'something to chunk', chunk_type = fixed, chunk_size = 5)",
+                new ParserErrorInfo(42, "SQL46010", "="));
+
+            // Misuse of 2-part identifier
+            ParserTestUtils.ErrorTest170(
+                "SELECT * FROM dbo.ai_generate_chunks(source = 'something to chunk', chunk_type = fixed, chunk_size = 5)",
+                new ParserErrorInfo(36, "SQL46010", "("));
+
+            // 2-part identifier misuse in CROSS APPLY
+            ParserTestUtils.ErrorTest170(
+                "SELECT * FROM source CROSS APPLY dbo.ai_generate_chunks(source.c1)",
+                new ParserErrorInfo(55, "SQL46010", "("));
+
+            // 2-part identifier misuse in CROSS APPLY
+            ParserTestUtils.ErrorTest170(
+                "SELECT source, target FROM userTable cross apply dbo.ai_generate_chunks(source)",
+                new ParserErrorInfo(71, "SQL46010", "("));
+
+            // Invalid CHUNK_TYPE
+            ParserTestUtils.ErrorTest170(
+                "SELECT * FROM AI_GENERATE_CHUNKS (source = 'some text', chunk_type = other, chunk_size = 5)",
+                new ParserErrorInfo(69, "SQL46010", "other"));
+        }
+
+        /// <summary>
+        /// Negative tests for AI_GENERATE_EMBEDDINGS syntax
+        /// </summary>
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void GenerateEmbeddingsNegativeTest170()
+        {
+            // Missing required USE MODEL clause
+            ParserTestUtils.ErrorTest170(
+                "SELECT AI_GENERATE_EMBEDDINGS('My Default Input Text')",
+                new ParserErrorInfo(53, "SQL46010", ")"));
+
+            // Missing model name after USE MODEL
+            ParserTestUtils.ErrorTest170(
+                "SELECT AI_GENERATE_EMBEDDINGS('My Default Input Text' USE MODEL)",
+                new ParserErrorInfo(63, "SQL46010", ")"));
+
+            // Missing USE keyword before MODEL
+            ParserTestUtils.ErrorTest170(
+                "SELECT AI_GENERATE_EMBEDDINGS('My Default Input Text' MODEL MyModel)",
+                new ParserErrorInfo(54, "SQL46010", "MODEL"));
+
+            // USE keyword misplaced before input expression
+            ParserTestUtils.ErrorTest170(
+                "SELECT AI_GENERATE_EMBEDDINGS(USE MODEL MyModel 'My Default Input Text')",
+                new ParserErrorInfo(30, "SQL46010", "USE"));
+
+            // PARAMETERS specified without USE MODEL
+            ParserTestUtils.ErrorTest170(
+                "SELECT AI_GENERATE_EMBEDDINGS('My Default Input Text' PARAMETERS (TRY_CONVERT(JSON, N'{}')))",
+                new ParserErrorInfo(54, "SQL46010", "PARAMETERS"));
+
+            // PARAMETERS missing parentheses
+            ParserTestUtils.ErrorTest170(
+                "SELECT AI_GENERATE_EMBEDDINGS('My Default Input Text' USE MODEL MyModel PARAMETERS TRY_CONVERT(JSON, N'{}'))",
+                new ParserErrorInfo(83, "SQL46010", "TRY_CONVERT"));
+
+            // Invalid expression inside PARAMETERS (missing closing parenthesis)
+            ParserTestUtils.ErrorTest170(
+                "SELECT AI_GENERATE_EMBEDDINGS('My Default Input Text' USE MODEL MyModel PARAMETERS (TRY_CONVERT(JSON, N'{}')",
+                new ParserErrorInfo(108, "SQL46029", "EOF"));
+
+            // Extra comma at end inside PARAMETERS
+            ParserTestUtils.ErrorTest170(
+                "SELECT AI_GENERATE_EMBEDDINGS('My Default Input Text' USE MODEL MyModel PARAMETERS (TRY_CONVERT(JSON, N'{}'),))",
+                new ParserErrorInfo(108, "SQL46010", ","));
+
+            // PARAMETERS misplaced before input
+            ParserTestUtils.ErrorTest170(
+                "SELECT AI_GENERATE_EMBEDDINGS(PARAMETERS (TRY_CONVERT(JSON, N'{}') 'My Default Input Text'))",
+                new ParserErrorInfo(67, "SQL46010", "'My Default Input Text'"));
+
+            // Missing MODEL keyword after USE
+            ParserTestUtils.ErrorTest170(
+                "SELECT AI_GENERATE_EMBEDDINGS('My Default Input Text' USE MyModel)",
+                new ParserErrorInfo(58, "SQL46005", "MODEL", "MyModel"));
+
+            // NULL model name after USE MODEL
+            ParserTestUtils.ErrorTest170(
+                "SELECT AI_GENERATE_EMBEDDINGS('My Default Input Text' USE MODEL NULL)",
+                new ParserErrorInfo(64, "SQL46010", "NULL"));
+        }
+
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void CreateExternalModelNegativeTest()
+        {
+            // Keyword typos
+            //
+            ParserTestUtils.ErrorTest170(
+                "CREATE EXTERNAL MODLE abc WITH (LOCATION = 'www.somemodellocation.235',API_FORMAT = 'Ollama',MODEL_TYPE = EMBEDDIGS,MODEL = 'shghfh',PARAMETERS = '{\"key\":\"value\"}');",
+                new ParserErrorInfo(16, "SQL46010", "MODLE"));
+
+            // Invalid Model type
+            //
+            ParserTestUtils.ErrorTest170(
+                "CREATE EXTERNAL MODEL abc WITH (LOCATION = 'www.somemodellocation.235',API_FORMAT = 'Ollama',MODEL_TYPE = EMBEDDIGS,MODEL = 'shghfh',PARAMETERS = '{\"key\":\"value\"}');",
+                new ParserErrorInfo(106, "SQL46010", "EMBEDDIGS"));
+
+            // Model type not identifier
+            //
+            ParserTestUtils.ErrorTest170(
+                "CREATE EXTERNAL MODEL abc WITH (LOCATION = 'www.somemodellocation.235',API_FORMAT = 'Ollama',MODEL_TYPE = 'EMBEDDINGS',MODEL = 'shghfh',PARAMETERS = '{\"key\":\"value\"}');",
+                new ParserErrorInfo(106, "SQL46010", "'EMBEDDINGS'"));
+
+            // Missing With Clause
+            //
+            ParserTestUtils.ErrorTest170(
+                "CREATE EXTERNAL MODEL abc (LOCATION = 'www.somemodellocation.235',API_FORMAT = 'Ollama',MODEL_TYPE = EMBEDDINGS,MODEL = 'shghfh',PARAMETERS = '{\"key\":\"value\"}');",
+                new ParserErrorInfo(26, "SQL46010", "("));
+
+            // Missing Model Name
+            //
+            ParserTestUtils.ErrorTest170(
+                "CREATE EXTERNAL MODEL WITH (LOCATION = 'www.somemodellocation.235',API_FORMAT = 'Ollama',MODEL_TYPE = EMBEDDINGS,MODEL = 'shghfh',PARAMETERS = '{\"key\":\"value\"}');",
+                new ParserErrorInfo(16, "SQL46010", "MODEL"));
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void AlterExternalModelNegativeTest()
+        {
+            // Keyword typos
+            //
+            ParserTestUtils.ErrorTest170(
+                "ALTER EXTERNAL MODLE abc SET (LOCATION = 'www.somemodellocation.235',API_FORMAT = 'Ollama',MODEL_TYPE = EMBEDDINGS,MODEL = 'shghfh',PARAMETERS = '{\"key\":\"value\"}');",
+                new ParserErrorInfo(15, "SQL46010", "MODLE"));
+
+            // Invalid Model type
+            //
+            ParserTestUtils.ErrorTest170(
+                "ALTER EXTERNAL MODEL abc SET (MODEL_TYPE = EMBEDDINS);",
+                new ParserErrorInfo(43, "SQL46010", "EMBEDDINS"));
+
+            // Model type not identifier
+            //
+            ParserTestUtils.ErrorTest170(
+                "ALTER EXTERNAL MODEL abc SET (LOCATION = 'www.somemodellocation.235',API_FORMAT = 'Ollama',MODEL_TYPE = 'EMBEDDINGS',MODEL = 'shghfh',PARAMETERS = '{\"key\":\"value\"}');",
+                new ParserErrorInfo(104, "SQL46010", "'EMBEDDINGS'"));
+
+            // Missing SET Clause
+            //
+            ParserTestUtils.ErrorTest170(
+                "ALTER EXTERNAL MODEL abc (MODEL = 'shghfh');",
+                new ParserErrorInfo(25, "SQL46010", "("));
+
+            // WITH instead of SET clause
+            //
+            ParserTestUtils.ErrorTest170(
+                "ALTER EXTERNAL MODEL abc WITH (LOCATION = 'www.somemodellocation.235',API_FORMAT = 'Ollama',MODEL_TYPE = EMBEDDINGS,MODEL = 'shghfh',PARAMETERS = '{\"key\":\"value\"}');",
+                new ParserErrorInfo(25, "SQL46010", "WITH"));
+
+            // Missing Model Name
+            //
+            ParserTestUtils.ErrorTest170(
+                "ALTER EXTERNAL MODEL SET (LOCATION = 'www.somemodellocation.235',API_FORMAT = 'Ollama',MODEL_TYPE = EMBEDDINGS,MODEL = 'shghfh',PARAMETERS = '{\"key\":\"value\"}');",
+                new ParserErrorInfo(15, "SQL46010", "MODEL"));
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void DropExternalModelNegativeTest()
+        {
+            // Keyword typos
+            //
+            ParserTestUtils.ErrorTest170(
+                "DROP EXTERNAL MODLE abc;",
+                new ParserErrorInfo(14, "SQL46010", "MODLE"));
+
+            // Missing Model Name
+            //
+            ParserTestUtils.ErrorTest170(
+                "DROP EXTERNAL MODEL;",
+                new ParserErrorInfo(14, "SQL46010", "MODEL"));
+
+            // Extra keyword
+            //
+            ParserTestUtils.ErrorTest170(
+                "DROP EXTERNAL MODEL abc WITH (LOCATION = 'www.somemodellocation.235');",
+                new ParserErrorInfo(29, "SQL46010", "("));
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void VectorSearchErrorTest170()
+        {
+            // Missing required parameters: TABLE
+            ParserTestUtils.ErrorTest170(
+                "SELECT * FROM VECTOR_SEARCH()",
+                new ParserErrorInfo(28, "SQL46010", ")"));
+
+            // Missing required parameters: COLUMN
+            ParserTestUtils.ErrorTest170(
+                "SELECT * FROM VECTOR_SEARCH(TABLE = tbl1)",
+                new ParserErrorInfo(40, "SQL46010", ")"));
+
+            // Missing required parameters: SIMILAR_TO
+            ParserTestUtils.ErrorTest170(
+                "SELECT * FROM VECTOR_SEARCH(TABLE = tbl1, COLUMN = col1)",
+                new ParserErrorInfo(55, "SQL46010", ")"));
+
+            // Missing required parameters: METRIC
+            ParserTestUtils.ErrorTest170(
+                "SELECT * FROM VECTOR_SEARCH(TABLE = tbl1, COLUMN = col1, SIMILAR_TO = query_vector)",
+                new ParserErrorInfo(82, "SQL46010", ")"));
+
+            // Missing required parameters: TOP_N
+            ParserTestUtils.ErrorTest170(
+                "SELECT * FROM VECTOR_SEARCH(TABLE = tbl1, COLUMN = col1, SIMILAR_TO = query_vector, METRIC = 'dot')",
+                new ParserErrorInfo(98, "SQL46010", ")"));
+
+            // Invalid order: COLUMN before TABLE
+            ParserTestUtils.ErrorTest170(
+                "SELECT * FROM VECTOR_SEARCH(COLUMN = col1, TABLE = tbl1, SIMILAR_TO = query_vector, METRIC = 'dot', TOP_N = 5)",
+                new ParserErrorInfo(28, "SQL46010", "COLUMN"));
+
+            // Invalid order: SIMILAR_TO before COLUMN
+            ParserTestUtils.ErrorTest170(
+                "SELECT * FROM VECTOR_SEARCH(TABLE = tbl1, SIMILAR_TO = query_vector, COLUMN = col1, METRIC = 'dot', TOP_N = 5)",
+                new ParserErrorInfo(42, "SQL46010", "SIMILAR_TO"));
+
+            // Invalid order: METRIC before SIMILAR_TO
+            ParserTestUtils.ErrorTest170(
+                "SELECT * FROM VECTOR_SEARCH(TABLE = tbl1, COLUMN = col1, METRIC = 'dot', SIMILAR_TO = query_vector, TOP_N = 5)",
+                new ParserErrorInfo(57, "SQL46005", "SIMILAR_TO", "METRIC"));
+
+            // Invalid value: TABLE = 'tbl1' (should be identifier, not string)
+            ParserTestUtils.ErrorTest170(
+                "SELECT * FROM VECTOR_SEARCH(TABLE = 'tbl1', COLUMN = col1, SIMILAR_TO = query_vector, METRIC = 'dot', TOP_N = 5)",
+                new ParserErrorInfo(36, "SQL46010", "'tbl1'"));
+
+            // Invalid value: TABLE = 123 (should be identifier, not integer)
+            ParserTestUtils.ErrorTest170(
+                "SELECT * FROM VECTOR_SEARCH(TABLE = 123, COLUMN = col1, SIMILAR_TO = query_vector, METRIC = 'dot', TOP_N = 5)",
+                new ParserErrorInfo(36, "SQL46010", "123"));
+
+            // Invalid value: COLUMN = 'col1' (should be identifier, not string)
+            ParserTestUtils.ErrorTest170(
+                "SELECT * FROM VECTOR_SEARCH(TABLE = tbl1, COLUMN = 'col1', SIMILAR_TO = query_vector, METRIC = 'dot', TOP_N = 5)",
+                new ParserErrorInfo(51, "SQL46010", "'col1'"));
+
+            // Invalid value: COLUMN = 123 (should be identifier, not integer)
+            ParserTestUtils.ErrorTest170(
+                "SELECT * FROM VECTOR_SEARCH(TABLE = tbl1, COLUMN = 123, SIMILAR_TO = query_vector, METRIC = 'dot', TOP_N = 5)",
+                new ParserErrorInfo(51, "SQL46010", "123"));
+
+            // Invalid value: METRIC = dot (should be string literal)
+            ParserTestUtils.ErrorTest170(
+                "SELECT * FROM VECTOR_SEARCH(TABLE = tbl1, COLUMN = col1, SIMILAR_TO = query_vector, METRIC = dot, TOP_N = 5)",
+                new ParserErrorInfo(93, "SQL46010", "dot"));
+
+            // Invalid value: METRIC = 'invalid_value' (should be either 'cosine', 'dot', or 'euclidean')
+            ParserTestUtils.ErrorTest170(
+                "SELECT * FROM VECTOR_SEARCH(TABLE = tbl1, COLUMN = col1, SIMILAR_TO = query_vector, METRIC = 'invalid_value', TOP_N = 5)",
+                new ParserErrorInfo(93, "SQL46010", "'invalid_value'"));
+
+            // Invalid value: TOP_N = '5' (should be integer, not string)
+            ParserTestUtils.ErrorTest170(
+                "SELECT * FROM VECTOR_SEARCH(TABLE = tbl1, COLUMN = col1, SIMILAR_TO = query_vector, METRIC = 'dot', TOP_N = '5')",
+                new ParserErrorInfo(108, "SQL46010", "'5'"));
+
+            // Invalid value: TOP_N = -5 (should be positive integer)
+            ParserTestUtils.ErrorTest170(
+                "SELECT * FROM VECTOR_SEARCH(TABLE = tbl1, COLUMN = col1, SIMILAR_TO = query_vector, METRIC = 'dot', TOP_N = -5)",
+                new ParserErrorInfo(108, "SQL46010", "-"));
+
+            // Missing value after equals for TABLE
+            ParserTestUtils.ErrorTest170(
+                "SELECT * FROM VECTOR_SEARCH(TABLE = , COLUMN = col1, SIMILAR_TO = query_vector, METRIC = 'dot', TOP_N = 5)",
+                new ParserErrorInfo(36, "SQL46010", ","));
+
+            // Missing value after equals for COLUMN
+            ParserTestUtils.ErrorTest170(
+                "SELECT * FROM VECTOR_SEARCH(TABLE = tbl1, COLUMN = , SIMILAR_TO = query_vector, METRIC = 'dot', TOP_N = 5)",
+                new ParserErrorInfo(51, "SQL46010", ","));
+
+            // Missing value after equals for SIMILAR_TO
+            ParserTestUtils.ErrorTest170(
+                "SELECT * FROM VECTOR_SEARCH(TABLE = tbl1, COLUMN = col1, SIMILAR_TO = , METRIC = 'dot', TOP_N = 5)",
+                new ParserErrorInfo(70, "SQL46010", ","));
+
+            // Missing value after equals for METRIC
+            ParserTestUtils.ErrorTest170(
+                "SELECT * FROM VECTOR_SEARCH(TABLE = tbl1, COLUMN = col1, SIMILAR_TO = query_vector, METRIC = , TOP_N = 5)",
+                new ParserErrorInfo(93, "SQL46010", ","));
+
+            // Missing value after equals for TOP_N
+            ParserTestUtils.ErrorTest170(
+                "SELECT * FROM VECTOR_SEARCH(TABLE = tbl1, COLUMN = col1, SIMILAR_TO = query_vector, METRIC = 'dot', TOP_N = )",
+                new ParserErrorInfo(108, "SQL46010", ")"));
+
+            // Extra parameter
+            ParserTestUtils.ErrorTest170(
+                "SELECT * FROM VECTOR_SEARCH(TABLE = tbl1, COLUMN = col1, SIMILAR_TO = query_vector, METRIC = 'dot', TOP_N = 5, EXTRA_PARAM = 'value')",
+                new ParserErrorInfo(109, "SQL46010", ","));
+
+            // Extra comma at end
+            ParserTestUtils.ErrorTest170(
+                "SELECT * FROM VECTOR_SEARCH(TABLE = tbl1, COLUMN = col1, SIMILAR_TO = query_vector, METRIC = 'dot', TOP_N = 5,)",
+                new ParserErrorInfo(109, "SQL46010", ","));
+
+            // Function call with constant input, not keyword params
+            ParserTestUtils.ErrorTest170(
+                "SELECT * FROM VECTOR_SEARCH('tbl1', 'col1', 'query_vector', 'dot', 5)",
+                new ParserErrorInfo(28, "SQL46010", "'tbl1'"));
         }
     }
 }

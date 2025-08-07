@@ -46,5 +46,29 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         }
 
         #endregion
+
+        /// <summary>
+        /// Parses security object kind with support for External Model (TSql170+)
+        /// </summary>
+        /// <param name="identifier1">The first identifier.</param>
+        /// <param name="identifier2">The second identifier.</param>
+        /// <returns>The security object kind.</returns>
+        protected SecurityObjectKind ParseSecurityObjectKindTSql170(Identifier identifier1, Identifier identifier2)
+        {
+            if (identifier1 == null)
+            {
+                throw new ArgumentNullException(nameof(identifier1));
+            }
+
+            switch (identifier1.Value.ToUpperInvariant())
+            {
+                case CodeGenerationSupporter.External:
+                    Match(identifier2, CodeGenerationSupporter.Model);
+                    return SecurityObjectKind.ExternalModel;
+                default:
+                    // Fall back to the base class implementation for all other cases
+                    return TSql160ParserBaseInternal.ParseSecurityObjectKind(identifier1, identifier2);
+            }
+        }
     }
 }
