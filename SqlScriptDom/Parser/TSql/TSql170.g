@@ -32786,6 +32786,9 @@ builtInFunctionCall returns [FunctionCall vResult = FragmentFactory.CreateFragme
          {(vResult.FunctionName != null && vResult.FunctionName.Value.ToUpper(CultureInfo.InvariantCulture) == CodeGenerationSupporter.JsonObjectAgg)}?
             jsonObjectAggBuiltInFunctionCall[vResult]
         |
+        {(vResult.FunctionName != null && vResult.FunctionName.Value.ToUpper(CultureInfo.InvariantCulture) == CodeGenerationSupporter.JsonArrayAgg)}?
+            jsonArrayAggBuiltInFunctionCall[vResult]
+        |
          {(vResult.FunctionName != null && vResult.FunctionName.Value.ToUpper(CultureInfo.InvariantCulture) == CodeGenerationSupporter.Trim) && 
           (NextTokenMatches(CodeGenerationSupporter.Leading) | NextTokenMatches(CodeGenerationSupporter.Trailing) | NextTokenMatches(CodeGenerationSupporter.Both))}?
             trim3ArgsBuiltInFunctionCall[vResult]
@@ -32812,6 +32815,32 @@ jsonArrayBuiltInFunctionCall [FunctionCall vParent]
            expressionList[vParent, vParent.Parameters]        
         |
             /* empty */
+        )
+        (
+           jsonNullClauseFunction[vParent]
+        |
+            /* empty */
+        )
+        (
+            jsonReturningClause[vParent]
+        |
+            /* empty */
+        )
+        tRParen:RightParenthesis
+        {
+            UpdateTokenInfo(vParent, tRParen);
+        }
+    ;
+
+jsonArrayAggBuiltInFunctionCall [FunctionCall vParent]
+{
+    ScalarExpression vExpression;
+}
+    :   (
+           vExpression=expression
+           {
+               AddAndUpdateTokenInfo(vParent, vParent.Parameters, vExpression);
+           }
         )
         (
            jsonNullClauseFunction[vParent]

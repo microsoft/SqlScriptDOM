@@ -549,6 +549,35 @@ WITH
         }
 
         /// <summary>
+        /// Negative tests for JSON_ARRAYAGG syntax in functions
+        /// </summary>
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void JsonArrayAggSyntaxNegativeTest()
+        {
+            // Incorrect placing of colon
+            ParserTestUtils.ErrorTest160("SELECT JSON_ARRAYAGG('name':'value')",
+               new ParserErrorInfo(27, "SQL46010", ":"));
+
+            // Incorrect placing of single quotes
+            ParserTestUtils.ErrorTest160("SELECT JSON_ARRAYAGG('name)",
+               new ParserErrorInfo(21, "SQL46030", "'name)"));
+
+            // Cannot use incomplete absent on null clause cases
+            ParserTestUtils.ErrorTest160("SELECT JSON_ARRAYAGG('name', NULL ABSENT ON)",
+                new ParserErrorInfo(34, "SQL46010", "ABSENT"));
+
+            // one params only
+            ParserTestUtils.ErrorTest160("SELECT JSON_ARRAYAGG('name', 'value', NULL ON NULL)",
+                new ParserErrorInfo(43, "SQL46010", "ON"));
+
+            // Cannot use  null on null incorrectly
+            ParserTestUtils.ErrorTest160("SELECT JSON_ARRAYAGG('name', NULL NULL ON)",
+                new ParserErrorInfo(34, "SQL46010", "NULL"));
+        }
+
+        /// <summary>
         /// Negative tests for Data Masking Alter Column syntax.
         /// </summary>
         [TestMethod]
