@@ -32771,7 +32771,20 @@ builtInFunctionCall returns [FunctionCall vResult = FragmentFactory.CreateFragme
 {
     Identifier vIdentifier;
 }
-    :    vIdentifier=identifier
+    :    // Special case for REGEXP_LIKE since LIKE is a reserved keyword
+        tRegexp:Identifier tLike:Like
+        {
+            Match(tRegexp, "REGEXP_");
+            vIdentifier = this.FragmentFactory.CreateFragment<Identifier>();
+            UpdateTokenInfo(vIdentifier, tRegexp);
+            UpdateTokenInfo(vIdentifier, tLike);
+            vIdentifier.SetUnquotedIdentifier(CodeGenerationSupporter.RegexpLike);
+            vResult.FunctionName = vIdentifier;
+        }
+        LeftParenthesis
+        regularBuiltInFunctionCall[vResult]
+    |
+        vIdentifier=nonQuotedIdentifier
         {
             vResult.FunctionName = vIdentifier;
         }
