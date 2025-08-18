@@ -32771,7 +32771,7 @@ builtInFunctionCall returns [FunctionCall vResult = FragmentFactory.CreateFragme
 {
     Identifier vIdentifier;
 }
-    :    vIdentifier=nonQuotedIdentifier
+    :    vIdentifier=identifier
         {
             vResult.FunctionName = vIdentifier;
         }
