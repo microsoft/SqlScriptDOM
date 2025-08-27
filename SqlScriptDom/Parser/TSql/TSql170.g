@@ -31095,6 +31095,9 @@ booleanExpressionPrimary [ExpressionFlags expressionFlags] returns [BooleanExpre
             UpdateTokenInfo(vResult,tRParen);
         }
     |
+        {NextTokenMatches(CodeGenerationSupporter.RegexpLike)}?
+            vResult=regexpLikePredicate
+    |
         vExpressionFirst=expressionWithFlags[expressionFlags]
         (
             vType=comparisonOperator
@@ -31471,6 +31474,29 @@ tsEqualCall returns [TSEqualCall vResult = this.FragmentFactory.CreateFragment<T
         Comma vExpression=expression tRParen:RightParenthesis
         {
             vResult.SecondExpression = vExpression;
+            UpdateTokenInfo(vResult,tRParen);
+        }
+    ;
+
+regexpLikePredicate returns [RegexpLikePredicate vResult = this.FragmentFactory.CreateFragment<RegexpLikePredicate>()]
+{
+    ScalarExpression vText;
+    ScalarExpression vPattern;
+    ScalarExpression vFlags = null;
+}
+    :   tRegexp:Identifier LeftParenthesis vText=expression Comma vPattern=expression
+        {
+            UpdateTokenInfo(vResult,tRegexp);
+            vResult.Text = vText;
+            vResult.Pattern = vPattern;
+        }
+        (Comma vFlags=expression
+        )?
+        {
+            vResult.Flags = vFlags;
+        }
+        tRParen:RightParenthesis
+        {
             UpdateTokenInfo(vResult,tRParen);
         }
     ;

@@ -349,6 +349,11 @@
     <Member Name="OdbcEscape" Type="bool" Summary="True if escape is defined using odbc delimiters."/>
     <Member Name="EscapeExpression" Type="ScalarExpression" Summary="The escape expression. Optional may be null."/>
   </Class>
+  <Class Name="RegexpLikePredicate" Base="BooleanExpression" Summary="Represents the REGEXP_LIKE boolean predicate.">
+    <Member Name="Text" Type="ScalarExpression" Summary="The text to match against the pattern."/>
+    <Member Name="Pattern" Type="ScalarExpression" Summary="The regular expression pattern."/>
+    <Member Name="Flags" Type="ScalarExpression" Optional="true" Summary="Optional flags for the regular expression match."/>
+  </Class>
   <Class Name="DistinctPredicate" Base="BooleanExpression" Summary="Represents the distinct predicate.">
     <Member Name="FirstExpression" Type="ScalarExpression" Summary="The first expression."/>
     <Member Name="SecondExpression" Type="ScalarExpression" Summary="The second expression."/>
