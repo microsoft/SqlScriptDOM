@@ -236,6 +236,7 @@
     <Member Name="ExpressionName" Type="Identifier" Summary="The expression name."/>
     <Member Name="Columns" Type="Identifier" Collection="true" Summary="The columns. Optional may have zero elements."/>
     <Member Name="QueryExpression" Type="QueryExpression" Summary="The query definition."/>
+    <Member Name="WithCtesAndXmlNamespaces" Type="WithCtesAndXmlNamespaces" Nullable="true" Summary="Nested CTE." />
   </Class>
   <Class Name="WithCtesAndXmlNamespaces" Summary="This class represents a common construct that can have common table expressions and xml namespaces in it.">
     <Member Name="XmlNamespaces" Type="XmlNamespaces" Summary="The xml namespaces. May be null."/>
