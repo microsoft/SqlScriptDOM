@@ -19238,7 +19238,10 @@ aiGenerateFixedChunksTableReference [ScalarExpression vSource, Identifier vChunk
             Match(vEnableChunkSetIdParam, CodeGenerationSupporter.EnableChunkSetId);
         }
         EqualsSign
-        vEnableChunkSetId = expression
+        (
+            vEnableChunkSetId = integer       // constant integer
+          | vEnableChunkSetId = nullLiteral   // NULL literal
+        )
         {
             vResult.EnableChunkSetId = vEnableChunkSetId;
         }

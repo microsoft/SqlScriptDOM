@@ -7218,6 +7218,31 @@ WHEN NOT MATCHED BY SOURCE THEN DELETE OUTPUT inserted.*, deleted.*;";
             ParserTestUtils.ErrorTest170(
                 "SELECT * FROM AI_GENERATE_CHUNKS (source = 'some text', chunk_type = other, chunk_size = 5)",
                 new ParserErrorInfo(69, "SQL46010", "other"));
+
+            // Invalid ENABLE_CHUNK_SET_ID (parameter reference not allowed)
+            ParserTestUtils.ErrorTest170(
+                "SELECT * FROM AI_GENERATE_CHUNKS (SOURCE = @SOURCE, CHUNK_TYPE = fixed, CHUNK_SIZE = @CHUNK_SIZE, OVERLAP = @OVERLAP, ENABLE_CHUNK_SET_ID = @ENABLE_CHUNK_SET_ID)",
+                new ParserErrorInfo(140, "SQL46010", "@ENABLE_CHUNK_SET_ID"));
+
+            // Invalid ENABLE_CHUNK_SET_ID (column reference not allowed)
+            ParserTestUtils.ErrorTest170(
+                "SELECT * FROM t1 CROSS APPLY AI_GENERATE_CHUNKS (SOURCE = 'some text', CHUNK_TYPE = fixed, CHUNK_SIZE = 10, OVERLAP = 5, ENABLE_CHUNK_SET_ID = t1.c1)",
+                new ParserErrorInfo(143, "SQL46010", "t1"));
+
+            // Invalid ENABLE_CHUNK_SET_ID (decimal literal not allowed)
+            ParserTestUtils.ErrorTest170(
+                "SELECT * FROM t1 CROSS APPLY AI_GENERATE_CHUNKS (SOURCE = 'some text', CHUNK_TYPE = fixed, CHUNK_SIZE = 10, OVERLAP = 5, ENABLE_CHUNK_SET_ID = 0.1)",
+                new ParserErrorInfo(143, "SQL46010", "0.1"));
+
+            // Invalid ENABLE_CHUNK_SET_ID (string literal not allowed)
+            ParserTestUtils.ErrorTest170(
+                "SELECT * FROM t1 CROSS APPLY AI_GENERATE_CHUNKS (SOURCE = 'some text', CHUNK_TYPE = fixed, CHUNK_SIZE = 10, OVERLAP = 5, ENABLE_CHUNK_SET_ID = '1')",
+                new ParserErrorInfo(143, "SQL46010", "'1'"));
+
+            // Invalid ENABLE_CHUNK_SET_ID (function call not allowed)
+            ParserTestUtils.ErrorTest170(
+                "SELECT * FROM t1 CROSS APPLY AI_GENERATE_CHUNKS (SOURCE = 'some text', CHUNK_TYPE = fixed, CHUNK_SIZE = 10, OVERLAP = 5, ENABLE_CHUNK_SET_ID = rand())",
+                new ParserErrorInfo(143, "SQL46010", "rand"));
         }
 
         /// <summary>
