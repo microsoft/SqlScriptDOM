@@ -32531,6 +32531,22 @@ jsonKeyValueExpression returns [JsonKeyValue vResult = FragmentFactory.CreateFra
             {            
                 vResult.JsonValue=vValue;
             }
+       
+        |   
+        
+            label:Label
+            {
+                var identifier = this.FragmentFactory.CreateFragment<Identifier>();
+                var multiPartIdentifier = this.FragmentFactory.CreateFragment<MultiPartIdentifier>();
+                var columnRef = this.FragmentFactory.CreateFragment<ColumnReferenceExpression>();
+                CreateIdentifierFromLabel(label, identifier, multiPartIdentifier);
+                columnRef.MultiPartIdentifier = multiPartIdentifier;
+                vResult.JsonKeyName=columnRef;
+            }
+            vValue=expression 
+            {            
+                vResult.JsonValue=vValue;
+            }
         )
     ;
 
