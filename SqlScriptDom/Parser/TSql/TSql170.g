@@ -3064,17 +3064,14 @@ alterDbModify returns [AlterDatabaseStatement vResult = null]
     ;
 
 alterDbModifyAzureOptions returns [AlterDatabaseSetStatement vResult = FragmentFactory.CreateFragment<AlterDatabaseSetStatement>()]
-{
-    bool hasManualCutover = false;
-}
     :
         azureOptions[vResult, vResult.Options]
         (
             With tManualCutover:Identifier
             {
                 Match(tManualCutover, CodeGenerationSupporter.ManualCutover);
-                hasManualCutover = true;
                 vResult.WithManualCutover = true;
+                UpdateTokenInfo(vResult, tManualCutover);
             }
         )?
     ;
