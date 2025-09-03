@@ -23927,7 +23927,6 @@ dropSecurityPolicyStatement returns [DropSecurityPolicyStatement vResult = Fragm
 createExternalModelStatement returns [CreateExternalModelStatement vResult = FragmentFactory.CreateFragment<CreateExternalModelStatement>()]
 {
     Identifier vName;
-    long encounteredOptions = 0;
 }
     :   tModel:Identifier vName = identifier
         {
@@ -24089,7 +24088,6 @@ externalModelParameters[ExternalModelStatement vParent]
 alterExternalModelStatement returns [AlterExternalModelStatement vResult = FragmentFactory.CreateFragment<AlterExternalModelStatement>()]
 {
     Identifier vName;
-    long encounteredOptions = 0;
 }
     :   tModel:Identifier vName = identifier
         {
