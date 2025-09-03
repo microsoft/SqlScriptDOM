@@ -17746,15 +17746,29 @@ commonTableExpression returns [CommonTableExpression vResult = this.FragmentFact
 {
     Identifier vIdentifier;
     QueryExpression vQueryExpression;
+    WithCtesAndXmlNamespaces vWithCommonTableExpressionsAndXmlNamespaces;
 }
     :   vIdentifier=identifier
         {
             vResult.ExpressionName = vIdentifier;
         }
         (columnNameList[vResult, vResult.Columns])?
-        As tLParen:LeftParenthesis vQueryExpression=subqueryExpression[SubDmlFlags.SelectNotForInsert] tRParen:RightParenthesis
+        As tLParen:LeftParenthesis 
+        (
+            vWithCommonTableExpressionsAndXmlNamespaces=withCommonTableExpressionsAndXmlNamespaces
+            vQueryExpression=subqueryExpression[SubDmlFlags.SelectNotForInsert]
+            {
+                vResult.QueryExpression = vQueryExpression;
+                vResult.WithCtesAndXmlNamespaces = vWithCommonTableExpressionsAndXmlNamespaces;
+            }
+        |
+            vQueryExpression=subqueryExpression[SubDmlFlags.SelectNotForInsert]
+            {
+                vResult.QueryExpression = vQueryExpression;
+            }
+        )
+        tRParen:RightParenthesis
         {
-            vResult.QueryExpression = vQueryExpression;
             UpdateTokenInfo(vResult,tLParen);
             UpdateTokenInfo(vResult,tRParen);
         }

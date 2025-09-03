@@ -263,6 +263,25 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
                 fragment.UpdateTokenInfo(tokenIndex, tokenIndex);
         }
 
+        /// <summary>
+        /// Creates an identifier from a label token and adds it to the multipart identifier.
+        /// </summary>
+        /// <param name="token"></param>
+        /// <param name="identifier"></param>
+        /// <param name="multiPartIdentifier"></param>
+        internal static void CreateIdentifierFromLabel(antlr.IToken token, Identifier identifier, MultiPartIdentifier multiPartIdentifier)
+        {
+            var tokenText = token?.getText();
+            if (string.IsNullOrEmpty(tokenText))
+            {
+                throw GetUnexpectedTokenErrorException(token);
+            }
+            var identifierName = tokenText?.EndsWith(":") == true ? tokenText.Substring(0, tokenText.Length - 1) : tokenText;
+            identifier.SetIdentifier(identifierName);
+            UpdateTokenInfo(identifier, token);
+            AddAndUpdateTokenInfo(multiPartIdentifier, multiPartIdentifier.Identifiers, identifier);
+        }
+
         protected static void AddAndUpdateTokenInfo<TFragmentType>(TSqlFragment node, IList<TFragmentType> collection, TFragmentType item)
             where TFragmentType : TSqlFragment
         {

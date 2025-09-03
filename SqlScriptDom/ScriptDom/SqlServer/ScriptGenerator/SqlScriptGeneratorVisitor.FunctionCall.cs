@@ -82,6 +82,17 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
                 GenerateReturnType(node?.ReturnType);
                 GenerateSymbol(TSqlTokenType.RightParenthesis);
             }
+			else if (node.FunctionName.Value.ToUpper(CultureInfo.InvariantCulture) == CodeGenerationSupporter.JsonArrayAgg)
+            {
+                GenerateCommaSeparatedList(node.Parameters);
+                if (node.Parameters?.Count > 0 && node?.AbsentOrNullOnNull?.Count > 0) //If there are values and null on null or absent on null present then generate space in between them
+                    GenerateSpace();
+                GenerateNullOnNullOrAbsentOnNull(node?.AbsentOrNullOnNull);
+				if (node.ReturnType?.Count > 0) //If there are values and null on null or absent on null present then generate space in between them
+                    GenerateSpace();
+                GenerateReturnType(node?.ReturnType);
+                GenerateSymbol(TSqlTokenType.RightParenthesis);
+            }
             else
             {
                 GenerateUniqueRowFilter(node.UniqueRowFilter, false);

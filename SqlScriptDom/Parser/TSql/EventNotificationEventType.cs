@@ -1092,6 +1092,11 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         DropExternalLanguage = 331,
 
         /// <summary>
+        /// CREATE_JSON_INDEX
+        /// </summary>
+        CreateJsonIndex = 343,
+
+        /// <summary>
         /// CREATE_VECTOR_INDEX
         /// </summary>
         CreateVectorIndex = 344,

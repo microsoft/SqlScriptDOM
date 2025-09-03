@@ -31,7 +31,28 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
             AlignmentPoint subquery = new AlignmentPoint();
             MarkAndPushAlignmentPoint(subquery);
 
-            GenerateQueryExpressionInParentheses(node.QueryExpression);
+            GenerateSymbol(TSqlTokenType.LeftParenthesis);
+
+            AlignmentPoint queryBody = new AlignmentPoint();
+            MarkAndPushAlignmentPoint(queryBody);
+
+            // Generate nested WITH clause if present
+            if (node.WithCtesAndXmlNamespaces != null)
+            {
+                AlignmentPoint clauseBodyNested = new AlignmentPoint(ClauseBody);
+                GenerateFragmentWithAlignmentPointIfNotNull(node.WithCtesAndXmlNamespaces, clauseBodyNested);
+                NewLine();
+            }
+
+            if (node.QueryExpression != null)
+            {
+                AlignmentPoint clauseBodyQuery = new AlignmentPoint(ClauseBody);
+                GenerateFragmentWithAlignmentPointIfNotNull(node.QueryExpression, clauseBodyQuery);
+            }
+
+            PopAlignmentPoint();
+
+            GenerateSymbol(TSqlTokenType.RightParenthesis);
 
             PopAlignmentPoint();
         }
