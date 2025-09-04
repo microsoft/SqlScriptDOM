@@ -427,6 +427,8 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         internal const string FlushIntervalSecondsAlt = "DATA_FLUSH_INTERVAL_SECONDS";
         internal const string Fn = "FN";
         internal const string Float = "FLOAT";
+        internal const string Float16 = "FLOAT16";
+        internal const string Float32 = "FLOAT32";
         internal const string For = "FOR";
         internal const string ForceFailoverAllowDataLoss = "FORCE_FAILOVER_ALLOW_DATA_LOSS";
         internal const string ForceScan = "FORCESCAN";

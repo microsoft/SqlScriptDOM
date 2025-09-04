@@ -30675,6 +30675,32 @@ xmlDataType [SchemaObjectName vName] returns [XmlDataTypeReference vResult = Fra
         )?
     ;
 
+vectorDataType [SchemaObjectName vName] returns [VectorDataTypeReference vResult = FragmentFactory.CreateFragment<VectorDataTypeReference>()]
+{
+    vResult.Name = vName;
+    vResult.UpdateTokenInfo(vName);
+    
+    IntegerLiteral vDimension = null;
+    Identifier vBaseType = null;
+}
+    :
+        (   LeftParenthesis vDimension=integer
+            {
+                vResult.Dimension = vDimension;
+            }
+            (
+                Comma vBaseType=identifier
+                {
+                    vResult.BaseType = vBaseType;
+                }
+            )?
+            tRParen:RightParenthesis
+            {
+                UpdateTokenInfo(vResult,tRParen);
+            }
+        )
+    ;
+
 scalarDataType returns [DataTypeReference vResult = null]
 {
     SchemaObjectName vName;
@@ -30695,6 +30721,9 @@ scalarDataType returns [DataTypeReference vResult = null]
             (
                 {isXmlDataType}?
                 vResult = xmlDataType[vName]
+            |
+                {typeOption == SqlDataTypeOption.Vector}?
+                vResult = vectorDataType[vName]
             |
                 {typeOption != SqlDataTypeOption.None}?
                 vResult = sqlDataTypeWithoutNational[vName, typeOption]

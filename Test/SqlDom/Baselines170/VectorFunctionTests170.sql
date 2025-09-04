@@ -1,4 +1,4 @@
-DECLARE @qv AS VECTOR (1536) = AI_GENERATE_EMBEDDINGS(N'Pink Floyd music style' USE MODEL Ada2Embeddings);
+DECLARE @qv AS VECTOR(1536) = AI_GENERATE_EMBEDDINGS(N'Pink Floyd music style' USE MODEL Ada2Embeddings);
 
 SELECT t.id,
        s.distance,
