@@ -14,11 +14,11 @@ SQL Script DOM is a .NET library that provides formatting and parsing capabiliti
 Script DOM is used by DacFX and as an standalone library for client applications. 
 
 ## Resources:
-- 📦 NuGet package: https://www.nuget.org/packages/Microsoft.SqlServer.TransactSql.ScriptDom
-- 📚 API docs: https://learn.microsoft.com/dotnet/api/microsoft.sqlserver.transactsql.scriptdom
-- 🛠️ Contributor's guide: [CONTRIBUTING.md](./CONTRIBUTING.md)
-- 💬 Discussions: [DacFx discussions](https://github.com/microsoft/DacFx/discussions)
-
+- 📦 [NuGet package](https://www.nuget.org/packages/Microsoft.SqlServer.TransactSql.ScriptDom)
+- 📚 [API docs](https://learn.microsoft.com/dotnet/api/microsoft.sqlserver.transactsql.scriptdom)
+- 🛠️ [Contributor's guide](./CONTRIBUTING.md)
+- 💬 [Discussions](https://github.com/microsoft/DacFx/discussions)
+- 🛫 [Release notes](./release-notes)
 
 ## Built With
 * https://www.antlr.org/
