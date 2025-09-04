@@ -50,7 +50,9 @@ namespace SqlStudio.Tests.UTSqlScriptDom
             new ParserTest150("DropExternalLanguage150.sql", 2, 2, 2, 2, 2, 2, 2),
             new ParserTest150("FromClauseTests150.sql", 12, 12, 5, 5, 5, 0, 0),
             new ParserTest150("DeclareTableVariableTests150.sql", 1, 1, 1, 1, 1, 1, 1),
-            new ParserTest150("MaterializedViewTests150.sql", 6, 3, 3, 3, 3, 0, 0)
+            new ParserTest150("MaterializedViewTests150.sql", 6, 3, 3, 3, 3, 0, 0),
+            new ParserTest150("CreateEventSessionNotLikePredicate.sql", nErrors80: 2, nErrors90: 1,  nErrors100: 1, nErrors110: 1, nErrors120: 1, nErrors130: 0, nErrors140: 0),
+
         };
 
         /// <summary>

@@ -555,6 +555,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         internal const string Level3 = "LEVEL_3";
         internal const string Level4 = "LEVEL_4";
         internal const string Library = "LIBRARY";
+        internal const string Like = "LIKE";
         internal const string LifeTime = "LIFETIME";
         internal const string Linux = "LINUX";
         internal const string List = "LIST";

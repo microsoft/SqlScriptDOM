@@ -73,7 +73,8 @@ namespace SqlStudio.Tests.UTSqlScriptDom
             new ParserTest130("DataClassificationTests130.sql", 1, 4, 4, 4, 4),
             new ParserTest130("AlterWorkloadGroupStatementSqlDwTests.sql", 12, 6, 5, 5, 5),
             new ParserTest130("CreateWorkloadClassifierStatementSqlDwTests.sql", 2, 1, 1, 1, 1),
-            new ParserTest130("PredictSqlDwTests.sql", 3, 3, 3, 3, 3)
+            new ParserTest130("PredictSqlDwTests.sql", 3, 3, 3, 3, 3),
+            new ParserTest130("CreateEventSessionNotLikePredicate.sql", 2, 1, 1, 1, 1)
         };
 
         [TestMethod]
