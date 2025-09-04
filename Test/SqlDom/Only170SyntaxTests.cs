@@ -1,6 +1,7 @@
 ﻿using Microsoft.SqlServer.TransactSql.ScriptDom;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SqlStudio.Tests.AssemblyTools.TestCategory;
+using System.Collections.Generic;
 
 namespace SqlStudio.Tests.UTSqlScriptDom
 {
@@ -15,8 +16,8 @@ namespace SqlStudio.Tests.UTSqlScriptDom
             new ParserTest170("AlterDatabaseManualCutoverTests170.sql", nErrors80: 4, nErrors90: 4, nErrors100: 4, nErrors110: 4, nErrors120: 4, nErrors130: 4, nErrors140: 4, nErrors150: 4, nErrors160: 4),
             new ParserTest170("CreateColumnStoreIndexTests170.sql", nErrors80: 3, nErrors90: 3, nErrors100: 3, nErrors110: 3, nErrors120: 3, nErrors130: 0, nErrors140: 0, nErrors150: 0, nErrors160: 0),
             new ParserTest170("RegexpTests170.sql", nErrors80: 0, nErrors90: 0, nErrors100: 0, nErrors110: 0, nErrors120: 0, nErrors130: 0, nErrors140: 0, nErrors150: 0, nErrors160: 0),
-            new ParserTest170("AiGenerateChunksTests170.sql", nErrors80: 21, nErrors90: 18, nErrors100: 17, nErrors110: 17, nErrors120: 17, nErrors130: 17, nErrors140: 17, nErrors150: 17, nErrors160: 17),
-            new ParserTest170("JsonFunctionTests170.sql", nErrors80: 9, nErrors90: 8, nErrors100: 30, nErrors110: 30, nErrors120: 30, nErrors130: 30, nErrors140: 30, nErrors150: 30, nErrors160: 30),
+            new ParserTest170("AiGenerateChunksTests170.sql", nErrors80: 19, nErrors90: 16, nErrors100: 15, nErrors110: 15, nErrors120: 15, nErrors130: 15, nErrors140: 15, nErrors150: 15, nErrors160: 15),
+            new ParserTest170("JsonFunctionTests170.sql", nErrors80: 10, nErrors90: 8, nErrors100: 35, nErrors110: 35, nErrors120: 35, nErrors130: 35, nErrors140: 35, nErrors150: 35, nErrors160: 35),
             new ParserTest170("AiGenerateEmbeddingsTests170.sql", nErrors80: 12, nErrors90: 9, nErrors100: 9, nErrors110: 9, nErrors120: 9, nErrors130: 9, nErrors140: 9, nErrors150: 9, nErrors160: 9),
             new ParserTest170("CreateExternalModelStatementTests170.sql", nErrors80: 2, nErrors90: 2, nErrors100: 2, nErrors110: 2, nErrors120: 2, nErrors130: 4, nErrors140: 4, nErrors150: 4, nErrors160: 4),
             new ParserTest170("AlterExternalModelStatementTests170.sql", nErrors80: 2, nErrors90: 2, nErrors100: 2, nErrors110: 2, nErrors120: 2, nErrors130: 5, nErrors140: 5, nErrors150: 5, nErrors160: 5),
@@ -24,8 +25,7 @@ namespace SqlStudio.Tests.UTSqlScriptDom
             new ParserTest170("VectorFunctionTests170.sql", nErrors80: 1, nErrors90: 1, nErrors100: 2, nErrors110: 2, nErrors120: 2, nErrors130: 2, nErrors140: 2, nErrors150: 2, nErrors160: 2),
             new ParserTest170("SecurityStatementExternalModelTests170.sql", nErrors80: 2, nErrors90: 17, nErrors100: 17, nErrors110: 17, nErrors120: 17, nErrors130: 17, nErrors140: 17, nErrors150: 17, nErrors160: 17),
             new ParserTest170("CreateEventSessionNotLikePredicate.sql", nErrors80: 2, nErrors90: 1,  nErrors100: 1, nErrors110: 1, nErrors120: 1, nErrors130: 0, nErrors140: 0, nErrors150: 0, nErrors160: 0),
-
-
+            new ParserTest170("RegexpLikeTests170.sql", nErrors80: 13, nErrors90: 13, nErrors100: 13, nErrors110: 15, nErrors120: 15, nErrors130: 15, nErrors140: 15, nErrors150: 15, nErrors160: 15)
         };
 
         private static readonly ParserTest[] SqlAzure170_TestInfos =

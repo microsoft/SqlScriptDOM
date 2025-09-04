@@ -31844,15 +31844,31 @@ jsonKeyValueExpression returns [JsonKeyValue vResult = FragmentFactory.CreateFra
 	: 
         (
             vKey=expression
-		    {           
-		        vResult.JsonKeyName=vKey;
-		    }
+            {           
+                vResult.JsonKeyName=vKey;
+           }
             Colon vValue=expression 
-			{            
-			    vResult.JsonValue=vValue;
+            {            
+                vResult.JsonValue=vValue;
             }
-		)
-	;
+               
+        |   
+        
+            label:Label
+            {
+                var identifier = this.FragmentFactory.CreateFragment<Identifier>();
+                var multiPartIdentifier = this.FragmentFactory.CreateFragment<MultiPartIdentifier>();
+                var columnRef = this.FragmentFactory.CreateFragment<ColumnReferenceExpression>();
+                CreateIdentifierFromLabel(label, identifier, multiPartIdentifier);
+                columnRef.MultiPartIdentifier = multiPartIdentifier;
+                vResult.JsonKeyName=columnRef;
+            }
+            vValue=expression 
+            {            
+                vResult.JsonValue=vValue;
+            }
+        )
+    ;
 
 windowClause returns [WindowClause vResult = FragmentFactory.CreateFragment<WindowClause>()]
 {

@@ -549,6 +549,35 @@ WITH
         }
 
         /// <summary>
+        /// Negative tests for JSON_ARRAYAGG syntax in functions
+        /// </summary>
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void JsonArrayAggSyntaxNegativeTest()
+        {
+            // Incorrect placing of colon
+            ParserTestUtils.ErrorTest160("SELECT JSON_ARRAYAGG('name':'value')",
+               new ParserErrorInfo(27, "SQL46010", ":"));
+
+            // Incorrect placing of single quotes
+            ParserTestUtils.ErrorTest160("SELECT JSON_ARRAYAGG('name)",
+               new ParserErrorInfo(21, "SQL46030", "'name)"));
+
+            // Cannot use incomplete absent on null clause cases
+            ParserTestUtils.ErrorTest160("SELECT JSON_ARRAYAGG('name', NULL ABSENT ON)",
+                new ParserErrorInfo(34, "SQL46010", "ABSENT"));
+
+            // one params only
+            ParserTestUtils.ErrorTest160("SELECT JSON_ARRAYAGG('name', 'value', NULL ON NULL)",
+                new ParserErrorInfo(43, "SQL46010", "ON"));
+
+            // Cannot use  null on null incorrectly
+            ParserTestUtils.ErrorTest160("SELECT JSON_ARRAYAGG('name', NULL NULL ON)",
+                new ParserErrorInfo(34, "SQL46010", "NULL"));
+        }
+
+        /// <summary>
         /// Negative tests for Data Masking Alter Column syntax.
         /// </summary>
         [TestMethod]
@@ -7189,6 +7218,31 @@ WHEN NOT MATCHED BY SOURCE THEN DELETE OUTPUT inserted.*, deleted.*;";
             ParserTestUtils.ErrorTest170(
                 "SELECT * FROM AI_GENERATE_CHUNKS (source = 'some text', chunk_type = other, chunk_size = 5)",
                 new ParserErrorInfo(69, "SQL46010", "other"));
+
+            // Invalid ENABLE_CHUNK_SET_ID (parameter reference not allowed)
+            ParserTestUtils.ErrorTest170(
+                "SELECT * FROM AI_GENERATE_CHUNKS (SOURCE = @SOURCE, CHUNK_TYPE = fixed, CHUNK_SIZE = @CHUNK_SIZE, OVERLAP = @OVERLAP, ENABLE_CHUNK_SET_ID = @ENABLE_CHUNK_SET_ID)",
+                new ParserErrorInfo(140, "SQL46010", "@ENABLE_CHUNK_SET_ID"));
+
+            // Invalid ENABLE_CHUNK_SET_ID (column reference not allowed)
+            ParserTestUtils.ErrorTest170(
+                "SELECT * FROM t1 CROSS APPLY AI_GENERATE_CHUNKS (SOURCE = 'some text', CHUNK_TYPE = fixed, CHUNK_SIZE = 10, OVERLAP = 5, ENABLE_CHUNK_SET_ID = t1.c1)",
+                new ParserErrorInfo(143, "SQL46010", "t1"));
+
+            // Invalid ENABLE_CHUNK_SET_ID (decimal literal not allowed)
+            ParserTestUtils.ErrorTest170(
+                "SELECT * FROM t1 CROSS APPLY AI_GENERATE_CHUNKS (SOURCE = 'some text', CHUNK_TYPE = fixed, CHUNK_SIZE = 10, OVERLAP = 5, ENABLE_CHUNK_SET_ID = 0.1)",
+                new ParserErrorInfo(143, "SQL46010", "0.1"));
+
+            // Invalid ENABLE_CHUNK_SET_ID (string literal not allowed)
+            ParserTestUtils.ErrorTest170(
+                "SELECT * FROM t1 CROSS APPLY AI_GENERATE_CHUNKS (SOURCE = 'some text', CHUNK_TYPE = fixed, CHUNK_SIZE = 10, OVERLAP = 5, ENABLE_CHUNK_SET_ID = '1')",
+                new ParserErrorInfo(143, "SQL46010", "'1'"));
+
+            // Invalid ENABLE_CHUNK_SET_ID (function call not allowed)
+            ParserTestUtils.ErrorTest170(
+                "SELECT * FROM t1 CROSS APPLY AI_GENERATE_CHUNKS (SOURCE = 'some text', CHUNK_TYPE = fixed, CHUNK_SIZE = 10, OVERLAP = 5, ENABLE_CHUNK_SET_ID = rand())",
+                new ParserErrorInfo(143, "SQL46010", "rand"));
         }
 
         /// <summary>

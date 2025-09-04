@@ -19236,7 +19236,10 @@ aiGenerateFixedChunksTableReference [ScalarExpression vSource, Identifier vChunk
             Match(vEnableChunkSetIdParam, CodeGenerationSupporter.EnableChunkSetId);
         }
         EqualsSign
-        vEnableChunkSetId = expression
+        (
+            vEnableChunkSetId = integer       // constant integer
+          | vEnableChunkSetId = nullLiteral   // NULL literal
+        )
         {
             vResult.EnableChunkSetId = vEnableChunkSetId;
         }
@@ -31093,6 +31096,9 @@ booleanExpressionPrimary [ExpressionFlags expressionFlags] returns [BooleanExpre
             UpdateTokenInfo(vResult,tRParen);
         }
     |
+        {NextTokenMatches(CodeGenerationSupporter.RegexpLike)}?
+            vResult=regexpLikePredicate
+    |
         vExpressionFirst=expressionWithFlags[expressionFlags]
         (
             vType=comparisonOperator
@@ -31469,6 +31475,29 @@ tsEqualCall returns [TSEqualCall vResult = this.FragmentFactory.CreateFragment<T
         Comma vExpression=expression tRParen:RightParenthesis
         {
             vResult.SecondExpression = vExpression;
+            UpdateTokenInfo(vResult,tRParen);
+        }
+    ;
+
+regexpLikePredicate returns [RegexpLikePredicate vResult = this.FragmentFactory.CreateFragment<RegexpLikePredicate>()]
+{
+    ScalarExpression vText;
+    ScalarExpression vPattern;
+    ScalarExpression vFlags = null;
+}
+    :   tRegexp:Identifier LeftParenthesis vText=expression Comma vPattern=expression
+        {
+            UpdateTokenInfo(vResult,tRegexp);
+            vResult.Text = vText;
+            vResult.Pattern = vPattern;
+        }
+        (Comma vFlags=expression
+        )?
+        {
+            vResult.Flags = vFlags;
+        }
+        tRParen:RightParenthesis
+        {
             UpdateTokenInfo(vResult,tRParen);
         }
     ;
@@ -32500,6 +32529,22 @@ jsonKeyValueExpression returns [JsonKeyValue vResult = FragmentFactory.CreateFra
             {            
                 vResult.JsonValue=vValue;
             }
+       
+        |   
+        
+            label:Label
+            {
+                var identifier = this.FragmentFactory.CreateFragment<Identifier>();
+                var multiPartIdentifier = this.FragmentFactory.CreateFragment<MultiPartIdentifier>();
+                var columnRef = this.FragmentFactory.CreateFragment<ColumnReferenceExpression>();
+                CreateIdentifierFromLabel(label, identifier, multiPartIdentifier);
+                columnRef.MultiPartIdentifier = multiPartIdentifier;
+                vResult.JsonKeyName=columnRef;
+            }
+            vValue=expression 
+            {            
+                vResult.JsonValue=vValue;
+            }
         )
     ;
 
@@ -32784,6 +32829,9 @@ builtInFunctionCall returns [FunctionCall vResult = FragmentFactory.CreateFragme
          {(vResult.FunctionName != null && vResult.FunctionName.Value.ToUpper(CultureInfo.InvariantCulture) == CodeGenerationSupporter.JsonObjectAgg)}?
             jsonObjectAggBuiltInFunctionCall[vResult]
         |
+        {(vResult.FunctionName != null && vResult.FunctionName.Value.ToUpper(CultureInfo.InvariantCulture) == CodeGenerationSupporter.JsonArrayAgg)}?
+            jsonArrayAggBuiltInFunctionCall[vResult]
+        |
          {(vResult.FunctionName != null && vResult.FunctionName.Value.ToUpper(CultureInfo.InvariantCulture) == CodeGenerationSupporter.Trim) && 
           (NextTokenMatches(CodeGenerationSupporter.Leading) | NextTokenMatches(CodeGenerationSupporter.Trailing) | NextTokenMatches(CodeGenerationSupporter.Both))}?
             trim3ArgsBuiltInFunctionCall[vResult]
@@ -32810,6 +32858,32 @@ jsonArrayBuiltInFunctionCall [FunctionCall vParent]
            expressionList[vParent, vParent.Parameters]        
         |
             /* empty */
+        )
+        (
+           jsonNullClauseFunction[vParent]
+        |
+            /* empty */
+        )
+        (
+            jsonReturningClause[vParent]
+        |
+            /* empty */
+        )
+        tRParen:RightParenthesis
+        {
+            UpdateTokenInfo(vParent, tRParen);
+        }
+    ;
+
+jsonArrayAggBuiltInFunctionCall [FunctionCall vParent]
+{
+    ScalarExpression vExpression;
+}
+    :   (
+           vExpression=expression
+           {
+               AddAndUpdateTokenInfo(vParent, vParent.Parameters, vExpression);
+           }
         )
         (
            jsonNullClauseFunction[vParent]

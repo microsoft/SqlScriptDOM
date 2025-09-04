@@ -35,7 +35,7 @@ DECLARE @id_key AS NVARCHAR (10) = N'id', @id_value AS NVARCHAR (64) = NEWID();
 SELECT JSON_OBJECT('user_name':USER_NAME(), @id_key:@id_value, 'sid':(SELECT @@SPID));
 
 SELECT s.session_id,
-       JSON_OBJECT('security_id':s.security_id, 'login':s.login_name, 'status':s.status) AS info
+       JSON_OBJECT(security_id:s.security_id, 'login':s.login_name, 'status':s.status) AS info
 FROM sys.dm_exec_sessions AS s
 WHERE s.is_user_process = 1;
 
@@ -96,3 +96,35 @@ SELECT JSON_OBJECTAGG('name':'b' NULL ON NULL RETURNING JSON);
 SELECT JSON_OBJECTAGG('name':'b' ABSENT ON NULL RETURNING JSON);
 
 SELECT JSON_OBJECTAGG('name':'b' RETURNING JSON);
+
+SELECT JSON_ARRAYAGG('name');
+
+SELECT JSON_ARRAYAGG('a');
+SELECT JSON_OBJECTAGG( c1:c2 )
+SELECT JSON_OBJECTAGG( c1:'c2' )
+
+SELECT JSON_ARRAYAGG('a' NULL ON NULL);
+
+SELECT JSON_ARRAYAGG('a' NULL ON NULL RETURNING JSON);
+
+SELECT s.session_id,
+       JSON_ARRAYAGG(s.host_name)
+FROM sys.dm_exec_sessions AS s
+WHERE s.is_user_process = 1;
+
+SELECT s.session_id,
+       JSON_ARRAYAGG(s.host_name NULL ON NULL)
+FROM sys.dm_exec_sessions AS s
+WHERE s.is_user_process = 1;
+
+SELECT s.session_id,
+       JSON_ARRAYAGG(s.host_name NULL ON NULL RETURNING JSON)
+FROM sys.dm_exec_sessions AS s
+WHERE s.is_user_process = 1;
+
+GO
+CREATE VIEW dbo.jsonfunctest AS
+                    SELECT JSON_OBJECTAGG( c1:c2 ) as jsoncontents
+                    FROM (
+                    VALUES('key1', 'c'), ('key2', 'b'), ('key3','a')
+                    ) AS t(c1, c2);
