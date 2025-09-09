@@ -720,6 +720,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         internal const string OperatorAudit = "OPERATOR_AUDIT";
         internal const string Optimistic = "OPTIMISTIC";
         internal const string Optimize = "OPTIMIZE";
+        internal const string OptimizedLocking = "OPTIMIZED_LOCKING";
         internal const string OptimizeForSequentialKey = "OPTIMIZE_FOR_SEQUENTIAL_KEY";
         internal const string OptimizerQueue = "OPTIMIZER_QUEUE";
         internal const string Order = "ORDER";

@@ -2525,6 +2525,10 @@
     <InheritedClass Name="DatabaseOption" />
     <Member Name="OptionState" Type="OptionState" GenerateUpdatePositionInfoCall="false" Summary="Option state."/>
   </Class>
+  <Class Name="OptimizedLockingDatabaseOption" Base="DatabaseOption" Summary="OPTIMIZED_LOCKING option in ALTER DATABASE statement, SET case">
+    <InheritedClass Name="DatabaseOption" />
+    <Member Name="OptionState" Type="OptionState" GenerateUpdatePositionInfoCall="false" Summary="Option state."/>
+  </Class>
   <Class Name="QueryStoreDatabaseOption" Base="DatabaseOption" Summary="Query Store (QDS) option in ALTER DATABASE statement, SET case">
     <InheritedClass Name="DatabaseOption" />
     <Member Name="Clear" Type="bool" Summary="True if Clear QDS option was specified"/>
