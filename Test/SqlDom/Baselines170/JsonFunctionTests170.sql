@@ -133,3 +133,9 @@ CREATE VIEW dbo.jsonfunctest
 AS
 SELECT JSON_OBJECTAGG(c1:c2) AS jsoncontents
 FROM (VALUES ('key1', 'c'), ('key2', 'b'), ('key3', 'a')) AS t(c1, c2);
+
+GO
+SELECT TOP (5) c.object_id,
+               JSON_OBJECTAGG(c.name:c.column_id) AS columns
+FROM sys.columns AS c
+GROUP BY c.object_id;
