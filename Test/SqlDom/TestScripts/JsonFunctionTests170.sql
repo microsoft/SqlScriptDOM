@@ -134,4 +134,15 @@ GO
 SELECT JSON_QUERY('{ "a": 1 }');
 SELECT JSON_QUERY('{ "a": 1 }', '$.a');
 SELECT JSON_QUERY('{ "a": [1,2,3] }', '$.a') WITH ARRAY WRAPPER;
+
 GO
+CREATE VIEW dbo.jsonfunctest AS
+                    SELECT JSON_OBJECTAGG( c1:c2 ) as jsoncontents
+                    FROM (
+                    VALUES('key1', 'c'), ('key2', 'b'), ('key3','a')
+                    ) AS t(c1, c2);
+
+GO
+SELECT TOP(5) c.object_id, JSON_OBJECTAGG(c.name:c.column_id) AS columns
+  FROM sys.columns AS c
+ GROUP BY c.object_id;
