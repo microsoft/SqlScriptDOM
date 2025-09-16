@@ -133,3 +133,11 @@ CREATE VIEW dbo.jsonfunctest
 AS
 SELECT JSON_OBJECTAGG(c1:c2) AS jsoncontents
 FROM (VALUES ('key1', 'c'), ('key2', 'b'), ('key3', 'a')) AS t(c1, c2);
+
+
+GO
+SELECT JSON_QUERY('{ "a": 1 }');
+
+SELECT JSON_QUERY('{ "a": 1 }', '$.a');
+
+SELECT JSON_QUERY('{ "a": [1,2,3] }', '$.a') WITH ARRAY WRAPPER;
