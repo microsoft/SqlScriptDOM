@@ -32520,30 +32520,33 @@ jsonKeyValueExpression returns [JsonKeyValue vResult = FragmentFactory.CreateFra
 {
     ScalarExpression vKey;
     ScalarExpression vValue;
+    MultiPartIdentifier vMultiPartIdentifier = null;
 }
     : 
         (
+            (vMultiPartIdentifier=multiPartIdentifier[2] Dot)? label:Label
+            {
+                var identifier = this.FragmentFactory.CreateFragment<Identifier>();
+                if (vMultiPartIdentifier == null)
+                {
+                    vMultiPartIdentifier = this.FragmentFactory.CreateFragment<MultiPartIdentifier>();
+                }
+                var columnRef = this.FragmentFactory.CreateFragment<ColumnReferenceExpression>();
+                CreateIdentifierFromLabel(label, identifier, vMultiPartIdentifier);
+
+                columnRef.MultiPartIdentifier = vMultiPartIdentifier;
+                vResult.JsonKeyName=columnRef;
+            }
+            vValue=expression 
+            {            
+                vResult.JsonValue=vValue;
+            }
+        |
             vKey=expression
             {           
                 vResult.JsonKeyName=vKey;
             }
             Colon vValue=expression 
-            {            
-                vResult.JsonValue=vValue;
-            }
-       
-        |   
-        
-            label:Label
-            {
-                var identifier = this.FragmentFactory.CreateFragment<Identifier>();
-                var multiPartIdentifier = this.FragmentFactory.CreateFragment<MultiPartIdentifier>();
-                var columnRef = this.FragmentFactory.CreateFragment<ColumnReferenceExpression>();
-                CreateIdentifierFromLabel(label, identifier, multiPartIdentifier);
-                columnRef.MultiPartIdentifier = multiPartIdentifier;
-                vResult.JsonKeyName=columnRef;
-            }
-            vValue=expression 
             {            
                 vResult.JsonValue=vValue;
             }
