@@ -32153,6 +32153,7 @@ aiGenerateEmbeddingsFunctionCall
     ScalarExpression vInput;
     SchemaObjectName vModelName;
     ScalarExpression vParams = null;
+    StringLiteral vParamNode = null;
 }
     :
         tFunc:Identifier LeftParenthesis
@@ -32164,8 +32165,7 @@ aiGenerateEmbeddingsFunctionCall
         {
             vResult.Input = vInput;
         }
-
-        tUse:Use                         // your reserved keyword
+        tUse:Use
         {
             UpdateTokenInfo(vResult, tUse);
         }
@@ -32184,10 +32184,18 @@ aiGenerateEmbeddingsFunctionCall
             tParams:Identifier
             {
                 Match(tParams, CodeGenerationSupporter.Parameters);
+                UpdateTokenInfo(vResult, tParams);
             }
-            LeftParenthesis
-                vParams=expression
-            RightParenthesis
+            (
+                LeftParenthesis
+                    vParams=expression
+                RightParenthesis
+              |
+                vParamNode=stringLiteral
+                {
+                    vParams = vParamNode;
+                }
+            )
             {
                 vResult.OptionalParameters = vParams;
             }
