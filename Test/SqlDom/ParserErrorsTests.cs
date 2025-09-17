@@ -578,6 +578,43 @@ WITH
         }
 
         /// <summary>
+        /// Negative tests for JSON_QUERY syntax in functions
+        /// </summary>
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void JsonQuerySyntaxNegativeTest()
+        {
+            // Cannot use WITH without ARRAY WRAPPER (incomplete syntax)
+            ParserTestUtils.ErrorTest170("SELECT JSON_QUERY('{ \"a\": 1 }') WITH",
+                new ParserErrorInfo(32, "SQL46010", "WITH"));
+
+            // Cannot use WITH ARRAY without WRAPPER (unexpected end of file)
+            ParserTestUtils.ErrorTest170("SELECT JSON_QUERY('{ \"a\": 1 }') WITH ARRAY",
+                new ParserErrorInfo(42, "SQL46029", ""));
+
+            // Cannot use WITH WRAPPER without ARRAY (unexpected end of file)
+            ParserTestUtils.ErrorTest170("SELECT JSON_QUERY('{ \"a\": 1 }') WITH WRAPPER",
+                new ParserErrorInfo(44, "SQL46029", ""));
+
+            // Cannot use incorrect keyword instead of ARRAY
+            ParserTestUtils.ErrorTest170("SELECT JSON_QUERY('{ \"a\": 1 }') WITH OBJECT WRAPPER",
+                new ParserErrorInfo(37, "SQL46010", "OBJECT"));
+
+            // Cannot use incorrect keyword instead of WRAPPER
+            ParserTestUtils.ErrorTest170("SELECT JSON_QUERY('{ \"a\": 1 }') WITH ARRAY OBJECT",
+                new ParserErrorInfo(43, "SQL46010", "OBJECT"));
+
+            // Cannot use JSON_QUERY with colon syntax (key:value pairs like JSON_OBJECT)
+            ParserTestUtils.ErrorTest170("SELECT JSON_QUERY('name':'value')",
+               new ParserErrorInfo(24, "SQL46010", ":"));
+
+            // WITH ARRAY WRAPPER must come after closing parenthesis, not before
+            ParserTestUtils.ErrorTest170("SELECT JSON_QUERY('{ \"a\": 1 }' WITH ARRAY WRAPPER)",
+                new ParserErrorInfo(31, "SQL46010", "WITH"));
+        }
+
+        /// <summary>
         /// Negative tests for Data Masking Alter Column syntax.
         /// </summary>
         [TestMethod]

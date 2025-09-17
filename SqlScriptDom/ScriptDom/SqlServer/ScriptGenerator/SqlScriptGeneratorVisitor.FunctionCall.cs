@@ -93,6 +93,22 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
                 GenerateReturnType(node?.ReturnType);
                 GenerateSymbol(TSqlTokenType.RightParenthesis);
             }
+            else if (node.FunctionName.Value.ToUpper(CultureInfo.InvariantCulture) == CodeGenerationSupporter.JsonQuery)
+            {
+                GenerateCommaSeparatedList(node.Parameters);
+                GenerateSymbol(TSqlTokenType.RightParenthesis);
+                
+                // Handle WITH ARRAY WRAPPER clause
+                if (node.WithArrayWrapper)
+                {
+                    GenerateSpace();
+                    GenerateKeyword(TSqlTokenType.With);
+                    GenerateSpace();
+                    GenerateIdentifier(CodeGenerationSupporter.Array);
+                    GenerateSpace();
+                    GenerateIdentifier(CodeGenerationSupporter.Wrapper);
+                }
+            }
             else
             {
                 GenerateUniqueRowFilter(node.UniqueRowFilter, false);

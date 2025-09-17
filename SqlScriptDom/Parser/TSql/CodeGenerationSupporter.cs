@@ -524,6 +524,9 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         internal const string JsonObject = "JSON_OBJECT";
         internal const string JsonObjectAgg = "JSON_OBJECTAGG";
         internal const string JsonArrayAgg = "JSON_ARRAYAGG";
+        internal const string JsonQuery = "JSON_QUERY";
+        internal const string Array = "ARRAY";
+        internal const string Wrapper = "WRAPPER";
         internal const string Keep = "KEEP";
         internal const string KeepDefaults = "KEEPDEFAULTS";
         internal const string KeepFixed = "KEEPFIXED";

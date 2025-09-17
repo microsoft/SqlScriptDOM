@@ -32835,6 +32835,9 @@ builtInFunctionCall returns [FunctionCall vResult = FragmentFactory.CreateFragme
         {(vResult.FunctionName != null && vResult.FunctionName.Value.ToUpper(CultureInfo.InvariantCulture) == CodeGenerationSupporter.JsonArrayAgg)}?
             jsonArrayAggBuiltInFunctionCall[vResult]
         |
+        {(vResult.FunctionName != null && vResult.FunctionName.Value.ToUpper(CultureInfo.InvariantCulture) == CodeGenerationSupporter.JsonQuery)}?
+            jsonQueryBuiltInFunctionCall[vResult]
+        |
          {(vResult.FunctionName != null && vResult.FunctionName.Value.ToUpper(CultureInfo.InvariantCulture) == CodeGenerationSupporter.Trim) && 
           (NextTokenMatches(CodeGenerationSupporter.Leading) | NextTokenMatches(CodeGenerationSupporter.Trailing) | NextTokenMatches(CodeGenerationSupporter.Both))}?
             trim3ArgsBuiltInFunctionCall[vResult]
@@ -32932,6 +32935,41 @@ jsonObjectAggBuiltInFunctionCall [FunctionCall vParent]
         {
             UpdateTokenInfo(vParent, tRParen);
         }
+    ;
+
+jsonQueryBuiltInFunctionCall [FunctionCall vParent]
+{
+    ScalarExpression vExpression;
+    ScalarExpression vPath;
+}
+    :   vExpression=expression
+        {
+            AddAndUpdateTokenInfo(vParent, vParent.Parameters, vExpression);
+        }
+        (
+            Comma vPath=expression
+            {
+                AddAndUpdateTokenInfo(vParent, vParent.Parameters, vPath);
+            }
+        )?
+        tRParen:RightParenthesis
+        {
+            UpdateTokenInfo(vParent, tRParen);
+        }
+        (
+            With tArray:Identifier tWrapper:Identifier
+            {
+                if (!tArray.getText().Equals(CodeGenerationSupporter.Array, StringComparison.OrdinalIgnoreCase))
+                {
+                    throw GetUnexpectedTokenErrorException(tArray);
+                }
+                if (!tWrapper.getText().Equals(CodeGenerationSupporter.Wrapper, StringComparison.OrdinalIgnoreCase))
+                {
+                    throw GetUnexpectedTokenErrorException(tWrapper);
+                }
+                vParent.WithArrayWrapper = true;
+            }
+        )?
     ;
 
 regularBuiltInFunctionCall [FunctionCall vParent]
