@@ -239,6 +239,9 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
                 new KeywordGenerator(TSqlTokenType.MultiplyEquals) }},
             { BooleanComparisonType.RightOuterJoin, new List<TokenGenerator>() {
                 new KeywordGenerator(TSqlTokenType.RightOuterJoin) }},
+            { BooleanComparisonType.NotLike, new List<TokenGenerator>() {
+                new KeywordGenerator(TSqlTokenType.Not, true),
+                new KeywordGenerator(TSqlTokenType.Like) }},
             { BooleanComparisonType.IsDistinctFrom, new List<TokenGenerator>() {
                 new KeywordGenerator(TSqlTokenType.Is, true),
                 new KeywordGenerator(TSqlTokenType.Distinct, true),

@@ -66,5 +66,10 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         /// The distinct predicate, IS NOT DISTINCT FROM.
         /// </summary>
         IsNotDistinctFrom = 12,
+
+        /// <summary>
+        /// The NOT LIKE predicate
+        /// </summary>
+        NotLike = 13,
     }
 }

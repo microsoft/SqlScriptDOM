@@ -7289,16 +7289,14 @@ eventDeclarationComparisonPredicate [BooleanComparisonExpression vParent, EventS
     BooleanComparisonType vType = BooleanComparisonType.Equals;
     ScalarExpression eventValue;
 }
-    :    vType = comparisonOperator eventValue = eventDeclarationValue
-        {
-            vSourceDeclaration.Value = vSource;
-            vParent.FirstExpression = vSourceDeclaration;
-            vParent.ComparisonType = vType;
-            vParent.SecondExpression = eventValue;
-        }
-    ;
-
-dropEventDeclarationList [AlterEventSessionStatement vParent]
+    :    (vType = comparisonOperator | {LA(2) == Like}? tNot:Not tLike:Like { vType = BooleanComparisonType.NotLike; }) eventValue = eventDeclarationValue
+    {
+        vSourceDeclaration.Value = vSource;
+        vParent.FirstExpression = vSourceDeclaration;
+        vParent.ComparisonType = vType;
+        vParent.SecondExpression = eventValue;
+    }
+    ;dropEventDeclarationList [AlterEventSessionStatement vParent]
 {
     EventSessionObjectName vDropEventDeclaration;
 }

@@ -26,6 +26,7 @@ namespace SqlStudio.Tests.UTSqlScriptDom
             new ParserTest170("DropExternalModelStatementTests170.sql", nErrors80: 1, nErrors90: 1, nErrors100: 1, nErrors110: 1, nErrors120: 1, nErrors130: 1, nErrors140: 1, nErrors150: 1, nErrors160: 1),
             new ParserTest170("VectorFunctionTests170.sql", nErrors80: 1, nErrors90: 1, nErrors100: 2, nErrors110: 2, nErrors120: 2, nErrors130: 2, nErrors140: 2, nErrors150: 2, nErrors160: 2),
             new ParserTest170("SecurityStatementExternalModelTests170.sql", nErrors80: 2, nErrors90: 17, nErrors100: 17, nErrors110: 17, nErrors120: 17, nErrors130: 17, nErrors140: 17, nErrors150: 17, nErrors160: 17),
+            new ParserTest170("CreateEventSessionNotLikePredicate.sql", nErrors80: 2, nErrors90: 1,  nErrors100: 1, nErrors110: 1, nErrors120: 1, nErrors130: 0, nErrors140: 0, nErrors150: 0, nErrors160: 0),
             new ParserTest170("RegexpLikeTests170.sql", nErrors80: 13, nErrors90: 13, nErrors100: 13, nErrors110: 15, nErrors120: 15, nErrors130: 15, nErrors140: 15, nErrors150: 15, nErrors160: 15)
         };
 
