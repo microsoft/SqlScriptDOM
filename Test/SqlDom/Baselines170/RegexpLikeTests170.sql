@@ -31,3 +31,9 @@ SELECT CASE WHEN NOT REGEXP_LIKE ('abc', '^a', NULL) THEN 1 ELSE 0 END AS is_mat
 SELECT CASE WHEN REGEXP_LIKE (NULL, '^a', 'c') THEN 1 ELSE 0 END AS is_match;
 
 SELECT IIF (NOT REGEXP_LIKE ('abc', NULL), 1, 0) AS is_match;
+
+SELECT 1
+WHERE REGEXP_LIKE ('a', '^a');
+
+SELECT 1
+WHERE (REGEXP_LIKE ('a', '%pattern%'));

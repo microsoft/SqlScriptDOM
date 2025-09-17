@@ -40,3 +40,14 @@ The process of fixing a bug, especially one that involves adding new syntax, fol
     *   **d. Re-run the Tests**: Run the same test command again. This time, the tests should pass, confirming that the generated script matches the new baseline.
 
 By following these steps, you can ensure that new syntax is correctly parsed, represented in the AST, generated back into a script, and fully validated by the testing framework.
+
+## Special Case: Parser Predicate Recognition Issues
+
+If you encounter a bug where:
+- An identifier-based predicate (like `REGEXP_LIKE`) works without parentheses: `WHERE REGEXP_LIKE('a', 'pattern')` ✅
+- But fails with parentheses: `WHERE (REGEXP_LIKE('a', 'pattern'))` ❌
+- The error is a syntax error near the closing parenthesis or semicolon
+
+This is likely a **parser predicate recognition issue**. The grammar and AST are correct, but the `IsNextRuleBooleanParenthesis()` function doesn't recognize the identifier-based predicate.
+
+**Solution**: Follow the [Parser Predicate Recognition Fix Guide](PARSER_PREDICATE_RECOGNITION_FIX.md) instead of the standard grammar modification workflow.
