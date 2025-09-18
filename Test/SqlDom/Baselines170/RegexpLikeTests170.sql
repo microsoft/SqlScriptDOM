@@ -8,6 +8,8 @@ SELECT IIF (REGEXP_LIKE ('abc', '^a'), 1, 0) AS is_match;
 
 SELECT IIF (NOT REGEXP_LIKE ('abc', '^a'), 1, 0) AS is_match;
 
+SELECT (IIF (REGEXP_LIKE ('abc', '^a'), 'Match', 'No Match')) AS result;
+
 SELECT CASE WHEN REGEXP_LIKE ('abc', '^a') THEN 1 ELSE 0 END AS is_match;
 
 SELECT CASE WHEN NOT REGEXP_LIKE ('abc', '^a') THEN 1 ELSE 0 END AS is_match;
