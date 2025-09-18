@@ -130,6 +130,11 @@ GO
 
 SELECT Title
 FROM Production.Document
+WHERE (Contains ( t1.c1, @a));
+GO
+
+SELECT Title
+FROM Production.Document
 WHERE Freetext ( t2.*, N'abc');
 GO
 

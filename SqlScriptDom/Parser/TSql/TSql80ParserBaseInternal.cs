@@ -808,6 +808,15 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
                         {
                             ++insideIIf;
                         }
+                        // if identifier is REGEXP_LIKE
+                        else if(NextTokenMatches(CodeGenerationSupporter.RegexpLike))
+                        {
+                            if (caseDepth == 0 && topmostSelect == 0 && insideIIf == 0)
+                            {
+                                matches = true;
+                                loop = false;
+                            }
+                        }
                         break;
                     case TSql80ParserInternal.LeftParenthesis:
                         ++openParens;
