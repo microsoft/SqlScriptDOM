@@ -21,3 +21,28 @@ FROM VECTOR_SEARCH(
          TOP_N = 10
      )
 ORDER BY distance;
+
+DECLARE @k AS INT = 5;
+
+SELECT t.id,
+       s.distance,
+       t.title
+FROM VECTOR_SEARCH(
+         TABLE = graphnode AS src,
+         COLUMN = embedding,
+         SIMILAR_TO = @qv,
+         METRIC = 'cosine',
+         TOP_N = @k
+     ) AS ann
+ORDER BY s.distance;
+
+SELECT outerref.id
+FROM graphnode AS outerref
+WHERE outerref.id IN (SELECT src.id
+                      FROM VECTOR_SEARCH(
+                               TABLE = graphnode AS src,
+                               COLUMN = embedding,
+                               SIMILAR_TO = @qv,
+                               METRIC = 'cosine',
+                               TOP_N = outerref.max_results
+                           ) AS ann);
