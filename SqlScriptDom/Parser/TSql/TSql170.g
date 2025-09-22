@@ -19252,7 +19252,7 @@ vectorSearchTableReference returns [VectorSearchTableReference vResult = Fragmen
     ColumnReferenceExpression vColumn;
     ScalarExpression vSimilarTo;
     StringLiteral vMetric;
-    IntegerLiteral vTopN;
+    ScalarExpression vTopN;
 }
     :
         tVectorSearch:Identifier LeftParenthesis
@@ -19279,9 +19279,16 @@ vectorSearchTableReference returns [VectorSearchTableReference vResult = Fragmen
             MatchString(vMetric, CodeGenerationSupporter.Cosine, CodeGenerationSupporter.Dot, CodeGenerationSupporter.Euclidean);
             vResult.Metric = vMetric;
         }
-        Comma tTopN:Identifier EqualsSign vTopN = integer
+        Comma tTopN:Identifier EqualsSign vTopN = signedIntegerOrVariableOrColumnReference
         {
             Match(tTopN, CodeGenerationSupporter.TopN);
+            
+            // Validate that TOP_N is not a negative number
+            if (vTopN is UnaryExpression unaryExpr && unaryExpr.UnaryExpressionType == UnaryExpressionType.Negative)
+            {
+                ThrowParseErrorException("SQL46010", unaryExpr, TSqlParserResource.SQL46010Message, "-");
+            }
+            
             vResult.TopN = vTopN;
         }
         RightParenthesis simpleTableReferenceAliasOpt[vResult]
@@ -33689,6 +33696,24 @@ signedIntegerOrStringOrVariable returns [ScalarExpression vResult]
 signedIntegerOrVariableOrNull returns [ScalarExpression vResult]
     : vResult=signedIntegerOrVariable
     | vResult=nullLiteral
+    ;
+
+signedIntegerOrVariableOrColumnReference returns [ScalarExpression vResult]
+    : vResult=signedInteger
+    | vResult=variable
+    | vResult=vectorSearchColumnReferenceExpression
+    ;
+
+vectorSearchColumnReferenceExpression returns [ColumnReferenceExpression vResult = this.FragmentFactory.CreateFragment<ColumnReferenceExpression>()]
+{
+    MultiPartIdentifier vMultiPartIdentifier;
+}
+    :
+        vMultiPartIdentifier=multiPartIdentifier[2]
+        {
+            vResult.ColumnType = ColumnType.Regular;
+            vResult.MultiPartIdentifier = vMultiPartIdentifier;
+        }
     ;
 
 stringLiteralOrNull returns [Literal vResult]
