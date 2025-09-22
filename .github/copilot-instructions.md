@@ -51,6 +51,8 @@ ScriptDom is a library for parsing and generating T-SQL scripts. It is primarily
 ## Bug Fixing and Baseline Generation
 For a practical guide on fixing bugs, including the detailed workflow for generating test baselines, see the [Bug Fixing Guide](BUG_FIXING_GUIDE.md).
 
+For specific parser predicate recognition issues (when identifier-based predicates like `REGEXP_LIKE` don't work with parentheses), see the [Parser Predicate Recognition Fix Guide](PARSER_PREDICATE_RECOGNITION_FIX.md).
+
 ## Editing generated outputs, debugging generation
 - Never edit generated files permanently (they live under `obj/...`/CsGenIntermediateOutputPath). Instead change:
   - `.g` grammar files

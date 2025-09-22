@@ -136,3 +136,15 @@ When extending from literals to expressions, consider supporting:
 2. **`TSql*.g`**: Update variable declarations and parsing rules
 3. **Test files**: Add comprehensive test coverage
 4. **Script generators**: Usually no changes needed for well-designed generators
+By following these steps, you can ensure that new syntax is correctly parsed, represented in the AST, generated back into a script, and fully validated by the testing framework.
+
+## Special Case: Parser Predicate Recognition Issues
+
+If you encounter a bug where:
+- An identifier-based predicate (like `REGEXP_LIKE`) works without parentheses: `WHERE REGEXP_LIKE('a', 'pattern')` ✅
+- But fails with parentheses: `WHERE (REGEXP_LIKE('a', 'pattern'))` ❌
+- The error is a syntax error near the closing parenthesis or semicolon
+
+This is likely a **parser predicate recognition issue**. The grammar and AST are correct, but the `IsNextRuleBooleanParenthesis()` function doesn't recognize the identifier-based predicate.
+
+**Solution**: Follow the [Parser Predicate Recognition Fix Guide](PARSER_PREDICATE_RECOGNITION_FIX.md) instead of the standard grammar modification workflow.
