@@ -63,3 +63,7 @@ For a practical guide on fixing bugs, including the detailed workflow for genera
 - **Operator vs. Function-Style Predicates:** Be careful to distinguish between standard T-SQL operators (like `NOT LIKE`, `>`, `=`) and the function-style predicates used in some contexts (like `package.equals(...)` in `CREATE EVENT SESSION`). For example, `NOT LIKE` in an event session's `WHERE` clause is a standard comparison operator, not a function call. Always verify the exact T-SQL syntax before modifying the grammar.
 - **Logical `NOT` vs. Compound Operators:** The grammar handles the logical `NOT` operator (e.g., `WHERE NOT (condition)`) in a general way, often in a `booleanExpressionUnary` rule. This is distinct from compound operators like `NOT LIKE` or `NOT IN`, which are typically parsed as a single unit within a comparison rule. Don't assume that because `NOT` is supported, `NOT LIKE` will be automatically supported in all predicate contexts.
 
+## Local development on macOS and Linux
+
+- Run build for .NET 8.0 target framework only
+- Run tests for .NET 8.0 target framework only

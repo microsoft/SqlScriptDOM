@@ -412,6 +412,133 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
             return value;
         }
 
+        // Helper: replace a trailing newline element with a single space token.
+        public bool ReplaceTrailingNewLineWithSpaceIfPresent()
+        {
+            if (_scriptWriterElements.Count == 0)
+                return false;
+
+            int index = _scriptWriterElements.Count - 1;
+            // Skip alignment points (they sit logically at position 0 width)
+            while (index >= 0 && _scriptWriterElements[index] is AlignmentPointData)
+            {
+                index--;
+            }
+            if (index < 0) return false;
+            var last = _scriptWriterElements[index];
+            if (last is NewLineElement)
+            {
+                _scriptWriterElements.RemoveAt(index);
+                AddToken(ScriptGeneratorSupporter.CreateWhitespaceToken(1));
+                return true;
+            }
+            if (last is TokenWrapper tw && (tw.Token.Text == "\n" || tw.Token.Text == "\r\n"))
+            {
+                _scriptWriterElements.RemoveAt(index);
+                AddToken(ScriptGeneratorSupporter.CreateWhitespaceToken(1));
+                return true;
+            }
+            return false;
+        }
+
+        // Helper: ensure exactly one space at the end (unless last element already whitespace or newline).
+        public void EnsureSingleTrailingSpace()
+        {
+            if (_scriptWriterElements.Count == 0)
+                return;
+            var last = _scriptWriterElements[_scriptWriterElements.Count - 1];
+            if (last is NewLineElement)
+                return; // newline already provides separation
+            if (last is TokenWrapper tw)
+            {
+                var txt = tw.Token.Text;
+                if (txt.EndsWith(" ") || txt.EndsWith("\t") || txt.EndsWith("\n") || txt.EndsWith("\r"))
+                    return;
+            }
+            AddToken(ScriptGeneratorSupporter.CreateWhitespaceToken(1));
+        }
+
+        public bool IsLastElementNewLine()
+        {
+            if (_scriptWriterElements.Count == 0) return false;
+            return _scriptWriterElements[_scriptWriterElements.Count - 1] is NewLineElement;
+        }
+
+        public bool HasElements()
+        {
+            return _scriptWriterElements.Count > 0;
+        }
+
+        // If the last non-alignment element is a single-line comment token, remove and return it.
+        public TSqlParserToken PopLastSingleLineCommentIfAny()
+        {
+            int index = _scriptWriterElements.Count - 1;
+            while (index >= 0 && _scriptWriterElements[index] is AlignmentPointData)
+            {
+                index--;
+            }
+            if (index >= 0 && _scriptWriterElements[index] is TokenWrapper tw && tw.Token.TokenType == TSqlTokenType.SingleLineComment)
+            {
+                _scriptWriterElements.RemoveAt(index);
+                return tw.Token;
+            }
+            return null;
+        }
+
+        public void TrimTrailingWhitespace()
+        {
+            int index = _scriptWriterElements.Count - 1;
+            while (index >= 0 && _scriptWriterElements[index] is AlignmentPointData)
+            {
+                index--;
+            }
+            if (index >= 0 && _scriptWriterElements[index] is TokenWrapper tw && tw.Token.TokenType == TSqlTokenType.WhiteSpace)
+            {
+                _scriptWriterElements.RemoveAt(index);
+            }
+        }
+
+        // Rewrites a trailing pattern (NewLine, optional alignment points) so that a multiline comment can appear inline
+        // at the end of the previous line. Restores the newline and alignment points after the comment to preserve alignment.
+        public void InsertInlineTrailingComment(TSqlParserToken commentToken)
+        {
+            if (commentToken == null) return;
+            int scan = _scriptWriterElements.Count - 1;
+            // Skip alignment points to locate newline element
+            while (scan >= 0 && _scriptWriterElements[scan] is AlignmentPointData)
+            {
+                scan--;
+            }
+            if (scan >= 0 && _scriptWriterElements[scan] is NewLineElement)
+            {
+                int newlineIndex = scan;
+                // Determine if we need a space before inserting comment
+                bool needsSpace = true;
+                int beforeNewline = newlineIndex - 1;
+                while (beforeNewline >= 0 && _scriptWriterElements[beforeNewline] is AlignmentPointData)
+                {
+                    beforeNewline--;
+                }
+                if (beforeNewline >= 0 && _scriptWriterElements[beforeNewline] is TokenWrapper twPrev)
+                {
+                    var txt = twPrev.Token.Text;
+                    if (txt.EndsWith(" ") || txt.EndsWith("\t"))
+                        needsSpace = false;
+                }
+                if (needsSpace)
+                {
+                    _scriptWriterElements.Insert(newlineIndex, new TokenWrapper(ScriptGeneratorSupporter.CreateWhitespaceToken(1)));
+                    newlineIndex++;
+                }
+                _scriptWriterElements.Insert(newlineIndex, new TokenWrapper(commentToken));
+            }
+            else
+            {
+                EnsureSingleTrailingSpace();
+                AddToken(commentToken);
+            }
+        }
+
         #endregion
     }
 }
