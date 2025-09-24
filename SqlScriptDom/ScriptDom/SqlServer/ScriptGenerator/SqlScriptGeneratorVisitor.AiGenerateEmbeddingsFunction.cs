@@ -36,22 +36,8 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
             {
                 GenerateSpace();
                 GenerateIdentifierWithoutCasing(CodeGenerationSupporter.Parameters);
-
-                // If OptionalParameters is a StringLiteral, emit without parentheses:
-                //   PARAMETERS '<json>'
-                // Otherwise, preserve the legacy form:
-                //   PARAMETERS (<expr>)
-                if (node.OptionalParameters is StringLiteral)
-                {
-                    GenerateSpace();
-                    GenerateFragmentIfNotNull(node.OptionalParameters);
-                }
-                else
-                {
-                    GenerateSpaceAndSymbol(TSqlTokenType.LeftParenthesis);
-                    GenerateFragmentIfNotNull(node.OptionalParameters);
-                    GenerateSymbol(TSqlTokenType.RightParenthesis);
-                }
+                GenerateSpace();
+                GenerateFragmentIfNotNull(node.OptionalParameters);
             }
 
             // Emit closing parenthesis

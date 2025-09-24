@@ -32153,7 +32153,7 @@ aiGenerateEmbeddingsFunctionCall
     ScalarExpression vInput;
     SchemaObjectName vModelName;
     ScalarExpression vParams = null;
-    StringLiteral vParamNode = null;
+    ScalarExpression vParamsInner;
 }
     :
         tFunc:Identifier LeftParenthesis
@@ -32173,28 +32173,96 @@ aiGenerateEmbeddingsFunctionCall
         tModel:Identifier
         {
             Match(tModel, CodeGenerationSupporter.Model);
+            UpdateTokenInfo(vResult, tModel);
         }
 
-        vModelName=schemaObjectThreePartName
-        {
-            vResult.ModelName = vModelName;
-        }
-
+        // --- MODEL NAME: single-part only (strict) ---------------------------------------------
+        // We accept exactly **one identifier token** after "USE MODEL".
+        //
+        // Why:
+        //   - Users may store model names that *visually* contain dots or spaces, e.g. [dbo.MyDefaultModel].
+        //     When bracket-delimited, the lexer emits this as a **single** token (QuotedIdentifier), so it’s OK.
+        //   - True multipart names (db.schema.model) must be rejected here, so we do NOT consume any Dot tokens.
+        //
+        // Allowed (single token):
+        //   USE MODEL MyDefaultModel            -- Identifier
+        //   USE MODEL [dbo.MyDefaultModel]      -- QuotedIdentifier (one token; dot lives inside the brackets)
+        //
+        // Rejected (multipart):
+        //   USE MODEL dbo.MyDefaultModel        -- Identifier '.' Identifier  (two tokens + Dot)
+        //   USE MODEL [dbo].[MyDefaultModel]    -- QuotedIdentifier '.' QuotedIdentifier
+        //
+        // Token notes:
+        //   - Identifier         : unquoted identifier; cannot contain spaces or '.'.
+        //   - QuotedIdentifier   : bracket-delimited; may contain spaces and '.' inside the brackets.
         (
-            tParams:Identifier
+            vModelId:Identifier
             {
-                Match(tParams, CodeGenerationSupporter.Parameters);
-                UpdateTokenInfo(vResult, tParams);
+                vModelName = this.FragmentFactory.CreateFragment<SchemaObjectName>();
+                vModelName.Identifiers.Add(this.CreateIdentifierFromToken(vModelId));
+                vResult.ModelName = vModelName;
             }
+          |
+            vModelQId:QuotedIdentifier
+            {
+                vModelName = this.FragmentFactory.CreateFragment<SchemaObjectName>();
+                vModelName.Identifiers.Add(this.CreateIdentifierFromToken(vModelQId));
+                vResult.ModelName = vModelName;
+            }
+        )
+
+        // --- Optional PARAMETERS clause ---------------------------------------------------------
+        // Shape:  [PARAMETERS (<expr>)] | [PARAMETERS <expr-not-string>]
+        // Goals:
+        //   1) Accept a general **expression** as the PARAMETERS value.
+        //   2) Preserve user-written parentheses by constructing a ParenthesisExpression node
+        //      for the "( <expr> )" variant so pretty-printing round-trips exactly.
+        //   3) **Reject** a bare JSON string literal (e.g., PARAMETERS '{...}'); callers must pass
+        //      a parsed JSON expression (e.g., TRY_CONVERT(JSON, N'{}')).
+        // Notes:
+        //   - Some builds tokenize PARAMETERS as a keyword; others as an Identifier. Support both.
+        (
             (
-                LeftParenthesis
-                    vParams=expression
-                RightParenthesis
-              |
-                vParamNode=stringLiteral
+                // PARAMETERS as a true keyword token.
+                tParamsKw:Parameters
                 {
-                    vParams = vParamNode;
+                    UpdateTokenInfo(vResult, tParamsKw);
                 }
+              |
+                // PARAMETERS as an identifier token; enforce its text equals "Parameters".
+                tParams:Identifier
+                {
+                    Match(tParams, CodeGenerationSupporter.Parameters);
+                    UpdateTokenInfo(vResult, tParams);
+                }
+            )
+
+            // ---- Value of PARAMETERS -----------------------------------------------------------
+            (
+                // Variant A: user wrote parentheses around the value: PARAMETERS ( <expr> )
+                // Build a ParenthesisExpression so the printer re-emits parens.
+                tLP:LeftParenthesis
+                    vParamsInner=expression
+                tRP:RightParenthesis
+                {
+                    ParenthesisExpression p = this.FragmentFactory.CreateFragment<ParenthesisExpression>();
+                    p.Expression = vParamsInner;
+                    vParams = p;
+
+                    // Attach LP/RP token info for accurate script generation.
+                    UpdateTokenInfo(p, tLP);
+                    UpdateTokenInfo(p, tRP);
+                }
+              |
+                // Variant B: bare expression without surrounding parentheses.
+                // Guardrail: Disallow a leading string literal so that
+                //   PARAMETERS '{"dimensions":768}'
+                // is a **syntax error**, while
+                //   PARAMETERS TRY_CONVERT(JSON, N'{}')
+                // is allowed.
+                // LA(1) is the next token type; block both ASCII ('...') and Unicode (N'...') strings.
+                { LA(1) != AsciiStringLiteral && LA(1) != UnicodeStringLiteral }?
+                vParams=expression
             )
             {
                 vResult.OptionalParameters = vParams;

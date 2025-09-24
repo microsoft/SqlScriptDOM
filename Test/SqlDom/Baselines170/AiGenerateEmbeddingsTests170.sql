@@ -1,9 +1,10 @@
 SELECT AI_GENERATE_EMBEDDINGS('My Default Input Text' USE MODEL MyDefaultModel);
 SELECT AI_GENERATE_EMBEDDINGS(N'My Default Input Text' USE MODEL MyDefaultModel);
 SELECT AI_GENERATE_EMBEDDINGS('My Default Input Text' USE MODEL MyDefaultModel PARAMETERS (TRY_CONVERT (JSON, N'{}')));
-SELECT AI_GENERATE_EMBEDDINGS('My Default Input Text' USE MODEL dbo.MyDefaultModel);
-SELECT AI_GENERATE_EMBEDDINGS('My Default Input Text' USE MODEL MyDatabase.dbo.MyDefaultModel);
-SELECT AI_GENERATE_EMBEDDINGS('My Default Input Text' USE MODEL MyDefaultModel PARAMETERS '{"dimensions" : 768 }');
+SELECT AI_GENERATE_EMBEDDINGS('My Default Input Text' USE MODEL MyDefaultModel PARAMETERS TRY_CONVERT (JSON, N'{}'));
+SELECT AI_GENERATE_EMBEDDINGS('My Default Input Text' USE MODEL [My Default Model]);
+SELECT AI_GENERATE_EMBEDDINGS('My Default Input Text' USE MODEL [dbo.MyDefaultModel]);
+SELECT AI_GENERATE_EMBEDDINGS('' USE MODEL MyDefaultModel);
 GO
 
 CREATE FUNCTION dbo.AI_GENERATE_EMBEDDINGS
@@ -36,7 +37,7 @@ GO
 
 CREATE VIEW dbo.MyEmbeddingView
 AS
-SELECT AI_GENERATE_EMBEDDINGS(N'View Input' USE MODEL dbo.MyDefaultModel) AS EmbeddingResult;
+SELECT AI_GENERATE_EMBEDDINGS(N'View Input' USE MODEL MyDefaultModel) AS EmbeddingResult;
 GO
 
 CREATE TABLE dbo.SimpleEmbeddingTable (
