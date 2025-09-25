@@ -13,7 +13,7 @@ namespace SqlStudio.Tests.UTSqlScriptDom
         private static readonly ParserTest[] Only170TestInfos =
         {
             new ParserTest170("RegexpTVFTests170.sql", nErrors80: 1, nErrors90: 1, nErrors100: 0, nErrors110: 0, nErrors120: 0, nErrors130: 0, nErrors140: 0, nErrors150: 0, nErrors160: 0),
-            new ParserTest170("JsonIndexTests170.sql", nErrors80: 2, nErrors90: 8, nErrors100: 8, nErrors110: 8, nErrors120: 8, nErrors130: 8, nErrors140: 8, nErrors150: 8, nErrors160: 8),
+            new ParserTest170("JsonIndexTests170.sql", nErrors80: 2, nErrors90: 9, nErrors100: 9, nErrors110: 9, nErrors120: 9, nErrors130: 9, nErrors140: 9, nErrors150: 9, nErrors160: 9),
             new ParserTest170("VectorIndexTests170.sql", nErrors80: 2, nErrors90: 12, nErrors100: 12, nErrors110: 12, nErrors120: 12, nErrors130: 12, nErrors140: 12, nErrors150: 12, nErrors160: 12),
             new ParserTest170("AlterDatabaseManualCutoverTests170.sql", nErrors80: 4, nErrors90: 4, nErrors100: 4, nErrors110: 4, nErrors120: 4, nErrors130: 4, nErrors140: 4, nErrors150: 4, nErrors160: 4),
             new ParserTest170("CreateColumnStoreIndexTests170.sql", nErrors80: 3, nErrors90: 3, nErrors100: 3, nErrors110: 3, nErrors120: 3, nErrors130: 0, nErrors140: 0, nErrors150: 0, nErrors160: 0),

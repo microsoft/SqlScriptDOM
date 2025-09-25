@@ -40,6 +40,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         XmlCompression      = 23,
         VectorMetric        = 24,
         VectorType          = 25,
+        OptimizeForArraySearch = 26,
     }
 
 #pragma warning restore 1591
