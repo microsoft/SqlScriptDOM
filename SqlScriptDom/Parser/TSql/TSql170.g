@@ -13,7 +13,7 @@
 // Also for token that we don't track of like Comma, Semicolon etc. we have to
 // call the same function.  Alternatively the properties(StartOffset, FragmentLength)
 // on Fragment.cs can be used for this purpose.
-
+'
 options {
     language = "CSharp";
     namespace = "Microsoft.SqlServer.TransactSql.ScriptDom";
