@@ -32181,7 +32181,7 @@ aiGenerateEmbeddingsFunctionCall
         //
         // Why:
         //   - Users may store model names that *visually* contain dots or spaces, e.g. [dbo.MyDefaultModel].
-        //     When bracket-delimited, the lexer emits this as a **single** token (QuotedIdentifier), so it’s OK.
+        //     When bracket-delimited, the lexer emits this as a **single** token (QuotedIdentifier), so it's OK.
         //   - True multipart names (db.schema.model) must be rejected here, so we do NOT consume any Dot tokens.
         //
         // Allowed (single token):
