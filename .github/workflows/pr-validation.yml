@@ -18,6 +18,12 @@ jobs:
       run: dotnet restore
     - name: Build
       run: dotnet build dirs.proj
+    - name: Archive antlr log # on linux when build fails
+      if: failure() && matrix.os == 'ubuntu-latest'
+      uses: actions/upload-artifact@v2
+      with:
+        name: antlr-log
+        path: SqlScriptDom/NUL
   test: 
     runs-on: ${{ matrix.os }}
     strategy:
