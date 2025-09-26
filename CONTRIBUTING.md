@@ -117,23 +117,37 @@ Before sending a Pull Request, please do the following:
 
 ### Helpful notes for SQLDOM extensions
 
-1. For changing the DOM classes, modify the XML file (the C# code is generated based on this during the build process) `$(EnlistmentRoot)\Source\SqlDom\SqlScriptDom\Parser\TSql\Ast.xml`. Change Ast.xml to put the class pieces on their appropriate statements.
-    1. The build process is defined in `$(EnlistmentRoot)\Source\SqlDom\SqlScriptDom\SqlScriptDom.props` (Target Name="CreateAST")
-    2. The generated files are dropped in `$(EnlistmentRoot)\obj\<x64|x86>\<Debug|Release>\SqlScriptDom.csproj\`
+1. For changing the DOM classes, modify the XML file (the C# code is generated based on this during the build process) `SqlScriptDom\Parser\TSql\Ast.xml`. Change Ast.xml to put the class pieces on their appropriate statements.
+    1. The build process is defined in `SqlScriptDom\GenerateFiles.props` (Target Name="CreateAST")
+    2. The generated files are dropped in `obj\SqlScriptDom\AnyCPU\<Debug|Release>\<TargetPlatform>\Microsoft.SqlServer.TransactSql.ScriptDom.csproj\`
+    
+    Regenerating generated sources (what to run and when)
+    ---------------------------------------------------
+    When you modify `Source\SqlDom\SqlScriptDom\Parser\TSql\Ast.xml` or any `TSql<#>.g` grammar file, the C# parser and DOM sources are produced by MSBuild generation targets (for example `CreateAST`). These targets are invoked automatically during a normal build, so in most cases you can simply run:
+
+    ```powershell
+    dotnet build Source\SqlDom\SqlScriptDom\Microsoft.SqlServer.TransactSql.ScriptDom.csproj -c Debug
+    ```
+
+    If you only want to run generation targets (no compile) or need more detailed generation logs, invoke the MSBuild targets directly:
+
+    ```powershell
+    dotnet msbuild Source\SqlDom\SqlScriptDom\Microsoft.SqlServer.TransactSql.ScriptDom.csproj -t:GLexerParserCompile;GSqlTokenTypesCompile;CreateAST -p:Configuration=Debug
+    ```
+
+    Generated files are written into the `obj` folder for that project (for example `obj\SqlScriptDom\AnyCPU\<Debug|Release>\<TargetPlatform>\Microsoft.SqlServer.TransactSql.ScriptDom.csproj\`). If antlr or related tools are missing, see `Directory.Build.props` for `AntlrLocation` and follow the repo guidance to supply the binaries.
    
 2. For changing the parser, modify the .g file here:
-`$(EnlistmentRoot)\Source\SqlDom\SqlScriptDom\Parser\TSql\TSql<#>.g` where # is the version (ie - 100, 120, 130). This will usually be the latest number if adding new grammar. Change the Tsql(xxx).g file to parse the new syntax.
-    1. The build process is defined in `$(EnlistmentRoot)\Source\SqlDom\SqlScriptDom\SqlScriptDom.props` (Target Name="CreateAST")
-    2. The generated files are dropped in `$(EnlistmentRoot)\obj\x86|x64\Debug|Release\sqlscriptdom.csproj\`
+`SqlScriptDom\Parser\TSql\TSql<#>.g` where # is the version (ie - 100, 120, 130). This will usually be the latest number if adding new grammar. Change the Tsql(xxx).g file to parse the new syntax.
+    1. The build process is defined in `SqlScriptDom\GenerateFiles.props` (Target Name="CreateAST")
+    2. The generated files are dropped in `obj\SqlScriptDom\AnyCPU\<Debug|Release>\<TargetPlatform>\Microsoft.SqlServer.TransactSql.ScriptDom.csproj\`
 
-3. For changing the ScriptGenerator, modify the appropriate file (i.e. Visitor that accepts the modified DOM class) in here: `$(EnlistmentRoot)\Source\SqlDom\SqlScriptDom\ScriptDom\SqlServer\ScriptGenerator`.
-    1. To add a new ScriptGenerator, you need to add the file to `$(EnlistmentRoot)\Source\SqlDom\SqlScriptDom\SqlScriptDom.props`
+3. For changing the ScriptGenerator, modify the appropriate file (i.e. Visitor that accepts the modified DOM class) in here: `SqlScriptDom\ScriptDom\SqlServer\ScriptGenerator`.
     1. Change The visitors SqlScriptGenerator.X to use the new piece from AST.XML
     1. If you're adding syntax that's Azure-only or Standalone-only, implement appropriate Versioning Visitor for your constructs.
 
-4. When adding/removing new files please add/remove an entry to/from `$(EnlistmentRoot)\Source\SqlDom\SqlScriptDom\SqlScriptDom.csproj` 
 
-5. To extend the tests do the following:
+4. To extend the tests do the following:
     1. Baselines# needs to be updated or added with the appropriate .sql file as expected results.
     1. The Only#SyntaxTests.cs needs to be extended or added to specify the appropriate TestScripts script.
     1. Positive tests go in Only#SyntaxTests.cs if adding new grammar.

@@ -7315,11 +7315,6 @@ WHEN NOT MATCHED BY SOURCE THEN DELETE OUTPUT inserted.*, deleted.*;";
                 "SELECT AI_GENERATE_EMBEDDINGS('My Default Input Text' PARAMETERS (TRY_CONVERT(JSON, N'{}')))",
                 new ParserErrorInfo(54, "SQL46010", "PARAMETERS"));
 
-            // PARAMETERS missing parentheses
-            ParserTestUtils.ErrorTest170(
-                "SELECT AI_GENERATE_EMBEDDINGS('My Default Input Text' USE MODEL MyModel PARAMETERS TRY_CONVERT(JSON, N'{}'))",
-                new ParserErrorInfo(83, "SQL46010", "TRY_CONVERT"));
-
             // Invalid expression inside PARAMETERS (missing closing parenthesis)
             ParserTestUtils.ErrorTest170(
                 "SELECT AI_GENERATE_EMBEDDINGS('My Default Input Text' USE MODEL MyModel PARAMETERS (TRY_CONVERT(JSON, N'{}')",
@@ -7344,6 +7339,21 @@ WHEN NOT MATCHED BY SOURCE THEN DELETE OUTPUT inserted.*, deleted.*;";
             ParserTestUtils.ErrorTest170(
                 "SELECT AI_GENERATE_EMBEDDINGS('My Default Input Text' USE MODEL NULL)",
                 new ParserErrorInfo(64, "SQL46010", "NULL"));
+            
+            // Invalid model reference: schema-qualified name after USE MODEL
+            ParserTestUtils.ErrorTest170(
+                "SELECT AI_GENERATE_EMBEDDINGS('My Default Input Text' USE MODEL [dbo].[MyDefaultModel])",
+                new ParserErrorInfo(69, "SQL46010", "."));
+
+            // Invalid model reference: database + schema-qualified name after USE MODEL
+            ParserTestUtils.ErrorTest170(
+                "SELECT AI_GENERATE_EMBEDDINGS('My Default Input Text' USE MODEL [MyDatabase].[dbo].[MyDefaultModel])",
+                new ParserErrorInfo(76, "SQL46010", "."));
+
+            // Varchar Optional Parameters
+            ParserTestUtils.ErrorTest170(
+                "SELECT AI_GENERATE_EMBEDDINGS('My Default Input Text' USE MODEL MyDefaultModel PARAMETERS '{\"dimensions\" : 768 }')",
+                new ParserErrorInfo(90, "SQL46010", "'{\"dimensions\" : 768 }'"));
         }
 
 

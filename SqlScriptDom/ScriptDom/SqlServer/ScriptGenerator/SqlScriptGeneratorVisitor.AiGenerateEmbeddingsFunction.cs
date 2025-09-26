@@ -36,9 +36,8 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
             {
                 GenerateSpace();
                 GenerateIdentifierWithoutCasing(CodeGenerationSupporter.Parameters);
-                GenerateSpaceAndSymbol(TSqlTokenType.LeftParenthesis);
+                GenerateSpace();
                 GenerateFragmentIfNotNull(node.OptionalParameters);
-                GenerateSymbol(TSqlTokenType.RightParenthesis);
             }
 
             // Emit closing parenthesis

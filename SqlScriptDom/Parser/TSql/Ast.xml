@@ -271,6 +271,11 @@
                     Summary="The xml data type option."/>
     <Member Name="XmlSchemaCollection" Type="SchemaObjectName" Summary="The xml schema collection. Optional may be null."/>
   </Class>
+  <Class Name="VectorDataTypeReference" Base="DataTypeReference" Summary="Represents vector data types">
+    <InheritedClass Name="DataTypeReference" />
+    <Member Name="Dimension" Type="IntegerLiteral" Summary="The dimension of the vector."/>
+    <Member Name="BaseType" Type="Identifier" Summary="Type of dimension values."/>
+  </Class>
   <Class Name="ScalarFunctionReturnType" Base="FunctionReturnType" Summary="The return type definition for scalar-valued functions">
     <Member Name="DataType" Type="DataTypeReference" Summary="The data type of the return."/>
   </Class>
@@ -2517,6 +2522,10 @@
     <Member Name="Unit" Type="TimeUnit" GenerateUpdatePositionInfoCall="false" Summary="Units (days|hours|minutes) for retention period."/>
   </Class>
   <Class Name="AcceleratedDatabaseRecoveryDatabaseOption" Base="DatabaseOption" Summary="ACCELERATED_DATABASE_RECOVERY option in ALTER DATABASE statement, SET case">
+    <InheritedClass Name="DatabaseOption" />
+    <Member Name="OptionState" Type="OptionState" GenerateUpdatePositionInfoCall="false" Summary="Option state."/>
+  </Class>
+  <Class Name="OptimizedLockingDatabaseOption" Base="DatabaseOption" Summary="OPTIMIZED_LOCKING option in ALTER DATABASE statement, SET case">
     <InheritedClass Name="DatabaseOption" />
     <Member Name="OptionState" Type="OptionState" GenerateUpdatePositionInfoCall="false" Summary="Option state."/>
   </Class>

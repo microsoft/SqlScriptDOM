@@ -29,3 +29,11 @@ FOR ('$.data.attributes');
 -- JSON index with complex path expressions
 CREATE JSON INDEX IX_JSON_Complex ON dbo.Documents (Content)
 FOR ('$.metadata.title', '$.content.sections[*].text', '$.tags[*]');
+
+-- Create JSON index with OPTIMIZE_FOR_ARRAY_SEARCH option
+CREATE JSON INDEX IX_JSON ON dbo.Users (JsonData) 
+WITH (OPTIMIZE_FOR_ARRAY_SEARCH = ON);
+
+-- Create JSON index with PAD_INDEX and DROP_EXISTING options
+CREATE JSON INDEX IX_JSON ON dbo.Users (JsonData) 
+WITH (PAD_INDEX = ON, DROP_EXISTING = ON);
