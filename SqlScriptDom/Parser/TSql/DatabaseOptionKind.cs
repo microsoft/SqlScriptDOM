@@ -98,7 +98,8 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         Ledger                      = 68,
 
         ManualCutover               = 69,
-        PerformCutover              = 70
+        PerformCutover              = 70,
+        OptimizedLocking            = 71
     }
 
 #pragma warning restore 1591

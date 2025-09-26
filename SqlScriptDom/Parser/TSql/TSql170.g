@@ -3064,17 +3064,14 @@ alterDbModify returns [AlterDatabaseStatement vResult = null]
     ;
 
 alterDbModifyAzureOptions returns [AlterDatabaseSetStatement vResult = FragmentFactory.CreateFragment<AlterDatabaseSetStatement>()]
-{
-    bool hasManualCutover = false;
-}
     :
         azureOptions[vResult, vResult.Options]
         (
             With tManualCutover:Identifier
             {
                 Match(tManualCutover, CodeGenerationSupporter.ManualCutover);
-                hasManualCutover = true;
                 vResult.WithManualCutover = true;
+                UpdateTokenInfo(vResult, tManualCutover);
             }
         )?
     ;
@@ -3247,6 +3244,8 @@ dbOptionStateItem[ref ulong encounteredOptions] returns [DatabaseOption vResult 
         vResult = changeTrackingDbOption
     |    {NextTokenMatches(CodeGenerationSupporter.AcceleratedDatabaseRecovery)}?
         vResult = acceleratedDatabaseRecoveryOption
+    |    {NextTokenMatches(CodeGenerationSupporter.OptimizedLocking)}?
+        vResult = optimizedLockingOption
     |    {NextTokenMatches(CodeGenerationSupporter.Containment)}?
         vResult = dbContainmentOption
     |    {NextTokenMatches(CodeGenerationSupporter.Hadr)}?
@@ -3542,6 +3541,30 @@ acceleratedDatabaseRecoveryOption returns [AcceleratedDatabaseRecoveryDatabaseOp
             Match(tAcceleratedDatabaseRecovery, CodeGenerationSupporter.AcceleratedDatabaseRecovery);
             vResult.OptionKind = DatabaseOptionKind.AcceleratedDatabaseRecovery;
             UpdateTokenInfo(vResult, tAcceleratedDatabaseRecovery);
+        }
+        (
+            (EqualsSign tOff:Off
+                {
+                    vResult.OptionState = OptionState.Off;
+                    UpdateTokenInfo(vResult, tOff);
+                }
+            )
+        |
+            (EqualsSign tOn:On
+                {
+                    vResult.OptionState = OptionState.On;
+                    UpdateTokenInfo(vResult, tOn);
+                }
+            )
+        )
+    ;
+
+optimizedLockingOption returns [OptimizedLockingDatabaseOption vResult = FragmentFactory.CreateFragment<OptimizedLockingDatabaseOption>()]
+    : tOptimizedLocking:Identifier
+        {
+            Match(tOptimizedLocking, CodeGenerationSupporter.OptimizedLocking);
+            vResult.OptionKind = DatabaseOptionKind.OptimizedLocking;
+            UpdateTokenInfo(vResult, tOptimizedLocking);
         }
         (
             (EqualsSign tOff:Off
@@ -19252,7 +19275,7 @@ vectorSearchTableReference returns [VectorSearchTableReference vResult = Fragmen
     ColumnReferenceExpression vColumn;
     ScalarExpression vSimilarTo;
     StringLiteral vMetric;
-    IntegerLiteral vTopN;
+    ScalarExpression vTopN;
 }
     :
         tVectorSearch:Identifier LeftParenthesis
@@ -19279,9 +19302,16 @@ vectorSearchTableReference returns [VectorSearchTableReference vResult = Fragmen
             MatchString(vMetric, CodeGenerationSupporter.Cosine, CodeGenerationSupporter.Dot, CodeGenerationSupporter.Euclidean);
             vResult.Metric = vMetric;
         }
-        Comma tTopN:Identifier EqualsSign vTopN = integer
+        Comma tTopN:Identifier EqualsSign vTopN = signedIntegerOrVariableOrColumnReference
         {
             Match(tTopN, CodeGenerationSupporter.TopN);
+            
+            // Validate that TOP_N is not a negative number
+            if (vTopN is UnaryExpression unaryExpr && unaryExpr.UnaryExpressionType == UnaryExpressionType.Negative)
+            {
+                ThrowParseErrorException("SQL46010", unaryExpr, TSqlParserResource.SQL46010Message, "-");
+            }
+            
             vResult.TopN = vTopN;
         }
         RightParenthesis simpleTableReferenceAliasOpt[vResult]
@@ -23923,7 +23953,6 @@ dropSecurityPolicyStatement returns [DropSecurityPolicyStatement vResult = Fragm
 createExternalModelStatement returns [CreateExternalModelStatement vResult = FragmentFactory.CreateFragment<CreateExternalModelStatement>()]
 {
     Identifier vName;
-    long encounteredOptions = 0;
 }
     :   tModel:Identifier vName = identifier
         {
@@ -24085,7 +24114,6 @@ externalModelParameters[ExternalModelStatement vParent]
 alterExternalModelStatement returns [AlterExternalModelStatement vResult = FragmentFactory.CreateFragment<AlterExternalModelStatement>()]
 {
     Identifier vName;
-    long encounteredOptions = 0;
 }
     :   tModel:Identifier vName = identifier
         {
@@ -30673,6 +30701,32 @@ xmlDataType [SchemaObjectName vName] returns [XmlDataTypeReference vResult = Fra
         )?
     ;
 
+vectorDataType [SchemaObjectName vName] returns [VectorDataTypeReference vResult = FragmentFactory.CreateFragment<VectorDataTypeReference>()]
+{
+    vResult.Name = vName;
+    vResult.UpdateTokenInfo(vName);
+    
+    IntegerLiteral vDimension = null;
+    Identifier vBaseType = null;
+}
+    :
+        (   LeftParenthesis vDimension=integer
+            {
+                vResult.Dimension = vDimension;
+            }
+            (
+                Comma vBaseType=identifier
+                {
+                    vResult.BaseType = vBaseType;
+                }
+            )?
+            tRParen:RightParenthesis
+            {
+                UpdateTokenInfo(vResult,tRParen);
+            }
+        )
+    ;
+
 scalarDataType returns [DataTypeReference vResult = null]
 {
     SchemaObjectName vName;
@@ -30693,6 +30747,9 @@ scalarDataType returns [DataTypeReference vResult = null]
             (
                 {isXmlDataType}?
                 vResult = xmlDataType[vName]
+            |
+                {typeOption == SqlDataTypeOption.Vector}?
+                vResult = vectorDataType[vName]
             |
                 {typeOption != SqlDataTypeOption.None}?
                 vResult = sqlDataTypeWithoutNational[vName, typeOption]
@@ -32096,6 +32153,7 @@ aiGenerateEmbeddingsFunctionCall
     ScalarExpression vInput;
     SchemaObjectName vModelName;
     ScalarExpression vParams = null;
+    ScalarExpression vParamsInner;
 }
     :
         tFunc:Identifier LeftParenthesis
@@ -32107,8 +32165,7 @@ aiGenerateEmbeddingsFunctionCall
         {
             vResult.Input = vInput;
         }
-
-        tUse:Use                         // your reserved keyword
+        tUse:Use
         {
             UpdateTokenInfo(vResult, tUse);
         }
@@ -32116,21 +32173,97 @@ aiGenerateEmbeddingsFunctionCall
         tModel:Identifier
         {
             Match(tModel, CodeGenerationSupporter.Model);
+            UpdateTokenInfo(vResult, tModel);
         }
 
-        vModelName=schemaObjectThreePartName
-        {
-            vResult.ModelName = vModelName;
-        }
-
+        // --- MODEL NAME: single-part only (strict) ---------------------------------------------
+        // We accept exactly **one identifier token** after "USE MODEL".
+        //
+        // Why:
+        //   - Users may store model names that *visually* contain dots or spaces, e.g. [dbo.MyDefaultModel].
+        //     When bracket-delimited, the lexer emits this as a **single** token (QuotedIdentifier), so it's OK.
+        //   - True multipart names (db.schema.model) must be rejected here, so we do NOT consume any Dot tokens.
+        //
+        // Allowed (single token):
+        //   USE MODEL MyDefaultModel            -- Identifier
+        //   USE MODEL [dbo.MyDefaultModel]      -- QuotedIdentifier (one token; dot lives inside the brackets)
+        //
+        // Rejected (multipart):
+        //   USE MODEL dbo.MyDefaultModel        -- Identifier '.' Identifier  (two tokens + Dot)
+        //   USE MODEL [dbo].[MyDefaultModel]    -- QuotedIdentifier '.' QuotedIdentifier
+        //
+        // Token notes:
+        //   - Identifier         : unquoted identifier; cannot contain spaces or '.'.
+        //   - QuotedIdentifier   : bracket-delimited; may contain spaces and '.' inside the brackets.
         (
-            tParams:Identifier
+            vModelId:Identifier
             {
-                Match(tParams, CodeGenerationSupporter.Parameters);
+                vModelName = this.FragmentFactory.CreateFragment<SchemaObjectName>();
+                vModelName.Identifiers.Add(this.CreateIdentifierFromToken(vModelId));
+                vResult.ModelName = vModelName;
             }
-            LeftParenthesis
+          |
+            vModelQId:QuotedIdentifier
+            {
+                vModelName = this.FragmentFactory.CreateFragment<SchemaObjectName>();
+                vModelName.Identifiers.Add(this.CreateIdentifierFromToken(vModelQId));
+                vResult.ModelName = vModelName;
+            }
+        )
+
+        // --- Optional PARAMETERS clause ---------------------------------------------------------
+        // Shape:  [PARAMETERS (<expr>)] | [PARAMETERS <expr-not-string>]
+        // Goals:
+        //   1) Accept a general **expression** as the PARAMETERS value.
+        //   2) Preserve user-written parentheses by constructing a ParenthesisExpression node
+        //      for the "( <expr> )" variant so pretty-printing round-trips exactly.
+        //   3) **Reject** a bare JSON string literal (e.g., PARAMETERS '{...}'); callers must pass
+        //      a parsed JSON expression (e.g., TRY_CONVERT(JSON, N'{}')).
+        // Notes:
+        //   - Some builds tokenize PARAMETERS as a keyword; others as an Identifier. Support both.
+        (
+            (
+                // PARAMETERS as a true keyword token.
+                tParamsKw:Parameters
+                {
+                    UpdateTokenInfo(vResult, tParamsKw);
+                }
+              |
+                // PARAMETERS as an identifier token; enforce its text equals "Parameters".
+                tParams:Identifier
+                {
+                    Match(tParams, CodeGenerationSupporter.Parameters);
+                    UpdateTokenInfo(vResult, tParams);
+                }
+            )
+
+            // ---- Value of PARAMETERS -----------------------------------------------------------
+            (
+                // Variant A: user wrote parentheses around the value: PARAMETERS ( <expr> )
+                // Build a ParenthesisExpression so the printer re-emits parens.
+                tLP:LeftParenthesis
+                    vParamsInner=expression
+                tRP:RightParenthesis
+                {
+                    ParenthesisExpression p = this.FragmentFactory.CreateFragment<ParenthesisExpression>();
+                    p.Expression = vParamsInner;
+                    vParams = p;
+
+                    // Attach LP/RP token info for accurate script generation.
+                    UpdateTokenInfo(p, tLP);
+                    UpdateTokenInfo(p, tRP);
+                }
+              |
+                // Variant B: bare expression without surrounding parentheses.
+                // Guardrail: Disallow a leading string literal so that
+                //   PARAMETERS '{"dimensions":768}'
+                // is a **syntax error**, while
+                //   PARAMETERS TRY_CONVERT(JSON, N'{}')
+                // is allowed.
+                // LA(1) is the next token type; block both ASCII ('...') and Unicode (N'...') strings.
+                { LA(1) != AsciiStringLiteral && LA(1) != UnicodeStringLiteral }?
                 vParams=expression
-            RightParenthesis
+            )
             {
                 vResult.OptionalParameters = vParams;
             }
@@ -33689,6 +33822,24 @@ signedIntegerOrStringOrVariable returns [ScalarExpression vResult]
 signedIntegerOrVariableOrNull returns [ScalarExpression vResult]
     : vResult=signedIntegerOrVariable
     | vResult=nullLiteral
+    ;
+
+signedIntegerOrVariableOrColumnReference returns [ScalarExpression vResult]
+    : vResult=signedInteger
+    | vResult=variable
+    | vResult=vectorSearchColumnReferenceExpression
+    ;
+
+vectorSearchColumnReferenceExpression returns [ColumnReferenceExpression vResult = this.FragmentFactory.CreateFragment<ColumnReferenceExpression>()]
+{
+    MultiPartIdentifier vMultiPartIdentifier;
+}
+    :
+        vMultiPartIdentifier=multiPartIdentifier[2]
+        {
+            vResult.ColumnType = ColumnType.Regular;
+            vResult.MultiPartIdentifier = vMultiPartIdentifier;
+        }
     ;
 
 stringLiteralOrNull returns [Literal vResult]

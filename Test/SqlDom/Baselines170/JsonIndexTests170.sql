@@ -27,3 +27,9 @@ CREATE JSON INDEX [IX JSON Index]
 CREATE JSON INDEX IX_JSON_Complex
     ON dbo.Documents (Content)
     FOR ('$.metadata.title', '$.content.sections[*].text', '$.tags[*]');
+
+CREATE JSON INDEX IX_JSON
+    ON dbo.Users (JsonData) WITH (OPTIMIZE_FOR_ARRAY_SEARCH = ON);
+
+CREATE JSON INDEX IX_JSON
+    ON dbo.Users (JsonData) WITH (PAD_INDEX = ON, DROP_EXISTING = ON);

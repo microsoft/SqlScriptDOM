@@ -3221,6 +3221,8 @@ dbOptionStateItem[ref ulong encounteredOptions] returns [DatabaseOption vResult 
         vResult = changeTrackingDbOption
     |    {NextTokenMatches(CodeGenerationSupporter.AcceleratedDatabaseRecovery)}?
         vResult = acceleratedDatabaseRecoveryOption
+    |    {NextTokenMatches(CodeGenerationSupporter.OptimizedLocking)}?
+        vResult = optimizedLockingOption
     |    {NextTokenMatches(CodeGenerationSupporter.Containment)}?
         vResult = dbContainmentOption
     |    {NextTokenMatches(CodeGenerationSupporter.Hadr)}?
@@ -3516,6 +3518,30 @@ acceleratedDatabaseRecoveryOption returns [AcceleratedDatabaseRecoveryDatabaseOp
             Match(tAcceleratedDatabaseRecovery, CodeGenerationSupporter.AcceleratedDatabaseRecovery);
             vResult.OptionKind = DatabaseOptionKind.AcceleratedDatabaseRecovery;
             UpdateTokenInfo(vResult, tAcceleratedDatabaseRecovery);
+        }
+        (
+            (EqualsSign tOff:Off
+                {
+                    vResult.OptionState = OptionState.Off;
+                    UpdateTokenInfo(vResult, tOff);
+                }
+            )
+        |
+            (EqualsSign tOn:On
+                {
+                    vResult.OptionState = OptionState.On;
+                    UpdateTokenInfo(vResult, tOn);
+                }
+            )
+        )
+    ;
+
+optimizedLockingOption returns [OptimizedLockingDatabaseOption vResult = FragmentFactory.CreateFragment<OptimizedLockingDatabaseOption>()]
+    : tOptimizedLocking:Identifier
+        {
+            Match(tOptimizedLocking, CodeGenerationSupporter.OptimizedLocking);
+            vResult.OptionKind = DatabaseOptionKind.OptimizedLocking;
+            UpdateTokenInfo(vResult, tOptimizedLocking);
         }
         (
             (EqualsSign tOff:Off

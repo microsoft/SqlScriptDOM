@@ -138,6 +138,12 @@ FROM Production.Document
 WHERE CONTAINS ((t1.c1), @a);
 
 
+
+GO
+SELECT Title
+FROM Production.Document
+WHERE (CONTAINS ((t1.c1), @a));
+
 GO
 SELECT Title
 FROM Production.Document

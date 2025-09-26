@@ -35,7 +35,13 @@ ScriptDom is a library for parsing and generating T-SQL scripts. It is primarily
    - Put the input SQL in `Test/SqlDom/TestScripts/` (filename is case sensitive and used as an embedded resource).
    - Add/confirm baseline output in `Test/SqlDom/Baselines<version>/` (the UT project embeds these baselines as resources).
    - Update the appropriate `Only<version>SyntaxTests.cs` (e.g., `Only170SyntaxTests.cs`) by adding a `ParserTest170("MyNewTest.sql", ...)` entry. See `ParserTest.cs` and `ParserTestOutput.cs` for helper constructors and verification semantics.
-5. Run `dotnet test Test/SqlDom/UTSqlScriptDom.csproj -c Debug` and iterate until tests pass.
+5. **Run full test suite** to ensure no regressions:
+   ```bash
+   dotnet test Test/SqlDom/UTSqlScriptDom.csproj -c Debug
+   ```
+   - ⚠️ **CRITICAL**: Grammar changes can break unrelated functionality when shared rules are modified
+   - If tests fail unexpectedly, create context-specific grammar rules instead of modifying shared ones
+6. Iterate until all tests pass, including both new functionality and existing regression tests.
 
 ## Testing details and how tests assert correctness
 - Tests run a full parse -> script generator -> reparse round-trip. Baseline comparison verifies pretty-printed generated scripts exactly match the stored baseline.
@@ -44,6 +50,8 @@ ScriptDom is a library for parsing and generating T-SQL scripts. It is primarily
 
 ## Bug Fixing and Baseline Generation
 For a practical guide on fixing bugs, including the detailed workflow for generating test baselines, see the [Bug Fixing Guide](BUG_FIXING_GUIDE.md).
+
+For specific parser predicate recognition issues (when identifier-based predicates like `REGEXP_LIKE` don't work with parentheses), see the [Parser Predicate Recognition Fix Guide](PARSER_PREDICATE_RECOGNITION_FIX.md).
 
 ## Editing generated outputs, debugging generation
 - Never edit generated files permanently (they live under `obj/...`/CsGenIntermediateOutputPath). Instead change:
@@ -62,6 +70,9 @@ For a practical guide on fixing bugs, including the detailed workflow for genera
 ## Grammar Gotchas & Common Pitfalls
 - **Operator vs. Function-Style Predicates:** Be careful to distinguish between standard T-SQL operators (like `NOT LIKE`, `>`, `=`) and the function-style predicates used in some contexts (like `package.equals(...)` in `CREATE EVENT SESSION`). For example, `NOT LIKE` in an event session's `WHERE` clause is a standard comparison operator, not a function call. Always verify the exact T-SQL syntax before modifying the grammar.
 - **Logical `NOT` vs. Compound Operators:** The grammar handles the logical `NOT` operator (e.g., `WHERE NOT (condition)`) in a general way, often in a `booleanExpressionUnary` rule. This is distinct from compound operators like `NOT LIKE` or `NOT IN`, which are typically parsed as a single unit within a comparison rule. Don't assume that because `NOT` is supported, `NOT LIKE` will be automatically supported in all predicate contexts.
+- **Modifying Shared Grammar Rules:** **NEVER modify existing shared grammar rules** like `identifierColumnReferenceExpression` that are used throughout the codebase. This can cause tests to fail in unrelated areas because the rule now accepts or rejects different syntax. Instead, create specialized rules for your specific context (e.g., `vectorSearchColumnReferenceExpression` for VECTOR_SEARCH-specific needs).
+- **Full Test Suite Validation:** After any grammar changes, **always run the complete test suite** (`dotnet test Test/SqlDom/UTSqlScriptDom.csproj -c Debug`) to catch regressions. Grammar changes can have far-reaching effects on seemingly unrelated functionality.
+- **Extending Literals to Expressions:** When functions/constructs currently accept only literal values (e.g., `IntegerLiteral`, `StringLiteral`) but need to support dynamic values (parameters, variables, outer references), change both the AST definition (in `Ast.xml`) and grammar rules (in `TSql*.g`) to use `ScalarExpression` instead. This pattern was used for VECTOR_SEARCH TOP_N parameter. See the detailed example in [BUG_FIXING_GUIDE.md](BUG_FIXING_GUIDE.md#special-case-extending-grammar-rules-from-literals-to-expressions) and [GRAMMAR_EXTENSION_PATTERNS.md](GRAMMAR_EXTENSION_PATTERNS.md) for comprehensive patterns.
 
 ## Local development on macOS and Linux
 
