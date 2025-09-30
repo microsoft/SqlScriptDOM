@@ -33094,10 +33094,6 @@ jsonQueryBuiltInFunctionCall [FunctionCall vParent]
                 AddAndUpdateTokenInfo(vParent, vParent.Parameters, vPath);
             }
         )?
-        tRParen:RightParenthesis
-        {
-            UpdateTokenInfo(vParent, tRParen);
-        }
         (
             With tArray:Identifier tWrapper:Identifier
             {
@@ -33112,6 +33108,10 @@ jsonQueryBuiltInFunctionCall [FunctionCall vParent]
                 vParent.WithArrayWrapper = true;
             }
         )?
+        tRParen:RightParenthesis
+        {
+            UpdateTokenInfo(vParent, tRParen);
+        }
     ;
 
 regularBuiltInFunctionCall [FunctionCall vParent]

@@ -140,7 +140,7 @@ SELECT JSON_QUERY('{ "a": 1 }');
 
 SELECT JSON_QUERY('{ "a": 1 }', '$.a');
 
-SELECT JSON_QUERY('{ "a": [1,2,3] }', '$.a') WITH ARRAY WRAPPER;
+SELECT JSON_QUERY('{ "a": [1,2,3] }', '$.a' WITH ARRAY WRAPPER);
 
 
 GO

@@ -98,9 +98,8 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
             else if (node.FunctionName.Value.ToUpper(CultureInfo.InvariantCulture) == CodeGenerationSupporter.JsonQuery)
             {
                 GenerateCommaSeparatedList(node.Parameters);
-                GenerateSymbol(TSqlTokenType.RightParenthesis);
                 
-                // Handle WITH ARRAY WRAPPER clause
+                // Handle WITH ARRAY WRAPPER clause - inside parentheses
                 if (node.WithArrayWrapper)
                 {
                     GenerateSpace();
@@ -110,6 +109,8 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
                     GenerateSpace();
                     GenerateIdentifier(CodeGenerationSupporter.Wrapper);
                 }
+                
+                GenerateSymbol(TSqlTokenType.RightParenthesis);
             }
             else
             {
