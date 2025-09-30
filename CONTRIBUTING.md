@@ -106,14 +106,36 @@ Example: To run all priority 0 tests
 dotnet test --filter Priority=0
 ```
 
+#### ⚠️ CRITICAL: Full Test Suite for Parser Changes
+
+**If you make ANY changes to grammar files (`.g` files) or AST definitions (`Ast.xml`), you MUST run the complete test suite** to ensure no regressions:
+
+```cmd
+dotnet test Test/SqlDom/UTSqlScriptDom.csproj -c Debug
+```
+
+**Why this is critical for parser changes:**
+- Grammar changes can have far-reaching effects on seemingly unrelated functionality
+- Shared grammar rules are used in multiple contexts throughout the parser
+- AST modifications can affect script generation and visitor patterns across the entire codebase
+- Token recognition changes can impact parsing of statements that don't even use the modified feature
+
+**Example of unexpected failures:**
+- Modifying a shared rule like `identifierColumnReferenceExpression` can cause other tests to fail because the rule now accepts syntax that should be rejected in different contexts
+- Changes to operator precedence can affect unrelated expressions
+- Adding new AST members without proper script generation support can break round-trip parsing
+
+Always verify that all ~557 tests pass before submitting your changes.
+
 ### Pull Request Process
 
 Before sending a Pull Request, please do the following:
 
-1. Ensure builds are still successful and tests, including any added or updated tests, pass prior to submitting the pull request.
-2. Update any documentation, user and contributor, that is impacted by your changes.
-3. Include your change description in `CHANGELOG.md` file as part of pull request.
-4. You may merge the pull request in once you have the sign-off of two other developers, or if you do not have permission to do that, you may request the second reviewer to merge it for you.
+1. **For parser changes (grammar/AST modifications): Run the complete test suite** (`dotnet test Test/SqlDom/UTSqlScriptDom.csproj -c Debug`) and ensure all ~557 tests pass. Grammar changes can have unexpected side effects.
+2. Ensure builds are still successful and tests, including any added or updated tests, pass prior to submitting the pull request.
+3. Update any documentation, user and contributor, that is impacted by your changes.
+4. Include your change description in `CHANGELOG.md` file as part of pull request.
+5. You may merge the pull request in once you have the sign-off of two other developers, or if you do not have permission to do that, you may request the second reviewer to merge it for you.
 
 ### Helpful notes for SQLDOM extensions
 

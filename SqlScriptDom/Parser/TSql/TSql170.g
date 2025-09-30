@@ -33017,12 +33017,21 @@ jsonArrayBuiltInFunctionCall [FunctionCall vParent]
 jsonArrayAggBuiltInFunctionCall [FunctionCall vParent]
 {
     ScalarExpression vExpression;
+    OrderByClause vOrderByClause;
 }
     :   (
            vExpression=expression
            {
                AddAndUpdateTokenInfo(vParent, vParent.Parameters, vExpression);
            }
+        )
+        (
+           vOrderByClause=orderByClause
+           {
+               vParent.JsonOrderByClause = vOrderByClause;
+           }
+        |
+            /* empty */
         )
         (
            jsonNullClauseFunction[vParent]

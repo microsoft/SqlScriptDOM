@@ -501,6 +501,14 @@ WITH
             // Cannot use incomplete null on null clause cases
             ParserTestUtils.ErrorTest160("SELECT JSON_ARRAY('name', 'value', NULL, 'type' ON NULL)",
                 new ParserErrorInfo(48, "SQL46010", "ON"));
+
+            // Incorrect usage of ORDER BY in JSON_ARRAY
+            ParserTestUtils.ErrorTest170("SELECT JSON_ARRAYAGG(data ORDER priority DESC, created_at ASC) FROM records;",
+                new ParserErrorInfo(32, "SQL46010", "priority"));
+
+            // Incorrect usage of ORDER BY in JSON_ARRAY
+            ParserTestUtils.ErrorTest170("SELECT JSON_ARRAYAGG(data ORDER By) FROM records;",
+                new ParserErrorInfo(34, "SQL46010", ")"));
         }
 
         /// <summary>

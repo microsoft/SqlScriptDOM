@@ -85,6 +85,8 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
 			else if (node.FunctionName.Value.ToUpper(CultureInfo.InvariantCulture) == CodeGenerationSupporter.JsonArrayAgg)
             {
                 GenerateCommaSeparatedList(node.Parameters);
+                // Generate ORDER BY clause if present
+                GenerateSpaceAndFragmentIfNotNull(node.JsonOrderByClause);
                 if (node.Parameters?.Count > 0 && node?.AbsentOrNullOnNull?.Count > 0) //If there are values and null on null or absent on null present then generate space in between them
                     GenerateSpace();
                 GenerateNullOnNullOrAbsentOnNull(node?.AbsentOrNullOnNull);

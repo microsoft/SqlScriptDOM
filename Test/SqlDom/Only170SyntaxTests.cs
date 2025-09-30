@@ -20,6 +20,7 @@ namespace SqlStudio.Tests.UTSqlScriptDom
             new ParserTest170("RegexpTests170.sql", nErrors80: 0, nErrors90: 0, nErrors100: 0, nErrors110: 0, nErrors120: 0, nErrors130: 0, nErrors140: 0, nErrors150: 0, nErrors160: 0),
             new ParserTest170("AiGenerateChunksTests170.sql", nErrors80: 19, nErrors90: 16, nErrors100: 15, nErrors110: 15, nErrors120: 15, nErrors130: 15, nErrors140: 15, nErrors150: 15, nErrors160: 15),
             new ParserTest170("JsonFunctionTests170.sql", nErrors80: 13, nErrors90: 8, nErrors100: 38, nErrors110: 38, nErrors120: 38, nErrors130: 38, nErrors140: 38, nErrors150: 38, nErrors160: 38),
+            new ParserTest170("JsonArrayAggOrderBy170.sql", nErrors80: 6, nErrors90: 6, nErrors100: 6, nErrors110: 6, nErrors120: 6, nErrors130: 6, nErrors140: 6, nErrors150: 6, nErrors160: 6),
             new ParserTest170("AiGenerateEmbeddingsTests170.sql", nErrors80: 14, nErrors90: 11, nErrors100: 11, nErrors110: 11, nErrors120: 11, nErrors130: 11, nErrors140: 11, nErrors150: 11, nErrors160: 11),
             new ParserTest170("CreateExternalModelStatementTests170.sql", nErrors80: 2, nErrors90: 2, nErrors100: 2, nErrors110: 2, nErrors120: 2, nErrors130: 4, nErrors140: 4, nErrors150: 4, nErrors160: 4),
             new ParserTest170("AlterExternalModelStatementTests170.sql", nErrors80: 2, nErrors90: 2, nErrors100: 2, nErrors110: 2, nErrors120: 2, nErrors130: 5, nErrors140: 5, nErrors150: 5, nErrors160: 5),
