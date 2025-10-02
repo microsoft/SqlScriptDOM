@@ -28,17 +28,9 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
                     MarkAndPushAlignmentPoint(start);
 
                     GenerateKeyword(TSqlTokenType.From);
-                    if (_suppressNextClauseAlignment)
-                    {
-                        // Simple single space after FROM when coming directly after an inline trailing comment
-                        _suppressNextClauseAlignment = false;
-                        GenerateSpace();
-                    }
-                    else
-                    {
-                        MarkClauseBodyAlignmentWhenNecessary(_options.NewLineBeforeFromClause, clauseBody);
-                        GenerateSpace();
-                    }
+
+                    MarkClauseBodyAlignmentWhenNecessary(_options.NewLineBeforeFromClause, clauseBody);
+                    GenerateSpace();
 
                     AlignmentPoint fromItems = new AlignmentPoint();
                     MarkAndPushAlignmentPoint(fromItems);

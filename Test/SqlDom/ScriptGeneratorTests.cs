@@ -524,7 +524,7 @@ FROM MyTable;";
 SELECT Col1, /* inline comment */
        Col2,
        * -- all the columns
-FROM MyTable;";
+FROM   MyTable;";
             var formattedSqlWithoutComments = @"SELECT Col1,
        Col2,
        *
