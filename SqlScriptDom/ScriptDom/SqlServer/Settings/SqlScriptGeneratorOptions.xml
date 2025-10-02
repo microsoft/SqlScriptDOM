@@ -28,6 +28,11 @@
       <Description>IncludeSemiColons_Description</Description>
       <Summary>Gets or sets a boolean indicating if a semi colon should be included after each statement</Summary>
     </Setting>
+    <Setting name="PreserveComments" type="bool" default="false">
+      <Title>PreserveComments_Title</Title>
+      <Description>PreserveComments_Description</Description>
+      <Summary>Gets or sets a boolean indicating if single-line and multi-line comments should be preserved during script generation</Summary>
+    </Setting>
     <Setting name="NewLineFormattedIndexDefinition" type="bool" default="false">
       <Summary>Gets or sets a boolean indicating if index definitions should have UNIQUE, INCLUDE and WHERE on their own line</Summary>
     </Setting>
