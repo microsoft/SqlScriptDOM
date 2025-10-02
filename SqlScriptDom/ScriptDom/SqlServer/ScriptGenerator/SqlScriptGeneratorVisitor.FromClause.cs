@@ -30,6 +30,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
                     GenerateKeyword(TSqlTokenType.From);
 
                     MarkClauseBodyAlignmentWhenNecessary(_options.NewLineBeforeFromClause, clauseBody);
+
                     GenerateSpace();
 
                     AlignmentPoint fromItems = new AlignmentPoint();
