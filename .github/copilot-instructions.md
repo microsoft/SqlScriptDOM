@@ -74,7 +74,3 @@ For specific parser predicate recognition issues (when identifier-based predicat
 - **Full Test Suite Validation:** After any grammar changes, **always run the complete test suite** (`dotnet test Test/SqlDom/UTSqlScriptDom.csproj -c Debug`) to catch regressions. Grammar changes can have far-reaching effects on seemingly unrelated functionality.
 - **Extending Literals to Expressions:** When functions/constructs currently accept only literal values (e.g., `IntegerLiteral`, `StringLiteral`) but need to support dynamic values (parameters, variables, outer references), change both the AST definition (in `Ast.xml`) and grammar rules (in `TSql*.g`) to use `ScalarExpression` instead. This pattern was used for VECTOR_SEARCH TOP_N parameter. See the detailed example in [BUG_FIXING_GUIDE.md](BUG_FIXING_GUIDE.md#special-case-extending-grammar-rules-from-literals-to-expressions) and [GRAMMAR_EXTENSION_PATTERNS.md](GRAMMAR_EXTENSION_PATTERNS.md) for comprehensive patterns.
 
-## Local development on macOS and Linux
-
-- Run build for .NET 8.0 target framework only
-- Run tests for .NET 8.0 target framework only
