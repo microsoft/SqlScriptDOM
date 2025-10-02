@@ -412,35 +412,6 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
             return value;
         }
 
-        // Helper: replace a trailing newline element with a single space token.
-        public bool ReplaceTrailingNewLineWithSpaceIfPresent()
-        {
-            if (_scriptWriterElements.Count == 0)
-                return false;
-
-            int index = _scriptWriterElements.Count - 1;
-            // Skip alignment points (they sit logically at position 0 width)
-            while (index >= 0 && _scriptWriterElements[index] is AlignmentPointData)
-            {
-                index--;
-            }
-            if (index < 0) return false;
-            var last = _scriptWriterElements[index];
-            if (last is NewLineElement)
-            {
-                _scriptWriterElements.RemoveAt(index);
-                AddToken(ScriptGeneratorSupporter.CreateWhitespaceToken(1));
-                return true;
-            }
-            if (last is TokenWrapper tw && (tw.Token.Text == "\n" || tw.Token.Text == "\r\n"))
-            {
-                _scriptWriterElements.RemoveAt(index);
-                AddToken(ScriptGeneratorSupporter.CreateWhitespaceToken(1));
-                return true;
-            }
-            return false;
-        }
-
         // Helper: ensure exactly one space at the end (unless last element already whitespace or newline).
         public void EnsureSingleTrailingSpace()
         {
