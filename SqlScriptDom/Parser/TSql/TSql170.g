@@ -32631,21 +32631,85 @@ expressionList [TSqlFragment vParent, IList<ScalarExpression> expressions]
         )
     ;
 
+/* jsonReturningClause is used by json_object, json_objectagg, json_array, json_arrayagg where only 
+ RETURNING JSON  is supported. Any other type with JSON should return in error */
 jsonReturningClause [FunctionCall vParent]
 {
-    Identifier vJson;
+    DataTypeReference vDataType;
 }
 :
-    tReturning:Identifier tJson:Identifier
+    tReturning:Identifier vDataType=jsonDataType
     {
         Match(tReturning, CodeGenerationSupporter.Returning);
-        Match(tJson, CodeGenerationSupporter.Json);
-        UpdateTokenInfo(vParent,tJson);
-        vJson = FragmentFactory.CreateFragment<Identifier>();
-        AddAndUpdateTokenInfo(vParent, vParent.ReturnType, vJson);
-        vJson.SetUnquotedIdentifier(tJson.getText());
+        UpdateTokenInfo(vParent, tReturning);
+        vParent.ReturnType.Add(vDataType);
     }
 ;
+
+jsonDataType returns [SqlDataTypeReference vResult = null]
+{
+    SchemaObjectName vJsonTypeName;
+}
+:
+    vJsonTypeName=schemaObjectTwoPartName
+    {
+        // Only allow JSON as the data type
+        if (vJsonTypeName.BaseIdentifier.Value.ToUpper(CultureInfo.InvariantCulture) != CodeGenerationSupporter.Json)
+        {
+            ThrowParseErrorException("SQL46005", vJsonTypeName,
+                TSqlParserResource.SQL46005Message, CodeGenerationSupporter.Json, vJsonTypeName.BaseIdentifier.Value);
+        }
+
+        vResult = FragmentFactory.CreateFragment<SqlDataTypeReference>();
+        vResult.Name = vJsonTypeName;
+        vResult.SqlDataTypeOption = SqlDataTypeOption.Json;
+        vResult.UpdateTokenInfo(vJsonTypeName);
+    }
+;
+
+/* jsonValueReturningClause is used by json_value. Only json_value support RETURNING <SQL-TYPE> syntax*/
+jsonValueReturningClause [FunctionCall vParent]
+{
+    DataTypeReference vDataType;
+}
+:
+    tReturning:Identifier vDataType=scalarDataType
+    {
+        Match(tReturning, CodeGenerationSupporter.Returning);
+        UpdateTokenInfo(vParent, tReturning);
+
+        // JSON_VALUE only supports specific SQL data types in RETURNING clause
+        if (vDataType is SqlDataTypeReference sqlDataType)
+        {
+            bool isAllowedType = sqlDataType.SqlDataTypeOption == SqlDataTypeOption.Int ||
+                                sqlDataType.SqlDataTypeOption == SqlDataTypeOption.TinyInt ||
+                                sqlDataType.SqlDataTypeOption == SqlDataTypeOption.SmallInt ||
+                                sqlDataType.SqlDataTypeOption == SqlDataTypeOption.BigInt ||
+                                sqlDataType.SqlDataTypeOption == SqlDataTypeOption.Float ||
+                                sqlDataType.SqlDataTypeOption == SqlDataTypeOption.Real ||
+                                sqlDataType.SqlDataTypeOption == SqlDataTypeOption.Decimal ||
+                                sqlDataType.SqlDataTypeOption == SqlDataTypeOption.Numeric ||
+                                sqlDataType.SqlDataTypeOption == SqlDataTypeOption.Bit ||
+                                sqlDataType.SqlDataTypeOption == SqlDataTypeOption.VarChar ||
+                                sqlDataType.SqlDataTypeOption == SqlDataTypeOption.NVarChar ||
+                                sqlDataType.SqlDataTypeOption == SqlDataTypeOption.Char ||
+                                sqlDataType.SqlDataTypeOption == SqlDataTypeOption.NChar ||
+                                sqlDataType.SqlDataTypeOption == SqlDataTypeOption.Date ||
+                                sqlDataType.SqlDataTypeOption == SqlDataTypeOption.Time ||
+                                sqlDataType.SqlDataTypeOption == SqlDataTypeOption.DateTime2 ||
+                                sqlDataType.SqlDataTypeOption == SqlDataTypeOption.DateTimeOffset;
+
+            if (!isAllowedType)
+            {
+                ThrowParseErrorException("SQL46005", vDataType,
+                    TSqlParserResource.SQL46005Message, "supported data type", sqlDataType.SqlDataTypeOption.ToString());
+            }
+        }
+
+        vParent.ReturnType.Add(vDataType);
+    }
+;
+
 
 jsonKeyValueExpression returns [JsonKeyValue vResult = FragmentFactory.CreateFragment<JsonKeyValue>()]
 {
@@ -32971,6 +33035,9 @@ builtInFunctionCall returns [FunctionCall vResult = FragmentFactory.CreateFragme
         {(vResult.FunctionName != null && vResult.FunctionName.Value.ToUpper(CultureInfo.InvariantCulture) == CodeGenerationSupporter.JsonQuery)}?
             jsonQueryBuiltInFunctionCall[vResult]
         |
+        {(vResult.FunctionName != null && vResult.FunctionName.Value.ToUpper(CultureInfo.InvariantCulture) == CodeGenerationSupporter.JsonValue)}?
+            jsonValueBuiltInFunctionCall[vResult]
+        |
          {(vResult.FunctionName != null && vResult.FunctionName.Value.ToUpper(CultureInfo.InvariantCulture) == CodeGenerationSupporter.Trim) && 
           (NextTokenMatches(CodeGenerationSupporter.Leading) | NextTokenMatches(CodeGenerationSupporter.Trailing) | NextTokenMatches(CodeGenerationSupporter.Both))}?
             trim3ArgsBuiltInFunctionCall[vResult]
@@ -33111,6 +33178,30 @@ jsonQueryBuiltInFunctionCall [FunctionCall vParent]
         tRParen:RightParenthesis
         {
             UpdateTokenInfo(vParent, tRParen);
+        }
+    ;
+
+jsonValueBuiltInFunctionCall [FunctionCall vParent]
+{
+    ScalarExpression vExpression;
+    ScalarExpression vPath;
+}
+    :   vExpression=expression
+        {
+            AddAndUpdateTokenInfo(vParent, vParent.Parameters, vExpression);
+        }
+        Comma vPath=expression
+        {
+            AddAndUpdateTokenInfo(vParent, vParent.Parameters, vPath);
+        }
+        (
+            jsonValueReturningClause[vParent]
+        |
+            /* empty */
+        )
+        tRParen:RightParenthesis
+        {
+			UpdateTokenInfo(vParent, tRParen);
         }
     ;
 
