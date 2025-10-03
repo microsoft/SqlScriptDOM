@@ -7096,19 +7096,11 @@ WHEN NOT MATCHED BY SOURCE THEN DELETE OUTPUT inserted.*, deleted.*;";
         [SqlStudioTestCategory(Category.UnitTest)]
         public void IdentityColumnNegativeTestsFabricDW()
         {
-            string identityColumnSyntax = @"CREATE TABLE TestTable1 (
-                                                ID INT IDENTITY(1,1),
-                                                Name VARCHAR(50)
-                                            );
-                                            ";
-            ParserTestUtils.ErrorTestFabricDW(identityColumnSyntax, new ParserErrorInfo(89, "SQL46010", "("));
+            string identityColumnSyntax = @"CREATE TABLE TestTable1 (ID INT IDENTITY(1,1), Name VARCHAR(50));";
+            ParserTestUtils.ErrorTestFabricDW(identityColumnSyntax, new ParserErrorInfo(40, "SQL46010", "("));
 
-            string identityColumnSyntax2 = @"CREATE TABLE TestTable2 (
-                                                RecordID BIGINT IDENTITY(100,5),
-                                                Description NVARCHAR(200)
-                                            );
-                                            ";
-            ParserTestUtils.ErrorTestFabricDW(identityColumnSyntax2, new ParserErrorInfo(98, "SQL46010", "("));
+            string identityColumnSyntax2 = @"CREATE TABLE TestTable2 (RecordID BIGINT IDENTITY(100,5), Description NVARCHAR(200));";
+            ParserTestUtils.ErrorTestFabricDW(identityColumnSyntax2, new ParserErrorInfo(49, "SQL46010", "("));
         }
 
         /// <summary>
