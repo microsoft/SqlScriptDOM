@@ -172,3 +172,16 @@ SELECT JSON_VALUE('c', '$' RETURNING DATE);
 SELECT JSON_VALUE('c', '$' RETURNING DATETIME2);
 SELECT JSON_VALUE('c', '$' RETURNING TIME);
 SELECT JSON_VALUE('c', '$' RETURNING BIT);
+
+SELECT id,
+       json_col
+FROM tab1
+WHERE JSON_CONTAINS(json_col, 'abc', '$.a') = 1;
+
+SELECT id,
+       json_col
+FROM tab1
+WHERE JSON_CONTAINS(json_col, 'abc%', '$.a', 1) = 1;
+
+SELECT JSON_MODIFY(json_col, '$.a', 30)
+FROM tab1;
