@@ -652,8 +652,9 @@
     <Member Name="IgnoreRespectNulls" Type="Identifier"  Collection="true" Summary="The ignore nulls is used to eliminate rows with null value in the output. Optional may be null."/>
     <Member Name="TrimOptions" Type="Identifier" Summary="TRIM intrinsic can take optional arguments like 'Leading', 'Trailing' or 'Both'."/>
     <Member Name="JsonParameters" Type="JsonKeyValue" Collection="true" Summary="The Json parameters to the function."/>
+    <Member Name="JsonOrderByClause" Type="OrderByClause" Summary="The order by clause used for JSON aggregation functions like JSON_ARRAYAGG. Optional may be null."/>
     <Member Name="AbsentOrNullOnNull" Type="Identifier"  Collection="true" Summary="The Absent or Null on Null will convert or remove sql null to json null"/>
-    <Member Name="ReturnType" Type="Identifier"  Collection="true" Summary="Return type of function. Used by json_arrayagg, json_objectagg, json_array, json_object and json_value"/>
+    <Member Name="ReturnType" Type="DataTypeReference"  Collection="true" Summary="Return type of function. Used by json_arrayagg, json_objectagg, json_array, json_object and json_value"/>
     <Member Name="WithArrayWrapper" Type="bool" Summary="Indicates whether WITH ARRAY WRAPPER clause is specified for JSON_QUERY function."/>
   </Class>
   <Class Name="CallTarget" Abstract="true" Summary="Represents a target of a function call.">

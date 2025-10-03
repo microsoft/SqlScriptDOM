@@ -85,6 +85,8 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
 			else if (node.FunctionName.Value.ToUpper(CultureInfo.InvariantCulture) == CodeGenerationSupporter.JsonArrayAgg)
             {
                 GenerateCommaSeparatedList(node.Parameters);
+                // Generate ORDER BY clause if present
+                GenerateSpaceAndFragmentIfNotNull(node.JsonOrderByClause);
                 if (node.Parameters?.Count > 0 && node?.AbsentOrNullOnNull?.Count > 0) //If there are values and null on null or absent on null present then generate space in between them
                     GenerateSpace();
                 GenerateNullOnNullOrAbsentOnNull(node?.AbsentOrNullOnNull);
@@ -96,9 +98,8 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
             else if (node.FunctionName.Value.ToUpper(CultureInfo.InvariantCulture) == CodeGenerationSupporter.JsonQuery)
             {
                 GenerateCommaSeparatedList(node.Parameters);
-                GenerateSymbol(TSqlTokenType.RightParenthesis);
                 
-                // Handle WITH ARRAY WRAPPER clause
+                // Handle WITH ARRAY WRAPPER clause - inside parentheses
                 if (node.WithArrayWrapper)
                 {
                     GenerateSpace();
@@ -108,6 +109,18 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
                     GenerateSpace();
                     GenerateIdentifier(CodeGenerationSupporter.Wrapper);
                 }
+                
+                GenerateSymbol(TSqlTokenType.RightParenthesis);
+            }
+            else if (node.FunctionName.Value.ToUpper(CultureInfo.InvariantCulture) == CodeGenerationSupporter.JsonValue)
+            {
+                GenerateCommaSeparatedList(node.Parameters);
+                if (node.ReturnType?.Count > 0) //If there are return types then generate space and return type clause
+                {
+                    GenerateSpace();
+                    GenerateReturnType(node?.ReturnType);
+                }
+                GenerateSymbol(TSqlTokenType.RightParenthesis);
             }
             else
             {
@@ -161,13 +174,47 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
                 GenerateKeyword(TSqlTokenType.Null);
             }
         }
-        private void GenerateReturnType(IList<Identifier> list)
+
+        // Generate returning clause with SQLType.
+        private void GenerateReturnType(IList<DataTypeReference> list)
         {
-            if (list?.Count > 0 && list[0].Value?.ToUpper(CultureInfo.InvariantCulture) == CodeGenerationSupporter.Json)
+            if (list?.Count > 0)
             {
                 GenerateIdentifier("RETURNING");
                 GenerateSpace();
-                GenerateSpaceSeparatedList(list);
+
+                // Generate each data type correctly
+                for (int i = 0; i < list.Count; i++)
+                {
+                    if (i > 0)
+                        GenerateSpace();
+
+                    // Handle SqlDataTypeReference properly - need to generate the type name and parameters separately
+                    if (list[i] is SqlDataTypeReference sqlDataType)
+                    {
+                        // Generate the data type name (e.g., NVARCHAR)
+                        string dataTypeName = sqlDataType.SqlDataTypeOption.ToString().ToUpper(CultureInfo.InvariantCulture);
+                        GenerateIdentifier(dataTypeName);
+
+                        // Generate parameters if any (e.g., (50))
+                        if (sqlDataType.Parameters?.Count > 0)
+                        {
+                            GenerateSymbol(TSqlTokenType.LeftParenthesis);
+                            for (int j = 0; j < sqlDataType.Parameters.Count; j++)
+                            {
+                                if (j > 0)
+                                    GenerateSymbol(TSqlTokenType.Comma);
+                                GenerateFragmentIfNotNull(sqlDataType.Parameters[j]);
+                            }
+                            GenerateSymbol(TSqlTokenType.RightParenthesis);
+                        }
+                    }
+                    else
+                    {
+                        // For other data type references, use the default generation
+                        GenerateFragmentIfNotNull(list[i]);
+                    }
+                }
             }
         }
     }

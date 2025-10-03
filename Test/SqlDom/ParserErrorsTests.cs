@@ -472,6 +472,14 @@ WITH
             // Cannot use incomplete null on null clause cases
             ParserTestUtils.ErrorTest160("SELECT JSON_OBJECT('name':'value', 'type':NULL NULL ON)",
                 new ParserErrorInfo(54, "SQL46010", ")"));
+
+            // Cannot use anything other than JSON in RETURNING clause
+            ParserTestUtils.ErrorTest170("SELECT JSON_OBJECT('name':'a' RETURNING VARCHAR(10))",
+                    new ParserErrorInfo(40, "SQL46005", "JSON", "VARCHAR"));
+
+            // Cannot use anything other than JSON in RETURNING clause
+            ParserTestUtils.ErrorTest170("SELECT JSON_OBJECT('name':'a' RETURNING SMALLINT)",
+                    new ParserErrorInfo(40, "SQL46005", "JSON", "SMALLINT"));
         }
 
         /// <summary>
@@ -501,6 +509,26 @@ WITH
             // Cannot use incomplete null on null clause cases
             ParserTestUtils.ErrorTest160("SELECT JSON_ARRAY('name', 'value', NULL, 'type' ON NULL)",
                 new ParserErrorInfo(48, "SQL46010", "ON"));
+
+            // Incorrect usage of ORDER BY in JSON_ARRAY
+            ParserTestUtils.ErrorTest170("SELECT JSON_ARRAYAGG(data ORDER priority DESC, created_at ASC) FROM records;",
+                new ParserErrorInfo(32, "SQL46010", "priority"));
+
+            // Incorrect usage of ORDER BY in JSON_ARRAY
+            ParserTestUtils.ErrorTest170("SELECT JSON_ARRAYAGG(data ORDER By) FROM records;",
+                new ParserErrorInfo(34, "SQL46010", ")"));
+
+            // Cannot use anything other than JSON in RETURNING clause
+            ParserTestUtils.ErrorTest170("SELECT JSON_ARRAYAGG('name' RETURNING INT)",
+                    new ParserErrorInfo(38, "SQL46005", "JSON", "INT"));
+
+            // Cannot use anything other than JSON in RETURNING clause
+            ParserTestUtils.ErrorTest170("SELECT JSON_ARRAY('name' RETURNING VARCHAR(10))",
+                    new ParserErrorInfo(35, "SQL46005", "JSON", "VARCHAR"));
+
+            // Cannot use anything other than JSON in RETURNING clause
+            ParserTestUtils.ErrorTest170("SELECT JSON_ARRAY('name' RETURNING Float)",
+                    new ParserErrorInfo(35, "SQL46005", "JSON", "Float"));
         }
 
         /// <summary>
@@ -575,6 +603,31 @@ WITH
             // Cannot use  null on null incorrectly
             ParserTestUtils.ErrorTest160("SELECT JSON_ARRAYAGG('name', NULL NULL ON)",
                 new ParserErrorInfo(34, "SQL46010", "NULL"));
+
+            // Cannot use anything other than JSON in RETURNING clause
+            ParserTestUtils.ErrorTest170("SELECT JSON_ARRAYAGG('name' RETURNING INT)",
+                    new ParserErrorInfo(38, "SQL46005", "JSON", "INT"));
+
+            // Cannot use anything other than JSON in RETURNING clause
+            ParserTestUtils.ErrorTest170("SELECT JSON_ARRAYAGG('name' RETURNING NVARCHAR(10))",
+                    new ParserErrorInfo(38, "SQL46005", "JSON", "NVARCHAR"));
+        }
+
+        /// <summary>
+        /// Negative tests for Json_Value syntax in functions
+        /// </summary>
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void JsonValueSyntaxNegativeTest()
+        {
+            // Cannot use anything other than JSON in RETURNING clause
+            ParserTestUtils.ErrorTest170("SELECT JSON_VALUE('', '$' RETURNING JSON)",
+                    new ParserErrorInfo(36, "SQL46005", "supported data type", "Json"));
+
+            // Cannot use anything other than JSON in RETURNING clause
+            ParserTestUtils.ErrorTest170("SELECT JSON_VALUE('', '$' RETURNING Vector)",
+                    new ParserErrorInfo(36, "SQL46005", "supported data type", "Vector"));
         }
 
         /// <summary>
@@ -590,28 +643,24 @@ WITH
                 new ParserErrorInfo(32, "SQL46010", "WITH"));
 
             // Cannot use WITH ARRAY without WRAPPER (unexpected end of file)
-            ParserTestUtils.ErrorTest170("SELECT JSON_QUERY('{ \"a\": 1 }') WITH ARRAY",
-                new ParserErrorInfo(42, "SQL46029", ""));
+            ParserTestUtils.ErrorTest170("SELECT JSON_QUERY('{ \"a\": 1 }' WITH ARRAY",
+                new ParserErrorInfo(41, "SQL46029", ""));
 
             // Cannot use WITH WRAPPER without ARRAY (unexpected end of file)
-            ParserTestUtils.ErrorTest170("SELECT JSON_QUERY('{ \"a\": 1 }') WITH WRAPPER",
-                new ParserErrorInfo(44, "SQL46029", ""));
+            ParserTestUtils.ErrorTest170("SELECT JSON_QUERY('{ \"a\": 1 }' WITH WRAPPER",
+                new ParserErrorInfo(43, "SQL46029", ""));
 
             // Cannot use incorrect keyword instead of ARRAY
-            ParserTestUtils.ErrorTest170("SELECT JSON_QUERY('{ \"a\": 1 }') WITH OBJECT WRAPPER",
-                new ParserErrorInfo(37, "SQL46010", "OBJECT"));
+            ParserTestUtils.ErrorTest170("SELECT JSON_QUERY('{ \"a\": 1 }' WITH OBJECT WRAPPER",
+                new ParserErrorInfo(36, "SQL46010", "OBJECT"));
 
             // Cannot use incorrect keyword instead of WRAPPER
-            ParserTestUtils.ErrorTest170("SELECT JSON_QUERY('{ \"a\": 1 }') WITH ARRAY OBJECT",
-                new ParserErrorInfo(43, "SQL46010", "OBJECT"));
+            ParserTestUtils.ErrorTest170("SELECT JSON_QUERY('{ \"a\": 1 }' WITH ARRAY OBJECT",
+                new ParserErrorInfo(42, "SQL46010", "OBJECT"));
 
             // Cannot use JSON_QUERY with colon syntax (key:value pairs like JSON_OBJECT)
             ParserTestUtils.ErrorTest170("SELECT JSON_QUERY('name':'value')",
                new ParserErrorInfo(24, "SQL46010", ":"));
-
-            // WITH ARRAY WRAPPER must come after closing parenthesis, not before
-            ParserTestUtils.ErrorTest170("SELECT JSON_QUERY('{ \"a\": 1 }' WITH ARRAY WRAPPER)",
-                new ParserErrorInfo(31, "SQL46010", "WITH"));
         }
 
         /// <summary>
@@ -7047,19 +7096,11 @@ WHEN NOT MATCHED BY SOURCE THEN DELETE OUTPUT inserted.*, deleted.*;";
         [SqlStudioTestCategory(Category.UnitTest)]
         public void IdentityColumnNegativeTestsFabricDW()
         {
-            string identityColumnSyntax = @"CREATE TABLE TestTable1 (
-                                                ID INT IDENTITY(1,1),
-                                                Name VARCHAR(50)
-                                            );
-                                            ";
-            ParserTestUtils.ErrorTestFabricDW(identityColumnSyntax, new ParserErrorInfo(identityColumnSyntax.IndexOf("IDENTITY(") + 8, "SQL46010", "("));
+            string identityColumnSyntax = @"CREATE TABLE TestTable1 (ID INT IDENTITY(1,1), Name VARCHAR(50));";
+            ParserTestUtils.ErrorTestFabricDW(identityColumnSyntax, new ParserErrorInfo(40, "SQL46010", "("));
 
-            string identityColumnSyntax2 = @"CREATE TABLE TestTable2 (
-                                                RecordID BIGINT IDENTITY(100,5),
-                                                Description NVARCHAR(200)
-                                            );
-                                            ";
-            ParserTestUtils.ErrorTestFabricDW(identityColumnSyntax2, new ParserErrorInfo(identityColumnSyntax2.IndexOf("IDENTITY(") + 8, "SQL46010", "("));
+            string identityColumnSyntax2 = @"CREATE TABLE TestTable2 (RecordID BIGINT IDENTITY(100,5), Description NVARCHAR(200));";
+            ParserTestUtils.ErrorTestFabricDW(identityColumnSyntax2, new ParserErrorInfo(49, "SQL46010", "("));
         }
 
         /// <summary>

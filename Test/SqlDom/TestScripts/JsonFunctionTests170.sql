@@ -133,7 +133,7 @@ GO
 
 SELECT JSON_QUERY('{ "a": 1 }');
 SELECT JSON_QUERY('{ "a": 1 }', '$.a');
-SELECT JSON_QUERY('{ "a": [1,2,3] }', '$.a') WITH ARRAY WRAPPER;
+SELECT JSON_QUERY('{ "a": [1,2,3] }', '$.a' WITH ARRAY WRAPPER);
 
 GO
 CREATE VIEW dbo.jsonfunctest AS
@@ -146,3 +146,36 @@ GO
 SELECT TOP(5) c.object_id, JSON_OBJECTAGG(c.name:c.column_id) AS columns
   FROM sys.columns AS c
  GROUP BY c.object_id;
+
+SELECT JSON_VALUE('a', '$');
+SELECT JSON_VALUE('c', '$' RETURNING INT);
+SELECT JSON_VALUE('c', '$' RETURNING SMALLINT);
+SELECT JSON_VALUE('c', '$' RETURNING BIGINT);
+SELECT JSON_VALUE('c', '$' RETURNING TINYINT);
+SELECT JSON_VALUE('c', '$' RETURNING NUMERIC);
+SELECT JSON_VALUE('c', '$' RETURNING FLOAT);
+SELECT JSON_VALUE('c', '$' RETURNING REAL);
+SELECT JSON_VALUE('c', '$' RETURNING DECIMAL);
+SELECT JSON_VALUE('c', '$' RETURNING CHAR);
+SELECT JSON_VALUE('c', '$' RETURNING NVARCHAR(50));
+SELECT JSON_VALUE('c', '$' RETURNING NCHAR);
+SELECT JSON_VALUE('c', '$' RETURNING DATE);
+SELECT JSON_VALUE('c', '$' RETURNING DATETIME2);
+SELECT JSON_VALUE('c', '$' RETURNING TIME);
+SELECT JSON_VALUE('c', '$' RETURNING BIT);
+
+-- Json_Contains
+SELECT id,
+       json_col
+FROM tab1
+WHERE JSON_CONTAINS(json_col, 'abc', '$.a') = 1;
+
+-- Json_Contains as LIKE
+SELECT id,
+       json_col
+FROM tab1
+WHERE JSON_CONTAINS(json_col, 'abc%', '$.a', 1) = 1;
+
+-- Json_Modify
+SELECT JSON_MODIFY(json_col, '$.a', 30)
+FROM tab1;
