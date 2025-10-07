@@ -10,15 +10,15 @@ GRANT EXECUTE
     ON EXTERNAL MODEL::MyPredictionModel TO analyst;
 
 GRANT EXECUTE
-    ON EXTERNAL MODEL::schema1.ModelName TO user1, user2
+    ON EXTERNAL MODEL::ModelName TO user1, user2
     WITH GRANT OPTION;
 
 GRANT CONTROL
-    ON EXTERNAL MODEL::dbo.SalesModel TO mladmin
+    ON EXTERNAL MODEL::SalesModel TO mladmin
     AS dbo;
 
 GRANT VIEW DEFINITION
-    ON EXTERNAL MODEL::MySchema.MyModel TO PUBLIC;
+    ON EXTERNAL MODEL::MyModel TO PUBLIC;
 
 DENY ALTER ANY EXTERNAL MODEL TO restricteduser;
 
@@ -26,7 +26,7 @@ DENY EXECUTE
     ON EXTERNAL MODEL::TestModel TO guest CASCADE;
 
 DENY CONTROL
-    ON EXTERNAL MODEL::test.model1 TO user1, user2 CASCADE
+    ON EXTERNAL MODEL::model1 TO user1, user2 CASCADE
     AS admin;
 
 REVOKE ALTER ANY EXTERNAL MODEL TO olduser;
@@ -35,22 +35,22 @@ REVOKE GRANT OPTION FOR EXECUTE
     ON EXTERNAL MODEL::MyModel TO tempuser CASCADE;
 
 REVOKE CONTROL
-    ON EXTERNAL MODEL::prod.RecommendationModel TO contractor
+    ON EXTERNAL MODEL::RecommendationModel TO contractor
     AS manager;
 
 REVOKE EXECUTE
-    ON EXTERNAL MODEL::dbo.CustomerModel TO PUBLIC CASCADE;
+    ON EXTERNAL MODEL::CustomerModel TO PUBLIC CASCADE;
 
 ALTER AUTHORIZATION
     ON EXTERNAL MODEL::MyModel
     TO newowner;
 
 ALTER AUTHORIZATION
-    ON EXTERNAL MODEL::schema1.ModelName
+    ON EXTERNAL MODEL::ModelName
     TO SCHEMA OWNER;
 
 ALTER AUTHORIZATION
-    ON EXTERNAL MODEL::test.experimentalmodel
+    ON EXTERNAL MODEL::experimentalmodel
     TO datateam;
 
 GRANT EXECUTE, VIEW DEFINITION
@@ -63,7 +63,7 @@ REVOKE EXECUTE, VIEW DEFINITION
     ON EXTERNAL MODEL::OldModel TO formeranalyst;
 
 GRANT EXECUTE
-    ON EXTERNAL MODEL::MyDatabase.MySchema.ModelWithSpaces TO testuser;
+    ON EXTERNAL MODEL::ModelWithSpaces TO testuser;
 
 DENY ALTER ANY EXTERNAL MODEL TO userwithspaces;
 
