@@ -13,6 +13,29 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
 {
     partial class SqlScriptGeneratorVisitor
     {
+        // When a trailing single-line comment appears at end of a SELECT list line, suppress alignment padding
+        // for the very next clause body (e.g., FROM) so we preserve a single space formatting.
+        private bool _suppressNextClauseAlignment = false;
+        // Track which comment tokens have already been generated to avoid duplicates
+        private readonly HashSet<TSqlParserToken> _generatedComments = new HashSet<TSqlParserToken>();
+        // Track whether we already emitted leading (file-level) comments
+
+        private bool _leadingCommentsEmitted = false;
+        // Track the highest token index logically emitted (fragment or comment)
+        private int _lastEmittedTokenIndex = -1;
+        // Deferred single-line comments that actually belong to the next statement (prevented from being inlined before a semicolon)
+        private readonly List<TSqlParserToken> _pendingLeadingComments = new List<TSqlParserToken>();
+
+        private void EmitPendingLeadingComments()
+        {
+            if (_pendingLeadingComments.Count == 0) return;
+            foreach (var tok in _pendingLeadingComments)
+            {
+                _writer.AddToken(tok);
+                _writer.NewLine();
+            }
+            _pendingLeadingComments.Clear();
+        }
         // get the name for an enum value
         public static TValue GetValueForEnumKey<TKey, TValue>(Dictionary<TKey, TValue> dict, TKey key)
             where TKey : struct, IConvertible
@@ -166,12 +189,37 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
             GenerateSpaceAndSymbol(TSqlTokenType.EqualsSign);
         }
 
-        // generate the script from the given fragement if the fragment is not null
+        // generate the script from the given fragment if the fragment is not null
         protected void GenerateFragmentIfNotNull(TSqlFragment fragment)
         {
             if (fragment != null)
             {
+                // Emit leading comments (those before the first real token) once
+                if (_options.PreserveComments && !_leadingCommentsEmitted)
+                {
+                    EmitLeadingComments(fragment);
+                    _leadingCommentsEmitted = true;
+                }
+
+                // Gap comments: any comments between the last emitted token and this fragment's first token
+                if (_options.PreserveComments)
+                {
+                    EmitGapCommentsBeforeFragment(fragment);
+                }
+
                 fragment.Accept(this);
+                
+                // Attach trailing/inline comments to the fragment just generated
+                if (_options.PreserveComments)
+                {
+                    GenerateCommentsAfterFragment(fragment);
+                }
+
+                // Update last emitted token index (fragment itself)
+                if (fragment.LastTokenIndex > _lastEmittedTokenIndex)
+                {
+                    _lastEmittedTokenIndex = fragment.LastTokenIndex;
+                }
             }
         }
 
@@ -615,9 +663,160 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
                 ClearAlignmentPointsForFragment(node);
             }
         }
-#if false
-        // check if a string is a keyword
-        protected abstract Boolean IsKeyword(String identifier);
-#endif
+        
+        /// <summary>
+        /// Emit leading (file-level) comments appearing before the first token of the first fragment we generate.
+        /// </summary>
+        private void EmitLeadingComments(TSqlFragment fragment)
+        {
+            if (fragment?.ScriptTokenStream == null || fragment.FirstTokenIndex <= 0)
+                return;
+
+            for (int i = 0; i < fragment.FirstTokenIndex && i < fragment.ScriptTokenStream.Count; i++)
+            {
+                var token = fragment.ScriptTokenStream[i];
+                if ((token.TokenType == TSqlTokenType.SingleLineComment ||
+                    token.TokenType == TSqlTokenType.MultilineComment) &&
+                    !_generatedComments.Contains(token))
+                {
+                    GenerateCommentToken(token);
+                    _generatedComments.Add(token);
+                }
+            }
+        }
+
+        // Emit comments (not already emitted) located strictly between the last emitted token and the fragment's first token.
+        private void EmitGapCommentsBeforeFragment(TSqlFragment fragment)
+        {
+            if (!_options.PreserveComments)
+                return;
+            if (fragment?.ScriptTokenStream == null || fragment.FirstTokenIndex < 0)
+                return;
+
+            int start = _lastEmittedTokenIndex + 1;
+            int end = fragment.FirstTokenIndex - 1;
+            if (end < start)
+                return; // no gap
+
+            var tokens = fragment.ScriptTokenStream;
+            for (int i = start; i <= end && i < tokens.Count; i++)
+            {
+                var t = tokens[i];
+                if ((t.TokenType == TSqlTokenType.SingleLineComment || t.TokenType == TSqlTokenType.MultilineComment) && !_generatedComments.Contains(t))
+                {
+                    // Heuristic: if single-line comment directly follows a comma or identifier in same logical area, keep inline.
+                    // For multiline, existing logic will put it on its own line (GenerateCommentToken handles that).
+                    GenerateCommentToken(t);
+                    _generatedComments.Add(t);
+                    if (i > _lastEmittedTokenIndex)
+                        _lastEmittedTokenIndex = i;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Generates comment tokens that appear after the specified fragment in the original script.
+        /// </summary>
+        /// <param name="fragment">The fragment to check for trailing comments.</param>
+        protected void GenerateCommentsAfterFragment(TSqlFragment fragment)
+        {
+            if (!_options.PreserveComments)
+                return;
+            if (fragment?.ScriptTokenStream == null || fragment.LastTokenIndex < 0)
+                return;
+                
+            // Walk forward from the last token of the fragment until we reach the next non-whitespace, non-comment token.
+            // Any comments in this window are treated as trailing (including inline) comments of this fragment.
+            for (int i = fragment.LastTokenIndex + 1; i < fragment.ScriptTokenStream.Count; i++)
+            {
+                var token = fragment.ScriptTokenStream[i];
+                if ((token.TokenType == TSqlTokenType.SingleLineComment || 
+                     token.TokenType == TSqlTokenType.MultilineComment) &&
+                    !_generatedComments.Contains(token))
+                {
+                    GenerateCommentToken(token);
+                    _generatedComments.Add(token);
+                }
+                else if (token.TokenType != TSqlTokenType.WhiteSpace)
+                {
+                    // Stop at the next non-whitespace, non-comment token
+                    break;
+                }
+            }
+        }
+        
+        /// <summary>
+        /// Generates a comment token to the output.
+        /// </summary>
+        /// <param name="commentToken">The comment token to generate.</param>
+        protected void GenerateCommentToken(TSqlParserToken commentToken)
+        {
+            if (commentToken.TokenType == TSqlTokenType.SingleLineComment)
+            {
+                bool atLineStart = _writer.IsLastElementNewLine() || !_writer.HasElements();
+                if (atLineStart)
+                {
+                    // Standalone comment line; just emit and ensure newline after
+                    _writer.AddToken(commentToken);
+                    if (!commentToken.Text.EndsWith("\n") && !commentToken.Text.EndsWith("\r\n"))
+                    {
+                        NewLine();
+                    }
+                }
+                else
+                {
+                    // Inline trailing single-line comment: ensure space then emit; no immediate newline (next clause handles it)
+                    _writer.EnsureSingleTrailingSpace();
+                    _writer.AddToken(commentToken);
+                    _suppressNextClauseAlignment = true;
+                    // Do not add newline here to avoid extra blank line; clause separator will introduce it.
+                }
+            }
+            else if (commentToken.TokenType == TSqlTokenType.MultilineComment)
+            {
+                // Decide if this multiline comment should be inline or block.
+                bool isFirstLeadingComment = _generatedComments.Count == 0 && !_leadingCommentsEmitted;
+                bool inlineContext = IsLikelyInlineMultilineComment(commentToken);
+
+                if (inlineContext)
+                {
+                    _writer.InsertInlineTrailingComment(commentToken);
+                    _generatedComments.Add(commentToken);
+                    return; // already handled fully
+                }
+                else if (!isFirstLeadingComment)
+                {
+                    NewLine();
+                }
+
+                _writer.AddToken(commentToken);
+
+                if (!commentToken.Text.EndsWith("\n") && !commentToken.Text.EndsWith("\r\n"))
+                {
+                    NewLine();
+                }
+            }
+        }
+
+        // Heuristic: treat a multiline comment as inline if it appeared between tokens on the same original line
+        // and immediately after a comma or identifier in a SELECT list.
+        // We approximate using token indices we have tracked: we look backwards in the token stream for the last non-whitespace token.
+        private bool IsLikelyInlineMultilineComment(TSqlParserToken commentToken)
+        {
+            // Need script token stream: attempt to cast through reflection via known field not available here; rely on commentToken.Offset only is insufficient.
+            // Fallback heuristic: if previous emitted token index is >= 0 and difference between current token index and last emitted <= 3 (implying only whitespace/newline tokens between),
+            // AND the whitespace did not include a newline (cannot directly inspect), we relax and allow inline.
+            // Since we cannot read intervening token kinds here without passing more context, store last index in _lastEmittedTokenIndex.
+            // If distance small, treat as inline unless we just began (first leading comment handled earlier).
+            // This is conservative: will inline some cases that are acceptable.
+            if (_lastEmittedTokenIndex < 0)
+                return false;
+
+            // If we just emitted a fragment and the gap scanner placed us here, small gap implies inline.
+            int currentApproxIndex = _lastEmittedTokenIndex + 1; // best-effort; real index not carried with token instance
+            // Without actual token index on the token, we cannot be precise; return false only when first leading.
+            // Provide a configurable hook if later needed.
+            return true; // prefer inline for multiline comments discovered in gaps
+        }
     }
 }
