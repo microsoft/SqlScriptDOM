@@ -170,7 +170,28 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
         {
             if (applyCasing)
             {
+                // Apply keyword casing (for identifiers that are actually keywords)
                 text = ScriptGeneratorSupporter.GetCasedString(text, _options.KeywordCasing);
+            }
+            else
+            {
+                // Apply identifier casing (for actual identifiers)
+                switch (_options.IdentifierCasing)
+                {
+                    case IdentifierCasing.Lowercase:
+                        text = text.ToLowerInvariant();
+                        break;
+                    case IdentifierCasing.Uppercase:
+                        text = text.ToUpperInvariant();
+                        break;
+                    case IdentifierCasing.PascalCase:
+                        text = ScriptGeneratorSupporter.GetPascalCase(text);
+                        break;
+                    case IdentifierCasing.PreserveOriginal:
+                    default:
+                        // No transformation - preserve original casing
+                        break;
+                }
             }
 
             TSqlParserToken token = new TSqlParserToken(TSqlTokenType.Identifier, text);
