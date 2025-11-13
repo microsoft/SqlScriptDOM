@@ -1480,8 +1480,8 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
                     if (option.OptionKind == IndexOptionKind.DropExisting ||
                         option.OptionKind == IndexOptionKind.LobCompaction ||
                         option.OptionKind == IndexOptionKind.Order || 
-                        option.OptionKind == IndexOptionKind.Resumable ||
-                        option.OptionKind == IndexOptionKind.MaxDuration)
+                        ((versionFlags & SqlVersionFlags.TSql160AndAbove) == 0 && option.OptionKind == IndexOptionKind.Resumable) ||
+                        ((versionFlags & SqlVersionFlags.TSql120AndAbove) == 0 && option.OptionKind == IndexOptionKind.MaxDuration))
                     {
                         invalidOption = true;
                     }

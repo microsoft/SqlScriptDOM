@@ -16,6 +16,7 @@ namespace SqlStudio.Tests.UTSqlScriptDom
         private static readonly ParserTest[] Only160TestInfos =
         {
             new ParserTest160("AlterTableStatementTests160.sql", nErrors80: 0, nErrors90: 0, nErrors100: 0, nErrors110: 0, nErrors120: 0, nErrors130: 0, nErrors140: 0, nErrors150: 0),
+            new ParserTest160("AlterTableResumableTests160.sql", nErrors80: 4, nErrors90: 4, nErrors100: 4, nErrors110: 4, nErrors120: 4, nErrors130: 4, nErrors140: 4, nErrors150: 4),
             new ParserTest160("ExpressionTests160.sql", nErrors80: 1, nErrors90: 0, nErrors100: 0, nErrors110: 0, nErrors120: 0, nErrors130: 0, nErrors140: 0, nErrors150: 0),
             new ParserTest160("CreateUserFromExternalProvider160.sql", nErrors80: 2, nErrors90: 1, nErrors100: 1, nErrors110: 1, nErrors120: 1, nErrors130: 1, nErrors140: 1, nErrors150: 1),
             new ParserTest160("CreateExternalTableStatementTests160.sql", nErrors80: 2, nErrors90: 2, nErrors100: 2, nErrors110: 2, nErrors120: 2, nErrors130: 2, nErrors140: 2, nErrors150: 2),

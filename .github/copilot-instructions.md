@@ -49,9 +49,28 @@ ScriptDom is a library for parsing and generating T-SQL scripts. It is primarily
 - If a test fails due to mismatch in generated script, compare the generated output (the test harness logs it) against the baseline to spot formatting/structure differences.
 
 ## Bug Fixing and Baseline Generation
-For a practical guide on fixing bugs, including the detailed workflow for generating test baselines, see the [Bug Fixing Guide](BUG_FIXING_GUIDE.md).
 
-For specific parser predicate recognition issues (when identifier-based predicates like `REGEXP_LIKE` don't work with parentheses), see the [Parser Predicate Recognition Fix Guide](PARSER_PREDICATE_RECOGNITION_FIX.md).
+Different types of bugs require different fix approaches. **Start by diagnosing which type of issue you're dealing with:**
+
+### 1. Validation-Based Issues (Most Common)
+If you see an error like "Option 'X' is not valid..." or "Feature 'Y' not supported..." but the syntax SHOULD work according to SQL Server docs:
+- **Guide**: [Validation Fix Guide](VALIDATION_FIX_GUIDE.md) - Version-gated validation fixes
+- **Example**: ALTER TABLE RESUMABLE option (SQL Server 2022+)
+- **Key Signal**: Similar syntax works in other contexts (e.g., ALTER INDEX works but ALTER TABLE doesn't)
+
+### 2. Grammar-Based Issues (Adding New Syntax)
+If the parser doesn't recognize the syntax at all, or you need to add new T-SQL features:
+- **Guide**: [Bug Fixing Guide](BUG_FIXING_GUIDE.md) - Grammar modifications, AST updates, script generation
+- **Example**: Adding new operators, statements, or function types
+- **Key Signal**: Syntax error like "Incorrect syntax near..." or "Unexpected token..."
+
+### 3. Parser Predicate Recognition Issues (Parentheses)
+If identifier-based predicates (like `REGEXP_LIKE`) work without parentheses but fail with them:
+- **Guide**: [Parser Predicate Recognition Fix Guide](PARSER_PREDICATE_RECOGNITION_FIX.md)
+- **Example**: `WHERE REGEXP_LIKE('a', 'pattern')` works, but `WHERE (REGEXP_LIKE('a', 'pattern'))` fails
+- **Key Signal**: Syntax error near closing parenthesis or semicolon
+
+**Quick Diagnostic**: Search for the error message in the codebase to determine which type of fix is needed.
 
 ## Editing generated outputs, debugging generation
 - Never edit generated files permanently (they live under `obj/...`/CsGenIntermediateOutputPath). Instead change:
@@ -60,6 +79,85 @@ For specific parser predicate recognition issues (when identifier-based predicat
   - AST XML in `SqlScriptDom/Parser/TSql/Ast.xml` if AST node shapes need to change (used by `tools/AstGen`).
 - To see antlr output/errors, force verbose generation by setting MSBuild property `OutputErrorInLexerParserCompile=true` on the command line (e.g. `dotnet msbuild -t:GLexerParserCompile -p:OutputErrorInLexerParserCompile=true`).
 - If the antlr download fails during build, manually download `antlr-2.7.5.jar` (for non-Windows) or `.exe` (for Windows) and place it at the location defined in `Directory.Build.props` or override `AntlrLocation` when invoking msbuild.
+
+## Debugging Tips and Investigation Workflow
+
+### Step 1: Identify the Bug Type
+Start by searching for the error message to understand what type of fix is needed:
+```bash
+# Search for error code or message
+grep -r "SQL46057" SqlScriptDom/
+grep -r "is not a valid" SqlScriptDom/
+```
+
+**Common Error Patterns**:
+- `"Option 'X' is not valid..."` → Validation issue (see [VALIDATION_FIX_GUIDE.md](VALIDATION_FIX_GUIDE.md))
+- `"Incorrect syntax near..."` → Grammar issue (see [BUG_FIXING_GUIDE.md](BUG_FIXING_GUIDE.md))
+- `"Syntax error near ')'"` with parentheses → Predicate recognition (see [PARSER_PREDICATE_RECOGNITION_FIX.md](PARSER_PREDICATE_RECOGNITION_FIX.md))
+
+### Step 2: Find Where Similar Syntax Works
+If the syntax works in one context but not another:
+```bash
+# Search for working examples
+grep -r "RESUMABLE" Test/SqlDom/TestScripts/
+grep -r "OptionName" SqlScriptDom/Parser/TSql/
+```
+
+**Example**: ALTER INDEX with RESUMABLE works, but ALTER TABLE doesn't → Likely validation issue
+
+### Step 3: Locate the Relevant Code
+Common files to check:
+- **Validation**: `SqlScriptDom/Parser/TSql/TSql80ParserBaseInternal.cs` (most validation logic)
+- **Grammar**: `SqlScriptDom/Parser/TSql/TSql*.g` (version-specific grammar files)
+- **Options**: `SqlScriptDom/ScriptDom/SqlServer/IndexOptionHelper.cs` (option registration)
+- **AST**: `SqlScriptDom/Parser/TSql/Ast.xml` (AST node definitions)
+
+### Step 4: Check SQL Server Version Support
+Always verify Microsoft documentation:
+- Search for "Applies to: SQL Server 20XX (XX.x)" in Microsoft docs
+- Note that different features within the same option set can have different version requirements
+- Example: MAX_DURATION (SQL 2014+) vs RESUMABLE (SQL 2022+)
+
+### Step 5: Verify with Tests
+Before and after making changes:
+```bash
+# Build the parser
+dotnet build SqlScriptDom/Microsoft.SqlServer.TransactSql.ScriptDom.csproj -c Debug
+
+# Run specific test
+dotnet test --filter "FullyQualifiedName~YourTest" -c Debug
+
+# ALWAYS run full suite before committing
+dotnet test Test/SqlDom/UTSqlScriptDom.csproj -c Debug
+```
+
+### Common Investigation Patterns
+
+#### Pattern 1: Option Not Recognized
+```bash
+# Find where option is registered
+grep -r "YourOptionName" SqlScriptDom/ScriptDom/SqlServer/IndexOptionHelper.cs
+
+# Check enum definition
+grep -r "enum IndexOptionKind" SqlScriptDom/
+```
+
+#### Pattern 2: Version-Specific Behavior
+```bash
+# Find version checks
+grep -r "TSql160AndAbove" SqlScriptDom/Parser/TSql/
+
+# Check which parser version you're testing
+# TSql80 = SQL Server 2000, TSql90 = 2005, ..., TSql160 = 2022, TSql170 = 2025
+```
+
+#### Pattern 3: Statement-Specific Restrictions
+```bash
+# Find validation by statement type
+grep -r "IndexAffectingStatement" SqlScriptDom/Parser/TSql/TSql80ParserBaseInternal.cs
+
+# Common statement types: CreateIndex, AlterIndex, AlterTableAddElement
+```
 
 
 ## Patterns & code style to follow (examples you will see)
