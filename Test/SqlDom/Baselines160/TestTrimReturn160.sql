@@ -1,0 +1,7 @@
+ALTER FUNCTION TestTrim
+( )
+RETURNS NVARCHAR (MAX)
+AS
+BEGIN
+    RETURN (TRIM(' test '));
+END

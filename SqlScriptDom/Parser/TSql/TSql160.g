@@ -31477,6 +31477,12 @@ expressionPrimary [ExpressionFlags expressionFlags] returns [PrimaryExpression v
             {NextTokenMatches(CodeGenerationSupporter.IIf) && (LA(2) == LeftParenthesis)}?
             vResult=iIfCall
         |
+            {NextTokenMatches(CodeGenerationSupporter.JsonObject) && (LA(2) == LeftParenthesis)}?
+            vResult=jsonObjectCall
+        |
+            {NextTokenMatches(CodeGenerationSupporter.JsonArray) && (LA(2) == LeftParenthesis)}?
+            vResult=jsonArrayCall
+        |
             (Identifier LeftParenthesis)=>
             vResult=builtInFunctionCall
         |
@@ -32494,6 +32500,32 @@ iIfCall returns [IIfCall vResult = this.FragmentFactory.CreateFragment<IIfCall>(
         {
             UpdateTokenInfo(vResult,tRParen);
         }
+    ;
+
+jsonObjectCall returns [FunctionCall vResult = this.FragmentFactory.CreateFragment<FunctionCall>()]
+{
+    Identifier vIdentifier;
+}
+    :    vIdentifier=nonQuotedIdentifier
+        {
+            Match(vIdentifier, CodeGenerationSupporter.JsonObject);
+            vResult.FunctionName = vIdentifier;
+        }
+        LeftParenthesis
+        jsonObjectBuiltInFunctionCall[vResult]
+    ;
+
+jsonArrayCall returns [FunctionCall vResult = this.FragmentFactory.CreateFragment<FunctionCall>()]
+{
+    Identifier vIdentifier;
+}
+    :    vIdentifier=nonQuotedIdentifier
+        {
+            Match(vIdentifier, CodeGenerationSupporter.JsonArray);
+            vResult.FunctionName = vIdentifier;
+        }
+        LeftParenthesis
+        jsonArrayBuiltInFunctionCall[vResult]
     ;
 
 coalesceExpression [ExpressionFlags expressionFlags] returns [CoalesceExpression vResult = this.FragmentFactory.CreateFragment<CoalesceExpression>()]

@@ -1,0 +1,7 @@
+ALTER FUNCTION TestJsonArray
+( )
+RETURNS NVARCHAR (MAX)
+AS
+BEGIN
+    RETURN (JSON_ARRAY('value1', 'value2'));
+END

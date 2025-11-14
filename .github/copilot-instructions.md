@@ -72,6 +72,8 @@ If identifier-based predicates (like `REGEXP_LIKE`) work without parentheses but
 
 **Quick Diagnostic**: Search for the error message in the codebase to determine which type of fix is needed.
 
+For adding new system functions to the parser, including handling RETURN statement contexts and ANTLR v2 syntactic predicate limitations, see the [Function Guidelines](instructions/function.guidelines.instructions.md).
+
 ## Editing generated outputs, debugging generation
 - Never edit generated files permanently (they live under `obj/...`/CsGenIntermediateOutputPath). Instead change:
   - `.g` grammar files
