@@ -9,6 +9,7 @@ The SqlScriptDOM testing framework validates parser functionality through:
 2. **Baseline Comparison** - Verifies generated T-SQL matches expected formatted output
 3. **Error Count Validation** - Confirms expected parse errors for invalid syntax across SQL versions
 4. **Version-Specific Testing** - Tests syntax across multiple SQL Server versions (SQL 2000-2025)
+5. **Exact T-SQL Verification** - When testing specific T-SQL syntax from prompts or user requests, the **exact T-SQL statement must be included and verified** in the test to ensure the specific syntax works as expected
 
 ## Test Framework Architecture
 
@@ -50,6 +51,18 @@ GO
 SELECT JSON_ARRAY();
 SELECT JSON_ARRAY(NULL, 'test', 123);
 ```
+
+**CRITICAL**: When testing specific T-SQL syntax from user prompts or requests, **include the exact T-SQL statement provided** in your test script. Do not modify, simplify, or generalize the syntax - test the precise statement that was requested.
+
+**Example**: If the user provides:
+```sql
+SELECT JSON_OBJECTAGG( t.c1 : t.c2 )
+FROM (
+    VALUES('key1', 'c'), ('key2', 'b'), ('key3','a')
+) AS t(c1, c2);
+```
+
+Then your test **must include exactly that statement** to verify the specific syntax works.
 
 **Naming Convention**:
 - `<FeatureName>Tests<SQLVersion>.sql` (e.g., `JsonFunctionTests160.sql`)
@@ -98,6 +111,14 @@ Add test configuration to appropriate `Only<version>SyntaxTests.cs` file:
 **File**: `Test/SqlDom/Only160SyntaxTests.cs`
 ```csharp
 // Around line where other ParserTest160 entries are defined
+
+// Option 1: Simplified - only specify error counts you care about
+new ParserTest160("YourFeatureTests160.sql"),  // All previous versions default to null (ignored), TSql160 expects 0 errors
+
+// Option 2: Specify only some previous version error counts
+new ParserTest160("YourFeatureTests160.sql", nErrors80: 1, nErrors90: 1),  // Only SQL 2000/2005 expect errors
+
+// Option 3: Full specification (legacy compatibility)
 new ParserTest160("YourFeatureTests160.sql", 
     nErrors80: 1,   // SQL Server 2000 - expect error for new syntax
     nErrors90: 1,   // SQL Server 2005 - expect error for new syntax  
@@ -114,7 +135,13 @@ new ParserTest160("YourFeatureTests160.sql",
 **Error Count Guidelines**:
 - **0 errors**: Syntax should parse successfully in this SQL version
 - **1+ errors**: Syntax should fail with specified number of parse errors
+- **null (default)**: Error count is ignored for this SQL version - test will pass regardless of actual error count
 - **Consider SQL version compatibility**: When was the feature introduced?
+
+**New Simplified Approach**: ParserTest160 (and later versions) use nullable parameters with default values of `null`. This means:
+- You only need to specify error counts for versions where you expect specific behavior
+- Unspecified parameters default to `null` and their error counts are ignored
+- TSql160 parser (current version) always expects 0 errors unless syntax is intentionally invalid
 
 ### 4. Run and Validate Test
 
@@ -271,6 +298,19 @@ ALTER FUNCTION Test() RETURNS NVARCHAR(MAX) AS BEGIN
 END;
 ```
 
+**CRITICAL**: When testing syntax from user requests, **always include the exact T-SQL provided**:
+```sql
+-- ✅ Include the exact syntax from user prompt
+SELECT JSON_OBJECTAGG( t.c1 : t.c2 )
+FROM (
+    VALUES('key1', 'c'), ('key2', 'b'), ('key3','a')
+) AS t(c1, c2);
+
+-- ✅ Then add additional test variations
+SELECT JSON_OBJECTAGG( alias.col1 : alias.col2 ) FROM table_name alias;
+SELECT JSON_OBJECTAGG( schema.table.col1 : schema.table.col2 ) FROM schema.table;
+```
+
 #### Focused Testing
 ```sql
 -- ❌ Avoid: Mixing unrelated syntax in single test
@@ -292,7 +332,13 @@ SELECT JSON_ARRAY((SELECT nested FROM table));  -- Subqueries
 
 #### Version Compatibility
 ```csharp
-// ✅ Good: Realistic version expectations
+// ✅ Good: Simplified - most new syntax fails in older versions
+new ParserTest160("JsonTests160.sql"),  // TSql160 expects success, older versions ignored
+
+// ✅ Good: Specify only when you need specific behavior
+new ParserTest160("JsonTests160.sql", nErrors130: 0),  // JSON supported since SQL 2016
+
+// ✅ Good: Full specification when needed for precision
 new ParserTest160("JsonTests160.sql", 
     nErrors80: 1,   // JSON not in SQL 2000
     nErrors90: 1,   // JSON not in SQL 2005
@@ -305,11 +351,11 @@ new ParserTest160("JsonTests160.sql",
 #### Grammar Reality
 ```csharp
 // ⚠️ Consider: Grammar changes may affect all versions
-new ParserTest160("TestFunction160.sql",
-    nErrors80: 1,   // If function syntax fails in SQL 2000 due to function structure
-    nErrors90: 0,   // If shared grammar makes it work in all versions
-    // ...
-),
+// If shared grammar makes function work in all SQL versions:
+new ParserTest160("TestFunction160.sql"),  // All versions will succeed
+
+// If function fails in older versions due to grammar limitations:
+new ParserTest160("TestFunction160.sql", nErrors80: 1, nErrors90: 1),  // Only specify versions that fail
 ```
 
 ### File Organization
@@ -329,6 +375,74 @@ TestScripts/
 TestScripts/JsonTests160.sql ↔ Baselines160/JsonTests160.sql
 TestScripts/JsonTests170.sql ↔ Baselines170/JsonTests170.sql  
 ```
+
+## Simplified Error Count Handling (TSql160+)
+
+### New Constructor Behavior
+
+Starting with `ParserTest160`, the constructor uses nullable integer parameters with default values of `null`. This pattern extends to later versions like `ParserTest170`:
+
+```csharp
+public ParserTest160(string scriptFilename, 
+    int? nErrors80 = null,    // Default: null (ignored)
+    int? nErrors90 = null,    // Default: null (ignored) 
+    int? nErrors100 = null,   // Default: null (ignored)
+    int? nErrors110 = null,   // Default: null (ignored)
+    int? nErrors120 = null,   // Default: null (ignored)
+    int? nErrors130 = null,   // Default: null (ignored)
+    int? nErrors140 = null,   // Default: null (ignored)
+    int? nErrors150 = null)   // Default: null (ignored)
+    // TSql160 always expects 0 errors unless syntax is invalid
+
+public ParserTest170(string scriptFilename,
+    int? nErrors80 = null,    // Default: null (ignored)
+    int? nErrors90 = null,    // Default: null (ignored)
+    int? nErrors100 = null,   // Default: null (ignored)
+    int? nErrors110 = null,   // Default: null (ignored)
+    int? nErrors120 = null,   // Default: null (ignored)
+    int? nErrors130 = null,   // Default: null (ignored)
+    int? nErrors140 = null,   // Default: null (ignored)
+    int? nErrors150 = null,   // Default: null (ignored)
+    int? nErrors160 = null)   // Default: null (ignored)
+    // TSql170 always expects 0 errors unless syntax is invalid
+```
+
+### Benefits
+
+1. **Simplified Test Creation**: Most tests only need the script filename
+2. **Focus on What Matters**: Only specify error counts for versions where you expect specific behavior
+3. **Reduced Maintenance**: No need to update all error counts when adding version-agnostic syntax
+4. **Backward Compatibility**: Existing tests with full error specifications still work
+
+### Usage Patterns
+
+```csharp
+// Minimal - test new SQL 2022 syntax
+new ParserTest160("NewFeatureTests160.sql"),
+
+// Minimal - test new SQL 2025 syntax
+new ParserTest170("NewFeatureTests170.sql"),
+
+// Specify only critical version boundaries  
+new ParserTest160("FeatureTests160.sql", nErrors130: 0),  // Supported since SQL 2016
+new ParserTest170("FeatureTests170.sql", nErrors130: 0),  // Supported since SQL 2016
+
+// Mix of specified and default parameters
+new ParserTest160("EdgeCaseTests160.sql", nErrors80: 2, nErrors150: 1),  // SQL 2000 has 2 errors, SQL 2019 has 1
+new ParserTest170("EdgeCaseTests170.sql", nErrors80: 2, nErrors160: 1),  // SQL 2000 has 2 errors, SQL 2022 has 1
+
+// Legacy full specification still supported
+new ParserTest160("LegacyTests160.sql", 1, 1, 1, 1, 1, 1, 1, 1),
+new ParserTest170("LegacyTests170.sql", 1, 1, 1, 1, 1, 1, 1, 1, 1),
+```
+
+### When to Specify Error Counts
+
+- **Don't specify**: When older SQL versions should be ignored (most common case for both TSql160 and TSql170)
+- **Specify as 0**: When feature was introduced in a specific older SQL version
+- **Specify as 1+**: When you need to validate specific error conditions
+- **Specify for debugging**: When investigating cross-version compatibility issues
+- **TSql170 considerations**: Remember that TSql160 (SQL Server 2022) is now also a "previous version" when using ParserTest170
 
 ## Performance Considerations
 
@@ -405,7 +519,8 @@ dotnet test Test/SqlDom/UTSqlScriptDom.csproj -c Debug
 ### Adding New Function
 
 ```sql
--- Test/SqlDom/TestScripts/NewFunctionTests160.sql
+-- Test/SqlDom/TestScripts/NewFunctionTests160.sql (for SQL 2022)
+-- Test/SqlDom/TestScripts/NewFunctionTests170.sql (for SQL 2025)
 SELECT NEW_FUNCTION('param1', 'param2');
 SELECT NEW_FUNCTION(@variable);
 SELECT NEW_FUNCTION(column_name);
@@ -420,10 +535,24 @@ END;
 GO
 ```
 
+**Test Configuration**:
+```csharp
+// Simplified approach for SQL 2022 - NEW_FUNCTION is SQL 2022 syntax
+new ParserTest160("NewFunctionTests160.sql"),
+
+// Simplified approach for SQL 2025 - NEW_FUNCTION is SQL 2025 syntax  
+new ParserTest170("NewFunctionTests170.sql"),
+
+// Or specify if function works in earlier versions
+new ParserTest160("NewFunctionTests160.sql", nErrors140: 0),  // Works since SQL 2017
+new ParserTest170("NewFunctionTests170.sql", nErrors140: 0),  // Works since SQL 2017
+```
+
 ### Adding New Statement
 
 ```sql  
--- Test/SqlDom/TestScripts/NewStatementTests170.sql
+-- Test/SqlDom/TestScripts/NewStatementTests160.sql (for SQL 2022)
+-- Test/SqlDom/TestScripts/NewStatementTests170.sql (for SQL 2025)
 NEW_STATEMENT option1 = 'value1', option2 = 'value2';
 
 NEW_STATEMENT 
@@ -435,6 +564,15 @@ NEW_STATEMENT
 NEW_STATEMENT computed_option = (value1 + value2);
 ```
 
+**Test Configuration**:
+```csharp
+// For SQL 2022 syntax:
+new ParserTest160("NewStatementTests160.sql"),
+
+// For SQL 2025 syntax:
+new ParserTest170("NewStatementTests170.sql"),
+```
+
 ### Testing Error Conditions
 
 ```sql
@@ -444,6 +582,45 @@ NEW_STATEMENT computed_option = (value1 + value2);
 NEW_FUNCTION();  -- Invalid: missing required parameters
 NEW_FUNCTION('param1',);  -- Invalid: trailing comma
 NEW_FUNCTION('param1' 'param2');  -- Invalid: missing comma
+```
+
+**Test Configuration**:
+```csharp
+// Test should fail parsing in TSql160 due to invalid syntax
+new ParserTest160("ErrorConditionTests160.sql", 
+    nErrors80: 3,    // 3 syntax errors expected in all versions
+    nErrors90: 3,
+    nErrors100: 3,
+    nErrors110: 3,
+    nErrors120: 3,
+    nErrors130: 3,
+    nErrors140: 3,
+    nErrors150: 3,
+    nErrors160: 3),  // Even TSql160 should have 3 errors - syntax is invalid
+
+// Test should fail parsing in TSql170 due to invalid syntax  
+new ParserTest170("ErrorConditionTests170.sql",
+    nErrors80: 3,    // 3 syntax errors expected in all versions
+    nErrors90: 3,
+    nErrors100: 3,
+    nErrors110: 3,
+    nErrors120: 3,
+    nErrors130: 3,
+    nErrors140: 3,
+    nErrors150: 3,
+    nErrors160: 3,
+    nErrors170: 3),  // Even TSql170 should have 3 errors - syntax is invalid
+
+// Or simplified if error count is same across all versions:
+new ParserTest160("ErrorConditionTests160.sql", 
+    nErrors80: 3, nErrors90: 3, nErrors100: 3, nErrors110: 3, 
+    nErrors120: 3, nErrors130: 3, nErrors140: 3, nErrors150: 3, 
+    nErrors160: 3),
+    
+new ParserTest170("ErrorConditionTests170.sql",
+    nErrors80: 3, nErrors90: 3, nErrors100: 3, nErrors110: 3,
+    nErrors120: 3, nErrors130: 3, nErrors140: 3, nErrors150: 3,
+    nErrors160: 3, nErrors170: 3),
 ```
 
 ## Advanced Testing Patterns
@@ -487,6 +664,19 @@ BEGIN
 END;
 ```
 
+**Test Configuration**:
+```csharp
+// Regression test - should work in TSql160, may fail in earlier versions
+new ParserTest160("RegressionBugFix12345Tests160.sql"),
+
+// Regression test - should work in TSql170, may fail in earlier versions
+new ParserTest170("RegressionBugFix12345Tests170.sql"),
+
+// Or if you need to verify the bug existed in specific versions:
+new ParserTest160("RegressionBugFix12345Tests160.sql", nErrors150: 1),  // Bug existed in SQL 2019
+new ParserTest170("RegressionBugFix12345Tests170.sql", nErrors160: 1),  // Bug existed in SQL 2022
+```
+
 ## Summary
 
 The SqlScriptDOM testing framework provides comprehensive validation of parser functionality through:
@@ -494,5 +684,8 @@ The SqlScriptDOM testing framework provides comprehensive validation of parser f
 - **Baseline comparison** (Generated output vs expected)
 - **Cross-version validation** (Test syntax across SQL Server versions)
 - **Error condition testing** (Invalid syntax produces expected errors)
+- **Exact syntax verification** (Exact T-SQL from user requests is tested precisely)
 
 Following these guidelines ensures robust test coverage for parser functionality and prevents regressions when adding new features or fixing bugs.
+
+**Key Principle**: Always test the exact T-SQL syntax provided in user prompts or requests to verify that the specific syntax works as expected, rather than testing generalized or simplified versions of the syntax.

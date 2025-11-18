@@ -8,7 +8,7 @@
         "ADO_DEFAULT_PROJECT": "SQLToolsAndLibraries",
         "ADO_DEFAULT_REPO": "ScriptDOM",
         "ADO_DEFAULT_BRANCH": "main",
-        "ADO_DEFAULT_AREA_PATH": "SQLToolsAndLibraries\\DacFx"
+        "ADO_DEFAULT_AREA_PATH": "SQLToolsAndLibraries\\ScriptDOM"
       }
     },
     "my-mcp-mini-drivers": {

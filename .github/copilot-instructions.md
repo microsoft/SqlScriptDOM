@@ -26,6 +26,8 @@ ScriptDom is a library for parsing and generating T-SQL scripts. It is primarily
 - `SqlScriptDom/ParserPostProcessing.sed`, `LexerPostProcessing.sed`, `TSqlTokenTypes.ps1` — post-processing for generated C# sources and tokens.
 - `tools/` — contains code generators used during build: `AstGen`, `ScriptGenSettingsGenerator`, `TokenListGenerator`.
 - `Test/SqlDom/` — unit tests, baselines and test scripts. See `Only170SyntaxTests.cs`, `TestScripts/`, and `Baselines170/`.
+- `.github/instructions/testing.guidelines.instructions.md` — comprehensive testing framework guide with patterns and best practices.
+- `.github/instructions/function.guidelines.instructions.md` — specialized guide for adding new T-SQL system functions.
 
 ## Developer workflow & conventions (typical change cycle)
 1. Add/modify grammar rule(s) in the correct `TSql*.g` (pick the _version_ the syntax belongs to).
@@ -35,6 +37,7 @@ ScriptDom is a library for parsing and generating T-SQL scripts. It is primarily
    - Put the input SQL in `Test/SqlDom/TestScripts/` (filename is case sensitive and used as an embedded resource).
    - Add/confirm baseline output in `Test/SqlDom/Baselines<version>/` (the UT project embeds these baselines as resources).
    - Update the appropriate `Only<version>SyntaxTests.cs` (e.g., `Only170SyntaxTests.cs`) by adding a `ParserTest170("MyNewTest.sql", ...)` entry. See `ParserTest.cs` and `ParserTestOutput.cs` for helper constructors and verification semantics.
+   - **For comprehensive testing guidance**, see [Testing Guidelines](instructions/testing.guidelines.instructions.md) with detailed patterns, best practices, and simplified constructor approaches.
 5. **Run full test suite** to ensure no regressions:
    ```bash
    dotnet test Test/SqlDom/UTSqlScriptDom.csproj -c Debug
@@ -54,25 +57,41 @@ Different types of bugs require different fix approaches. **Start by diagnosing 
 
 ### 1. Validation-Based Issues (Most Common)
 If you see an error like "Option 'X' is not valid..." or "Feature 'Y' not supported..." but the syntax SHOULD work according to SQL Server docs:
-- **Guide**: [Validation Fix Guide](VALIDATION_FIX_GUIDE.md) - Version-gated validation fixes
+- **Guide**: [Validation Fix Guide](instructions/validation_fix.guidelines.instructions.md) - Version-gated validation fixes
 - **Example**: ALTER TABLE RESUMABLE option (SQL Server 2022+)
 - **Key Signal**: Similar syntax works in other contexts (e.g., ALTER INDEX works but ALTER TABLE doesn't)
 
 ### 2. Grammar-Based Issues (Adding New Syntax)
 If the parser doesn't recognize the syntax at all, or you need to add new T-SQL features:
-- **Guide**: [Bug Fixing Guide](BUG_FIXING_GUIDE.md) - Grammar modifications, AST updates, script generation
+- **Guide**: [Bug Fixing Guide](instructions/bug_fixing.guidelines.instructions.md) - Grammar modifications, AST updates, script generation
 - **Example**: Adding new operators, statements, or function types
 - **Key Signal**: Syntax error like "Incorrect syntax near..." or "Unexpected token..."
 
 ### 3. Parser Predicate Recognition Issues (Parentheses)
 If identifier-based predicates (like `REGEXP_LIKE`) work without parentheses but fail with them:
-- **Guide**: [Parser Predicate Recognition Fix Guide](PARSER_PREDICATE_RECOGNITION_FIX.md)
+- **Guide**: [Parser Predicate Recognition Fix Guide](instructions/parser.guidelines.instructions.md)
 - **Example**: `WHERE REGEXP_LIKE('a', 'pattern')` works, but `WHERE (REGEXP_LIKE('a', 'pattern'))` fails
 - **Key Signal**: Syntax error near closing parenthesis or semicolon
 
 **Quick Diagnostic**: Search for the error message in the codebase to determine which type of fix is needed.
 
-For adding new system functions to the parser, including handling RETURN statement contexts and ANTLR v2 syntactic predicate limitations, see the [Function Guidelines](instructions/function.guidelines.instructions.md).
+### 4. Adding New System Functions
+For adding new T-SQL system functions to the parser, including handling RETURN statement contexts and ANTLR v2 syntactic predicate limitations:
+- **Guide**: [Function Guidelines](instructions/function.guidelines.instructions.md) - Complete guide for system function implementation
+- **Example**: JSON_OBJECT, JSON_ARRAY functions with RETURN statement support
+- **Key Requirements**: Syntactic predicates for lookahead, proper AST design, comprehensive testing
+
+### 5. Adding New Data Types
+For adding completely new SQL Server data types that require custom parsing logic and specialized AST nodes:
+- **Guide**: [New Data Types Guidelines](instructions/new_data_types.guidelines.instructions.md) - Complete guide for implementing new data types
+- **Example**: VECTOR data type with dimension and optional base type parameters
+- **Key Signal**: New SQL Server data type with custom parameter syntax different from standard data types
+
+### 6. Adding New Index Types
+For adding completely new SQL Server index types that require specialized syntax and custom parsing logic:
+- **Guide**: [New Index Types Guidelines](instructions/new_index_types.guidelines.instructions.md) - Complete guide for implementing new index types
+- **Example**: JSON INDEX with FOR clause, VECTOR INDEX with METRIC/TYPE options
+- **Key Signal**: New SQL Server index type with custom syntax different from standard CREATE INDEX
 
 ## Editing generated outputs, debugging generation
 - Never edit generated files permanently (they live under `obj/...`/CsGenIntermediateOutputPath). Instead change:
@@ -93,9 +112,9 @@ grep -r "is not a valid" SqlScriptDom/
 ```
 
 **Common Error Patterns**:
-- `"Option 'X' is not valid..."` → Validation issue (see [VALIDATION_FIX_GUIDE.md](VALIDATION_FIX_GUIDE.md))
-- `"Incorrect syntax near..."` → Grammar issue (see [BUG_FIXING_GUIDE.md](BUG_FIXING_GUIDE.md))
-- `"Syntax error near ')'"` with parentheses → Predicate recognition (see [PARSER_PREDICATE_RECOGNITION_FIX.md](PARSER_PREDICATE_RECOGNITION_FIX.md))
+- `"Option 'X' is not valid..."` → Validation issue (see [Validation_fix.guidelines.instructions.md](instructions/Validation_fix.guidelines.instructions.md))
+- `"Incorrect syntax near..."` → Grammar issue (see [bug_fixing.guidelines.instructions.md](instructions/bug_fixing.guidelines.instructions.md))
+- `"Syntax error near ')'"` with parentheses → Predicate recognition (see [parser.guidelines.instructions.md](instructions/parser.guidelines.instructions.md))
 
 ### Step 2: Find Where Similar Syntax Works
 If the syntax works in one context but not another:
@@ -172,5 +191,5 @@ grep -r "IndexAffectingStatement" SqlScriptDom/Parser/TSql/TSql80ParserBaseInter
 - **Logical `NOT` vs. Compound Operators:** The grammar handles the logical `NOT` operator (e.g., `WHERE NOT (condition)`) in a general way, often in a `booleanExpressionUnary` rule. This is distinct from compound operators like `NOT LIKE` or `NOT IN`, which are typically parsed as a single unit within a comparison rule. Don't assume that because `NOT` is supported, `NOT LIKE` will be automatically supported in all predicate contexts.
 - **Modifying Shared Grammar Rules:** **NEVER modify existing shared grammar rules** like `identifierColumnReferenceExpression` that are used throughout the codebase. This can cause tests to fail in unrelated areas because the rule now accepts or rejects different syntax. Instead, create specialized rules for your specific context (e.g., `vectorSearchColumnReferenceExpression` for VECTOR_SEARCH-specific needs).
 - **Full Test Suite Validation:** After any grammar changes, **always run the complete test suite** (`dotnet test Test/SqlDom/UTSqlScriptDom.csproj -c Debug`) to catch regressions. Grammar changes can have far-reaching effects on seemingly unrelated functionality.
-- **Extending Literals to Expressions:** When functions/constructs currently accept only literal values (e.g., `IntegerLiteral`, `StringLiteral`) but need to support dynamic values (parameters, variables, outer references), change both the AST definition (in `Ast.xml`) and grammar rules (in `TSql*.g`) to use `ScalarExpression` instead. This pattern was used for VECTOR_SEARCH TOP_N parameter. See the detailed example in [BUG_FIXING_GUIDE.md](BUG_FIXING_GUIDE.md#special-case-extending-grammar-rules-from-literals-to-expressions) and [GRAMMAR_EXTENSION_PATTERNS.md](GRAMMAR_EXTENSION_PATTERNS.md) for comprehensive patterns.
+- **Extending Literals to Expressions:** When functions/constructs currently accept only literal values (e.g., `IntegerLiteral`, `StringLiteral`) but need to support dynamic values (parameters, variables, outer references), change both the AST definition (in `Ast.xml`) and grammar rules (in `TSql*.g`) to use `ScalarExpression` instead. This pattern was used for VECTOR_SEARCH TOP_N parameter. See the detailed example in [bug_fixing.guidelines.instructions.md](instructions/bug_fixing.guidelines.instructions.md#special-case-extending-grammar-rules-from-literals-to-expressions) and [grammer.guidelines.instructions.md](instructions/grammer.guidelines.instructions.md) for comprehensive patterns.
 

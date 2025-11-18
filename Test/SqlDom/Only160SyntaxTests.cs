@@ -39,6 +39,7 @@ namespace SqlStudio.Tests.UTSqlScriptDom
             new ParserTest160("TrimFunctionTests160.sql", nErrors80: 7, nErrors90: 7, nErrors100: 7, nErrors110: 7, nErrors120: 7, nErrors130: 7, nErrors140: 4, nErrors150: 4),
             new ParserTest160("JsonFunctionTests160.sql", nErrors80: 9, nErrors90: 8, nErrors100: 14, nErrors110: 14, nErrors120: 14, nErrors130: 14, nErrors140: 14, nErrors150: 14),
             new ParserTest160("AlterFunctionJsonObjectTests160.sql", nErrors80: 1, nErrors90: 1, nErrors100: 1, nErrors110: 1, nErrors120: 1, nErrors130: 1, nErrors140: 1, nErrors150: 1),
+            new ParserTest160("ComplexJsonObjectFunctionTests160.sql"),
             new ParserTest160("TestTrimReturn160.sql", nErrors80: 1, nErrors90: 0, nErrors100: 0, nErrors110: 0, nErrors120: 0, nErrors130: 0, nErrors140: 0, nErrors150: 0),
             new ParserTest160("TestJsonArrayReturn160.sql", nErrors80: 1, nErrors90: 0, nErrors100: 0, nErrors110: 0, nErrors120: 0, nErrors130: 0, nErrors140: 0, nErrors150: 0),
             new ParserTest160(scriptFilename: "IgnoreRespectNullsSyntaxTests160.sql", nErrors80: 12, nErrors90: 8, nErrors100: 8, nErrors110: 8, nErrors120: 8, nErrors130: 8, nErrors140: 8, nErrors150: 8),

@@ -17,10 +17,10 @@ namespace SqlStudio.Tests.UTSqlScriptDom
     internal class ParserTestOutput
     {
         private readonly string _baselineFolder;
-        private readonly int _numberOfErrors;
+        private readonly int? _numberOfErrors;
         readonly ParserErrorInfo[] _errorInfos;
 
-        private ParserTestOutput(string baselineFolder, int numberOfErrors, ParserErrorInfo[] errorInfos)
+        private ParserTestOutput(string baselineFolder, int? numberOfErrors, ParserErrorInfo[] errorInfos)
         {
             _baselineFolder = baselineFolder;
             _numberOfErrors = numberOfErrors;
@@ -31,7 +31,7 @@ namespace SqlStudio.Tests.UTSqlScriptDom
             : this(baselineFolder, 0, null)
         { }
 
-        public ParserTestOutput(int numberOfErrors)
+        public ParserTestOutput(int? numberOfErrors)
             : this(null, numberOfErrors, null)
         { }
 
@@ -41,11 +41,14 @@ namespace SqlStudio.Tests.UTSqlScriptDom
 
         public void VerifyResult(string testScriptName, string prettyPrinted, IList<ParseError> errors)
         {
-            // Errors case - verify number/exact error texts
-            if (_numberOfErrors != errors.Count)
-                ParserTestUtils.LogErrors(errors);
+            if (_numberOfErrors.HasValue)
+            {
+                // Errors case - verify number/exact error texts
+                if (_numberOfErrors.Value != errors.Count)
+                    ParserTestUtils.LogErrors(errors);
 
-            Assert.AreEqual<int>(_numberOfErrors, errors.Count, testScriptName + ": number of errors after parsing is different from expected.");
+                Assert.AreEqual<int>(_numberOfErrors, errors.Count, testScriptName + ": number of errors after parsing is different from expected.");
+            }
             if (_errorInfos != null)
             {
                 for (int i = 0; i < _errorInfos.Length; ++i)
@@ -57,7 +60,7 @@ namespace SqlStudio.Tests.UTSqlScriptDom
             // Check with baseline...
             if (_baselineFolder != null)
             {
-                string baseline = ParserTestUtils.GetStringFromResource(GlobalConstants.TSqlNameSpace + "." + _baselineFolder+"." + testScriptName);
+                string baseline = ParserTestUtils.GetStringFromResource(GlobalConstants.TSqlNameSpace + "." + _baselineFolder + "." + testScriptName);
                 baseline = baseline.Trim();
                 prettyPrinted = prettyPrinted.Trim();
 
@@ -68,25 +71,16 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                 (
                     baselineLines.Length,
                     prettyPrintedLines.Length,
-                    string.Format
-                    (
-                        "Number of lines of baseline \"{0}\" and generated script does not match!. Expected: <{1}>. Actual: <{2}>.",
-                        testScriptName, baseline, prettyPrinted
-                    )
+                    $"Number of lines of baseline \"{testScriptName}\" and generated script does not match!. Expected: <{baseline}>. Actual: <{prettyPrinted}>. Update baseline {baseline} with the actual Content: {prettyPrinted}"
                 );
 
-                for(int lineCounter = 0; lineCounter <baselineLines.Length; lineCounter++)
+                for (int lineCounter = 0; lineCounter < baselineLines.Length; lineCounter++)
                 {
                     Assert.AreEqual<string>
                     (
                         baselineLines[lineCounter],
-                        prettyPrintedLines[lineCounter], 
-                        string.Format
-                        (
-                            "Different lines encountered. Pretty printed ASTs don't match the baseline \"{0}\". Different line number: {1}",
-                            testScriptName,
-                            lineCounter + 1
-                        )
+                        prettyPrintedLines[lineCounter],
+                        $"Different lines encountered. Pretty printed ASTs don't match the baseline \"{testScriptName}\". Different line number: {lineCounter + 1}. Update baseline {baseline} with the actual Content: {prettyPrinted}"
                     );
                 }
             }

@@ -53,7 +53,7 @@ grep -r "RESUMABLE" Test/SqlDom/TestScripts/
 # → It's a validation issue!
 ```
 
-**Solution:** [VALIDATION_FIX_GUIDE.md](VALIDATION_FIX_GUIDE.md)
+**Solution:** [Validation_fix.guidelines.instructions.md](Validation_fix.guidelines.instructions.md)
 **Files to Check:** `TSql80ParserBaseInternal.cs` (validation methods)
 
 ---
@@ -71,7 +71,7 @@ grep -r "YourKeyword" SqlScriptDom/Parser/TSql/*.g
 # Not found? → It's a grammar issue!
 ```
 
-**Solution:** [BUG_FIXING_GUIDE.md](BUG_FIXING_GUIDE.md)
+**Solution:** [bug_fixing.guidelines.instructions.md](bug_fixing.guidelines.instructions.md)
 **Files to Modify:** `TSql*.g`, `Ast.xml`, Script generators
 
 ---
@@ -90,7 +90,7 @@ echo "SELECT 1 WHERE (REGEXP_LIKE('a', 'b'));" > test2.sql
 # Second one fails? → Predicate recognition issue!
 ```
 
-**Solution:** [PARSER_PREDICATE_RECOGNITION_FIX.md](PARSER_PREDICATE_RECOGNITION_FIX.md)
+**Solution:** [parser.guidelines.instructions.md](parser.guidelines.instructions.md)
 **Files to Modify:** `TSql80ParserBaseInternal.cs` (`IsNextRuleBooleanParenthesis()`)
 
 ---
@@ -233,19 +233,19 @@ dotnet test Test/SqlDom/UTSqlScriptDom.csproj -c Debug -v detailed
 
 | You Need To... | Use This Guide | Estimated Complexity |
 |---------------|----------------|---------------------|
-| Fix "option not valid" error | [VALIDATION_FIX_GUIDE.md](VALIDATION_FIX_GUIDE.md) | ⭐ Easy |
-| Add new SQL keyword/operator | [BUG_FIXING_GUIDE.md](BUG_FIXING_GUIDE.md) | ⭐⭐⭐ Medium |
-| Fix parentheses with predicates | [PARSER_PREDICATE_RECOGNITION_FIX.md](PARSER_PREDICATE_RECOGNITION_FIX.md) | ⭐⭐ Easy-Medium |
-| Extend literal to expression | [GRAMMAR_EXTENSION_PATTERNS.md](GRAMMAR_EXTENSION_PATTERNS.md) | ⭐⭐⭐ Medium |
-| Add new statement type | [BUG_FIXING_GUIDE.md](BUG_FIXING_GUIDE.md) | ⭐⭐⭐⭐ Hard |
+| Fix "option not valid" error | [Validation_fix.guidelines.instructions.md](Validation_fix.guidelines.instructions.md) | ⭐ Easy |
+| Add new SQL keyword/operator | [bug_fixing.guidelines.instructions.md](bug_fixing.guidelines.instructions.md) | ⭐⭐⭐ Medium |
+| Fix parentheses with predicates | [parser.guidelines.instructions.md](parser.guidelines.instructions.md) | ⭐⭐ Easy-Medium |
+| Extend literal to expression | [grammer.guidelines.instructions.md](grammer.guidelines.instructions.md) | ⭐⭐⭐ Medium |
+| Add new statement type | [bug_fixing.guidelines.instructions.md](bug_fixing.guidelines.instructions.md) | ⭐⭐⭐⭐ Hard |
 
 ## 📚 Related Documentation
 
-- [copilot-instructions.md](copilot-instructions.md) - Main project documentation
-- [VALIDATION_FIX_GUIDE.md](VALIDATION_FIX_GUIDE.md) - Version-gated validation fixes
-- [BUG_FIXING_GUIDE.md](BUG_FIXING_GUIDE.md) - Grammar modifications and AST updates
-- [GRAMMAR_EXTENSION_PATTERNS.md](GRAMMAR_EXTENSION_PATTERNS.md) - Common extension patterns
-- [PARSER_PREDICATE_RECOGNITION_FIX.md](PARSER_PREDICATE_RECOGNITION_FIX.md) - Parentheses recognition
+- [copilot-instructions.md](../copilot-instructions.md) - Main project documentation
+- [Validation_fix.guidelines.instructions.md](Validation_fix.guidelines.instructions.md) - Version-gated validation fixes
+- [bug_fixing.guidelines.instructions.md](bug_fixing.guidelines.instructions.md) - Grammar modifications and AST updates
+- [grammer.guidelines.instructions.md](grammer.guidelines.instructions.md) - Common extension patterns
+- [parser.guidelines.instructions.md](parser.guidelines.instructions.md) - Parentheses recognition
 
 ---
 

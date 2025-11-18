@@ -11,8 +11,8 @@ Use this pattern when:
 - ✅ The feature was **added in a newer SQL Server version** but is rejected even in the correct parser
 
 **Do NOT use this guide when:**
-- ❌ Grammar rules need to be added/modified (use [BUG_FIXING_GUIDE.md](BUG_FIXING_GUIDE.md) instead)
-- ❌ AST nodes need to be created (use [GRAMMAR_EXTENSION_PATTERNS.md](GRAMMAR_EXTENSION_PATTERNS.md))
+- ❌ Grammar rules need to be added/modified (use [bug_fixing.guidelines.instructions.md](bug_fixing.guidelines.instructions.md) instead)
+- ❌ AST nodes need to be created (use [grammer.guidelines.instructions.md](grammer.guidelines.instructions.md))
 - ❌ The syntax never existed in SQL Server
 
 ## Real-World Example: ALTER TABLE RESUMABLE Option
@@ -141,17 +141,7 @@ WITH (RESUMABLE = ON);
 
 **Test Configuration**: `Test/SqlDom/Only160SyntaxTests.cs`
 ```csharp
-new ParserTest160("AlterTableResumableTests160.sql",
-    nErrors80: 4,   // SQL Server 2000: 4 errors (RESUMABLE not supported)
-    nErrors90: 4,   // SQL Server 2005: 4 errors
-    nErrors100: 4,  // SQL Server 2008: 4 errors
-    nErrors110: 4,  // SQL Server 2012: 4 errors
-    nErrors120: 4,  // SQL Server 2014: 4 errors (RESUMABLE not yet)
-    nErrors130: 4,  // SQL Server 2016: 4 errors
-    nErrors140: 4,  // SQL Server 2017: 4 errors
-    nErrors150: 4   // SQL Server 2019: 4 errors
-    // nErrors160: 0 (default) - SQL Server 2022: 0 errors (RESUMABLE supported!)
-),
+new ParserTest160("AlterTableResumableTests160.sql"),
 ```
 
 #### Step 5: Create Baseline Files
@@ -348,9 +338,9 @@ new ParserTestXXX("TestFile.sql",
 
 ## Related Guides
 
-- [BUG_FIXING_GUIDE.md](BUG_FIXING_GUIDE.md) - For grammar-level fixes
-- [GRAMMAR_EXTENSION_PATTERNS.md](GRAMMAR_EXTENSION_PATTERNS.md) - For extending existing grammar
-- [PARSER_PREDICATE_RECOGNITION_FIX.md](PARSER_PREDICATE_RECOGNITION_FIX.md) - For parentheses recognition issues
+- [bug_fixing.guidelines.instructions.md](bug_fixing.guidelines.instructions.md) - For grammar-level fixes
+- [grammer.guidelines.instructions.md](grammer.guidelines.instructions.md) - For extending existing grammar
+- [parser.guidelines.instructions.md](parser.guidelines.instructions.md) - For parentheses recognition issues
 
 ## Real-World Examples
 

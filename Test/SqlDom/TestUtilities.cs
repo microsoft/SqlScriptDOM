@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Text;
 using Microsoft.SqlServer.TransactSql.ScriptDom;
@@ -301,16 +302,25 @@ namespace SqlStudio.Tests.UTSqlScriptDom
         public static string GetStringFromResource(string resourceName)
         {
             string result = null;
-            using (StreamReader sr = new StreamReader(Assembly.GetExecutingAssembly().GetManifestResourceStream(resourceName)))
+            try
             {
-                result = sr.ReadToEnd();
+                using (StreamReader sr = new StreamReader(Assembly.GetExecutingAssembly().GetManifestResourceStream(resourceName)))
+                {
+                    result = sr.ReadToEnd();
+                }
+            }
+            catch (Exception ex)
+            {
+                string resourcePath = resourceName.Replace($"{typeof(ParserTestUtils).Namespace}.", string.Empty);
+                var resourceFilePath = Path.Combine("Test", "SqlDom", resourcePath);
+                throw new InvalidOperationException($"Failed to find resource file. errpr: {ex.Message}. Make sure the file exist before running the test: {resourceFilePath}");
             }
 
-            #if NET
+#if NET
             // Convert line endings from \n to \r\n
             if (System.Environment.NewLine == "\n")
                 result = result.ReplaceLineEndings("\r\n");
-            #endif
+#endif
 
             return result;
         }

@@ -6,10 +6,10 @@ Welcome to the SqlScriptDOM documentation! This folder contains comprehensive gu
 
 **New to the project?** Start here:
 1. Read [copilot-instructions.md](copilot-instructions.md) - Main project documentation
-2. Browse [DEBUGGING_WORKFLOW.md](DEBUGGING_WORKFLOW.md) - Visual quick reference
+2. Browse [debugging_workflow.guidelines.instructions.md](instructions/debugging_workflow.guidelines.instructions.md) - Visual quick reference
 
 **Fixing a bug?** Start here:
-1. Open [DEBUGGING_WORKFLOW.md](DEBUGGING_WORKFLOW.md) - Identify bug type
+1. Open [debugging_workflow.guidelines.instructions.md](instructions/debugging_workflow.guidelines.instructions.md) - Identify bug type
 2. Follow the flowchart to the appropriate guide
 3. Use the step-by-step instructions
 
@@ -33,7 +33,7 @@ Welcome to the SqlScriptDOM documentation! This folder contains comprehensive gu
 
 ### Quick Reference
 
-#### [DEBUGGING_WORKFLOW.md](DEBUGGING_WORKFLOW.md) - **QUICK REFERENCE**
+#### [debugging_workflow.guidelines.instructions.md](instructions/debugging_workflow.guidelines.instructions.md) - **QUICK REFERENCE**
 **Purpose**: Visual guide for quick bug diagnosis  
 **Contains**:
 - Diagnostic flowchart
@@ -49,7 +49,7 @@ Welcome to the SqlScriptDOM documentation! This folder contains comprehensive gu
 
 ### Specialized Fix Guides
 
-#### [VALIDATION_FIX_GUIDE.md](VALIDATION_FIX_GUIDE.md) - Most Common Fix Type ⭐
+#### [Validation_fix.guidelines.instructions.md](instructions/Validation_fix.guidelines.instructions.md) - Most Common Fix Type ⭐
 **Purpose**: Fixing validation-based bugs  
 **When to use**:
 - ✅ Error: "Option 'X' is not valid..." or "Feature not supported..."
@@ -67,7 +67,7 @@ Welcome to the SqlScriptDOM documentation! This folder contains comprehensive gu
 
 ---
 
-#### [BUG_FIXING_GUIDE.md](BUG_FIXING_GUIDE.md) - Grammar Changes
+#### [bug_fixing.guidelines.instructions.md](instructions/bug_fixing.guidelines.instructions.md) - Grammar Changes
 **Purpose**: Adding new syntax or modifying parser grammar  
 **When to use**:
 - ✅ Error: "Incorrect syntax near..." or "Unexpected token..."
@@ -87,7 +87,7 @@ Welcome to the SqlScriptDOM documentation! This folder contains comprehensive gu
 
 ---
 
-#### [PARSER_PREDICATE_RECOGNITION_FIX.md](PARSER_PREDICATE_RECOGNITION_FIX.md)
+#### [parser.guidelines.instructions.md](instructions/parser.guidelines.instructions.md)
 **Purpose**: Fixing parentheses recognition issues  
 **When to use**:
 - ✅ `WHERE PREDICATE(...)` works
@@ -104,7 +104,7 @@ Welcome to the SqlScriptDOM documentation! This folder contains comprehensive gu
 
 ---
 
-#### [GRAMMAR_EXTENSION_PATTERNS.md](GRAMMAR_EXTENSION_PATTERNS.md)
+#### [grammer.guidelines.instructions.md](instructions/grammer.guidelines.instructions.md)
 **Purpose**: Common patterns for extending existing grammar  
 **When to use**:
 - ✅ Need to extend literal types to accept expressions
@@ -124,7 +124,7 @@ Welcome to the SqlScriptDOM documentation! This folder contains comprehensive gu
 
 ### Meta Documentation
 
-#### [DOCUMENTATION_IMPROVEMENTS.md](DOCUMENTATION_IMPROVEMENTS.md)
+#### [documentation.guidelines.instructions.md](instructions/documentation.guidelines.instructions.md)
 **Purpose**: Summary of documentation improvements  
 **Contains**:
 - What was improved and why
@@ -169,11 +169,11 @@ Welcome to the SqlScriptDOM documentation! This folder contains comprehensive gu
 
 | Error Message | Bug Type | Guide | Complexity |
 |--------------|----------|-------|------------|
-| "Option 'X' is not valid in statement Y" | Validation | [VALIDATION_FIX_GUIDE](VALIDATION_FIX_GUIDE.md) | ⭐ Easy |
-| "Feature 'X' not supported in version Y" | Validation | [VALIDATION_FIX_GUIDE](VALIDATION_FIX_GUIDE.md) | ⭐ Easy |
-| "Incorrect syntax near keyword" | Grammar | [BUG_FIXING_GUIDE](BUG_FIXING_GUIDE.md) | ⭐⭐⭐ Medium |
-| "Unexpected token" | Grammar | [BUG_FIXING_GUIDE](BUG_FIXING_GUIDE.md) | ⭐⭐⭐ Medium |
-| Syntax error with parentheses only | Predicate Recognition | [PARSER_PREDICATE_RECOGNITION_FIX](PARSER_PREDICATE_RECOGNITION_FIX.md) | ⭐⭐ Easy-Medium |
+| "Option 'X' is not valid in statement Y" | Validation | [Validation_fix.guidelines.instructions.md](instructions/Validation_fix.guidelines.instructions.md) | ⭐ Easy |
+| "Feature 'X' not supported in version Y" | Validation | [Validation_fix.guidelines.instructions.md](instructions/Validation_fix.guidelines.instructions.md) | ⭐ Easy |
+| "Incorrect syntax near keyword" | Grammar | [bug_fixing.guidelines.instructions.md](instructions/bug_fixing.guidelines.instructions.md) | ⭐⭐⭐ Medium |
+| "Unexpected token" | Grammar | [bug_fixing.guidelines.instructions.md](instructions/bug_fixing.guidelines.instructions.md) | ⭐⭐⭐ Medium |
+| Syntax error with parentheses only | Predicate Recognition | [parser.guidelines.instructions.md](instructions/parser.guidelines.instructions.md) | ⭐⭐ Easy-Medium |
 | Need to extend literal to expression | Grammar Extension | [GRAMMAR_EXTENSION_PATTERNS](GRAMMAR_EXTENSION_PATTERNS.md) | ⭐⭐⭐ Medium |
 
 ## 🔍 Common Scenarios
@@ -229,16 +229,16 @@ grep -r "RESUMABLE" Test/SqlDom/TestScripts/
 
 ### Beginner Path (Understanding the Project)
 1. [copilot-instructions.md](copilot-instructions.md) - Read "Key points" section
-2. [DEBUGGING_WORKFLOW.md](DEBUGGING_WORKFLOW.md) - Understand bug types
-3. [VALIDATION_FIX_GUIDE.md](VALIDATION_FIX_GUIDE.md) - Follow ALTER TABLE RESUMABLE example
+2. [debugging_workflow.guidelines.instructions.md](instructions/debugging_workflow.guidelines.instructions.md) - Understand bug types
+3. [Validation_fix.guidelines.instructions.md](instructions/Validation_fix.guidelines.instructions.md) - Follow ALTER TABLE RESUMABLE example
 4. Try fixing a validation bug yourself
 
 **Time**: 2-3 hours
 
 ### Intermediate Path (Grammar Changes)
 1. Review beginner path first
-2. [BUG_FIXING_GUIDE.md](BUG_FIXING_GUIDE.md) - Complete workflow
-3. [GRAMMAR_EXTENSION_PATTERNS.md](GRAMMAR_EXTENSION_PATTERNS.md) - Common patterns
+2. [bug_fixing.guidelines.instructions.md](instructions/bug_fixing.guidelines.instructions.md) - Complete workflow
+3. [grammer.guidelines.instructions.md](instructions/grammer.guidelines.instructions.md) - Common patterns
 4. [copilot-instructions.md](copilot-instructions.md) - "Grammar Gotchas" section
 5. Try adding a simple new keyword
 
@@ -246,8 +246,8 @@ grep -r "RESUMABLE" Test/SqlDom/TestScripts/
 
 ### Advanced Path (Complex Features)
 1. Master beginner and intermediate paths
-2. [BUG_FIXING_GUIDE.md](BUG_FIXING_GUIDE.md) - AST modifications
-3. [GRAMMAR_EXTENSION_PATTERNS.md](GRAMMAR_EXTENSION_PATTERNS.md) - All patterns
+2. [bug_fixing.guidelines.instructions.md](instructions/bug_fixing.guidelines.instructions.md) - AST modifications
+3. [grammer.guidelines.instructions.md](instructions/grammer.guidelines.instructions.md) - All patterns
 4. Study existing complex features (e.g., VECTOR_SEARCH)
 5. Implement a new statement type
 

@@ -139,48 +139,6 @@ namespace SqlStudio.Tests.UTSqlScriptDom
 
         public ParserTest(
             string scriptFilename, 
-            string baseline80, string baseline90, string baseline100, 
-            string baseline110, string baseline120)
-            : this(
-                scriptFilename,
-                new ParserTestOutput(baseline80), new ParserTestOutput(baseline90), new ParserTestOutput(baseline100), 
-                new ParserTestOutput(baseline110), new ParserTestOutput(baseline120))
-        { }
-
-        public ParserTest(
-            string scriptFilename,
-            string baseline80, string baseline90, string baseline100,
-            string baseline110, string baseline120, string baseline130)
-            : this(
-                scriptFilename,
-                new ParserTestOutput(baseline80), new ParserTestOutput(baseline90), new ParserTestOutput(baseline100),
-                new ParserTestOutput(baseline110), new ParserTestOutput(baseline120), new ParserTestOutput(baseline130))
-        { }
-
-        public ParserTest(
-            string scriptFilename,
-            string baseline80, string baseline90, string baseline100,
-            string baseline110, string baseline120,
-            string baseline130, string baseline140)
-            : this(
-                scriptFilename,
-                new ParserTestOutput(baseline80), new ParserTestOutput(baseline90), new ParserTestOutput(baseline100),
-                new ParserTestOutput(baseline110), new ParserTestOutput(baseline120), new ParserTestOutput(baseline130),
-                new ParserTestOutput(baseline140))
-        { }
-
-        public ParserTest(
-            string scriptFilename,
-            string baseline80, string baseline90, string baseline100,
-            string baseline110)
-            : this(
-                scriptFilename,
-                new ParserTestOutput(baseline80), new ParserTestOutput(baseline90), new ParserTestOutput(baseline100),
-                new ParserTestOutput(baseline110), new ParserTestOutput(baseline110))
-        { }
-
-        public ParserTest(
-            string scriptFilename, 
             string baseline80, string baseline90, string baseline100)
             : this(
                 scriptFilename,
@@ -290,7 +248,7 @@ namespace SqlStudio.Tests.UTSqlScriptDom
 
     internal class ParserTest90And100 : ParserTest
     {
-        public ParserTest90And100(string scriptFilename, int nErrors80)
+        public ParserTest90And100(string scriptFilename, int? nErrors80 = null)
             : base(scriptFilename, new ParserTestOutput(nErrors80), new ParserTestOutput("Baselines90"), new ParserTestOutput("Baselines90"), new ParserTestOutput("Baselines90"))
         { }
 
@@ -301,7 +259,7 @@ namespace SqlStudio.Tests.UTSqlScriptDom
 
     internal class ParserTest100 : ParserTest
     {
-        public ParserTest100(string scriptFilename, int nErrors80, int nErrors90)
+        public ParserTest100(string scriptFilename, int? nErrors80 = null, int? nErrors90 = null)
             : base(scriptFilename, new ParserTestOutput(nErrors80), new ParserTestOutput(nErrors90), new ParserTestOutput("Baselines100"), new ParserTestOutput("Baselines100"))
         { }
 
@@ -316,7 +274,7 @@ namespace SqlStudio.Tests.UTSqlScriptDom
 
     internal class ParserTest110 : ParserTest
     {
-        public ParserTest110(string scriptFilename, int nErrors80, int nErrors90, int nErrors100)
+        public ParserTest110(string scriptFilename, int? nErrors80 = null, int? nErrors90 = null, int? nErrors100 = null)
             : base(scriptFilename, new ParserTestOutput(nErrors80), new ParserTestOutput(nErrors90), new ParserTestOutput(nErrors100), new ParserTestOutput("Baselines110"))
         { }
 
@@ -331,7 +289,7 @@ namespace SqlStudio.Tests.UTSqlScriptDom
 
     internal class ParserTest120 : ParserTest
     {
-        public ParserTest120(string scriptFilename, int nErrors80, int nErrors90, int nErrors100, int nErrors110)
+        public ParserTest120(string scriptFilename, int? nErrors80 = null, int? nErrors90 = null, int? nErrors100 = null, int? nErrors110 = null)
             : base(
                 scriptFilename, 
                 new ParserTestOutput(nErrors80), new ParserTestOutput(nErrors90), new ParserTestOutput(nErrors100),
@@ -355,7 +313,7 @@ namespace SqlStudio.Tests.UTSqlScriptDom
 
     internal class ParserTest130 : ParserTest
     {
-        public ParserTest130(string scriptFilename, int nErrors80, int nErrors90, int nErrors100, int nErrors110, int nErrors120)
+        public ParserTest130(string scriptFilename, int? nErrors80 = null, int? nErrors90 = null, int? nErrors100 = null, int? nErrors110 = null, int? nErrors120 = null)
             : base(
                 scriptFilename,
                 new ParserTestOutput(nErrors80), new ParserTestOutput(nErrors90), new ParserTestOutput(nErrors100),
@@ -383,7 +341,7 @@ namespace SqlStudio.Tests.UTSqlScriptDom
 
     internal class ParserTest140 : ParserTest
     {
-        public ParserTest140(string scriptFilename, int nErrors80, int nErrors90, int nErrors100, int nErrors110, int nErrors120, int nErrors130)
+        public ParserTest140(string scriptFilename, int? nErrors80 = null, int? nErrors90 = null, int? nErrors100 = null, int? nErrors110 = null, int? nErrors120 = null, int? nErrors130 = null)
             : base(
                 scriptFilename,
                 new ParserTestOutput(nErrors80), new ParserTestOutput(nErrors90), new ParserTestOutput(nErrors100),
@@ -414,7 +372,7 @@ namespace SqlStudio.Tests.UTSqlScriptDom
 
     internal class ParserTest150 : ParserTest
     {
-        public ParserTest150(string scriptFilename, int nErrors80, int nErrors90, int nErrors100, int nErrors110, int nErrors120, int nErrors130, int nErrors140)
+        public ParserTest150(string scriptFilename, int? nErrors80 = null, int? nErrors90 = null, int? nErrors100 = null, int? nErrors110 = null, int? nErrors120 = null, int? nErrors130 = null, int? nErrors140 = null)
             : base(
                 scriptFilename,
                 new ParserTestOutput(nErrors80), new ParserTestOutput(nErrors90), new ParserTestOutput(nErrors100),
@@ -447,7 +405,7 @@ namespace SqlStudio.Tests.UTSqlScriptDom
 
     internal class ParserTest160 : ParserTest
     {
-        public ParserTest160(string scriptFilename, int nErrors80, int nErrors90, int nErrors100, int nErrors110, int nErrors120, int nErrors130, int nErrors140, int nErrors150)
+        public ParserTest160(string scriptFilename, int? nErrors80= null, int? nErrors90 = null, int? nErrors100 = null, int? nErrors110 = null, int? nErrors120 = null, int? nErrors130 = null, int? nErrors140 = null, int? nErrors150 = null)
             : base(
                 scriptFilename,
                 new ParserTestOutput(nErrors80), new ParserTestOutput(nErrors90), new ParserTestOutput(nErrors100),
@@ -482,7 +440,7 @@ namespace SqlStudio.Tests.UTSqlScriptDom
 
     internal class ParserTest170 : ParserTest
     {
-        public ParserTest170(string scriptFilename, int nErrors80, int nErrors90, int nErrors100, int nErrors110, int nErrors120, int nErrors130, int nErrors140, int nErrors150, int nErrors160)
+        public ParserTest170(string scriptFilename, int? nErrors80 = null, int? nErrors90 = null, int? nErrors100 = null, int? nErrors110 = null, int? nErrors120 = null, int? nErrors130 = null, int? nErrors140 = null, int? nErrors150 = null, int? nErrors160 = null)
             : base(
                 scriptFilename,
                 new ParserTestOutput(nErrors80), new ParserTestOutput(nErrors90), new ParserTestOutput(nErrors100),
