@@ -32725,6 +32725,7 @@ jsonKeyValueExpression returns [JsonKeyValue vResult = FragmentFactory.CreateFra
 }
     : 
         (
+            ((Identifier Dot)? Label)=>
             (vMultiPartIdentifier=multiPartIdentifier[2] Dot)? label:Label
             {
                 var identifier = this.FragmentFactory.CreateFragment<Identifier>();

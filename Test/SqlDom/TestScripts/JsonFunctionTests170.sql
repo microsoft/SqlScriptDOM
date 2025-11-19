@@ -179,3 +179,9 @@ WHERE JSON_CONTAINS(json_col, 'abc%', '$.a', 1) = 1;
 -- Json_Modify
 SELECT JSON_MODIFY(json_col, '$.a', 30)
 FROM tab1;
+
+-- JSON_OBJECTAGG with qualified column names (from GitHub issue #175)
+SELECT JSON_OBJECTAGG( t.c1 : t.c2 )
+FROM (
+    VALUES('key1', 'c'), ('key2', 'b'), ('key3','a')
+) AS t(c1, c2);
