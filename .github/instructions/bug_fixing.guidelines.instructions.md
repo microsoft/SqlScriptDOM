@@ -9,7 +9,7 @@ This guide provides a summary of the typical workflow for fixing a bug in the Sq
 1. **Validation Issues**: Syntax is already parseable but incorrectly rejected
    - Error: "Option 'X' is not valid..." or "Feature 'Y' not supported..."
    - Example: ALTER TABLE RESUMABLE works in ALTER INDEX but not ALTER TABLE
-   - **→ Use [Validation_fix.guidelines.instructions.md](Validation_fix.guidelines.instructions.md) instead of this guide**
+   - **→ Use [grammar_validation.guidelines.instructions.md](grammar_validation.guidelines.instructions.md) instead of this guide**
 
 2. **Grammar Issues**: Parser doesn't recognize the syntax at all (THIS guide)
    - Error: "Incorrect syntax near..." or "Unexpected token..."
@@ -41,7 +41,8 @@ The process of fixing a bug, especially one that involves adding new syntax, fol
         ```
 
 6.  **Add a Unit Test**:
-    *   Create a new `.sql` file in `Test/SqlDom/TestScripts/` that contains the specific syntax for the new test case.
+    *   **YOU MUST ADD UNIT TESTS** - Create a new `.sql` file in `Test/SqlDom/TestScripts/` that contains the specific syntax for the new test case.
+    *   **DO NOT CREATE STANDALONE PROGRAMS TO TEST** - Use the existing test framework, not separate console applications or debug programs.
 
 7.  **Define the Test Case**:
     *   Add a new `ParserTest` entry to the appropriate `Only<version>SyntaxTests.cs` files (e.g., `Only130SyntaxTests.cs`). This entry points to your new test script and defines the expected number of parsing errors for each SQL Server version.
@@ -195,7 +196,7 @@ Start: You have a parsing bug
 │
 ├─→ Error: "Option 'X' is not valid..." or "Feature not supported..."
 │   └─→ Does similar syntax work elsewhere? (e.g., ALTER INDEX works)
-│       └─→ YES: Use [Validation_fix.guidelines.instructions.md](Validation_fix.guidelines.instructions.md)
+│       └─→ YES: Use [grammar_validation.guidelines.instructions.md](grammar_validation.guidelines.instructions.md)
 │
 ├─→ Error: "Incorrect syntax near..." or parser doesn't recognize syntax
 │   └─→ Does the grammar need new rules or AST nodes?
@@ -210,7 +211,7 @@ Start: You have a parsing bug
 
 | Symptom | Fix Type | Guide | Files Modified |
 |---------|----------|-------|----------------|
-| "Option 'X' is not valid in statement Y" | Validation | [Validation_fix.guidelines.instructions.md](Validation_fix.guidelines.instructions.md) | `TSql80ParserBaseInternal.cs` |
+| "Option 'X' is not valid in statement Y" | Validation | [grammar_validation.guidelines.instructions.md](grammar_validation.guidelines.instructions.md) | `TSql80ParserBaseInternal.cs` |
 | "Incorrect syntax near keyword" | Grammar | This guide | `TSql*.g`, `Ast.xml`, Script generators |
 | Parentheses break identifier predicates | Predicate Recognition | [parser.guidelines.instructions.md](parser.guidelines.instructions.md) | `TSql80ParserBaseInternal.cs` |
 | Literal needs to become expression | Grammar Extension | [grammer.guidelines.instructions.md](grammer.guidelines.instructions.md) | `Ast.xml`, `TSql*.g` |

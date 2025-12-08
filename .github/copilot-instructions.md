@@ -34,6 +34,8 @@ ScriptDom is a library for parsing and generating T-SQL scripts. It is primarily
 2. If tokens or token ordering change, update `TSqlTokenTypes.g` (and the sed/ps1 post-processors if necessary).
 3. Rebuild the ScriptDom project to regenerate parser and AST (`dotnet build` will run generation). Use the targeted msbuild targets if you only want generation.
 4. Add tests:
+   - **YOU MUST ADD UNIT TESTS** - Use the existing test framework in `Test/SqlDom/`
+   - **DO NOT CREATE STANDALONE PROGRAMS TO TEST** - Avoid separate console applications or debug programs
    - Put the input SQL in `Test/SqlDom/TestScripts/` (filename is case sensitive and used as an embedded resource).
    - Add/confirm baseline output in `Test/SqlDom/Baselines<version>/` (the UT project embeds these baselines as resources).
    - Update the appropriate `Only<version>SyntaxTests.cs` (e.g., `Only170SyntaxTests.cs`) by adding a `ParserTest170("MyNewTest.sql", ...)` entry. See `ParserTest.cs` and `ParserTestOutput.cs` for helper constructors and verification semantics.
@@ -112,7 +114,7 @@ grep -r "is not a valid" SqlScriptDom/
 ```
 
 **Common Error Patterns**:
-- `"Option 'X' is not valid..."` → Validation issue (see [Validation_fix.guidelines.instructions.md](instructions/Validation_fix.guidelines.instructions.md))
+- `"Option 'X' is not valid..."` → Validation issue (see [grammar_validation.guidelines.instructions.md](instructions/grammar_validation.guidelines.instructions.md))
 - `"Incorrect syntax near..."` → Grammar issue (see [bug_fixing.guidelines.instructions.md](instructions/bug_fixing.guidelines.instructions.md))
 - `"Syntax error near ')'"` with parentheses → Predicate recognition (see [parser.guidelines.instructions.md](instructions/parser.guidelines.instructions.md))
 
@@ -192,4 +194,16 @@ grep -r "IndexAffectingStatement" SqlScriptDom/Parser/TSql/TSql80ParserBaseInter
 - **Modifying Shared Grammar Rules:** **NEVER modify existing shared grammar rules** like `identifierColumnReferenceExpression` that are used throughout the codebase. This can cause tests to fail in unrelated areas because the rule now accepts or rejects different syntax. Instead, create specialized rules for your specific context (e.g., `vectorSearchColumnReferenceExpression` for VECTOR_SEARCH-specific needs).
 - **Full Test Suite Validation:** After any grammar changes, **always run the complete test suite** (`dotnet test Test/SqlDom/UTSqlScriptDom.csproj -c Debug`) to catch regressions. Grammar changes can have far-reaching effects on seemingly unrelated functionality.
 - **Extending Literals to Expressions:** When functions/constructs currently accept only literal values (e.g., `IntegerLiteral`, `StringLiteral`) but need to support dynamic values (parameters, variables, outer references), change both the AST definition (in `Ast.xml`) and grammar rules (in `TSql*.g`) to use `ScalarExpression` instead. This pattern was used for VECTOR_SEARCH TOP_N parameter. See the detailed example in [bug_fixing.guidelines.instructions.md](instructions/bug_fixing.guidelines.instructions.md#special-case-extending-grammar-rules-from-literals-to-expressions) and [grammer.guidelines.instructions.md](instructions/grammer.guidelines.instructions.md) for comprehensive patterns.
+
+# Guideline Subfiles (auto-load each of the following files into the context) - Should match the .config/GuidelineReviewAgent.yaml used by the guideline_review_agent.
+include: .github/instructions/grammar_validation.guidelines.instructions.md
+include: .github/instructions/bug_fixing.guidelines.instructions.md
+include: .github/instructions/parser.guidelines.instructions.md
+include: .github/instructions/function.guidelines.instructions.md
+include: .github/instructions/new_data_types.guidelines.instructions.md
+include: .github/instructions/new_index_types.guidelines.instructions.md
+include: .github/instructions/debugging_workflow.guidelines.instructions.md
+include: .github/instructions/grammer.guidelines.instructions.md
+include: .github/instructions/testing.guidelines.instructions.md
+
 

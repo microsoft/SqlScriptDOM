@@ -4,6 +4,8 @@ This guide provides comprehensive instructions for adding and running tests in t
 
 ## Overview
 
+**CRITICAL: YOU MUST ADD UNIT TESTS - DO NOT CREATE STANDALONE PROGRAMS TO TEST**
+
 The SqlScriptDOM testing framework validates parser functionality through:
 1. **Parse → Generate → Parse Round-trip Testing** - Ensures syntax is correctly parsed and regenerated
 2. **Baseline Comparison** - Verifies generated T-SQL matches expected formatted output
@@ -189,6 +191,20 @@ When you add a test to `Only160SyntaxTests.cs`, the framework automatically runs
 - `TSql160SyntaxIn150ParserTest` - Parse with SQL 2019 parser (may fail for new syntax)
 - `TSql160SyntaxIn140ParserTest` - Parse with SQL 2017 parser (may fail for new syntax)
 - ... and so on for all versions
+
+### Positive vs Negative Testing Strategy
+
+**CRITICAL**: When adding new T-SQL syntax, you must implement **both positive and negative tests**:
+
+#### Positive Tests (Success Cases)
+- **Location**: `Test/SqlDom/Only<version>SyntaxTests.cs` 
+- **Purpose**: Verify syntax parses correctly and generates expected T-SQL
+- **Pattern**: Round-trip testing (Parse → Generate → Compare baseline)
+
+#### Negative Tests (Error Cases)
+- **Location**: `Test/SqlDom/ParserErrorsTests.cs`
+- **Purpose**: Verify invalid syntax produces expected parse errors
+- **Pattern**: Direct error validation with specific error codes and messages
 
 ### Common Test Patterns
 

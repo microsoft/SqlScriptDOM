@@ -8,11 +8,11 @@
         "ADO_DEFAULT_PROJECT": "SQLToolsAndLibraries",
         "ADO_DEFAULT_REPO": "ScriptDOM",
         "ADO_DEFAULT_BRANCH": "main",
-        "ADO_DEFAULT_AREA_PATH": "SQLToolsAndLibraries\\ScriptDOM"
+        "ADO_DEFAULT_AREA_PATH": "SQLToolsAndLibraries\\DacFx"
       }
     },
     "my-mcp-mini-drivers": {
-			"url": "https://ecmini.azurewebsites.net",
+			"url": "https://mcp.bluebird-ai.net",
 			"type": "http",
 			"headers": {
 				"x-mcp-ec-organization": "msdata",

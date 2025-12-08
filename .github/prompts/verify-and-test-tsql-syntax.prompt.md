@@ -12,31 +12,21 @@ This guide helps you determine if a T-SQL syntax is already supported by ScriptD
 
 **CRITICAL**: Before doing anything else, test the exact T-SQL script provided to confirm whether it works or fails.
 
-### Quick Verification Process
+**IMPORTANT**: For initial verification, you MUST add a debug unit test method directly to an existing test file (like Only170SyntaxTests.cs). This is only for initial verification. Once you confirm the syntax status, you'll follow the proper testing workflow to add comprehensive test coverage.
 
-```bash
-# 1. Create a temporary test script with the EXACT script provided
-echo "PUT_YOUR_EXACT_SCRIPT_HERE" > temp_test_script.sql
+### Step 1: Add Debug Unit Test Method
 
-# Example: For JSON_OBJECTAGG
-echo "SELECT JSON_OBJECTAGG( t.c1 : t.c2 ) FROM (VALUES('key1', 'c'), ('key2', 'b'), ('key3','a')) AS t(c1, c2);" > temp_test_script.sql
-
-# 2. Build the parser to ensure it's up to date
-dotnet build SqlScriptDom/Microsoft.SqlServer.TransactSql.ScriptDom.csproj -c Debug
-
-# 3. Add a temporary unit test to debug the exact script
-```
-
-### Add Temporary Debug Unit Test
-
-Add this method to the appropriate test file (e.g., `Test/SqlDom/Only170SyntaxTests.cs`):
+Add this debug test method to the appropriate test file (e.g., `Test/SqlDom/Only170SyntaxTests.cs`):
 
 ```csharp
 [TestMethod]
 public void DebugExactScriptTest()
 {
-    // Read the exact script from file
-    string script = System.IO.File.ReadAllText("temp_test_script.sql");
+    // PUT THE EXACT T-SQL SCRIPT HERE - DO NOT CREATE SEPARATE FILES
+    string script = @"SELECT      Id,
+            DATEADD(DAY, 1, GETDATE())
+FROM        Table1";
+    
     Console.WriteLine($"Testing exact script: {script}");
     
     // Test with the target parser version first (e.g., TSql170)
@@ -103,13 +93,17 @@ public void DebugExactScriptTest()
 }
 ```
 
-### Run the Debug Test
+### Step 2: Build and Run the Debug Test
+### Step 2: Build and Run the Debug Test
 
 ```bash
-# 4. Run the debug test to see current status
+# 1. Build the parser to ensure it's up to date
+dotnet build SqlScriptDom/Microsoft.SqlServer.TransactSql.ScriptDom.csproj -c Debug
+
+# 2. Run the debug test to see current status
 dotnet test --filter "DebugExactScriptTest" Test/SqlDom/UTSqlScriptDom.csproj -c Debug
 
-# 5. Check the test output for detailed results
+# 3. Check the test output for detailed results
 # Look for the console output showing parsing results
 ```
 
@@ -122,6 +116,9 @@ dotnet test --filter "DebugExactScriptTest" Test/SqlDom/UTSqlScriptDom.csproj -c
 - Exact table/column names (e.g., `t.c1`, `t.c2`)
 - Exact function syntax (e.g., `JSON_OBJECTAGG( t.c1 : t.c2 )`)
 - Complete query context (FROM clause, subqueries, etc.)
+- Exact whitespace and formatting as provided
+
+**Remember**: Only add unit test methods to existing test files. Do not create separate SQL files, program files, or any other external files.
 
 ## Step 1: Determine the SQL Server Version
 
@@ -186,89 +183,121 @@ grep -r "VectorSearch" SqlScriptDom/Parser/TSql/Ast.xml
 ```
 
 ### Method 4: Try Parsing with Test Script
-Create a minimal test file and try parsing:
+Create a unit test method to verify parsing:
 
-```bash
-# Create test SQL file with the EXACT syntax you want to verify
-echo "ALTER TABLE t ADD CONSTRAINT pk PRIMARY KEY (id) WITH (RESUMABLE = ON);" > test_syntax.sql
-
-# Build the parser
-dotnet build SqlScriptDom/Microsoft.SqlServer.TransactSql.ScriptDom.csproj -c Debug
-
-# Use the minimal test script from Step 0 to verify parsing
-# This will show you exactly which parser versions support the syntax
-# and what error messages are generated if it fails
+```csharp
+// Add to appropriate test file (e.g., Test/SqlDom/Only170SyntaxTests.cs)
+[TestMethod]
+public void QuickTestExactSyntax()
+{
+    string script = @"ALTER TABLE t ADD CONSTRAINT pk PRIMARY KEY (id) WITH (RESUMABLE = ON);";
+    
+    TSql170Parser parser = new TSql170Parser(true);
+    IList<ParseError> errors;
+    
+    using (StringReader reader = new StringReader(script))
+    {
+        TSqlFragment fragment = parser.Parse(reader, out errors);
+        Console.WriteLine($"Errors: {errors.Count}");
+        
+        // This will show you exactly which parser versions support the syntax
+        // and what error messages are generated if it fails
+    }
+    
+    Assert.Inconclusive($"Test completed with {errors.Count} errors");
+}
 ```
 
 ### Method 5: Test in Existing Test Framework
-Run a quick test using the existing framework:
+Add a temporary test method to verify quickly:
 
-```bash
-# Find a similar test to modify temporarily
-ls Test/SqlDom/TestScripts/*170.sql | head -5
-
-# Copy an existing test and modify it
-cp Test/SqlDom/TestScripts/JsonFunctionTests170.sql Test/SqlDom/TestScripts/TempTest170.sql
-
-# Edit TempTest170.sql to contain ONLY your exact script
-# Add corresponding test entry to Only170SyntaxTests.cs temporarily
-# Use the debug test method from Step 0 as a template
-
-# Run the test
-dotnet test --filter "TempTest170" -c Debug
-
-# Clean up when done
-rm Test/SqlDom/TestScripts/TempTest170.sql
-# Remove test entry from Only170SyntaxTests.cs
+```csharp
+// Add to appropriate test file (e.g., Test/SqlDom/Only170SyntaxTests.cs)
+[TestMethod]
+public void TempTestExactScript()
+{
+    // Put ONLY your exact script here - do not create external files
+    string script = @"YOUR_EXACT_SCRIPT_HERE";
+    
+    TSql170Parser parser = new TSql170Parser(true);
+    IList<ParseError> errors;
+    
+    using (StringReader reader = new StringReader(script))
+    {
+        TSqlFragment fragment = parser.Parse(reader, out errors);
+        Console.WriteLine($"Parse result: {errors.Count} errors");
+        foreach (var error in errors)
+        {
+            Console.WriteLine($"Error: {error.Message}");
+        }
+    }
+    
+    Assert.Inconclusive("Temporary test - remove after verification");
+}
 ```
+
+Then run the test:
+```bash
+dotnet test --filter "TempTestExactScript" -c Debug
+```
+
+Remember to remove this temporary test method after verification.
 
 ## Step 3: Create a Test Script
 
 **CRITICAL**: Your test script MUST include the exact T-SQL statement provided. Don't modify, simplify, or generalize the syntax - test the precise statement given.
 
 ### Test File Naming Convention
-- Format: `DescriptiveFeatureName{Version}.sql`
-- Example: `AlterTableResumableTests160.sql` (for SQL Server 2022/TSql160)
+Follow the pattern from testing.guidelines.instructions.md:
+- Format: `<FeatureName>Tests<SQLVersion>.sql`
+- Examples: `JsonFunctionTests160.sql`, `AlterTableResumableTests160.sql`
 - Location: `Test/SqlDom/TestScripts/`
+- Use version number corresponding to SQL Server version where feature was introduced
 
 ### Test Script Requirements
 
 1. **Start with the exact script provided** - copy it exactly as given
-2. **Add variations** - test related scenarios, edge cases, simpler cases
+2. **Add comprehensive coverage** as described in testing guidelines:
+   - Basic syntax variations
+   - Function in different contexts (SELECT, WHERE, RETURN statements)
+   - Edge cases (empty parameters, NULL handling, subqueries)
+   - Integration contexts (variables, parameters, computed expressions)
 3. **Include context** - ensure the exact context (table aliases, subqueries) is tested
-4. **Test comprehensively** - but always include the original exact script
+4. **Test RETURN statements** - Critical for functions, always test in ALTER FUNCTION RETURN statements
 
 ### Test Script Template
+
+Follow the comprehensive coverage pattern from testing guidelines:
 
 ```sql
 -- Test 1: EXACT SCRIPT PROVIDED (REQUIRED - COPY EXACTLY)
 -- PUT THE EXACT T-SQL STATEMENT HERE WITHOUT ANY MODIFICATIONS
 -- Example: SELECT JSON_OBJECTAGG( t.c1 : t.c2 ) FROM (VALUES('key1', 'c'), ('key2', 'b'), ('key3','a')) AS t(c1, c2);
 
--- Test 2: Basic syntax variation
-ALTER TABLE dbo.MyTable 
-ADD CONSTRAINT pk_test PRIMARY KEY CLUSTERED (id)
-WITH (YOUR_OPTION = value);
+-- Test 2: Basic function call (if applicable)
+SELECT YOUR_FUNCTION('param1', 'param2');
 
--- Test 3: With multiple options
-ALTER TABLE dbo.MyTable
-ADD CONSTRAINT pk_test PRIMARY KEY CLUSTERED (id)
-WITH (ONLINE = ON, YOUR_OPTION = value);
+-- Test 3: Function in different contexts
+SELECT col1, YOUR_FUNCTION('param') AS computed FROM table1;
+WHERE YOUR_FUNCTION('param') > 0;
 
--- Test 4: Different statement variations
-ALTER TABLE dbo.MyTable
-ADD CONSTRAINT uq_test UNIQUE NONCLUSTERED (name)
-WITH (YOUR_OPTION = value);
+-- Test 4: CRITICAL - Function in RETURN statements (for functions)
+ALTER FUNCTION TestYourFunction()
+RETURNS NVARCHAR(MAX)
+AS
+BEGIN
+    RETURN (YOUR_FUNCTION('test_value'));
+END;
+GO
 
--- Test 5: With parameters (if applicable)
-ALTER TABLE dbo.MyTable
-ADD CONSTRAINT pk_test PRIMARY KEY CLUSTERED (id)
-WITH (YOUR_OPTION = @parameter);
+-- Test 5: With variables/parameters
+SELECT YOUR_FUNCTION(@variable);
+SELECT YOUR_FUNCTION(column_name);
 
--- Test 6: Complex scenario
-ALTER TABLE dbo.MyTable
-ADD CONSTRAINT pk_test PRIMARY KEY CLUSTERED (id, name)
-WITH (YOUR_OPTION = value, OTHER_OPTION = 100 MINUTES);
+-- Test 6: Edge cases
+SELECT YOUR_FUNCTION();  -- Empty parameters (if valid)
+SELECT YOUR_FUNCTION(NULL, 'test', 123);  -- NULL handling
+SELECT YOUR_FUNCTION((SELECT nested FROM table));  -- Subqueries
 ```
 
 ### Real-World Example: ALTER TABLE RESUMABLE
@@ -297,26 +326,38 @@ ADD CONSTRAINT uq_test UNIQUE NONCLUSTERED (name)
 WITH (RESUMABLE = ON);
 ```
 
-## Step 4: Create Test Configuration
+## Step 4: Configure Test Entry
+
+Add test configuration to the appropriate `Only<version>SyntaxTests.cs` file as described in testing guidelines.
 
 ### Test Configuration File Location
 - Format: `Only{Version}SyntaxTests.cs`
 - Example: `Only160SyntaxTests.cs` (for SQL Server 2022)
 - Location: `Test/SqlDom/`
+- Add to the `Only{Version}TestInfos` array
 
 ### Test Configuration Template
 
+Use the simplified approach from testing guidelines:
+
 ```csharp
-new ParserTest{Version}("YourTestFile{Version}.sql",
-    nErrors80: X,   // SQL Server 2000 - usually errors if new feature
-    nErrors90: X,   // SQL Server 2005
-    nErrors100: X,  // SQL Server 2008
-    nErrors110: X,  // SQL Server 2012
-    nErrors120: Y,  // SQL Server 2014 - may differ if partially supported
-    nErrors130: Y,  // SQL Server 2016
-    nErrors140: Y,  // SQL Server 2017
-    nErrors150: Y,  // SQL Server 2019
-    // nErrors{Version}: 0 - The version where feature is supported (default 0)
+// Option 1: Simplified - only specify error counts you care about
+new ParserTest{Version}("YourFeatureTests{Version}.sql"),  // All previous versions default to null (ignored), current version expects 0 errors
+
+// Option 2: Specify only some previous version error counts
+new ParserTest{Version}("YourFeatureTests{Version}.sql", nErrors80: 1, nErrors90: 1),  // Only SQL 2000/2005 expect errors
+
+// Option 3: Full specification (legacy compatibility)
+new ParserTest{Version}("YourFeatureTests{Version}.sql", 
+    nErrors80: 1,   // SQL Server 2000 - expect error for new syntax
+    nErrors90: 1,   // SQL Server 2005 - expect error for new syntax  
+    nErrors100: 1,  // SQL Server 2008 - expect error for new syntax
+    nErrors110: 1,  // SQL Server 2012 - expect error for new syntax
+    nErrors120: 1,  // SQL Server 2014 - expect error for new syntax
+    nErrors130: 1,  // SQL Server 2016 - expect error for new syntax
+    nErrors140: 1,  // SQL Server 2017 - expect error for new syntax
+    nErrors150: 1   // SQL Server 2019 - expect error for new syntax
+    // nErrors{Version}: 0 is implicit for current version - expect success
 ),
 ```
 
@@ -346,7 +387,7 @@ new ParserTest160("AlterTableResumableTests160.sql",
 ),
 ```
 
-## Step 5: Generate Baseline Files
+## Step 5: Create Baseline File
 
 Baseline files contain the expected formatted output after parsing and script generation.
 
@@ -354,25 +395,32 @@ Baseline files contain the expected formatted output after parsing and script ge
 - Format: `Baselines{Version}/YourTestFile{Version}.sql`
 - Example: `Baselines160/AlterTableResumableTests160.sql`
 - Location: `Test/SqlDom/`
+- **Critical**: Baseline filename MUST exactly match the test script filename
 
 ### Baseline Generation Process
 
-#### Option A: Automatic Generation (Recommended)
+Follow the testing guidelines process:
+
+#### Initial Creation:
+1. **Create empty or placeholder baseline file first**
+2. **Run the test** (it will fail) 
+3. **Copy "Actual" output** from test failure message
+4. **Paste into baseline file** with proper formatting
 
 ```bash
-# 1. Create empty baseline file first
-New-Item "Test/SqlDom/Baselines160/AlterTableResumableTests160.sql" -ItemType File
+# 1. Create placeholder baseline file
+New-Item "Test/SqlDom/Baselines160/YourFeatureTests160.sql" -ItemType File
 
-# 2. Run the test (it will fail, showing the generated output)
-dotnet test --filter "FullyQualifiedName~AlterTableResumableTests160" -c Debug
+# 2. Run the test (will fail initially)
+dotnet test --filter "YourFeatureTests160" -c Debug
 
-# 3. Copy the "Actual" output from test failure into the baseline file
-# Look for the section that says:
+# 3. Copy the "Actual" output from test failure into baseline file
+# Look for the test failure message showing:
 # Expected: <empty or old content>
 # Actual: <This is what you need to copy>
 
 # 4. Re-run the test (should pass now)
-dotnet test --filter "FullyQualifiedName~AlterTableResumableTests160" -c Debug
+dotnet test --filter "YourFeatureTests160" -c Debug
 ```
 
 #### Option B: Manual Creation
@@ -416,27 +464,32 @@ ALTER TABLE dbo.MyTable
     ADD CONSTRAINT uq_test UNIQUE NONCLUSTERED (name) WITH (RESUMABLE = ON);
 ```
 
-## Step 6: Run and Validate Tests
+## Step 6: Run and Validate Test
+
+Follow the testing guidelines validation process.
 
 ### Build the Parser
 ```bash
 # Build ScriptDOM library
 dotnet build SqlScriptDom/Microsoft.SqlServer.TransactSql.ScriptDom.csproj -c Debug
 
-# Build test project
+# Build test project  
 dotnet build Test/SqlDom/UTSqlScriptDom.csproj -c Debug
 ```
 
 ### Run Your Specific Test
 ```bash
-# Run by test name filter
-dotnet test --filter "FullyQualifiedName~YourTestName" -c Debug
+# Run specific test method
+dotnet test Test/SqlDom/UTSqlScriptDom.csproj --filter "FullyQualifiedName~TSql160SyntaxIn160ParserTest" -c Debug
 
-# Example: Run ALTER TABLE RESUMABLE tests
-dotnet test --filter "FullyQualifiedName~AlterTableResumableTests" -c Debug
+# Run tests for specific version
+dotnet test Test/SqlDom/UTSqlScriptDom.csproj --filter "TestCategory=TSql160" -c Debug
+
+# Run by test script name filter
+dotnet test --filter "YourFeatureTests160" -c Debug
 
 # Run with verbose output to see details
-dotnet test --filter "FullyQualifiedName~YourTestName" -c Debug -v detailed
+dotnet test --filter "YourFeatureTests160" -c Debug -v detailed
 ```
 
 ### Run Full Test Suite (CRITICAL!)
@@ -448,11 +501,20 @@ dotnet test Test/SqlDom/UTSqlScriptDom.csproj -c Debug
 # Test summary: total: 1116, failed: 0, succeeded: 1116, skipped: 0
 ```
 
-### Understanding Test Results
+### Interpret Results
+
+Follow the testing guidelines interpretation:
+
+- ✅ **Success**: Generated output matches baseline, error counts match expectations
+- ❌ **Failure**: Review actual vs expected output, adjust baseline or fix grammar  
+- ⚠️ **Baseline Mismatch**: Copy correct "Actual" output to baseline file
+- ⚠️ **Error Count Mismatch**: Adjust error expectations in test configuration
+
+### Common Test Results
 
 ✅ **Success**: All tests pass, including your new test
 ```
-Test summary: total: 1120, failed: 0, succeeded: 1120, skipped: 0
+Test summary: total: 1116, failed: 0, succeeded: 1116, skipped: 0
 ```
 
 ❌ **Baseline Mismatch**: Generated output doesn't match baseline
@@ -460,19 +522,22 @@ Test summary: total: 1120, failed: 0, succeeded: 1120, skipped: 0
 Expected: <baseline content>
 Actual: <generated content>
 ```
-**Fix**: Update baseline file with the "Actual" content
+**Solution**: Copy the "Actual" output to your baseline file (note spacing differences)
 
-❌ **Parsing Error**: Syntax not recognized or validation failed
+❌ **Error Count Mismatch**: Parse error count differs from expected  
 ```
-Error: SQL46057: Option 'X' is not a valid option...
+TestYourFeature.sql: number of errors after parsing is different from expected.
+Expected: 1, Actual: 0
 ```
-**Fix**: Grammar or validation needs to be updated (see other guides)
+**Solutions**:
+- **If Actual < Expected**: Grammar now supports syntax in older versions → Update error counts
+- **If Actual > Expected**: Grammar has issues → Fix grammar or adjust test
 
-❌ **Regression**: Existing tests now fail
+❌ **Parse Errors**: Syntax not recognized
 ```
-Test summary: total: 1120, failed: 5, succeeded: 1115, skipped: 0
+SQL46010: Incorrect syntax near 'YOUR_TOKEN'. at offset 45, line 2, column 15
 ```
-**Fix**: Your change broke existing functionality - review and fix
+**Solutions**: Check grammar rules, verify syntactic predicates, see function guidelines for RETURN statement issues
 
 ## Complete Example Workflow
 
@@ -596,9 +661,8 @@ git commit -m "Add tests for ALTER TABLE RESUMABLE option (SQL Server 2022)"
 ## Quick Reference Commands
 
 ```bash
-# STEP 0: Test exact script first
-echo "YOUR_EXACT_SCRIPT_HERE" > temp_test_script.sql
-# Add DebugExactScriptTest method to appropriate test file and run
+# Step 0: Add debug unit test method first (NO external files)
+# Add DebugExactScriptTest method to appropriate test file with exact script embedded
 
 # Search for syntax in tests
 grep -r "KEYWORD" Test/SqlDom/TestScripts/
@@ -615,13 +679,9 @@ dotnet test --filter "TestName" -c Debug
 # Run full suite
 dotnet test Test/SqlDom/UTSqlScriptDom.csproj -c Debug
 
-# Create test files
+# Create test files (only for comprehensive testing, not initial verification)
 New-Item "Test/SqlDom/TestScripts/MyTest160.sql"
 New-Item "Test/SqlDom/Baselines160/MyTest160.sql"
-
-# Quick temporary test
-cp Test/SqlDom/TestScripts/JsonFunctionTests170.sql Test/SqlDom/TestScripts/TempTest170.sql
-# Edit TempTest170.sql, add to Only170SyntaxTests.cs, test, then clean up
 ```
 
 ## Related Guides

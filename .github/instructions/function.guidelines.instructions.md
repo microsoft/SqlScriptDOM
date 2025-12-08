@@ -210,6 +210,8 @@ This will regenerate parser files from the grammar.
 
 #### 6b. Create Test Files
 
+**YOU MUST ADD UNIT TESTS - DO NOT CREATE STANDALONE PROGRAMS TO TEST**
+
 Create test script in `Test/SqlDom/TestScripts/YourFunctionTests160.sql`:
 
 ```sql
