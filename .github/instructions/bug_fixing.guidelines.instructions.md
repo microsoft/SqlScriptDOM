@@ -1,6 +1,24 @@
 # Bug Fixing Guide for SqlScriptDOM
 
-This guide provides a summary of the typical workflow for fixing a bug in the SqlScriptDOM parser, based on practical experience. For a more comprehensive overview of the project structure and code generation, please refer to the main [Copilot / AI instructions for SqlScriptDOM](copilot-instructions.md).
+This guide provides a summary of the typical workflow for fixing a bug in the SqlScriptDOM parser, based on practical experience. For a more comprehensive overview of the project structure and code generation, please refer to the main [Copilot / AI instructions for SqlScriptDOM](../copilot-instructions.md).
+
+## Before You Start: Identify the Bug Type
+
+**IMPORTANT**: Not all bugs require grammar changes. Determine which type of fix you need:
+
+1. **Validation Issues**: Syntax is already parseable but incorrectly rejected
+   - Error: "Option 'X' is not valid..." or "Feature 'Y' not supported..."
+   - Example: ALTER TABLE RESUMABLE works in ALTER INDEX but not ALTER TABLE
+   - **→ Use [grammar_validation.guidelines.instructions.md](grammar_validation.guidelines.instructions.md) instead of this guide**
+
+2. **Grammar Issues**: Parser doesn't recognize the syntax at all (THIS guide)
+   - Error: "Incorrect syntax near..." or "Unexpected token..."
+   - Example: Adding new keywords, operators, or statement types
+   - **→ Continue with this guide**
+
+3. **Predicate Recognition**: Identifier predicates fail with parentheses
+   - Error: `WHERE REGEXP_LIKE(...)` works but `WHERE (REGEXP_LIKE(...))` fails
+   - **→ Use [parser.guidelines.instructions.md](parser.guidelines.instructions.md)**
 
 ## Summary of the Bug-Fixing Workflow
 
@@ -23,7 +41,8 @@ The process of fixing a bug, especially one that involves adding new syntax, fol
         ```
 
 6.  **Add a Unit Test**:
-    *   Create a new `.sql` file in `Test/SqlDom/TestScripts/` that contains the specific syntax for the new test case.
+    *   **YOU MUST ADD UNIT TESTS** - Create a new `.sql` file in `Test/SqlDom/TestScripts/` that contains the specific syntax for the new test case.
+    *   **DO NOT CREATE STANDALONE PROGRAMS TO TEST** - Use the existing test framework, not separate console applications or debug programs.
 
 7.  **Define the Test Case**:
     *   Add a new `ParserTest` entry to the appropriate `Only<version>SyntaxTests.cs` files (e.g., `Only130SyntaxTests.cs`). This entry points to your new test script and defines the expected number of parsing errors for each SQL Server version.
@@ -38,6 +57,27 @@ The process of fixing a bug, especially one that involves adding new syntax, fol
         ```
     *   **c. Update the Baseline Files**: Copy the "Actual" output from the test failure log. This is the correctly formatted script generated from the AST. Paste this content into all the baseline files you created in step 8a.
     *   **d. Re-run the Tests**: Run the same test command again. This time, the tests should pass, confirming that the generated script matches the new baseline.
+
+    **Practical Example - Baseline Generation Workflow**:
+    ```bash
+    # 1. Create test script
+    echo "ALTER TABLE t ADD CONSTRAINT pk PRIMARY KEY (id) WITH (RESUMABLE = ON);" > Test/SqlDom/TestScripts/AlterTableResumableTests160.sql
+    
+    # 2. Create empty baseline
+    touch Test/SqlDom/Baselines160/AlterTableResumableTests160.sql
+    
+    # 3. Add test entry to Only160SyntaxTests.cs:
+    # new ParserTest160("AlterTableResumableTests160.sql", nErrors80: 1, ...),
+    
+    # 4. Run test (will fail, showing generated output)
+    dotnet test --filter "AlterTableResumableTests" -c Debug
+    
+    # 5. Copy the "Actual" output from test failure into baseline file
+    # Output looks like: "ALTER TABLE t ADD CONSTRAINT pk PRIMARY KEY (id) WITH (RESUMABLE = ON);"
+    
+    # 6. Re-run test (should pass now)
+    dotnet test --filter "AlterTableResumableTests" -c Debug
+    ```
 
 9.  **⚠️ CRITICAL: Run Full Test Suite**:
     *   **Always run the complete test suite** to ensure your changes didn't break existing functionality:
@@ -147,4 +187,32 @@ If you encounter a bug where:
 
 This is likely a **parser predicate recognition issue**. The grammar and AST are correct, but the `IsNextRuleBooleanParenthesis()` function doesn't recognize the identifier-based predicate.
 
-**Solution**: Follow the [Parser Predicate Recognition Fix Guide](PARSER_PREDICATE_RECOGNITION_FIX.md) instead of the standard grammar modification workflow.
+**Solution**: Follow the [Parser Predicate Recognition Fix Guide](parser.guidelines.instructions.md) instead of the standard grammar modification workflow.
+
+## Decision Tree: Which Guide to Use?
+
+```
+Start: You have a parsing bug
+│
+├─→ Error: "Option 'X' is not valid..." or "Feature not supported..."
+│   └─→ Does similar syntax work elsewhere? (e.g., ALTER INDEX works)
+│       └─→ YES: Use [grammar_validation.guidelines.instructions.md](grammar_validation.guidelines.instructions.md)
+│
+├─→ Error: "Incorrect syntax near..." or parser doesn't recognize syntax
+│   └─→ Does the grammar need new rules or AST nodes?
+│       └─→ YES: Use this guide (BUG_FIXING_GUIDE.md)
+│
+└─→ Error: Parentheses cause failure with identifier predicates
+    └─→ Does `WHERE PREDICATE(...)` work but `WHERE (PREDICATE(...))` fail?
+        └─→ YES: Use [parser.guidelines.instructions.md](parser.guidelines.instructions.md)
+```
+
+## Quick Reference: Fix Types by Symptom
+
+| Symptom | Fix Type | Guide | Files Modified |
+|---------|----------|-------|----------------|
+| "Option 'X' is not valid in statement Y" | Validation | [grammar_validation.guidelines.instructions.md](grammar_validation.guidelines.instructions.md) | `TSql80ParserBaseInternal.cs` |
+| "Incorrect syntax near keyword" | Grammar | This guide | `TSql*.g`, `Ast.xml`, Script generators |
+| Parentheses break identifier predicates | Predicate Recognition | [parser.guidelines.instructions.md](parser.guidelines.instructions.md) | `TSql80ParserBaseInternal.cs` |
+| Literal needs to become expression | Grammar Extension | [grammer.guidelines.instructions.md](grammer.guidelines.instructions.md) | `Ast.xml`, `TSql*.g` |
+
