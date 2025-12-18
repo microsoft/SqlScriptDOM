@@ -59,10 +59,20 @@ case TSql80ParserInternal.Identifier:
 ## Step-by-Step Fix Process
 
 ### 1. Reproduce the Issue
-Create a test case to confirm the bug:
-```sql
-SELECT 1 WHERE (REGEXP_LIKE('a', 'pattern'));  -- Should fail without fix
+Create a test case within the existing test framework to confirm the bug:
+```csharp
+[TestMethod]
+public void ReproduceParenthesesIssue()
+{
+    var parser = new TSql170Parser(true);
+    var sql = "SELECT 1 WHERE (REGEXP_LIKE('a', 'pattern'));";
+    var result = parser.Parse(new StringReader(sql), out var errors);
+    // Should fail before fix, pass after fix
+    Assert.AreEqual(0, errors.Count, "Should parse without errors after fix");
+}
 ```
+
+**⚠️ IMPORTANT**: Add this test to an existing test class like `Only170SyntaxTests.cs`, **do not** create a new test project.
 
 ### 2. Identify the Predicate Constant
 Find the predicate identifier in `CodeGenerationSupporter`:

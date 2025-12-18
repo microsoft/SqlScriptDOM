@@ -70,5 +70,44 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
                     return TSql160ParserBaseInternal.ParseSecurityObjectKind(identifier1, identifier2);
             }
         }
+
+        /// <summary>
+        /// Checks if VECTOR keyword appears in the upcoming tokens within a reasonable lookahead window.
+        /// Used to determine if SaveGuessing optimization is needed for VECTOR data type parsing.
+        /// </summary>
+        /// <returns>true if VECTOR keyword found in lookahead; false otherwise</returns>
+        protected bool ContainsVectorInLookahead()
+        {
+            // Scan ahead looking for VECTOR keyword (case-insensitive identifier match)
+
+            const int LookaheadLimit = 100; // Define a named constant for the lookahead limit
+            // We scan up to LookaheadLimit tokens to handle deeply nested JOIN structures with VECTOR types
+            for (int i = 1; i <= LookaheadLimit; i++)
+            {
+                IToken token;
+                try
+                {
+                    token = LT(i);
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"Error accessing token at lookahead index {i}: {ex.Message}");
+                    break;
+                }
+                if (token == null || token.Type == Token.EOF_TYPE)
+                {
+                    break;
+                }
+                
+                // Check if this is an identifier token with text "VECTOR"
+                if (token.Type == TSql170ParserInternal.Identifier &&
+                    string.Equals(token.getText(), CodeGenerationSupporter.Vector, StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
+            }
+            
+            return false;
+        }
     }
 }
