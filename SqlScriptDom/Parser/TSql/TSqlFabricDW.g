@@ -31630,6 +31630,27 @@ expressionPrimary [ExpressionFlags expressionFlags] returns [PrimaryExpression v
             {NextTokenMatches(CodeGenerationSupporter.JsonArray) && (LA(2) == LeftParenthesis)}?
             vResult=jsonArrayCall
         |
+            {NextTokenMatches(CodeGenerationSupporter.AIAnalyzeSentiment) && (LA(2) == LeftParenthesis)}?
+            vResult=aiAnalyzeSentimentFunctionCall
+        |
+            {NextTokenMatches(CodeGenerationSupporter.AIClassify) && (LA(2) == LeftParenthesis)}?
+            vResult=aiClassifyFunctionCall
+        |
+            {NextTokenMatches(CodeGenerationSupporter.AIExtract) && (LA(2) == LeftParenthesis)}?
+            vResult=aiExtractFunctionCall
+        |
+            {NextTokenMatches(CodeGenerationSupporter.AIFixGrammar) && (LA(2) == LeftParenthesis)}?
+            vResult=aiFixGrammarFunctionCall
+        |
+            {NextTokenMatches(CodeGenerationSupporter.AIGenerateResponse) && (LA(2) == LeftParenthesis)}?
+            vResult=aiGenerateResponseFunctionCall
+        |
+            {NextTokenMatches(CodeGenerationSupporter.AISummarize) && (LA(2) == LeftParenthesis)}?
+            vResult=aiSummarizeFunctionCall
+        |
+            {NextTokenMatches(CodeGenerationSupporter.AITranslate) && (LA(2) == LeftParenthesis)}?
+            vResult=aiTranslateFunctionCall
+        |
             (Identifier LeftParenthesis)=>
             vResult=builtInFunctionCall
         |
@@ -32267,6 +32288,182 @@ withinGroupClause returns [WithinGroupClause vResult = FragmentFactory.CreateFra
         }
     ;
 
+// AI_ANALYZE_SENTIMENT(<input>)
+aiAnalyzeSentimentFunctionCall returns [AIAnalyzeSentimentFunctionCall vResult = this.FragmentFactory.CreateFragment<AIAnalyzeSentimentFunctionCall>()]
+{
+    ScalarExpression vInput;
+}
+    : tFunc:Identifier LeftParenthesis
+        {
+            Match(tFunc, CodeGenerationSupporter.AIAnalyzeSentiment);
+            UpdateTokenInfo(vResult, tFunc);
+        }
+        vInput = expression
+        {
+            vResult.Input = vInput;
+        }
+        RightParenthesis
+    ;
+
+// AI_CLASSIFY(<input>, <class1>[, <class2> ... up to 21])
+// Input and labels accept any expression; type constraints are deferred to semantic/type phase.
+aiClassifyFunctionCall returns [AIClassifyFunctionCall vResult = this.FragmentFactory.CreateFragment<AIClassifyFunctionCall>()]
+{
+    ScalarExpression vExpr;
+    int labelsCount = 0;
+}
+    : tFunc:Identifier LeftParenthesis
+      {
+          Match(tFunc, CodeGenerationSupporter.AIClassify);
+          UpdateTokenInfo(vResult, tFunc);
+      }
+      // input: any expression
+      vExpr = expression
+      {
+          vResult.Input = vExpr;
+      }
+      // first label (required)
+      Comma vExpr = expression
+      {
+          AddAndUpdateTokenInfo(vResult, vResult.Labels, vExpr);
+          labelsCount = 1;
+      }
+      // additional labels up to 21 total
+      (
+          Comma vExpr = expression
+          {
+              ++labelsCount;
+              if (labelsCount > 21)
+              {ThrowParseErrorException("SQL46010", vExpr, TSqlParserResource.SQL46010Message, CodeGenerationSupporter.AIClassify);
+              }
+              AddAndUpdateTokenInfo(vResult, vResult.Labels, vExpr);
+          }
+      )*
+      tRParen:RightParenthesis
+      {
+          UpdateTokenInfo(vResult, tRParen);
+      }
+    ;
+
+// AI_EXTRACT(<input>, <class1>[, <class2> ... up to 21])
+// Input and labels accept any expression; type constraints are deferred to semantic/type phase.
+aiExtractFunctionCall returns [AIExtractFunctionCall vResult = this.FragmentFactory.CreateFragment<AIExtractFunctionCall>()]
+{
+    ScalarExpression vExpr;
+    int labelsCount = 0;
+}
+    : tFunc:Identifier LeftParenthesis
+      {
+          Match(tFunc, CodeGenerationSupporter.AIExtract);
+          UpdateTokenInfo(vResult, tFunc);
+      }
+      // input: any expression
+      vExpr = expression
+      {
+          vResult.Input = vExpr;
+      }
+      // first label (required)
+      Comma vExpr = expression
+      {
+          AddAndUpdateTokenInfo(vResult, vResult.Labels, vExpr);
+          labelsCount = 1;
+      }
+      // additional labels up to 21 total
+      (
+          Comma vExpr = expression
+          {
+              ++labelsCount;
+              if (labelsCount > 21)
+              {ThrowParseErrorException("SQL46010", vExpr, TSqlParserResource.SQL46010Message, CodeGenerationSupporter.AIExtract);
+              }
+              AddAndUpdateTokenInfo(vResult, vResult.Labels, vExpr);
+          }
+      )*
+      tRParen:RightParenthesis
+      {
+          UpdateTokenInfo(vResult, tRParen);
+      }
+    ;
+
+// AI_FIX_GRAMMAR(<input>)
+aiFixGrammarFunctionCall returns [AIFixGrammarFunctionCall vResult = this.FragmentFactory.CreateFragment<AIFixGrammarFunctionCall>()]
+{
+    ScalarExpression vInput;
+}
+    : tFunc:Identifier LeftParenthesis
+        {
+            Match(tFunc, CodeGenerationSupporter.AIFixGrammar);
+            UpdateTokenInfo(vResult, tFunc);
+        }
+        vInput = expression
+        {
+            vResult.Input = vInput;
+        }
+        RightParenthesis
+    ;
+
+// AI_GENERATE_RESPONSE(<promptPart1>[, <promptPart2>])
+aiGenerateResponseFunctionCall returns [AIGenerateResponseFunctionCall vResult = this.FragmentFactory.CreateFragment<AIGenerateResponseFunctionCall>()]
+{
+    ScalarExpression vPart1;
+    ScalarExpression vPart2;
+}
+    :   tFunc:Identifier LeftParenthesis
+        {
+            Match(tFunc, CodeGenerationSupporter.AIGenerateResponse);
+            UpdateTokenInfo(vResult, tFunc);
+        }
+        vPart1 = expression
+        {
+            vResult.PromptPart1 = vPart1;
+        }
+        (
+            Comma vPart2 = expression
+            {
+                vResult.PromptPart2 = vPart2;
+            }
+        )?
+        RightParenthesis
+    ;
+
+// AI_SUMMARIZE(<input>)
+aiSummarizeFunctionCall returns [AISummarizeFunctionCall vResult = this.FragmentFactory.CreateFragment<AISummarizeFunctionCall>()]
+{
+    ScalarExpression vInput;
+}
+    : tFunc:Identifier LeftParenthesis
+        {
+            Match(tFunc, CodeGenerationSupporter.AISummarize);
+            UpdateTokenInfo(vResult, tFunc);
+        }
+        vInput = expression
+        {
+            vResult.Input = vInput;
+        }
+        RightParenthesis
+    ;
+
+// AI_TRANSLATE(<input>, <lang>)
+aiTranslateFunctionCall returns [AITranslateFunctionCall vResult = this.FragmentFactory.CreateFragment<AITranslateFunctionCall>()]
+{
+    ScalarExpression vInput;
+    ScalarExpression vLang;
+}
+    :   tFunc:Identifier LeftParenthesis
+        {
+            Match(tFunc, CodeGenerationSupporter.AITranslate);
+            UpdateTokenInfo(vResult, tFunc);
+        }
+        vInput = expression
+        {
+            vResult.Input = vInput;
+        }
+        Comma vLang = expression
+        {
+            vResult.Language = vLang;
+        }
+        RightParenthesis
+    ;
 
 // TODO, olegr: Add more checks for allowed functions here - there are quite some in SQL Server parser
 builtInFunctionCall returns [FunctionCall vResult = FragmentFactory.CreateFragment<FunctionCall>()]

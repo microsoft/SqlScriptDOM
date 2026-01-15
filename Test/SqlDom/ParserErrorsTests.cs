@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using Microsoft.SqlServer.TransactSql.ScriptDom;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SqlStudio.Tests.AssemblyTools.TestCategory;
@@ -7104,87 +7105,6 @@ WHEN NOT MATCHED BY SOURCE THEN DELETE OUTPUT inserted.*, deleted.*;";
         }
 
         /// <summary>
-        /// Negative tests for VECTOR INDEX syntax
-        /// </summary>
-        [TestMethod]
-        [Priority(0)]
-        [SqlStudioTestCategory(Category.UnitTest)]
-        public void VectorIndexNegativeTests()
-        {
-            // Missing INDEX keyword
-            ParserTestUtils.ErrorTest170("CREATE VECTOR IX_Test ON dbo.Documents (VectorData)",
-                new ParserErrorInfo(7, "SQL46010", "VECTOR"));
-
-            // Missing table name
-            ParserTestUtils.ErrorTest170("CREATE VECTOR INDEX IX_Test ON (VectorData)",
-                new ParserErrorInfo(31, "SQL46010", "("));
-
-            // Missing column specification
-            ParserTestUtils.ErrorTest170("CREATE VECTOR INDEX IX_Test ON dbo.Documents",
-                new ParserErrorInfo(44, "SQL46029", ""));
-
-            // Empty column list
-            ParserTestUtils.ErrorTest170("CREATE VECTOR INDEX IX_Test ON dbo.Documents ()",
-                new ParserErrorInfo(46, "SQL46010", ")"));
-
-            // Multiple columns (not supported for vector indexes)
-            ParserTestUtils.ErrorTest170("CREATE VECTOR INDEX IX_Test ON dbo.Documents (VectorData, OtherColumn)",
-                new ParserErrorInfo(56, "SQL46010", ","));
-
-            // Invalid metric value
-            ParserTestUtils.ErrorTest170("CREATE VECTOR INDEX IX_Test ON dbo.Documents (VectorData) WITH (METRIC = 'invalid')",
-                new ParserErrorInfo(73, "SQL46010", "'invalid'"));
-
-            // Invalid type value
-            ParserTestUtils.ErrorTest170("CREATE VECTOR INDEX IX_Test ON dbo.Documents (VectorData) WITH (TYPE = 'invalid')",
-                new ParserErrorInfo(71, "SQL46010", "'invalid'"));
-
-            // Missing option value
-            ParserTestUtils.ErrorTest170("CREATE VECTOR INDEX IX_Test ON dbo.Documents (VectorData) WITH (METRIC = )",
-                new ParserErrorInfo(73, "SQL46010", ")"));
-
-            // Empty option value
-            ParserTestUtils.ErrorTest170("CREATE VECTOR INDEX IX_Test ON dbo.Documents (VectorData) WITH (METRIC = '')",
-                new ParserErrorInfo(73, "SQL46010", "''"));
-
-            // Missing WITH keyword when options are present
-            ParserTestUtils.ErrorTest170("CREATE VECTOR INDEX IX_Test ON dbo.Documents (VectorData) (METRIC = 'cosine')",
-                new ParserErrorInfo(59, "SQL46010", "METRIC"));
-
-            // Missing parentheses around options
-            ParserTestUtils.ErrorTest170("CREATE VECTOR INDEX IX_Test ON dbo.Documents (VectorData) WITH METRIC = 'cosine'",
-                new ParserErrorInfo(63, "SQL46010", "METRIC"));
-
-            // Invalid option name
-            ParserTestUtils.ErrorTest170("CREATE VECTOR INDEX IX_Test ON dbo.Documents (VectorData) WITH (INVALID_OPTION = 'value')",
-                new ParserErrorInfo(64, "SQL46010", "INVALID_OPTION"));
-
-            // Metric value without quotes
-            ParserTestUtils.ErrorTest170("CREATE VECTOR INDEX IX_Test ON dbo.Documents (VectorData) WITH (METRIC = cosine)",
-                new ParserErrorInfo(73, "SQL46010", "cosine"));
-
-            // Type value without quotes
-            ParserTestUtils.ErrorTest170("CREATE VECTOR INDEX IX_Test ON dbo.Documents (VectorData) WITH (TYPE = DiskANN)",
-                new ParserErrorInfo(71, "SQL46010", "DiskANN"));
-
-            // MAXDOP with invalid value
-            ParserTestUtils.ErrorTest170("CREATE VECTOR INDEX IX_Test ON dbo.Documents (VectorData) WITH (MAXDOP = 'invalid')",
-                new ParserErrorInfo(73, "SQL46010", "'invalid'"));
-
-            // MAXDOP with negative value
-            ParserTestUtils.ErrorTest170("CREATE VECTOR INDEX IX_Test ON dbo.Documents (VectorData) WITH (MAXDOP = -1)",
-                new ParserErrorInfo(73, "SQL46010", "-"));
-
-            // Missing equals sign in option
-            ParserTestUtils.ErrorTest170("CREATE VECTOR INDEX IX_Test ON dbo.Documents (VectorData) WITH (METRIC 'cosine')",
-                new ParserErrorInfo(64, "SQL46010", "METRIC"));
-
-            // Incomplete WITH clause
-            ParserTestUtils.ErrorTest170("CREATE VECTOR INDEX IX_Test ON dbo.Documents (VectorData) WITH",
-                new ParserErrorInfo(58, "SQL46010", "WITH"));
-        }
-
-        /// <summary>
         /// Negative tests for AI_GENERATE_CHUNKS syntax
         /// </summary>
         [TestMethod]
@@ -7624,6 +7544,235 @@ WHEN NOT MATCHED BY SOURCE THEN DELETE OUTPUT inserted.*, deleted.*;";
             ParserTestUtils.ErrorTest170(
                 "SELECT * FROM VECTOR_SEARCH('tbl1', 'col1', 'query_vector', 'dot', 5)",
                 new ParserErrorInfo(28, "SQL46010", "'tbl1'"));
+        }
+
+        /// <summary>
+        /// Negative tests for VECTOR INDEX syntax
+        /// </summary>
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void VectorIndexNegativeTests()
+        {
+            // Missing INDEX keyword
+            ParserTestUtils.ErrorTest170("CREATE VECTOR IX_Test ON dbo.Documents (VectorData)",
+                new ParserErrorInfo(7, "SQL46010", "VECTOR"));
+
+            // Missing table name
+            ParserTestUtils.ErrorTest170("CREATE VECTOR INDEX IX_Test ON (VectorData)",
+                new ParserErrorInfo(31, "SQL46010", "("));
+
+            // Missing column specification
+            ParserTestUtils.ErrorTest170("CREATE VECTOR INDEX IX_Test ON dbo.Documents",
+                new ParserErrorInfo(44, "SQL46029", ""));
+
+            // Empty column list
+            ParserTestUtils.ErrorTest170("CREATE VECTOR INDEX IX_Test ON dbo.Documents ()",
+                new ParserErrorInfo(46, "SQL46010", ")"));
+
+            // Multiple columns (not supported for vector indexes)
+            ParserTestUtils.ErrorTest170("CREATE VECTOR INDEX IX_Test ON dbo.Documents (VectorData, OtherColumn)",
+                new ParserErrorInfo(56, "SQL46010", ","));
+
+            // Invalid metric value
+            ParserTestUtils.ErrorTest170("CREATE VECTOR INDEX IX_Test ON dbo.Documents (VectorData) WITH (METRIC = 'invalid')",
+                new ParserErrorInfo(73, "SQL46010", "'invalid'"));
+
+            // Invalid type value
+            ParserTestUtils.ErrorTest170("CREATE VECTOR INDEX IX_Test ON dbo.Documents (VectorData) WITH (TYPE = 'invalid')",
+                new ParserErrorInfo(71, "SQL46010", "'invalid'"));
+
+            // Missing option value
+            ParserTestUtils.ErrorTest170("CREATE VECTOR INDEX IX_Test ON dbo.Documents (VectorData) WITH (METRIC = )",
+                new ParserErrorInfo(73, "SQL46010", ")"));
+
+            // Empty option value
+            ParserTestUtils.ErrorTest170("CREATE VECTOR INDEX IX_Test ON dbo.Documents (VectorData) WITH (METRIC = '')",
+                new ParserErrorInfo(73, "SQL46010", "''"));
+
+            // Missing WITH keyword when options are present
+            ParserTestUtils.ErrorTest170("CREATE VECTOR INDEX IX_Test ON dbo.Documents (VectorData) (METRIC = 'cosine')",
+                new ParserErrorInfo(59, "SQL46010", "METRIC"));
+
+            // Missing parentheses around options
+            ParserTestUtils.ErrorTest170("CREATE VECTOR INDEX IX_Test ON dbo.Documents (VectorData) WITH METRIC = 'cosine'",
+                new ParserErrorInfo(63, "SQL46010", "METRIC"));
+
+            // Invalid option name
+            ParserTestUtils.ErrorTest170("CREATE VECTOR INDEX IX_Test ON dbo.Documents (VectorData) WITH (INVALID_OPTION = 'value')",
+                new ParserErrorInfo(64, "SQL46010", "INVALID_OPTION"));
+
+            // Metric value without quotes
+            ParserTestUtils.ErrorTest170("CREATE VECTOR INDEX IX_Test ON dbo.Documents (VectorData) WITH (METRIC = cosine)",
+                new ParserErrorInfo(73, "SQL46010", "cosine"));
+
+            // Type value without quotes
+            ParserTestUtils.ErrorTest170("CREATE VECTOR INDEX IX_Test ON dbo.Documents (VectorData) WITH (TYPE = DiskANN)",
+                new ParserErrorInfo(71, "SQL46010", "DiskANN"));
+
+            // MAXDOP with invalid value
+            ParserTestUtils.ErrorTest170("CREATE VECTOR INDEX IX_Test ON dbo.Documents (VectorData) WITH (MAXDOP = 'invalid')",
+                new ParserErrorInfo(73, "SQL46010", "'invalid'"));
+
+            // MAXDOP with negative value
+            ParserTestUtils.ErrorTest170("CREATE VECTOR INDEX IX_Test ON dbo.Documents (VectorData) WITH (MAXDOP = -1)",
+                new ParserErrorInfo(73, "SQL46010", "-"));
+
+            // Missing equals sign in option
+            ParserTestUtils.ErrorTest170("CREATE VECTOR INDEX IX_Test ON dbo.Documents (VectorData) WITH (METRIC 'cosine')",
+                new ParserErrorInfo(64, "SQL46010", "METRIC"));
+
+            // Incomplete WITH clause
+            ParserTestUtils.ErrorTest170("CREATE VECTOR INDEX IX_Test ON dbo.Documents (VectorData) WITH",
+                new ParserErrorInfo(58, "SQL46010", "WITH"));
+        }
+
+        /// <summary>
+        /// Negative tests for AI_ANALYZE_SENTIMET syntax
+        /// </summary>
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void AiAnalyzeSentimentNegativeTestsFabricDw()
+        {
+            // Missing arguments
+            ParserTestUtils.ErrorTestFabricDW(
+                "SELECT AI_ANALYZE_SENTIMENT()",
+                new ParserErrorInfo(28, "SQL46010", ")"));
+
+            // Too many arguments
+            ParserTestUtils.ErrorTestFabricDW(
+                "SELECT AI_ANALYZE_SENTIMENT('1', '2')",
+                new ParserErrorInfo(31, "SQL46010", ","));
+        }
+
+        /// <summary>
+        /// Negative tests for AI_CLASSIFY syntax
+        /// </summary>
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void AiClassifyNegativeTestsFabricDw()
+        {
+            // Missing arguments
+            ParserTestUtils.ErrorTestFabricDW(
+                "SELECT AI_CLASSIFY()",
+                new ParserErrorInfo(19, "SQL46010", ")"));
+
+            // Too few arguments
+            ParserTestUtils.ErrorTestFabricDW(
+                "SELECT AI_CLASSIFY('1')",
+                new ParserErrorInfo(22, "SQL46010", ")"));
+
+            // Too many arguments
+            ParserTestUtils.ErrorTestFabricDW(
+                $"SELECT AI_CLASSIFY({string.Join(", ", Enumerable.Repeat("'1'", 23))})",
+                new ParserErrorInfo(129, "SQL46010", "AI_CLASSIFY"));
+        }
+
+        /// <summary>
+        /// Negative tests for AI_EXTRACT syntax
+        /// </summary>
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void AiExtractNegativeTestsFabricDw()
+        {
+            // Missing arguments
+            ParserTestUtils.ErrorTestFabricDW(
+                "SELECT AI_EXTRACT()",
+                new ParserErrorInfo(18, "SQL46010", ")"));
+
+            // Too few arguments
+            ParserTestUtils.ErrorTestFabricDW(
+                "SELECT AI_EXTRACT('1')",
+                new ParserErrorInfo(21, "SQL46010", ")"));
+
+            // Too many arguments
+            ParserTestUtils.ErrorTestFabricDW(
+                $"SELECT AI_EXTRACT({string.Join(", ", Enumerable.Repeat("'1'", 23))})",
+                new ParserErrorInfo(128, "SQL46010", "AI_EXTRACT"));
+        }
+
+        /// <summary>
+        /// Negative tests for AI_SUMMARIZE syntax
+        /// </summary>
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void AiFixGrammarNegativeTestsFabricDw()
+        {
+            // Missing arguments
+            ParserTestUtils.ErrorTestFabricDW(
+                "SELECT AI_FIX_GRAMMAR()",
+                new ParserErrorInfo(22, "SQL46010", ")"));
+
+            // Too many arguments
+            ParserTestUtils.ErrorTestFabricDW(
+                "SELECT AI_FIX_GRAMMAR('1', '2')",
+                new ParserErrorInfo(25, "SQL46010", ","));
+        }
+
+        /// <summary>
+        /// Negative tests for AI_GENERATE_RESPONSE syntax
+        /// </summary>
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void AiGenerateResponseNegativeTestsFabricDw()
+        {
+            // Missing arguments
+            ParserTestUtils.ErrorTestFabricDW(
+                "SELECT AI_GENERATE_RESPONSE()",
+                new ParserErrorInfo(28, "SQL46010", ")"));
+
+            // Too many arguments
+            ParserTestUtils.ErrorTestFabricDW(
+                "SELECT AI_GENERATE_RESPONSE('1', '2', '3')",
+                new ParserErrorInfo(36, "SQL46010", ","));
+        }
+
+        /// <summary>
+        /// Negative tests for AI_SUMMARIZE syntax
+        /// </summary>
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void AiSummarizeNegativeTestsFabricDw()
+        {
+            // Missing arguments
+            ParserTestUtils.ErrorTestFabricDW(
+                "SELECT AI_SUMMARIZE()",
+                new ParserErrorInfo(20, "SQL46010", ")"));
+
+            // Too many arguments
+            ParserTestUtils.ErrorTestFabricDW(
+                "SELECT AI_SUMMARIZE('1', '2')",
+                new ParserErrorInfo(23, "SQL46010", ","));
+        }
+
+        /// <summary>
+        /// Negative tests for AI_GENERATE_RESPONSE syntax
+        /// </summary>
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void AiTranslateNegativeTestsFabricDw()
+        {
+            // Missing arguments
+            ParserTestUtils.ErrorTestFabricDW(
+                "SELECT AI_TRANSLATE()",
+                new ParserErrorInfo(20, "SQL46010", ")"));
+
+            // Too few arguments
+            ParserTestUtils.ErrorTestFabricDW(
+                "SELECT AI_TRANSLATE('1')",
+                new ParserErrorInfo(23, "SQL46010", ")"));
+
+            // Too many arguments
+            ParserTestUtils.ErrorTestFabricDW(
+                "SELECT AI_TRANSLATE('1', '2', '3')",
+                new ParserErrorInfo(28, "SQL46010", ","));
         }
     }
 }

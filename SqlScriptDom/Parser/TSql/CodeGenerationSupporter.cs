@@ -101,6 +101,13 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         internal const string Aggregate = "AGGREGATE";
         internal const string AiGenerateChunks = "AI_GENERATE_CHUNKS";
         internal const string AIGenerateEmbeddings = "AI_GENERATE_EMBEDDINGS";
+        internal const string AIAnalyzeSentiment = "AI_ANALYZE_SENTIMENT";
+        internal const string AIClassify = "AI_CLASSIFY";
+        internal const string AIExtract = "AI_EXTRACT";
+        internal const string AIFixGrammar = "AI_FIX_GRAMMAR";
+        internal const string AIGenerateResponse = "AI_GENERATE_RESPONSE";
+        internal const string AISummarize = "AI_SUMMARIZE";
+        internal const string AITranslate = "AI_TRANSLATE";
         internal const string Algorithm = "ALGORITHM";
         internal const string AlterColumn = "ALTERCOLUMN";
         internal const string All = "ALL";
