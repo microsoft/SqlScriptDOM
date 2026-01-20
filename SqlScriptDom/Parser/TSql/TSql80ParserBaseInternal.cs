@@ -796,22 +796,35 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
             int caseDepth = 0;
             // 0 means there was no select
             int topmostSelect = 0;
-            int insideIIf = 0;
+            // Stack to track paren levels where IIF calls started
+            // This allows proper handling of multiple boolean operators inside IIF
+            Stack<int> iifParenLevels = new Stack<int>();
+            bool pendingIIf = false;
 
             for (bool loop = true; loop == true; consume())
             {
+                // Check if the previous token was IIF and this token is its opening parenthesis
+                // This must be done before resetting pendingIIf, as we need to consume the flag
+                bool isIIfOpeningParen = pendingIIf && LA(1) == TSql80ParserInternal.LeftParenthesis;
+                
+                // Reset pendingIIf at start of each iteration - it will only be set to true
+                // if this token is the IIF identifier. This ensures IIF must be immediately
+                // followed by ( to be recognized as a function call.
+                pendingIIf = false;
+
                 switch (LA(1))
                 {
                     case TSql80ParserInternal.Identifier:
                         // if identifier is IIF
                         if(NextTokenMatches(CodeGenerationSupporter.IIf))
                         {
-                            ++insideIIf;
+                            // Mark that we're expecting IIF's opening parenthesis next
+                            pendingIIf = true;
                         }
                         // if identifier is REGEXP_LIKE
                         else if(NextTokenMatches(CodeGenerationSupporter.RegexpLike))
                         {
-                            if (caseDepth == 0 && topmostSelect == 0 && insideIIf == 0)
+                            if (caseDepth == 0 && topmostSelect == 0 && iifParenLevels.Count == 0)
                             {
                                 matches = true;
                                 loop = false;
@@ -820,11 +833,22 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
                         break;
                     case TSql80ParserInternal.LeftParenthesis:
                         ++openParens;
+                        if (isIIfOpeningParen)
+                        {
+                            // Record the paren level where IIF started
+                            iifParenLevels.Push(openParens);
+                        }
                         break;
                     case TSql80ParserInternal.RightParenthesis:
                         if (openParens == topmostSelect)
                         {
                             topmostSelect = 0;
+                        }
+
+                        // Check if we're closing an IIF's parenthesis
+                        if (iifParenLevels.Count > 0 && iifParenLevels.Peek() == openParens)
+                        {
+                            iifParenLevels.Pop();
                         }
 
                         --openParens;
@@ -856,17 +880,12 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
                     case TSql80ParserInternal.Exists:
                     case TSql80ParserInternal.TSEqual:
                     case TSql80ParserInternal.Update:
-                        if (caseDepth == 0 && topmostSelect == 0 && insideIIf == 0)
+                        if (caseDepth == 0 && topmostSelect == 0 && iifParenLevels.Count == 0)
                         {
                             // The number of open paranthesis are not important.
-                            // Unless inside an iff
+                            // Unless inside an IIF (tracked by paren level stack)
                             matches = true;
                             loop = false;
-                        }
-                        else if (insideIIf > 0)
-                        {
-                            // Found the operator inside IIF
-                            --insideIIf;
                         }
                         break;
                     case TSql80ParserInternal.Case:
