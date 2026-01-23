@@ -13,6 +13,43 @@ The SqlScriptDOM testing framework validates parser functionality through:
 4. **Version-Specific Testing** - Tests syntax across multiple SQL Server versions (SQL 2000-2025)
 5. **Exact T-SQL Verification** - When testing specific T-SQL syntax from prompts or user requests, the **exact T-SQL statement must be included and verified** in the test to ensure the specific syntax works as expected
 
+## Quick Verification Tests
+
+For rapid verification and debugging, add simple test methods directly to existing test classes:
+
+```csharp
+[TestMethod]
+[Priority(0)]
+[SqlStudioTestCategory(Category.UnitTest)]
+public void VerifyMyNewSyntax()
+{
+    var parser = new TSql170Parser(true);
+    
+    // Test basic syntax
+    var query1 = "SELECT YOUR_NEW_FUNCTION('param1', 'param2');";
+    var result1 = parser.Parse(new StringReader(query1), out var errors1);
+    Assert.AreEqual(0, errors1.Count, "Basic syntax should parse");
+    
+    // Test complex variations
+    var query2 = "SELECT YOUR_NEW_FUNCTION(@variable);";
+    var result2 = parser.Parse(new StringReader(query2), out var errors2);
+    Assert.AreEqual(0, errors2.Count, "Variable syntax should parse");
+    
+    Console.WriteLine("✅ All tests passed!");
+}
+```
+
+**Where to Add Quick Tests:**
+- **SQL Server 2025 (170) features**: Add to `Test/SqlDom/Only170SyntaxTests.cs`
+- **SQL Server 2022 (160) features**: Add to `Test/SqlDom/Only160SyntaxTests.cs`
+- **Earlier versions**: Add to corresponding `Only<version>SyntaxTests.cs`
+
+**When to Use:**
+- Quick verification during development
+- Debugging parser issues
+- Initial syntax validation before full test suite
+- Rapid prototyping of test cases
+
 ## Test Framework Architecture
 
 ### Core Components
@@ -28,6 +65,30 @@ The SqlScriptDOM testing framework validates parser functionality through:
 2. **Generate Phase**: Parsed AST is converted back to T-SQL using script generator  
 3. **Validate Phase**: Generated output is compared against baseline file
 4. **Error Validation**: Parse error count is compared against expected error count for each SQL version
+
+## ❌ Anti-Patterns: What NOT to Do
+
+### Do NOT Create New Test Projects
+
+- ❌ **Don't create new `.csproj` files for testing**
+- ❌ **Don't create console applications** like `TestVectorParser.csproj` or `debug_complex.csproj`
+- ❌ **Don't create standalone test runners**
+- ❌ **Don't add new projects to the solution for testing**
+
+### Why This Causes Problems
+
+1. **Build Issues**: New projects often fail to build due to missing dependencies
+2. **Integration Problems**: Standalone projects don't integrate with existing test infrastructure
+3. **Maintenance Overhead**: Additional projects require separate maintenance and documentation
+4. **CI/CD Conflicts**: Build pipelines aren't configured for ad-hoc test projects
+5. **Resource Waste**: Creates duplicate testing infrastructure instead of using established patterns
+
+### The Correct Approach
+
+✅ **Always add test methods to existing test classes**:
+- Add to `Test/SqlDom/Only170SyntaxTests.cs` for SQL Server 2025 features
+- Add to `Test/SqlDom/Only160SyntaxTests.cs` for SQL Server 2022 features
+- Use the established test framework patterns documented in this guide
 
 ## Adding New Tests
 
@@ -638,6 +699,52 @@ new ParserTest170("ErrorConditionTests170.sql",
     nErrors120: 3, nErrors130: 3, nErrors140: 3, nErrors150: 3,
     nErrors160: 3, nErrors170: 3),
 ```
+
+## Real-World Example: VECTOR Parsing Verification
+
+This example shows the correct approach used to verify VECTOR data type parsing functionality:
+
+```csharp
+[TestMethod]
+[Priority(0)]
+[SqlStudioTestCategory(Category.UnitTest)]
+public void VerifyComplexQueryFix()
+{
+    // Test VECTOR parsing in various contexts - this is the real bug we found and fixed
+    var parser = new TSql170Parser(true);
+    
+    // Test 1: Basic VECTOR with base type
+    var query1 = "SELECT CAST('[1,2,3]' AS VECTOR(3, Float32));";
+    var result1 = parser.Parse(new StringReader(query1), out var errors1);
+    Assert.AreEqual(0, errors1.Count, "Basic VECTOR with base type should parse");
+    
+    // Test 2: VECTOR in complex CAST (from original failing query)
+    var query2 = "SELECT CAST('[-6.464173E+08,1.040823E+07,1.699169E+08]' AS VECTOR(3, Float32));";
+    var result2 = parser.Parse(new StringReader(query2), out var errors2);
+    Assert.AreEqual(0, errors2.Count, "VECTOR with scientific notation should parse");
+    
+    // Test 3: VECTOR in CONVERT (from original failing query)  
+    var query3 = "SELECT CONVERT(VECTOR(77), '[-7.230808E+08,4.075427E+08]');";
+    var result3 = parser.Parse(new StringReader(query3), out var errors3);
+    Assert.AreEqual(0, errors3.Count, "VECTOR in CONVERT should parse");
+    
+    // Test 4: VECTOR in JOIN context (simplified version of original complex query)
+    var query4 = @"SELECT t1.id 
+                   FROM table1 t1 
+                   INNER JOIN table2 t2 ON t1.vector_col = CAST('[1,2,3]' AS VECTOR(3, Float32));";
+    var result4 = parser.Parse(new StringReader(query4), out var errors4);
+    Assert.AreEqual(0, errors4.Count, "VECTOR in JOIN condition should parse");
+    
+    Console.WriteLine("✅ All VECTOR parsing tests passed - the original VECTOR bug is fixed!");
+}
+```
+
+**Key Points from This Example:**
+1. Test was added directly to `Only170SyntaxTests.cs` - no new project created
+2. Tests multiple contexts where the syntax appears (CAST, CONVERT, JOIN)
+3. Uses inline assertions with descriptive messages
+4. References the original bug being fixed
+5. Provides immediate feedback via Console.WriteLine
 
 ## Advanced Testing Patterns
 

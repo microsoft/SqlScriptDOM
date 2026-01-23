@@ -4769,6 +4769,38 @@
     <Member Name="ModelName" Type="SchemaObjectName" Summary="Model name used in USE MODEL clause." />
     <Member Name="OptionalParameters" Type="ScalarExpression" Summary="Optional PARAMETERS clause, must evaluate to JSON." />
   </Class>
+  <Class Name="AIAnalyzeSentimentFunctionCall" Base="PrimaryExpression" Summary="Represents the ai_analyze_sentiment built-in.">
+    <InheritedClass Name="PrimaryExpression" />
+    <Member Name="Input" Type="ScalarExpression" Summary="Input text to analyze sentiment for." />
+  </Class>
+  <Class Name="AIFixGrammarFunctionCall" Base="PrimaryExpression" Summary="Represents the ai_fix_grammar built-in.">
+    <InheritedClass Name="PrimaryExpression" />
+    <Member Name="Input" Type="ScalarExpression" Summary="Input text to fix grammar for." />
+  </Class>
+  <Class Name="AIClassifyFunctionCall" Base="PrimaryExpression" Summary="Represents AI_CLASSIFY(...) function call.">
+    <InheritedClass Name="PrimaryExpression" />
+    <Member Name="Input" Type="ScalarExpression" Summary="Variable or column identifier providing the text to classify." />
+    <Member Name="Labels" Type="ScalarExpression" Collection="true" Summary="One or more label expressions (at least two)." />
+  </Class>
+  <Class Name="AIExtractFunctionCall" Base="PrimaryExpression" Summary="Represents the ai_extract built-in.">
+    <InheritedClass Name="PrimaryExpression" />
+    <Member Name="Input" Type="ScalarExpression" Summary="Input text to extract from." />
+    <Member Name="Labels" Type="ScalarExpression" Collection="true" Summary="One or more label expressions." />
+  </Class>
+  <Class Name="AIGenerateResponseFunctionCall" Base="PrimaryExpression" Summary="Represents AI_GENERATE_RESPONSE(...) function call.">
+    <InheritedClass Name="PrimaryExpression" />
+    <Member Name="PromptPart1" Type="ScalarExpression" Summary="First prompt part (required)." />
+    <Member Name="PromptPart2" Type="ScalarExpression" Summary="Second prompt part (optional)." />
+  </Class>
+  <Class Name="AISummarizeFunctionCall" Base="PrimaryExpression" Summary="Represents AI_SUMMARIZE(...) function call.">
+    <InheritedClass Name="PrimaryExpression" />
+    <Member Name="Input" Type="ScalarExpression" Summary="Variable or column identifier providing the text to summarize." />
+  </Class>
+  <Class Name="AITranslateFunctionCall" Base="PrimaryExpression" Summary="Represents AI_TRANSLATE(...) function call.">
+    <InheritedClass Name="PrimaryExpression" />
+    <Member Name="Input" Type="ScalarExpression" Summary="Text to translate; variable or column reference." />
+    <Member Name="Language" Type="ScalarExpression" Summary="Target language; typically string literal or identifier." />
+  </Class>
   <Class Name="VectorSearchTableReference" Base="TableReferenceWithAlias" Summary="Represents the VECTOR_SEARCH table-valued function call.">
     <InheritedClass Name="TableReferenceWithAlias" />
     <Member Name="Table" Type="TableReferenceWithAlias" Summary="Table on which perform the search." />

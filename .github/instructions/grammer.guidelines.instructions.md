@@ -64,16 +64,31 @@ yourContextParameterRule returns [ScalarExpression vResult]
 Most script generators using `GenerateNameEqualsValue()` or similar methods work automatically with `ScalarExpression`. No changes typically needed.
 
 #### Step 4: Add Test Coverage
-```sql
--- Test parameter
-FUNCTION_NAME(PARAM = @parameter)
-
--- Test outer reference
-FUNCTION_NAME(PARAM = outerref.column)
-
--- Test computed expression
-FUNCTION_NAME(PARAM = value + 1)
+Add tests within the existing test framework:
+```csharp
+[TestMethod]
+public void VerifyGrammarExtension()
+{
+    var parser = new TSql170Parser(true);
+    
+    // Test parameter
+    var sql1 = "SELECT FUNCTION_NAME(PARAM = @parameter)";
+    var result1 = parser.Parse(new StringReader(sql1), out var errors1);
+    Assert.AreEqual(0, errors1.Count, "Parameter syntax should work");
+    
+    // Test outer reference
+    var sql2 = "SELECT FUNCTION_NAME(PARAM = outerref.column)";
+    var result2 = parser.Parse(new StringReader(sql2), out var errors2);
+    Assert.AreEqual(0, errors2.Count, "Outer reference syntax should work");
+    
+    // Test computed expression
+    var sql3 = "SELECT FUNCTION_NAME(PARAM = value + 1)";
+    var result3 = parser.Parse(new StringReader(sql3), out var errors3);
+    Assert.AreEqual(0, errors3.Count, "Computed expression syntax should work");
+}
 ```
+
+**⚠️ CRITICAL**: Add this test method to an existing test class (e.g., `Only170SyntaxTests.cs`). **Never create standalone test projects.**
 
 ### Real-World Example: VECTOR_SEARCH TOP_N
 

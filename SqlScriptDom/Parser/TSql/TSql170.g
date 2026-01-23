@@ -19142,9 +19142,21 @@ joinElement[SubDmlFlags subDmlFlags, ref TableReference vResult]
     ;
 
 selectTableReferenceElement [SubDmlFlags subDmlFlags] returns [TableReference vResult = null]
+{
+    IToken tAfterJoinParenthesis = null;
+}
     :
+        // Apply SaveGuessing optimization ONLY when VECTOR keyword is detected in lookahead
+        // This fixes VECTOR parsing in deeply nested JOINs without breaking other valid SQL patterns
+        {ContainsVectorInLookahead()}?
+        ({ if (!SkipGuessing(tAfterJoinParenthesis)) }:
+            (joinParenthesis[subDmlFlags])=> ({ SaveGuessing(out tAfterJoinParenthesis); }:))=>
+        ({ if (!SkipGuessing(tAfterJoinParenthesis)) }:
+            vResult=joinParenthesis[subDmlFlags])
+    |
+        // Standard syntactic predicate for all other cases
         (joinParenthesis[subDmlFlags])=>
-        vResult=joinParenthesis[subDmlFlags]
+            vResult=joinParenthesis[subDmlFlags]
     |   vResult=selectTableReferenceElementWithoutJoinParenthesis[subDmlFlags]
     ;
 

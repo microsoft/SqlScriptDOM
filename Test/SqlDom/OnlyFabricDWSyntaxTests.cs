@@ -17,6 +17,13 @@ namespace SqlStudio.Tests.UTSqlScriptDom
             new ParserTestFabricDW("NestedCTETestsFabricDW.sql", nErrors80: 1, nErrors90: 2, nErrors100: 2, nErrors110: 2, nErrors120: 2, nErrors130: 2, nErrors140: 2, nErrors150: 2, nErrors160: 2, nErrors170: 2),
             new ParserTestFabricDW("ScalarFunctionTestsFabricDW.sql", nErrors80: 3, nErrors90: 2, nErrors100: 2, nErrors110: 2, nErrors120: 2, nErrors130: 0, nErrors140: 0, nErrors150: 0, nErrors160: 0, nErrors170: 0),
             new ParserTestFabricDW("CreateEventSessionNotLikePredicate.sql", nErrors80: 2, nErrors90: 1,  nErrors100: 1, nErrors110: 1, nErrors120: 1, nErrors130: 0, nErrors140: 0, nErrors150: 0, nErrors160: 0, nErrors170: 0),
+            new ParserTestFabricDW("AiAnalyzeSentimentTestsFabricDW.sql", nErrors80: 2, nErrors90: 1, nErrors100: 2, nErrors110: 2, nErrors120: 2, nErrors130: 0, nErrors140: 0, nErrors150: 0, nErrors160: 0, nErrors170: 0),
+            new ParserTestFabricDW("AiClassifyTestsFabricDW.sql", nErrors80: 2, nErrors90: 1, nErrors100: 2, nErrors110: 2, nErrors120: 2, nErrors130: 0, nErrors140: 0, nErrors150: 0, nErrors160: 0, nErrors170: 0),
+            new ParserTestFabricDW("AiExtractTestsFabricDW.sql", nErrors80: 2, nErrors90: 1, nErrors100: 2, nErrors110: 2, nErrors120: 2, nErrors130: 0, nErrors140: 0, nErrors150: 0, nErrors160: 0, nErrors170: 0),
+            new ParserTestFabricDW("AiFixGrammarTestsFabricDW.sql", nErrors80: 2, nErrors90: 1, nErrors100: 2, nErrors110: 2, nErrors120: 2, nErrors130: 0, nErrors140: 0, nErrors150: 0, nErrors160: 0, nErrors170: 0),
+            new ParserTestFabricDW("AiGenerateResponseTestsFabricDW.sql", nErrors80: 3, nErrors90: 1, nErrors100: 2, nErrors110: 2, nErrors120: 2, nErrors130: 0, nErrors140: 0, nErrors150: 0, nErrors160: 0, nErrors170: 0),
+            new ParserTestFabricDW("AiSummarizeTestsFabricDW.sql", nErrors80: 2, nErrors90: 1, nErrors100: 2, nErrors110: 2, nErrors120: 2, nErrors130: 0, nErrors140: 0, nErrors150: 0, nErrors160: 0, nErrors170: 0),
+            new ParserTestFabricDW("AiTranslateTestsFabricDW.sql", nErrors80: 3, nErrors90: 1, nErrors100: 2, nErrors110: 2, nErrors120: 2, nErrors130: 0, nErrors140: 0, nErrors150: 0, nErrors160: 0, nErrors170: 0),
         };
 
         [TestMethod]

@@ -54,6 +54,7 @@ namespace SqlStudio.Tests.UTSqlScriptDom
             new ParserTest160("NotEnforcedConstraintTests160.sql", nErrors80: 3, nErrors90: 1, nErrors100: 1, nErrors110: 1, nErrors120: 1, nErrors130: 1, nErrors140: 1, nErrors150: 1),
             new ParserTest160("VectorFunctionTests160.sql", nErrors80: 0, nErrors90: 0, nErrors100: 0, nErrors110: 0, nErrors120: 0, nErrors130: 0, nErrors140: 0, nErrors150: 0),
             new ParserTest160("CreateEventSessionNotLikePredicate.sql", nErrors80: 2, nErrors90: 1,  nErrors100: 1, nErrors110: 1, nErrors120: 1, nErrors130: 0, nErrors140: 0, nErrors150: 0),
+            new ParserTest160("IifParenthesesTests160.sql", nErrors80: 16, nErrors90: 16, nErrors100: 16, nErrors110: 0, nErrors120: 0, nErrors130: 0, nErrors140: 0, nErrors150: 0),
         };
 
         private static readonly ParserTest[] SqlAzure160_TestInfos = 

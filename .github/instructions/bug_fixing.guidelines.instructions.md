@@ -90,6 +90,27 @@ The process of fixing a bug, especially one that involves adding new syntax, fol
 
 By following these steps, you can ensure that new syntax is correctly parsed, represented in the AST, generated back into a script, and fully validated by the testing framework without breaking existing functionality.
 
+## Testing Best Practices
+
+### ✅ DO: Use Existing Test Framework
+- Add test methods to existing test classes like `Only170SyntaxTests.cs`
+- Use the established `TSqlParser.Parse()` pattern for verification
+- Example:
+  ```csharp
+  [TestMethod]
+  public void VerifyNewSyntax()
+  {
+      var parser = new TSql170Parser(true);
+      var result = parser.Parse(new StringReader("YOUR SQL HERE"), out var errors);
+      Assert.AreEqual(0, errors.Count, "Should parse without errors");
+  }
+  ```
+
+### ❌ DON'T: Create New Test Projects
+- **Never** create standalone `.csproj` files for testing parser functionality
+- **Never** create new console applications or test runners
+- This causes build issues and doesn't integrate with the existing test infrastructure
+
 ## Special Case: Extending Grammar Rules from Literals to Expressions
 
 A common type of bug involves extending existing grammar rules that only accept literal values (like integers or strings) to accept full expressions (parameters, variables, outer references, etc.). This pattern was used to fix the VECTOR_SEARCH TOP_N parameter issue.
