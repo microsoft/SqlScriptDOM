@@ -14,6 +14,15 @@
       <Option value="KeywordCasing.PascalCase">KeywordCasing_PascalCase</Option>
       <Summary>Gets or sets the keyword casing option to use during script generation</Summary>
     </Setting>
+    <Setting name="IdentifierCasing" type="IdentifierCasing" default="IdentifierCasing.PreserveOriginal">
+      <Title>IdentifierCasing_Title</Title>
+      <Description>IdentifierCasing_Description</Description>
+      <Option value="IdentifierCasing.PreserveOriginal">IdentifierCasing_PreserveOriginal</Option>
+      <Option value="IdentifierCasing.Lowercase">IdentifierCasing_LowerCase</Option>
+      <Option value="IdentifierCasing.Uppercase">IdentifierCasing_UpperCase</Option>
+      <Option value="IdentifierCasing.PascalCase">IdentifierCasing_PascalCase</Option>
+      <Summary>Gets or sets the identifier casing option to use during script generation</Summary>
+    </Setting>
     <Setting name="SqlVersion" type="SqlVersion" default="SqlVersion.Sql90" browsable="false">
       <Summary>Gets or sets the Sql version to generate script for</Summary>
     </Setting>

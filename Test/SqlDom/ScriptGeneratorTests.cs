@@ -334,5 +334,252 @@ namespace SqlStudio.Tests.UTSqlScriptDom
 
             Assert.AreEqual(sqlText, generatedSqlText);
         }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestIdentifierCasingDefault()
+        {
+            Assert.AreEqual(IdentifierCasing.PreserveOriginal, new SqlScriptGeneratorOptions().IdentifierCasing);
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestIdentifierCasingPreserveOriginal()
+        {
+            var expectedSqlText = @"CREATE TABLE MyTableName (
+    MyColumnName VARCHAR (50),
+    anotherColumn INT,
+    MixedCaseColumn DECIMAL (10, 2)
+);";
+
+            ParseAndAssertEquality(expectedSqlText, new SqlScriptGeneratorOptions {
+                IdentifierCasing = IdentifierCasing.PreserveOriginal,
+                AlignColumnDefinitionFields = false
+            });
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestIdentifierCasingLowercase()
+        {
+            var inputSqlText = @"CREATE TABLE MyTableName (
+    MyColumnName VARCHAR (50),
+    AnotherColumn INT,
+    MixedCaseColumn DECIMAL (10, 2)
+);";
+
+            var expectedSqlText = @"CREATE TABLE mytablename (
+    mycolumnname VARCHAR (50),
+    anothercolumn INT,
+    mixedcasecolumn DECIMAL (10, 2)
+);";
+
+            ParseTransformAndAssertEquality(inputSqlText, expectedSqlText, new SqlScriptGeneratorOptions {
+                IdentifierCasing = IdentifierCasing.Lowercase,
+                AlignColumnDefinitionFields = false
+            });
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestIdentifierCasingUppercase()
+        {
+            var inputSqlText = @"CREATE TABLE MyTableName (
+    MyColumnName VARCHAR (50),
+    anotherColumn INT,
+    MixedCaseColumn DECIMAL (10, 2)
+);";
+
+            var expectedSqlText = @"CREATE TABLE MYTABLENAME (
+    MYCOLUMNNAME VARCHAR (50),
+    ANOTHERCOLUMN INT,
+    MIXEDCASECOLUMN DECIMAL (10, 2)
+);";
+
+            ParseTransformAndAssertEquality(inputSqlText, expectedSqlText, new SqlScriptGeneratorOptions {
+                IdentifierCasing = IdentifierCasing.Uppercase,
+                AlignColumnDefinitionFields = false
+            });
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestIdentifierCasingPascalCase()
+        {
+            var inputSqlText = @"CREATE TABLE MyTableName (
+    MyColumnName VARCHAR (50),
+    anotherColumn INT,
+    MIXEDCASECOLUMN DECIMAL (10, 2)
+);";
+
+            var expectedSqlText = @"CREATE TABLE Mytablename (
+    Mycolumnname VARCHAR (50),
+    Anothercolumn INT,
+    Mixedcasecolumn DECIMAL (10, 2)
+);";
+
+            ParseTransformAndAssertEquality(inputSqlText, expectedSqlText, new SqlScriptGeneratorOptions {
+                IdentifierCasing = IdentifierCasing.PascalCase,
+                AlignColumnDefinitionFields = false
+            });
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestIdentifierCasingWithAccentedCharactersLowercase()
+        {
+            var inputSqlText = @"CREATE TABLE [Příliš Žluťoučký Kůň] (
+    [Úpěl Ďábelské] VARCHAR (50),
+    [Ódy] INT
+);";
+
+            var expectedSqlText = @"CREATE TABLE [příliš žluťoučký kůň] (
+    [úpěl ďábelské] VARCHAR (50),
+    [ódy] INT
+);";
+
+            ParseTransformAndAssertEquality(inputSqlText, expectedSqlText, new SqlScriptGeneratorOptions {
+                IdentifierCasing = IdentifierCasing.Lowercase,
+                AlignColumnDefinitionFields = false
+            });
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestIdentifierCasingWithAccentedCharactersUppercase()
+        {
+            var inputSqlText = @"CREATE TABLE [Příliš Žluťoučký Kůň] (
+    [Úpěl Ďábelské] VARCHAR (50),
+    [Ódy] INT
+);";
+
+            var expectedSqlText = @"CREATE TABLE [PŘÍLIŠ ŽLUŤOUČKÝ KŮŇ] (
+    [ÚPĚL ĎÁBELSKÉ] VARCHAR (50),
+    [ÓDY] INT
+);";
+
+            ParseTransformAndAssertEquality(inputSqlText, expectedSqlText, new SqlScriptGeneratorOptions {
+                IdentifierCasing = IdentifierCasing.Uppercase,
+                AlignColumnDefinitionFields = false
+            });
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestIdentifierCasingWithAccentedCharactersPascalCase()
+        {
+            var inputSqlText = @"CREATE TABLE [PŘÍLIŠ ŽLUŤOUČKÝ KŮŇ] (
+    [ÚPĚL ĎÁBELSKÉ ÓDY] VARCHAR (50),
+    [ódy] INT
+);";
+
+            // Note: PascalCase with quoted identifiers containing spaces produces lowercase after first character
+            // because the GetPascalCase method only capitalizes the first character of the entire string
+            var expectedSqlText = @"CREATE TABLE [příliš žluťoučký kůň] (
+    [úpěl ďábelské ódy] VARCHAR (50),
+    [ódy] INT
+);";
+
+            ParseTransformAndAssertEquality(inputSqlText, expectedSqlText, new SqlScriptGeneratorOptions {
+                IdentifierCasing = IdentifierCasing.PascalCase,
+                AlignColumnDefinitionFields = false
+            });
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestIdentifierCasingDoesNotAffectKeywords()
+        {
+            var inputSqlText = @"Create Table MyTable (
+    MyColumn VarChar (50) not null,
+    MyId Int Primary Key
+);";
+
+            var expectedSqlTextLowercaseKeywords = @"create table MYTABLE (
+    MYCOLUMN varchar (50) not null,
+    MYID int primary key
+);";
+
+            var expectedSqlTextUppercaseKeywords = @"CREATE TABLE mytable (
+    mycolumn VARCHAR (50) NOT NULL,
+    myid INT PRIMARY KEY
+);";
+
+            var parser = new TSql160Parser(true);
+            var fragment = parser.ParseStatementList(new StringReader(inputSqlText), out var errors);
+
+            Assert.AreEqual(0, errors.Count);
+
+            // The setting trigger both keyword and identifier casing, set opposite to each other,
+            // and hence it's clear which part is affected by which setting.
+
+            // Test with lowercase keywords and uppercase identifiers
+            var generatorLowerKeywords = new Sql160ScriptGenerator(new SqlScriptGeneratorOptions {
+                KeywordCasing = KeywordCasing.Lowercase,
+                IdentifierCasing = IdentifierCasing.Uppercase,
+                AlignColumnDefinitionFields = false
+            });
+            generatorLowerKeywords.GenerateScript(fragment, out var generatedSqlTextLower);
+            Assert.AreEqual(expectedSqlTextLowercaseKeywords, generatedSqlTextLower);
+
+            // Test with uppercase keywords and lowercase identifiers
+            var generatorUpperKeywords = new Sql160ScriptGenerator(new SqlScriptGeneratorOptions {
+                KeywordCasing = KeywordCasing.Uppercase,
+                IdentifierCasing = IdentifierCasing.Lowercase,
+                AlignColumnDefinitionFields = false
+            });
+            generatorUpperKeywords.GenerateScript(fragment, out var generatedSqlTextUpper);
+            Assert.AreEqual(expectedSqlTextUppercaseKeywords, generatedSqlTextUpper);
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestIdentifierCasingWithComplexStatement()
+        {
+            var inputSqlText = @"SELECT T1.MyColumn,
+       T2.AnotherColumn
+FROM MySchema.MyTable AS T1
+     INNER JOIN AnotherSchema.AnotherTable AS T2 ON T1.Id = T2.ForeignId
+WHERE T1.StatusCode = 'ACTIVE';";
+
+            var expectedSqlText = @"SELECT t1.mycolumn,
+       t2.anothercolumn
+FROM   myschema.mytable AS t1
+       INNER JOIN
+       anotherschema.anothertable AS t2
+       ON t1.id = t2.foreignid
+WHERE  t1.statuscode = 'ACTIVE';";
+
+            ParseTransformAndAssertEquality(inputSqlText, expectedSqlText, new SqlScriptGeneratorOptions {
+                IdentifierCasing = IdentifierCasing.Lowercase,
+                AlignClauseBodies = true,
+                NewLineBeforeFromClause = true,
+                NewLineBeforeWhereClause = true,
+                NewLineBeforeJoinClause = true
+            });
+        }
+
+        void ParseTransformAndAssertEquality(string inputSqlText, string expectedSqlText, SqlScriptGeneratorOptions generatorOptions)
+        {
+            var parser = new TSql160Parser(true);
+            var fragment = parser.ParseStatementList(new StringReader(inputSqlText), out var errors);
+
+            Assert.AreEqual(0, errors.Count);
+
+            var generator = new Sql160ScriptGenerator(generatorOptions);
+            generator.GenerateScript(fragment, out var generatedSqlText);
+
+            Assert.AreEqual(expectedSqlText, generatedSqlText);
+        }
     }
 }
