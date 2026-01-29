@@ -12,6 +12,15 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
     {
         public override void ExplicitVisit(TSqlScript node)
         {
+            // Initialize token stream for comment preservation
+            if (_options.PreserveComments && node.ScriptTokenStream != null)
+            {
+                SetTokenStreamForComments(node.ScriptTokenStream);
+            }
+
+            // Emit leading comments before the script
+            BeforeVisitFragment(node);
+
             Boolean firstItem = true;
             foreach (var item in node.Batches)
             {
@@ -28,6 +37,9 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
 
                 GenerateFragmentIfNotNull(item);
             }
+
+            // Emit trailing comments after the script
+            AfterVisitFragment(node);
         }
     }
 }

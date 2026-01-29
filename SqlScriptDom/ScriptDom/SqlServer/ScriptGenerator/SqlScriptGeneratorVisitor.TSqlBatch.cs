@@ -11,11 +11,20 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
     {
         public override void ExplicitVisit(TSqlBatch node)
         {
+            // Emit leading comments before the batch
+            BeforeVisitFragment(node);
+
             foreach (TSqlStatement statement in node.Statements)
             {
+                // Emit leading comments before each statement
+                BeforeVisitFragment(statement);
+
                 GenerateFragmentIfNotNull(statement);
 
                 GenerateSemiColonWhenNecessary(statement);
+
+                // Emit trailing comments after each statement
+                AfterVisitFragment(statement);
 
                 if (statement is TSqlStatementSnippet == false)
                 {
@@ -23,6 +32,9 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
                     NewLine();
                 }
             }
+
+            // Emit trailing comments after the batch
+            AfterVisitFragment(node);
         }
     }
 }

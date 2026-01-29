@@ -33,7 +33,10 @@ namespace SqlStudio.Tests.UTSqlScriptDom
             new ParserTest170("OptimizedLockingTests170.sql", nErrors80: 2, nErrors90: 2, nErrors100: 2, nErrors110: 2, nErrors120: 2, nErrors130: 2, nErrors140: 2, nErrors150: 2, nErrors160: 2),
             new ParserTest170("CreateEventSessionNotLikePredicate.sql", nErrors80: 2, nErrors90: 1,  nErrors100: 1, nErrors110: 1, nErrors120: 1, nErrors130: 0, nErrors140: 0, nErrors150: 0, nErrors160: 0),
             // Complex query with VECTOR types - parses syntactically in all versions (optimization fix), but VECTOR type only valid in TSql170
-            new ParserTest170("ComplexQueryTests170.sql")
+            new ParserTest170("ComplexQueryTests170.sql"),
+            // Comment preservation tests - basic SQL syntax works in all versions
+            new ParserTest170("SingleLineCommentTests170.sql"),
+            new ParserTest170("MultiLineCommentTests170.sql")
         };
 
         private static readonly ParserTest[] SqlAzure170_TestInfos =

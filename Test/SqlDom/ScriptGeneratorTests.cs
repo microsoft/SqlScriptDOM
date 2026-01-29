@@ -334,5 +334,170 @@ namespace SqlStudio.Tests.UTSqlScriptDom
 
             Assert.AreEqual(sqlText, generatedSqlText);
         }
+
+        #region Comment Preservation Tests
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestPreserveCommentsDefault()
+        {
+            // Verify default is false
+            var options = new SqlScriptGeneratorOptions();
+            Assert.AreEqual(false, options.PreserveComments);
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestPreserveCommentsDisabled()
+        {
+            // When PreserveComments is false (default), comments should be stripped
+            var sqlWithComments = "-- This is a leading comment\nSELECT 1; -- trailing comment";
+            var parser = new TSql170Parser(true);
+            var fragment = parser.Parse(new StringReader(sqlWithComments), out var errors);
+
+            Assert.AreEqual(0, errors.Count);
+
+            var generatorOptions = new SqlScriptGeneratorOptions
+            {
+                PreserveComments = false  // default
+            };
+            var generator = new Sql170ScriptGenerator(generatorOptions);
+            generator.GenerateScript(fragment, out var generatedSql);
+
+            // Without PreserveComments, comments should not appear
+            Assert.IsFalse(generatedSql.Contains("--"), "Comments should be stripped when PreserveComments is false");
+            Assert.IsFalse(generatedSql.Contains("leading comment"), "Comment text should not appear");
+            Assert.IsFalse(generatedSql.Contains("trailing comment"), "Trailing comment should not appear");
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestPreserveCommentsEnabled_SingleLineLeading()
+        {
+            // When PreserveComments is true, leading single-line comments should be preserved
+            var sqlWithComments = "-- This is a leading comment\nSELECT 1;";
+            var parser = new TSql170Parser(true);
+            var fragment = parser.Parse(new StringReader(sqlWithComments), out var errors);
+
+            Assert.AreEqual(0, errors.Count);
+
+            var generatorOptions = new SqlScriptGeneratorOptions
+            {
+                PreserveComments = true
+            };
+            var generator = new Sql170ScriptGenerator(generatorOptions);
+            generator.GenerateScript(fragment, out var generatedSql);
+
+            // With PreserveComments, the comment should appear in output
+            Assert.IsTrue(generatedSql.Contains("-- This is a leading comment"), 
+                "Leading comment should be preserved when PreserveComments is true");
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestPreserveCommentsEnabled_SingleLineTrailing()
+        {
+            // When PreserveComments is true, trailing single-line comments should be preserved
+            var sqlWithComments = "SELECT 1; -- trailing comment";
+            var parser = new TSql170Parser(true);
+            var fragment = parser.Parse(new StringReader(sqlWithComments), out var errors);
+
+            Assert.AreEqual(0, errors.Count);
+
+            var generatorOptions = new SqlScriptGeneratorOptions
+            {
+                PreserveComments = true
+            };
+            var generator = new Sql170ScriptGenerator(generatorOptions);
+            generator.GenerateScript(fragment, out var generatedSql);
+
+            // With PreserveComments, the trailing comment should appear
+            Assert.IsTrue(generatedSql.Contains("-- trailing comment"), 
+                "Trailing comment should be preserved when PreserveComments is true");
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestPreserveCommentsEnabled_MultipleStatements()
+        {
+            // Test comments between multiple statements
+            var sqlWithComments = @"-- First statement
+SELECT 1;
+-- Comment between statements
+SELECT 2;";
+            var parser = new TSql170Parser(true);
+            var fragment = parser.Parse(new StringReader(sqlWithComments), out var errors);
+
+            Assert.AreEqual(0, errors.Count);
+
+            var generatorOptions = new SqlScriptGeneratorOptions
+            {
+                PreserveComments = true
+            };
+            var generator = new Sql170ScriptGenerator(generatorOptions);
+            generator.GenerateScript(fragment, out var generatedSql);
+
+            // Both comments should be preserved
+            Assert.IsTrue(generatedSql.Contains("-- First statement"), 
+                "First comment should be preserved");
+            Assert.IsTrue(generatedSql.Contains("-- Comment between statements"), 
+                "Comment between statements should be preserved");
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestPreserveCommentsEnabled_MultiLineComment()
+        {
+            // When PreserveComments is true, multi-line comments should be preserved
+            var sqlWithComments = "/* This is a multi-line comment */\nSELECT 1;";
+            var parser = new TSql170Parser(true);
+            var fragment = parser.Parse(new StringReader(sqlWithComments), out var errors);
+
+            Assert.AreEqual(0, errors.Count);
+
+            var generatorOptions = new SqlScriptGeneratorOptions
+            {
+                PreserveComments = true
+            };
+            var generator = new Sql170ScriptGenerator(generatorOptions);
+            generator.GenerateScript(fragment, out var generatedSql);
+
+            // With PreserveComments, the multi-line comment should appear
+            Assert.IsTrue(generatedSql.Contains("/* This is a multi-line comment */"), 
+                "Multi-line comment should be preserved when PreserveComments is true");
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestPreserveCommentsEnabled_MultiLineBlockComment()
+        {
+            // Test that decorative patterns are preserved
+            var sqlWithComments = @"/***** Header Comment *****/
+SELECT 1;";
+            var parser = new TSql170Parser(true);
+            var fragment = parser.Parse(new StringReader(sqlWithComments), out var errors);
+
+            Assert.AreEqual(0, errors.Count);
+
+            var generatorOptions = new SqlScriptGeneratorOptions
+            {
+                PreserveComments = true
+            };
+            var generator = new Sql170ScriptGenerator(generatorOptions);
+            generator.GenerateScript(fragment, out var generatedSql);
+
+            // Decorative pattern should be preserved exactly
+            Assert.IsTrue(generatedSql.Contains("/***** Header Comment *****/"), 
+                "Decorative comment pattern should be preserved exactly");
+        }
+
+        #endregion
     }
 }
