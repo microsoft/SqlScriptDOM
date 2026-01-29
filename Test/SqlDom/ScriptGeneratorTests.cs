@@ -394,6 +394,12 @@ namespace SqlStudio.Tests.UTSqlScriptDom
             // With PreserveComments, the comment should appear in output
             Assert.IsTrue(generatedSql.Contains("-- This is a leading comment"), 
                 "Leading comment should be preserved when PreserveComments is true");
+            
+            // Verify comment appears BEFORE the SELECT keyword (correct positioning)
+            int commentIndex = generatedSql.IndexOf("-- This is a leading comment");
+            int selectIndex = generatedSql.IndexOf("SELECT", StringComparison.OrdinalIgnoreCase);
+            Assert.IsTrue(commentIndex < selectIndex, 
+                $"Leading comment should appear before SELECT. Comment at {commentIndex}, SELECT at {selectIndex}");
         }
 
         [TestMethod]
@@ -418,6 +424,12 @@ namespace SqlStudio.Tests.UTSqlScriptDom
             // With PreserveComments, the trailing comment should appear
             Assert.IsTrue(generatedSql.Contains("-- trailing comment"), 
                 "Trailing comment should be preserved when PreserveComments is true");
+            
+            // Verify trailing comment appears AFTER the SELECT (correct positioning)
+            int selectIndex = generatedSql.IndexOf("SELECT", StringComparison.OrdinalIgnoreCase);
+            int commentIndex = generatedSql.IndexOf("-- trailing comment");
+            Assert.IsTrue(commentIndex > selectIndex, 
+                $"Trailing comment should appear after SELECT. SELECT at {selectIndex}, comment at {commentIndex}");
         }
 
         [TestMethod]
@@ -447,6 +459,19 @@ SELECT 2;";
                 "First comment should be preserved");
             Assert.IsTrue(generatedSql.Contains("-- Comment between statements"), 
                 "Comment between statements should be preserved");
+            
+            // Verify ordering: first comment -> SELECT 1 -> between comment -> SELECT 2
+            int firstCommentIndex = generatedSql.IndexOf("-- First statement");
+            int firstSelectIndex = generatedSql.IndexOf("SELECT 1", StringComparison.OrdinalIgnoreCase);
+            int betweenCommentIndex = generatedSql.IndexOf("-- Comment between statements");
+            int secondSelectIndex = generatedSql.IndexOf("SELECT 2", StringComparison.OrdinalIgnoreCase);
+            
+            Assert.IsTrue(firstCommentIndex < firstSelectIndex, 
+                "First comment should appear before first SELECT");
+            Assert.IsTrue(firstSelectIndex < betweenCommentIndex, 
+                "Between comment should appear after first SELECT");
+            Assert.IsTrue(betweenCommentIndex < secondSelectIndex, 
+                "Between comment should appear before second SELECT");
         }
 
         [TestMethod]
@@ -471,6 +496,12 @@ SELECT 2;";
             // With PreserveComments, the multi-line comment should appear
             Assert.IsTrue(generatedSql.Contains("/* This is a multi-line comment */"), 
                 "Multi-line comment should be preserved when PreserveComments is true");
+            
+            // Verify comment appears BEFORE the SELECT keyword (correct positioning)
+            int commentIndex = generatedSql.IndexOf("/* This is a multi-line comment */");
+            int selectIndex = generatedSql.IndexOf("SELECT", StringComparison.OrdinalIgnoreCase);
+            Assert.IsTrue(commentIndex < selectIndex, 
+                $"Multi-line comment should appear before SELECT. Comment at {commentIndex}, SELECT at {selectIndex}");
         }
 
         [TestMethod]
@@ -496,6 +527,220 @@ SELECT 1;";
             // Decorative pattern should be preserved exactly
             Assert.IsTrue(generatedSql.Contains("/***** Header Comment *****/"), 
                 "Decorative comment pattern should be preserved exactly");
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestPreserveCommentsEnabled_Subquery()
+        {
+            // Test comments with subqueries
+            var sqlWithComments = @"-- Outer query comment
+SELECT * FROM (
+    -- Inner subquery comment
+    SELECT id, name FROM users
+) AS subq;";
+            var parser = new TSql170Parser(true);
+            var fragment = parser.Parse(new StringReader(sqlWithComments), out var errors);
+
+            Assert.AreEqual(0, errors.Count);
+
+            var generatorOptions = new SqlScriptGeneratorOptions
+            {
+                PreserveComments = true
+            };
+            var generator = new Sql170ScriptGenerator(generatorOptions);
+            generator.GenerateScript(fragment, out var generatedSql);
+
+            // Outer comment should be preserved
+            Assert.IsTrue(generatedSql.Contains("-- Outer query comment"), 
+                "Outer query comment should be preserved");
+            
+            // Verify comment appears BEFORE the SELECT keyword (correct positioning)
+            int commentIndex = generatedSql.IndexOf("-- Outer query comment");
+            int selectIndex = generatedSql.IndexOf("SELECT", StringComparison.OrdinalIgnoreCase);
+            Assert.IsTrue(commentIndex < selectIndex, 
+                $"Outer query comment should appear before SELECT. Comment at {commentIndex}, SELECT at {selectIndex}");
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestPreserveCommentsEnabled_CTE()
+        {
+            // Test comments with Common Table Expressions
+            var sqlWithComments = @"-- CTE definition comment
+WITH cte AS (
+    SELECT id FROM users
+)
+-- Main query comment
+SELECT * FROM cte;";
+            var parser = new TSql170Parser(true);
+            var fragment = parser.Parse(new StringReader(sqlWithComments), out var errors);
+
+            Assert.AreEqual(0, errors.Count);
+
+            var generatorOptions = new SqlScriptGeneratorOptions
+            {
+                PreserveComments = true
+            };
+            var generator = new Sql170ScriptGenerator(generatorOptions);
+            generator.GenerateScript(fragment, out var generatedSql);
+
+            // CTE comment should be preserved AND appear before the WITH keyword
+            Assert.IsTrue(generatedSql.Contains("-- CTE definition comment"), 
+                "CTE definition comment should be preserved");
+            
+            // Verify comment appears BEFORE the WITH keyword (correct positioning)
+            int commentIndex = generatedSql.IndexOf("-- CTE definition comment");
+            int withIndex = generatedSql.IndexOf("WITH", StringComparison.OrdinalIgnoreCase);
+            Assert.IsTrue(commentIndex < withIndex, 
+                $"CTE comment should appear before WITH keyword. Comment at {commentIndex}, WITH at {withIndex}");
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestPreserveCommentsEnabled_InsertSelect()
+        {
+            // Test comments with INSERT...SELECT statements
+            var sqlWithComments = @"-- Insert with select comment
+INSERT INTO target_table (col1, col2)
+-- Select portion comment
+SELECT a, b FROM source_table;";
+            var parser = new TSql170Parser(true);
+            var fragment = parser.Parse(new StringReader(sqlWithComments), out var errors);
+
+            Assert.AreEqual(0, errors.Count);
+
+            var generatorOptions = new SqlScriptGeneratorOptions
+            {
+                PreserveComments = true
+            };
+            var generator = new Sql170ScriptGenerator(generatorOptions);
+            generator.GenerateScript(fragment, out var generatedSql);
+
+            // Insert comment should be preserved
+            Assert.IsTrue(generatedSql.Contains("-- Insert with select comment"), 
+                "Insert statement comment should be preserved");
+            
+            // Verify comment appears BEFORE the INSERT keyword (correct positioning)
+            int commentIndex = generatedSql.IndexOf("-- Insert with select comment");
+            int insertIndex = generatedSql.IndexOf("INSERT", StringComparison.OrdinalIgnoreCase);
+            Assert.IsTrue(commentIndex < insertIndex, 
+                $"Insert comment should appear before INSERT. Comment at {commentIndex}, INSERT at {insertIndex}");
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestPreserveCommentsEnabled_StoredProcedure()
+        {
+            // Test comments within stored procedure body
+            var sqlWithComments = @"-- Procedure header comment
+CREATE PROCEDURE TestProc
+AS
+BEGIN
+    -- First statement in proc
+    SELECT 1;
+    -- Second statement in proc
+    SELECT 2;
+END;";
+            var parser = new TSql170Parser(true);
+            var fragment = parser.Parse(new StringReader(sqlWithComments), out var errors);
+
+            Assert.AreEqual(0, errors.Count);
+
+            var generatorOptions = new SqlScriptGeneratorOptions
+            {
+                PreserveComments = true
+            };
+            var generator = new Sql170ScriptGenerator(generatorOptions);
+            generator.GenerateScript(fragment, out var generatedSql);
+
+            // Procedure header comment should be preserved
+            Assert.IsTrue(generatedSql.Contains("-- Procedure header comment"), 
+                "Procedure header comment should be preserved");
+            
+            // Verify comment appears BEFORE the CREATE keyword (correct positioning)
+            int commentIndex = generatedSql.IndexOf("-- Procedure header comment");
+            int createIndex = generatedSql.IndexOf("CREATE", StringComparison.OrdinalIgnoreCase);
+            Assert.IsTrue(commentIndex < createIndex, 
+                $"Procedure comment should appear before CREATE. Comment at {commentIndex}, CREATE at {createIndex}");
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestPreserveCommentsEnabled_MixedCommentStyles()
+        {
+            // Test mixing single-line and multi-line comments
+            var sqlWithComments = @"/* Block comment at start */
+-- Single line after block
+SELECT 1; /* inline block */ -- trailing single";
+            var parser = new TSql170Parser(true);
+            var fragment = parser.Parse(new StringReader(sqlWithComments), out var errors);
+
+            Assert.AreEqual(0, errors.Count);
+
+            var generatorOptions = new SqlScriptGeneratorOptions
+            {
+                PreserveComments = true
+            };
+            var generator = new Sql170ScriptGenerator(generatorOptions);
+            generator.GenerateScript(fragment, out var generatedSql);
+
+            // Both comment styles should be preserved
+            Assert.IsTrue(generatedSql.Contains("/* Block comment at start */"), 
+                "Block comment should be preserved");
+            Assert.IsTrue(generatedSql.Contains("-- Single line after block"), 
+                "Single line comment should be preserved");
+            
+            // Verify ordering: block comment -> single line comment -> SELECT
+            int blockCommentIndex = generatedSql.IndexOf("/* Block comment at start */");
+            int singleLineIndex = generatedSql.IndexOf("-- Single line after block");
+            int selectIndex = generatedSql.IndexOf("SELECT", StringComparison.OrdinalIgnoreCase);
+            
+            Assert.IsTrue(blockCommentIndex < singleLineIndex, 
+                "Block comment should appear before single-line comment");
+            Assert.IsTrue(singleLineIndex < selectIndex, 
+                "Single-line comment should appear before SELECT");
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestPreserveCommentsEnabled_CreateTable()
+        {
+            // Test comments with CREATE TABLE statement
+            var sqlWithComments = @"-- Table creation comment
+CREATE TABLE TestTable (
+    -- Primary key column
+    Id INT PRIMARY KEY,
+    -- Name column
+    Name NVARCHAR(100)
+);";
+            var parser = new TSql170Parser(true);
+            var fragment = parser.Parse(new StringReader(sqlWithComments), out var errors);
+
+            Assert.AreEqual(0, errors.Count);
+
+            var generatorOptions = new SqlScriptGeneratorOptions
+            {
+                PreserveComments = true
+            };
+            var generator = new Sql170ScriptGenerator(generatorOptions);
+            generator.GenerateScript(fragment, out var generatedSql);
+
+            // Table creation comment should be preserved
+            Assert.IsTrue(generatedSql.Contains("-- Table creation comment"), 
+                "Table creation comment should be preserved");
+            
+            // Verify comment appears BEFORE the CREATE keyword (correct positioning)
+            int commentIndex = generatedSql.IndexOf("-- Table creation comment");
+            int createIndex = generatedSql.IndexOf("CREATE", StringComparison.OrdinalIgnoreCase);
+            Assert.IsTrue(commentIndex < createIndex, 
+                $"Table comment should appear before CREATE. Comment at {commentIndex}, CREATE at {createIndex}");
         }
 
         #endregion
