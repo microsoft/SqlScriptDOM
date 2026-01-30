@@ -11,7 +11,6 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
     {
         public override void ExplicitVisit(TSqlBatch node)
         {
-            // Comments are now handled automatically by GenerateFragmentIfNotNull
             foreach (TSqlStatement statement in node.Statements)
             {
                 GenerateFragmentIfNotNull(statement);

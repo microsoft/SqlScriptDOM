@@ -32,7 +32,6 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
                     NewLine();
                 }
 
-                // GenerateFragmentIfNotNull now handles comments automatically
                 GenerateFragmentIfNotNull(item);
             }
 
