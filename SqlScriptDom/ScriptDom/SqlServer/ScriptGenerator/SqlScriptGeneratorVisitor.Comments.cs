@@ -23,6 +23,16 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
         /// </summary>
         private IList<TSqlParserToken> _currentTokenStream;
 
+        /// <summary>
+        /// Tracks which comment tokens have already been emitted to avoid duplicates.
+        /// </summary>
+        private readonly HashSet<TSqlParserToken> _emittedComments = new HashSet<TSqlParserToken>();
+
+        /// <summary>
+        /// Tracks whether leading (file-level) comments have been emitted.
+        /// </summary>
+        private bool _leadingCommentsEmitted = false;
+
         #endregion
 
         #region Comment Preservation Methods
@@ -36,216 +46,226 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
         {
             _currentTokenStream = tokenStream;
             _lastProcessedTokenIndex = -1;
+            _emittedComments.Clear();
+            _leadingCommentsEmitted = false;
         }
 
         /// <summary>
-        /// Gets leading comments that appear between the last processed token and the current fragment.
+        /// Emits comments that appear before the first fragment in the script (file-level leading comments).
+        /// Called once when generating the first fragment.
         /// </summary>
-        /// <param name="fragment">The current fragment being visited.</param>
-        /// <returns>List of comment information for leading comments.</returns>
-        protected List<CommentInfo> GetLeadingComments(TSqlFragment fragment)
+        /// <param name="fragment">The first fragment being generated.</param>
+        protected void EmitLeadingComments(TSqlFragment fragment)
         {
-            var comments = new List<CommentInfo>();
-
-            if (_currentTokenStream == null || fragment == null || !_options.PreserveComments)
+            if (!_options.PreserveComments || _currentTokenStream == null || fragment == null)
             {
-                return comments;
+                return;
+            }
+
+            if (fragment.FirstTokenIndex <= 0)
+            {
+                return;
+            }
+
+            for (int i = 0; i < fragment.FirstTokenIndex && i < _currentTokenStream.Count; i++)
+            {
+                var token = _currentTokenStream[i];
+                if (IsCommentToken(token) && !_emittedComments.Contains(token))
+                {
+                    EmitCommentToken(token, isLeading: true);
+                    _emittedComments.Add(token);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Emits comments that appear in the gap between the last emitted token and the current fragment.
+        /// This captures comments embedded within sub-expressions.
+        /// </summary>
+        /// <param name="fragment">The fragment about to be generated.</param>
+        protected void EmitGapComments(TSqlFragment fragment)
+        {
+            if (!_options.PreserveComments || _currentTokenStream == null || fragment == null)
+            {
+                return;
             }
 
             int startIndex = _lastProcessedTokenIndex + 1;
             int endIndex = fragment.FirstTokenIndex;
 
-            // Scan for comments between last processed and current fragment
+            if (endIndex <= startIndex)
+            {
+                return;
+            }
+
             for (int i = startIndex; i < endIndex && i < _currentTokenStream.Count; i++)
             {
                 var token = _currentTokenStream[i];
-                if (IsCommentToken(token))
+                if (IsCommentToken(token) && !_emittedComments.Contains(token))
                 {
-                    comments.Add(new CommentInfo(token, CommentPosition.Leading, fragment.FirstTokenIndex));
+                    EmitCommentToken(token, isLeading: true);
+                    _emittedComments.Add(token);
+                    _lastProcessedTokenIndex = i;
                 }
             }
-
-            return comments;
         }
 
         /// <summary>
-        /// Gets trailing comments that appear on the same line after the fragment.
+        /// Emits trailing comments that appear immediately after the fragment.
         /// </summary>
-        /// <param name="fragment">The current fragment being visited.</param>
-        /// <returns>List of comment information for trailing comments.</returns>
-        protected List<CommentInfo> GetTrailingComments(TSqlFragment fragment)
+        /// <param name="fragment">The fragment that was just generated.</param>
+        protected void EmitTrailingComments(TSqlFragment fragment)
         {
-            var comments = new List<CommentInfo>();
-
-            if (_currentTokenStream == null || fragment == null || !_options.PreserveComments)
+            if (!_options.PreserveComments || _currentTokenStream == null || fragment == null)
             {
-                return comments;
+                return;
             }
 
             int lastTokenIndex = fragment.LastTokenIndex;
             if (lastTokenIndex < 0 || lastTokenIndex >= _currentTokenStream.Count)
             {
-                return comments;
+                return;
             }
 
-            var lastToken = _currentTokenStream[lastTokenIndex];
-            int lastTokenLine = lastToken.Line;
-
-            // Scan for comments after the last token on the same line
+            // Scan for comments immediately following the fragment
             for (int i = lastTokenIndex + 1; i < _currentTokenStream.Count; i++)
             {
                 var token = _currentTokenStream[i];
                 
-                // Stop if we've gone past the same line (unless it's whitespace with no newline)
-                if (token.Line > lastTokenLine)
+                if (IsCommentToken(token) && !_emittedComments.Contains(token))
                 {
+                    EmitCommentToken(token, isLeading: false);
+                    _emittedComments.Add(token);
+                    _lastProcessedTokenIndex = i;
+                }
+                else if (token.TokenType != TSqlTokenType.WhiteSpace)
+                {
+                    // Stop at next non-whitespace, non-comment token
                     break;
                 }
-
-                // Found a comment on the same line
-                if (IsCommentToken(token))
-                {
-                    comments.Add(new CommentInfo(token, CommentPosition.Trailing, lastTokenIndex));
-                    
-                    // For single-line comments, there can't be anything else after on this line
-                    if (token.TokenType == TSqlTokenType.SingleLineComment)
-                    {
-                        break;
-                    }
-                }
             }
-
-            return comments;
         }
 
         /// <summary>
-        /// Emits a comment using the script writer with current indentation.
+        /// Updates tracking after generating a fragment.
         /// </summary>
-        /// <param name="commentInfo">The comment to emit.</param>
-        protected void EmitComment(CommentInfo commentInfo)
+        /// <param name="fragment">The fragment that was just generated.</param>
+        protected void UpdateLastProcessedIndex(TSqlFragment fragment)
         {
-            if (commentInfo == null || commentInfo.Token == null)
+            if (fragment != null && fragment.LastTokenIndex > _lastProcessedTokenIndex)
             {
-                return;
-            }
-
-            var text = commentInfo.Text;
-            if (string.IsNullOrEmpty(text))
-            {
-                return;
-            }
-
-            if (commentInfo.IsSingleLineComment)
-            {
-                EmitSingleLineComment(text, commentInfo.Position);
-            }
-            else if (commentInfo.IsMultiLineComment)
-            {
-                EmitMultiLineComment(text, commentInfo.Position);
+                _lastProcessedTokenIndex = fragment.LastTokenIndex;
             }
         }
 
         /// <summary>
-        /// Emits a single-line comment.
+        /// Called from GenerateFragmentIfNotNull to handle comments before generating a fragment.
+        /// This is the key integration point that enables comments within sub-expressions.
         /// </summary>
-        private void EmitSingleLineComment(string text, CommentPosition position)
-        {
-            if (position == CommentPosition.Trailing)
-            {
-                // Trailing: add space before comment, keep on same line
-                _writer.AddToken(ScriptGeneratorSupporter.CreateWhitespaceToken(1));
-            }
-            else
-            {
-                // Leading: comment goes on its own line
-                // Indentation is already applied by current context
-            }
-
-            // Write the comment as-is (preserving the -- prefix)
-            _writer.AddToken(new TSqlParserToken(TSqlTokenType.SingleLineComment, text));
-
-            if (position == CommentPosition.Leading)
-            {
-                // After a leading comment, we need a newline
-                _writer.NewLine();
-            }
-        }
-
-        /// <summary>
-        /// Emits a multi-line comment, preserving internal structure.
-        /// </summary>
-        private void EmitMultiLineComment(string text, CommentPosition position)
-        {
-            if (position == CommentPosition.Trailing)
-            {
-                // Trailing: add space before comment
-                _writer.AddToken(ScriptGeneratorSupporter.CreateWhitespaceToken(1));
-            }
-
-            // For multi-line comments, we preserve the content as-is
-            // The comment includes /* and */ delimiters
-            _writer.AddToken(new TSqlParserToken(TSqlTokenType.MultilineComment, text));
-
-            if (position == CommentPosition.Leading)
-            {
-                // After a leading multi-line comment, add newline
-                _writer.NewLine();
-            }
-        }
-
-        /// <summary>
-        /// Called before visiting a fragment to emit any leading comments.
-        /// </summary>
-        /// <param name="fragment">The fragment about to be visited.</param>
-        protected void BeforeVisitFragment(TSqlFragment fragment)
+        /// <param name="fragment">The fragment about to be generated.</param>
+        protected void BeforeGenerateFragment(TSqlFragment fragment)
         {
             if (!_options.PreserveComments || _currentTokenStream == null || fragment == null)
             {
                 return;
             }
 
-            var leadingComments = GetLeadingComments(fragment);
-            foreach (var comment in leadingComments)
+            // Emit file-level leading comments once
+            if (!_leadingCommentsEmitted)
             {
-                EmitComment(comment);
+                EmitLeadingComments(fragment);
+                _leadingCommentsEmitted = true;
             }
+
+            // Emit any comments in the gap between last processed token and this fragment
+            EmitGapComments(fragment);
         }
 
         /// <summary>
-        /// Called after visiting a fragment to emit any trailing comments and update tracking.
+        /// Called from GenerateFragmentIfNotNull to handle comments after generating a fragment.
         /// </summary>
-        /// <param name="fragment">The fragment that was just visited.</param>
-        protected void AfterVisitFragment(TSqlFragment fragment)
+        /// <param name="fragment">The fragment that was just generated.</param>
+        protected void AfterGenerateFragment(TSqlFragment fragment)
         {
             if (!_options.PreserveComments || _currentTokenStream == null || fragment == null)
             {
                 return;
             }
 
-            var trailingComments = GetTrailingComments(fragment);
-            foreach (var comment in trailingComments)
+            // Emit trailing comments and update tracking
+            EmitTrailingComments(fragment);
+            UpdateLastProcessedIndex(fragment);
+        }
+
+        /// <summary>
+        /// Emits a comment token to the output.
+        /// </summary>
+        /// <param name="token">The comment token.</param>
+        /// <param name="isLeading">True if this is a leading comment, false for trailing.</param>
+        private void EmitCommentToken(TSqlParserToken token, bool isLeading)
+        {
+            if (token == null)
             {
-                EmitComment(comment);
+                return;
             }
 
-            // Update the last processed token index
-            if (fragment.LastTokenIndex >= 0)
+            if (token.TokenType == TSqlTokenType.SingleLineComment)
             {
-                // Account for any trailing comments we just emitted
-                int newLastIndex = fragment.LastTokenIndex;
-                foreach (var comment in trailingComments)
+                if (!isLeading)
                 {
-                    // Find the index of this comment token
-                    for (int i = newLastIndex + 1; i < _currentTokenStream.Count; i++)
-                    {
-                        if (_currentTokenStream[i] == comment.Token)
-                        {
-                            newLastIndex = i;
-                            break;
-                        }
-                    }
+                    // Trailing: add space before comment
+                    _writer.AddToken(ScriptGeneratorSupporter.CreateWhitespaceToken(1));
                 }
-                _lastProcessedTokenIndex = newLastIndex;
+
+                _writer.AddToken(new TSqlParserToken(TSqlTokenType.SingleLineComment, token.Text));
+
+                if (isLeading)
+                {
+                    // After a leading comment, add newline
+                    _writer.NewLine();
+                }
+            }
+            else if (token.TokenType == TSqlTokenType.MultilineComment)
+            {
+                if (!isLeading)
+                {
+                    // Trailing: add space before comment
+                    _writer.AddToken(ScriptGeneratorSupporter.CreateWhitespaceToken(1));
+                }
+
+                _writer.AddToken(new TSqlParserToken(TSqlTokenType.MultilineComment, token.Text));
+
+                if (isLeading)
+                {
+                    // After a leading multi-line comment, add newline
+                    _writer.NewLine();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Emits any remaining comments at the end of the token stream.
+        /// Call this after visiting the root fragment to capture comments that appear
+        /// after the last statement (end-of-script comments).
+        /// </summary>
+        protected void EmitRemainingComments()
+        {
+            if (!_options.PreserveComments || _currentTokenStream == null)
+            {
+                return;
+            }
+
+            // Scan from the last processed token to the end of the token stream
+            for (int i = _lastProcessedTokenIndex + 1; i < _currentTokenStream.Count; i++)
+            {
+                var token = _currentTokenStream[i];
+                if (IsCommentToken(token) && !_emittedComments.Contains(token))
+                {
+                    // End-of-script comments: add newline before, emit comment
+                    _writer.NewLine();
+                    _writer.AddToken(new TSqlParserToken(token.TokenType, token.Text));
+                    _emittedComments.Add(token);
+                }
             }
         }
 

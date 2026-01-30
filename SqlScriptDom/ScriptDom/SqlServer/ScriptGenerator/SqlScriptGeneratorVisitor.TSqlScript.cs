@@ -18,9 +18,6 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
                 SetTokenStreamForComments(node.ScriptTokenStream);
             }
 
-            // Emit leading comments before the script
-            BeforeVisitFragment(node);
-
             Boolean firstItem = true;
             foreach (var item in node.Batches)
             {
@@ -35,11 +32,12 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
                     NewLine();
                 }
 
+                // GenerateFragmentIfNotNull now handles comments automatically
                 GenerateFragmentIfNotNull(item);
             }
 
-            // Emit trailing comments after the script
-            AfterVisitFragment(node);
+            // Emit any remaining comments at end of script (after the last statement)
+            EmitRemainingComments();
         }
     }
 }
