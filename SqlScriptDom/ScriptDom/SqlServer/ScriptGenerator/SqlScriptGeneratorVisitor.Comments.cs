@@ -163,7 +163,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
         /// This is the key integration point that enables comments within sub-expressions.
         /// </summary>
         /// <param name="fragment">The fragment about to be generated.</param>
-        protected void BeforeGenerateFragment(TSqlFragment fragment)
+        protected void HandleCommentsBeforeFragment(TSqlFragment fragment)
         {
             if (!_options.PreserveComments || _currentTokenStream == null || fragment == null)
             {
@@ -185,7 +185,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
         /// Called from GenerateFragmentIfNotNull to handle comments after generating a fragment.
         /// </summary>
         /// <param name="fragment">The fragment that was just generated.</param>
-        protected void AfterGenerateFragment(TSqlFragment fragment)
+        protected void HandleCommentsAfterFragment(TSqlFragment fragment)
         {
             if (!_options.PreserveComments || _currentTokenStream == null || fragment == null)
             {
