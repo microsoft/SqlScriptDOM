@@ -171,7 +171,14 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
         {
             if (fragment != null)
             {
+                // Handle comments before generating the fragment
+                // This is the key integration point that enables comments within sub-expressions
+                HandleCommentsBeforeFragment(fragment);
+
                 fragment.Accept(this);
+
+                // Handle comments after generating the fragment
+                HandleCommentsAfterFragment(fragment);
             }
         }
 

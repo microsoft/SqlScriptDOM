@@ -43,6 +43,9 @@
     <Setting name="NumNewlinesAfterStatement" type="int" default="1" min="0">
       <Summary>Gets or sets the number of newlines to include after each statement</Summary>
     </Setting>
+    <Setting name="PreserveComments" type="bool" default="false">
+      <Summary>Gets or sets a boolean indicating if comments from the original script should be preserved in the generated output</Summary>
+    </Setting>
   </SettingGroup>
   <SettingGroup name="CREATE TABLE">
     <Setting name="AlignColumnDefinitionFields" type="bool" default="true">

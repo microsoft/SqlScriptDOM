@@ -1,0 +1,10 @@
+SELECT 1;
+
+SELECT *
+FROM dbo.MyTable;
+
+SELECT 2;
+
+SELECT 3;
+
+SELECT 4;
