@@ -33104,6 +33104,7 @@ jsonArrayAggBuiltInFunctionCall [FunctionCall vParent]
 {
     ScalarExpression vExpression;
     OrderByClause vOrderByClause;
+    OverClause vOverClause;
 }
     :   (
            vExpression=expression
@@ -33133,6 +33134,12 @@ jsonArrayAggBuiltInFunctionCall [FunctionCall vParent]
         {
             UpdateTokenInfo(vParent, tRParen);
         }
+        (
+            vOverClause=overClauseNoOrderBy
+            {
+                vParent.OverClause = vOverClause;
+            }
+        )?
     ;
 
 jsonObjectBuiltInFunctionCall [FunctionCall vParent]
