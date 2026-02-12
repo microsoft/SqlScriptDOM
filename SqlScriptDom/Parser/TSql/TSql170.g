@@ -33987,7 +33987,7 @@ vectorSearchColumnReferenceExpression returns [ColumnReferenceExpression vResult
     MultiPartIdentifier vMultiPartIdentifier;
 }
     :
-        vMultiPartIdentifier=multiPartIdentifier[2]
+        vMultiPartIdentifier=multiPartIdentifier[4]
         {
             vResult.ColumnType = ColumnType.Regular;
             vResult.MultiPartIdentifier = vMultiPartIdentifier;
