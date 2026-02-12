@@ -7544,6 +7544,11 @@ WHEN NOT MATCHED BY SOURCE THEN DELETE OUTPUT inserted.*, deleted.*;";
             ParserTestUtils.ErrorTest170(
                 "SELECT * FROM VECTOR_SEARCH('tbl1', 'col1', 'query_vector', 'dot', 5)",
                 new ParserErrorInfo(28, "SQL46010", "'tbl1'"));
+
+            // Subquery not allowed in SIMILAR_TO parameter
+            ParserTestUtils.ErrorTest170(
+                "SELECT * FROM VECTOR_SEARCH(TABLE = graphnode, COLUMN = embedding, SIMILAR_TO = (SELECT TOP 1 embedding FROM GTQuery), METRIC = 'euclidean', TOP_N = 20) AS ann",
+                new ParserErrorInfo(80, "SQL46098"));
         }
 
         /// <summary>

@@ -19306,6 +19306,13 @@ vectorSearchTableReference returns [VectorSearchTableReference vResult = Fragmen
         Comma tSimilarTo:Identifier EqualsSign vSimilarTo = expression
         {
             Match(tSimilarTo, CodeGenerationSupporter.SimilarTo);
+            
+            // Validate that SIMILAR_TO does not contain a subquery
+            if (vSimilarTo is ScalarSubquery)
+            {
+                ThrowParseErrorException("SQL46098", vSimilarTo, TSqlParserResource.SQL46098Message);
+            }
+            
             vResult.SimilarTo = vSimilarTo;
         }
         Comma tMetric:Identifier EqualsSign vMetric = stringLiteral
