@@ -19306,6 +19306,13 @@ vectorSearchTableReference returns [VectorSearchTableReference vResult = Fragmen
         Comma tSimilarTo:Identifier EqualsSign vSimilarTo = expression
         {
             Match(tSimilarTo, CodeGenerationSupporter.SimilarTo);
+            
+            // Validate that SIMILAR_TO does not contain a subquery
+            if (vSimilarTo is ScalarSubquery)
+            {
+                ThrowParseErrorException("SQL46098", vSimilarTo, TSqlParserResource.SQL46098Message);
+            }
+            
             vResult.SimilarTo = vSimilarTo;
         }
         Comma tMetric:Identifier EqualsSign vMetric = stringLiteral
@@ -33104,6 +33111,7 @@ jsonArrayAggBuiltInFunctionCall [FunctionCall vParent]
 {
     ScalarExpression vExpression;
     OrderByClause vOrderByClause;
+    OverClause vOverClause;
 }
     :   (
            vExpression=expression
@@ -33133,6 +33141,12 @@ jsonArrayAggBuiltInFunctionCall [FunctionCall vParent]
         {
             UpdateTokenInfo(vParent, tRParen);
         }
+        (
+            vOverClause=overClauseNoOrderBy
+            {
+                vParent.OverClause = vOverClause;
+            }
+        )?
     ;
 
 jsonObjectBuiltInFunctionCall [FunctionCall vParent]
@@ -33980,7 +33994,7 @@ vectorSearchColumnReferenceExpression returns [ColumnReferenceExpression vResult
     MultiPartIdentifier vMultiPartIdentifier;
 }
     :
-        vMultiPartIdentifier=multiPartIdentifier[2]
+        vMultiPartIdentifier=multiPartIdentifier[4]
         {
             vResult.ColumnType = ColumnType.Regular;
             vResult.MultiPartIdentifier = vMultiPartIdentifier;

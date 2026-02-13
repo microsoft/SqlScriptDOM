@@ -17,3 +17,15 @@ SELECT TOP (5) c.object_id,
                JSON_ARRAYAGG(c.name ORDER BY c.column_id) AS column_list
 FROM sys.columns AS c
 GROUP BY c.object_id;
+
+SELECT JSON_ARRAYAGG(name) OVER (PARTITION BY dept)
+FROM employees;
+
+SELECT JSON_ARRAYAGG(name ABSENT ON NULL) OVER (PARTITION BY dept)
+FROM employees;
+
+SELECT JSON_ARRAYAGG(name NULL ON NULL) OVER (PARTITION BY dept)
+FROM employees;
+
+SELECT JSON_ARRAYAGG(name ORDER BY name NULL ON NULL RETURNING JSON) OVER (PARTITION BY dept)
+FROM employees;

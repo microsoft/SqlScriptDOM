@@ -20,7 +20,7 @@ namespace SqlStudio.Tests.UTSqlScriptDom
             new ParserTest170("RegexpTests170.sql", nErrors80: 0, nErrors90: 0, nErrors100: 0, nErrors110: 0, nErrors120: 0, nErrors130: 0, nErrors140: 0, nErrors150: 0, nErrors160: 0),
             new ParserTest170("AiGenerateChunksTests170.sql", nErrors80: 19, nErrors90: 16, nErrors100: 15, nErrors110: 15, nErrors120: 15, nErrors130: 15, nErrors140: 15, nErrors150: 15, nErrors160: 15),
             new ParserTest170("JsonFunctionTests170.sql", nErrors80: 29, nErrors90: 8, nErrors100: 54, nErrors110: 54, nErrors120: 54, nErrors130: 54, nErrors140: 54, nErrors150: 54, nErrors160: 54),
-            new ParserTest170("JsonArrayAggOrderBy170.sql", nErrors80: 6, nErrors90: 6, nErrors100: 6, nErrors110: 6, nErrors120: 6, nErrors130: 6, nErrors140: 6, nErrors150: 6, nErrors160: 6),
+            new ParserTest170("JsonArrayAggOrderBy170.sql", nErrors80: 10, nErrors90: 9, nErrors100: 9, nErrors110: 9, nErrors120: 9, nErrors130: 9, nErrors140: 9, nErrors150: 9, nErrors160: 9),
             new ParserTest170("ComplexJsonObjectFunctionTests170.sql"),
             new ParserTest170("AiGenerateEmbeddingsTests170.sql", nErrors80: 14, nErrors90: 11, nErrors100: 11, nErrors110: 11, nErrors120: 11, nErrors130: 11, nErrors140: 11, nErrors150: 11, nErrors160: 11),
             new ParserTest170("CreateExternalModelStatementTests170.sql", nErrors80: 2, nErrors90: 2, nErrors100: 2, nErrors110: 2, nErrors120: 2, nErrors130: 4, nErrors140: 4, nErrors150: 4, nErrors160: 4),
@@ -32,6 +32,7 @@ namespace SqlStudio.Tests.UTSqlScriptDom
             new ParserTest170("RegexpLikeTests170.sql", nErrors80: 15, nErrors90: 15, nErrors100: 15, nErrors110: 18, nErrors120: 18, nErrors130: 18, nErrors140: 18, nErrors150: 18, nErrors160: 18),
             new ParserTest170("OptimizedLockingTests170.sql", nErrors80: 2, nErrors90: 2, nErrors100: 2, nErrors110: 2, nErrors120: 2, nErrors130: 2, nErrors140: 2, nErrors150: 2, nErrors160: 2),
             new ParserTest170("CreateEventSessionNotLikePredicate.sql", nErrors80: 2, nErrors90: 1,  nErrors100: 1, nErrors110: 1, nErrors120: 1, nErrors130: 0, nErrors140: 0, nErrors150: 0, nErrors160: 0),
+            new ParserTest170("VectorSearchCrossApplyTests170.sql", nErrors80: 1, nErrors90: 1, nErrors100: 1, nErrors110: 1, nErrors120: 1, nErrors130: 1, nErrors140: 1, nErrors150: 1, nErrors160: 1),
             // Complex query with VECTOR types - parses syntactically in all versions (optimization fix), but VECTOR type only valid in TSql170
             new ParserTest170("ComplexQueryTests170.sql"),
             // Comment preservation tests - basic SQL syntax works in all versions

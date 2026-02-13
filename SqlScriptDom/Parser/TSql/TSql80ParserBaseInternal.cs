@@ -292,8 +292,9 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         protected static void AddAndUpdateTokenInfo<TFragmentType>(TSqlFragment node, IList<TFragmentType> collection, IList<TFragmentType> otherCollection)
             where TFragmentType : TSqlFragment
         {
-            foreach (TFragmentType item in otherCollection)
+            for (int i = 0; i < otherCollection.Count; i++)
             {
+                TFragmentType item = otherCollection[i];
                 AddAndUpdateTokenInfo(node, collection, item);
             }
         }
