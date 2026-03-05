@@ -33167,6 +33167,7 @@ jsonObjectBuiltInFunctionCall [FunctionCall vParent]
 
 jsonObjectAggBuiltInFunctionCall [FunctionCall vParent]
 {
+    OverClause vOverClause;
 }
     :   (
             jsonObjectAggExpressionList[vParent]
@@ -33177,6 +33178,12 @@ jsonObjectAggBuiltInFunctionCall [FunctionCall vParent]
         {
             UpdateTokenInfo(vParent, tRParen);
         }
+        (
+            vOverClause=overClauseNoOrderBy
+            {
+                vParent.OverClause = vOverClause;
+            }
+        )?
     ;
 
 jsonQueryBuiltInFunctionCall [FunctionCall vParent]

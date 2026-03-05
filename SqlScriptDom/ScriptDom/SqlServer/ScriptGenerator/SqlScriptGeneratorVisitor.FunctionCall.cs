@@ -70,6 +70,8 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
                     GenerateSpace();
                 GenerateReturnType(node?.ReturnType);
                 GenerateSymbol(TSqlTokenType.RightParenthesis);
+                // Generate OVER clause for windowed json_objectagg
+                GenerateSpaceAndFragmentIfNotNull(node.OverClause);
             }
             else if (node.FunctionName.Value.ToUpper(CultureInfo.InvariantCulture) == CodeGenerationSupporter.JsonArray)
             {
