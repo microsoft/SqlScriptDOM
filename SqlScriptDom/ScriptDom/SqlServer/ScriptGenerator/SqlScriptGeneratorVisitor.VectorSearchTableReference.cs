@@ -15,9 +15,9 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
         ///     TABLE = object[AS source_table_alias],
         ///     COLUMN = vector_column,
         ///     SIMILAR_TO = query_vector,
-        ///     METRIC = { 'cosine' | 'dot' | 'euclidean' },
-        ///     TOP_N = k
-        /// ) [AS result_table_alias]
+        ///     METRIC = { 'cosine' | 'dot' | 'euclidean' }
+        ///     [, TOP_N = k]
+        /// ) [WITH (FORCE_ANN_ONLY)] [AS result_table_alias]
         /// </summary>
         public override void ExplicitVisit(VectorSearchTableReference node)
         {
@@ -41,13 +41,28 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
 
             NewLineAndIndent();
             GenerateNameEqualsValue(CodeGenerationSupporter.Metric, node.Metric);
-            GenerateSymbol(TSqlTokenType.Comma);
-
-            NewLineAndIndent();
-            GenerateNameEqualsValue(CodeGenerationSupporter.TopN, node.TopN);
+            
+            // TOP_N is optional per SQL Server 2025 (commit 12d3e8fc)
+            if (node.TopN != null)
+            {
+                GenerateSymbol(TSqlTokenType.Comma);
+                NewLineAndIndent();
+                GenerateNameEqualsValue(CodeGenerationSupporter.TopN, node.TopN);
+            }
 
             NewLine();
             GenerateSymbol(TSqlTokenType.RightParenthesis);
+            
+            // WITH (FORCE_ANN_ONLY) hint per SQL Server 2025 (commit 12d3e8fc)
+            if (node.ForceAnnOnly)
+            {
+                GenerateSpaceAndKeyword(TSqlTokenType.With);
+                GenerateSpace();
+                GenerateSymbol(TSqlTokenType.LeftParenthesis);
+                GenerateIdentifier(CodeGenerationSupporter.ForceAnnOnly);
+                GenerateSymbol(TSqlTokenType.RightParenthesis);
+            }
+            
             GenerateSpaceAndAlias(node.Alias);
 
             PopAlignmentPoint();

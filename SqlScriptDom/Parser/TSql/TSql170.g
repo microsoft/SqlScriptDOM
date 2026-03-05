@@ -19321,19 +19321,35 @@ vectorSearchTableReference returns [VectorSearchTableReference vResult = Fragmen
             MatchString(vMetric, CodeGenerationSupporter.Cosine, CodeGenerationSupporter.Dot, CodeGenerationSupporter.Euclidean);
             vResult.Metric = vMetric;
         }
-        Comma tTopN:Identifier EqualsSign vTopN = signedIntegerOrVariableOrColumnReference
-        {
-            Match(tTopN, CodeGenerationSupporter.TopN);
-            
-            // Validate that TOP_N is not a negative number
-            if (vTopN is UnaryExpression unaryExpr && unaryExpr.UnaryExpressionType == UnaryExpressionType.Negative)
+        // TOP_N is optional per SQL Server 2025 (commit 12d3e8fc)
+        (
+            Comma tTopN:Identifier EqualsSign vTopN = signedIntegerOrVariableOrColumnReference
             {
-                ThrowParseErrorException("SQL46010", unaryExpr, TSqlParserResource.SQL46010Message, "-");
+                Match(tTopN, CodeGenerationSupporter.TopN);
+                
+                // Validate that TOP_N is not a negative number
+                if (vTopN is UnaryExpression unaryExpr && unaryExpr.UnaryExpressionType == UnaryExpressionType.Negative)
+                {
+                    ThrowParseErrorException("SQL46010", unaryExpr, TSqlParserResource.SQL46010Message, "-");
+                }
+                
+                vResult.TopN = vTopN;
             }
-            
-            vResult.TopN = vTopN;
+        )?
+        tRParen:RightParenthesis
+        {
+            UpdateTokenInfo(vResult, tRParen);
         }
-        RightParenthesis simpleTableReferenceAliasOpt[vResult]
+        // WITH clause per SQL Server 2025 (commit 12d3e8fc)
+        (
+            With LeftParenthesis tForceAnnOnly:Identifier tRParen2:RightParenthesis
+            {
+                Match(tForceAnnOnly, CodeGenerationSupporter.ForceAnnOnly);
+                UpdateTokenInfo(vResult, tRParen2);
+                vResult.ForceAnnOnly = true;
+            }
+        )?
+        simpleTableReferenceAliasOpt[vResult]
     ;
 
 predictTableReference[SubDmlFlags subDmlFlags] returns [PredictTableReference vResult]

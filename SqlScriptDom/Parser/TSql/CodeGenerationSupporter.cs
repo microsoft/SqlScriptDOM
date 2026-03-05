@@ -75,6 +75,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         internal const string AnsiWarnings = "ANSI_WARNINGS";
         internal const string ForcePlan = "FORCEPLAN";
         internal const string ForAppend = "FOR_APPEND";
+        internal const string ForceAnnOnly = "FORCE_ANN_ONLY";
         internal const string ShowPlanAll = "SHOWPLAN_ALL";
         internal const string ShowPlanText = "SHOWPLAN_TEXT";
         internal const string IO = "IO";

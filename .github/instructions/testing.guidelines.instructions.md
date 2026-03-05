@@ -321,6 +321,25 @@ Expected: 'SELECT JSON_ARRAY('value1', 'value2');'
 
 **Solution**: Copy the "Actual" output to your baseline file (note spacing differences).
 
+**CRITICAL CHECK**: After copying baseline, compare it against your test script:
+```sql
+-- Input script (TestScripts/MyTest.sql)
+SELECT * FROM FUNC() WITH (HINT);
+
+-- Generated baseline (Baselines170/MyTest.sql)  
+SELECT *
+FROM FUNC();
+-- ⚠️ WHERE IS 'WITH (HINT)'?
+```
+
+**If baseline is missing syntax from input:**
+1. **This is likely a BUG** - not just formatting difference
+2. Check if AST has member to store the missing syntax
+3. Verify grammar stores value: `vResult.PropertyName = vValue;`
+4. Check script generator outputs the value: `GenerateFragmentIfNotNull(node.Property)`
+5. If syntax should be preserved, add AST storage and script generation
+6. Document in spec if intentional omission (e.g., query optimizer hints)
+
 #### 2. Error Count Mismatch  
 ```
 TestYourFeature.sql: number of errors after parsing is different from expected.
@@ -800,6 +819,38 @@ new ParserTest160("RegressionBugFix12345Tests160.sql", nErrors150: 1),  // Bug e
 new ParserTest170("RegressionBugFix12345Tests170.sql", nErrors160: 1),  // Bug existed in SQL 2022
 ```
 
+## Round-Trip Fidelity Validation Checklist
+
+**CRITICAL: After generating baseline files, ALWAYS verify:**
+
+✅ **Input Preservation Check**:
+1. Open test script side-by-side with baseline file
+2. For each SQL statement, verify baseline preserves all syntax from input
+3. Check optional clauses: `WITH`, `WHERE`, `HAVING`, `ORDER BY`, etc.
+4. Check hints: Table hints, query hints, join hints
+5. Check keywords: All keywords from input should appear in baseline (unless documented normalization)
+
+✅ **Missing Syntax Investigation**:
+If baseline omits syntax from input:
+- [ ] Is this intentional keyword normalization? (e.g., APPROX → APPROXIMATE)
+- [ ] Is this a query optimizer hint that doesn't need preservation?
+- [ ] Is this a BUG where AST doesn't store the value?
+
+✅ **Bug Indicators**:
+- ❌ Input: `FUNCTION() WITH (HINT)` → Baseline: `FUNCTION()` = **LIKELY BUG**
+- ❌ Input: `SELECT ... ORDER BY col` → Baseline: `SELECT ...` = **BUG**
+- ✅ Input: `FETCH APPROX` → Baseline: `FETCH APPROXIMATE` = Acceptable normalization
+- ✅ Input: `SELECT /*+ HINT */` → Baseline: `SELECT` = Query hint (document in spec)
+
+✅ **Resolution Steps**:
+1. Check AST definition in `Ast.xml` for member to store value
+2. Verify grammar assigns value: `vResult.Property = vValue;`
+3. Check script generator outputs value: `if (node.Property != null) { ... }`
+4. If missing: Add AST member, update grammar, update script generator, rebuild
+5. Document decision in spec if intentional omission
+
+---
+
 ## Summary
 
 The SqlScriptDOM testing framework provides comprehensive validation of parser functionality through:
@@ -808,7 +859,11 @@ The SqlScriptDOM testing framework provides comprehensive validation of parser f
 - **Cross-version validation** (Test syntax across SQL Server versions)
 - **Error condition testing** (Invalid syntax produces expected errors)
 - **Exact syntax verification** (Exact T-SQL from user requests is tested precisely)
+- **Round-trip fidelity validation** (Baseline preserves all input syntax unless documented)
 
 Following these guidelines ensures robust test coverage for parser functionality and prevents regressions when adding new features or fixing bugs.
 
-**Key Principle**: Always test the exact T-SQL syntax provided in user prompts or requests to verify that the specific syntax works as expected, rather than testing generalized or simplified versions of the syntax.
+**Key Principles**: 
+1. Always test the exact T-SQL syntax provided in user prompts or requests
+2. Always verify baseline output preserves input syntax (missing syntax may indicate bugs)
+3. Document any intentional omissions (normalization, query hints) in spec

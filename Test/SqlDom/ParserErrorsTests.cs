@@ -7059,6 +7059,7 @@ WHEN NOT MATCHED BY SOURCE THEN DELETE OUTPUT inserted.*, deleted.*;";
                                                 RETURN @first + ' ' + @last
                                             END;";
             ParserTestUtils.ErrorTestFabricDW(scalarFunctionSyntax2, new ParserErrorInfo(scalarFunctionSyntax2.IndexOf("INLINE"), "SQL46010", "INLINE"));
+
             string scalarFunctionSyntax3 = @"CREATE OR ALTER FUNCTION dbo.CountProducts
                                             (
                                                 @ProductTable AS dbo.ProductType READONLY
@@ -7097,11 +7098,22 @@ WHEN NOT MATCHED BY SOURCE THEN DELETE OUTPUT inserted.*, deleted.*;";
         [SqlStudioTestCategory(Category.UnitTest)]
         public void IdentityColumnNegativeTestsFabricDW()
         {
-            string identityColumnSyntax = @"CREATE TABLE TestTable1 (ID INT IDENTITY(1,1), Name VARCHAR(50));";
-            ParserTestUtils.ErrorTestFabricDW(identityColumnSyntax, new ParserErrorInfo(40, "SQL46010", "("));
+            string identityColumnSyntax = @"CREATE TABLE TestTable1 (
+                                                ID INT IDENTITY(1,1),
+                                                Name VARCHAR(50)
+                                            );
+                                            ";
+            string token = "IDENTITY";
+            int errorOffSet = identityColumnSyntax.IndexOf(token) + token.Length;
+            ParserTestUtils.ErrorTestFabricDW(identityColumnSyntax, new ParserErrorInfo(errorOffSet, "SQL46010", "("));
 
-            string identityColumnSyntax2 = @"CREATE TABLE TestTable2 (RecordID BIGINT IDENTITY(100,5), Description NVARCHAR(200));";
-            ParserTestUtils.ErrorTestFabricDW(identityColumnSyntax2, new ParserErrorInfo(49, "SQL46010", "("));
+            string identityColumnSyntax2 = @"CREATE TABLE TestTable2 (
+                                                RecordID BIGINT IDENTITY(100,5),
+                                                Description NVARCHAR(200)
+                                            );
+                                            ";
+            errorOffSet = identityColumnSyntax2.IndexOf(token) + token.Length;
+            ParserTestUtils.ErrorTestFabricDW(identityColumnSyntax2, new ParserErrorInfo(errorOffSet, "SQL46010", "("));
         }
 
         /// <summary>
@@ -7445,10 +7457,9 @@ WHEN NOT MATCHED BY SOURCE THEN DELETE OUTPUT inserted.*, deleted.*;";
                 "SELECT * FROM VECTOR_SEARCH(TABLE = tbl1, COLUMN = col1, SIMILAR_TO = query_vector)",
                 new ParserErrorInfo(82, "SQL46010", ")"));
 
-            // Missing required parameters: TOP_N
-            ParserTestUtils.ErrorTest170(
-                "SELECT * FROM VECTOR_SEARCH(TABLE = tbl1, COLUMN = col1, SIMILAR_TO = query_vector, METRIC = 'dot')",
-                new ParserErrorInfo(98, "SQL46010", ")"));
+            // TOP_N is now OPTIONAL per SQL Server 2025 (commit 12d3e8fc)
+            // The following test case has been removed as it tested for TOP_N being mandatory
+            // which is no longer the case. VECTOR_SEARCH now accepts queries without TOP_N.
 
             // Invalid order: COLUMN before TABLE
             ParserTestUtils.ErrorTest170(

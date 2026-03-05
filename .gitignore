@@ -360,3 +360,14 @@ out/
 
 # Temporary build artifacts
 tmp/
+
+# Speckit files
+speckit.files
+.github/.specify/
+.github/agents/speckit.*.agent.md
+.github/prompts/speckit.*
+
+# Specs directory - ignore all files except spec.md
+specs/**/*
+!specs/**/
+!specs/**/spec.md
