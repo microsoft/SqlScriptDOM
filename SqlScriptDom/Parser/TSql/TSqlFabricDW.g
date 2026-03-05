@@ -23761,8 +23761,6 @@ dropSecurityPolicyStatement returns [DropSecurityPolicyStatement vResult = Fragm
 createExternalDataSourceStatement returns [CreateExternalDataSourceStatement vResult = FragmentFactory.CreateFragment<CreateExternalDataSourceStatement>()]
 {
     Identifier vName;
-    ExternalDataSourceOption vExternalDataSourceOption;
-    long encounteredOptions = 0;
     vResult.DataSourceType = ExternalDataSourceType.EXTERNAL_GENERICS;
 }
     :   tData:Identifier tSource:Identifier vName = identifier
@@ -23774,86 +23772,13 @@ createExternalDataSourceStatement returns [CreateExternalDataSourceStatement vRe
         }
 
         tWith:With LeftParenthesis
-        (
-            {NextTokenMatches(CodeGenerationSupporter.Type)}?
-            externalDataSourceType[vResult]
-        |
-            {NextTokenMatches(CodeGenerationSupporter.Location)}?
-            externalDataSourceLocation[vResult]
-        |
-            {NextTokenMatches(CodeGenerationSupporter.PushdownOption)}?
-            externalDataSourcePushdownOption[vResult]
-        |
-            vExternalDataSourceOption = externalDataSourceLiteralOrIdentifierOption
-            {
-                CheckOptionDuplication(ref encounteredOptions, (int)vExternalDataSourceOption.OptionKind, vExternalDataSourceOption);
-                AddAndUpdateTokenInfo(vResult, vResult.ExternalDataSourceOptions, vExternalDataSourceOption);
-            }
-        )
 
-        (
-            tComma:Comma
-            (
-                {NextTokenMatches(CodeGenerationSupporter.Type)}?
-                externalDataSourceType[vResult]
-            |
-                {NextTokenMatches(CodeGenerationSupporter.Location)}?
-                externalDataSourceLocation[vResult]
-            |
-                {NextTokenMatches(CodeGenerationSupporter.PushdownOption)}?
-                externalDataSourcePushdownOption[vResult]
-            |
-                vExternalDataSourceOption = externalDataSourceLiteralOrIdentifierOption
-                {
-                    CheckOptionDuplication(ref encounteredOptions, (int)vExternalDataSourceOption.OptionKind, vExternalDataSourceOption);
-                    AddAndUpdateTokenInfo(vResult, vResult.ExternalDataSourceOptions, vExternalDataSourceOption);
-                }
-            )
-        )*
+        externalDataSourceLocation[vResult]
 
         tRParen:RightParenthesis
         {
             UpdateTokenInfo(vResult,tRParen);
         }
-    ;
-
-externalDataSourceType[CreateExternalDataSourceStatement vParent]
-    :
-        tDataSourceType:Identifier EqualsSign
-        {
-            Match(tDataSourceType, CodeGenerationSupporter.Type);
-            UpdateTokenInfo(vParent, tDataSourceType);
-        }
-        (
-            tExternalDataSourceType:Identifier
-            {
-                if (TryMatch(tExternalDataSourceType, CodeGenerationSupporter.Hadoop))
-                {
-                    UpdateTokenInfo(vParent, tExternalDataSourceType);
-                    vParent.DataSourceType = ExternalDataSourceType.HADOOP;
-                }
-                else if (TryMatch(tExternalDataSourceType, CodeGenerationSupporter.Rdbms))
-                {
-                    UpdateTokenInfo(vParent, tExternalDataSourceType);
-                    vParent.DataSourceType = ExternalDataSourceType.RDBMS;
-                }
-                else if (TryMatch(tExternalDataSourceType, CodeGenerationSupporter.ShardMapManager))
-                {
-                    UpdateTokenInfo(vParent, tExternalDataSourceType);
-                    vParent.DataSourceType = ExternalDataSourceType.SHARD_MAP_MANAGER;
-                }
-                else if (TryMatch(tExternalDataSourceType, CodeGenerationSupporter.BlobStorage))
-                {
-                    UpdateTokenInfo(vParent, tExternalDataSourceType);
-                    vParent.DataSourceType = ExternalDataSourceType.BLOB_STORAGE;
-                }
-				else
-				{
-					UpdateTokenInfo(vParent, tExternalDataSourceType);
-                    vParent.DataSourceType = ExternalDataSourceType.EXTERNAL_GENERICS;
-				}
-            }
-        )
     ;
 
 externalDataSourceLocation[ExternalDataSourceStatement vParent]
@@ -23868,68 +23793,9 @@ externalDataSourceLocation[ExternalDataSourceStatement vParent]
         }
     ;
 
-externalDataSourcePushdownOption[ExternalDataSourceStatement vParent]
-    :
-        tPushdownOption:Identifier
-        {
-            Match(tPushdownOption, CodeGenerationSupporter.PushdownOption);
-            UpdateTokenInfo(vParent, tPushdownOption);
-        }
-        EqualsSign
-        (
-           tOn:On
-                {
-                    vParent.PushdownOption = ExternalDataSourcePushdownOption.ON;
-                    UpdateTokenInfo(vParent, tOn);
-                }
-          | tOff:Off
-                {
-                    vParent.PushdownOption = ExternalDataSourcePushdownOption.OFF;
-                    UpdateTokenInfo(vParent, tOff);
-                }
-        )
-    ;
-
-externalDataSourceLiteralOrIdentifierOption returns [ExternalDataSourceLiteralOrIdentifierOption vResult = this.FragmentFactory.CreateFragment<ExternalDataSourceLiteralOrIdentifierOption>()]
-{
-    Literal vLiteral;
-    Identifier vIdentifier;
-}
-    :
-        tOption:Identifier
-        {
-            vResult.OptionKind = ExternalDataSourceOptionHelper.Instance.ParseOption(tOption);
-        }
-        EqualsSign
-        (
-            vIdentifier = identifier
-            {
-                if (vResult.OptionKind != ExternalDataSourceOptionKind.Credential)
-                {
-                    throw GetUnexpectedTokenErrorException(tOption);
-                }
-                vResult.Value = IdentifierOrValueExpression(vIdentifier);
-            }
-        |
-            vLiteral = stringLiteral
-            {
-                if (vResult.OptionKind != ExternalDataSourceOptionKind.ResourceManagerLocation &&
-                    vResult.OptionKind != ExternalDataSourceOptionKind.DatabaseName &&
-                    vResult.OptionKind != ExternalDataSourceOptionKind.ShardMapName &&
-                    vResult.OptionKind != ExternalDataSourceOptionKind.ConnectionOptions)
-                {
-                    throw GetUnexpectedTokenErrorException(tOption);
-                }
-                vResult.Value = IdentifierOrValueExpression(vLiteral);
-            }
-        )
-    ;
-
 alterExternalDataSourceStatement returns [AlterExternalDataSourceStatement vResult = FragmentFactory.CreateFragment<AlterExternalDataSourceStatement>()]
 {
     Identifier vName;
-    ExternalDataSourceOption vExternalDataSourceOption;
-    long encounteredOptions = 0;
 }
     :   tData:Identifier tSource:Identifier vName = identifier
         {
@@ -23940,36 +23806,8 @@ alterExternalDataSourceStatement returns [AlterExternalDataSourceStatement vResu
         }
 
         tSet:Set
-        (
-            {NextTokenMatches(CodeGenerationSupporter.Location)}?
-            externalDataSourceLocation[vResult]
-        |
-            {NextTokenMatches(CodeGenerationSupporter.PushdownOption)}?
-            externalDataSourcePushdownOption[vResult]
-        |
-            vExternalDataSourceOption = externalDataSourceLiteralOrIdentifierOption
-            {
-                CheckOptionDuplication(ref encounteredOptions, (int)vExternalDataSourceOption.OptionKind, vExternalDataSourceOption);
-                AddAndUpdateTokenInfo(vResult, vResult.ExternalDataSourceOptions, vExternalDataSourceOption);
-            }
-        )
 
-        (
-            tComma:Comma
-            (
-                {NextTokenMatches(CodeGenerationSupporter.Location)}?
-                externalDataSourceLocation[vResult]
-            |
-                {NextTokenMatches(CodeGenerationSupporter.PushdownOption)}?
-                externalDataSourcePushdownOption[vResult]
-            |
-                vExternalDataSourceOption = externalDataSourceLiteralOrIdentifierOption
-                {
-                    CheckOptionDuplication(ref encounteredOptions, (int)vExternalDataSourceOption.OptionKind, vExternalDataSourceOption);
-                    AddAndUpdateTokenInfo(vResult, vResult.ExternalDataSourceOptions, vExternalDataSourceOption);
-                }
-            )
-        )*
+        externalDataSourceLocation[vResult]
     ;
 
 dropExternalDataSourceStatement returns [DropExternalDataSourceStatement vResult = FragmentFactory.CreateFragment<DropExternalDataSourceStatement>()]

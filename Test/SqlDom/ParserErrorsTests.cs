@@ -5236,6 +5236,30 @@ select 1",
             ParserTestUtils.ErrorTest130("CREATE EXTERNAL DATA SOURCE eds1 WITH (TYPE = RDBMS, LOCATION = someServer, DATABASE_NAME = 'someDatabase', CREDENTIAL = someCred)", new ParserErrorInfo(64, "SQL46010", "someServer"));
             ParserTestUtils.ErrorTest130("CREATE EXTERNAL DATA SOURCE eds1 WITH (TYPE = RDBMS, LOCATION = 'someServer', DATABASE_NAME = someDatabase, CREDENTIAL = someCred)", new ParserErrorInfo(78, "SQL46010", "DATABASE_NAME"));
             ParserTestUtils.ErrorTest130("CREATE EXTERNAL DATA SOURCE eds1 WITH (TYPE = RDBMS, LOCATION = 'someServer', DATABASE_NAME = 'someDatabase', CREDENTIAL = 'someCred')", new ParserErrorInfo(110, "SQL46010", "CREDENTIAL"));
+
+            // CREATE with TYPE parameter (no longer supported — parser expects LOCATION)
+            //
+            ParserTestUtils.ErrorTestFabricDW("CREATE EXTERNAL DATA SOURCE eds1 WITH (TYPE = HADOOP, LOCATION = 'protocol://ip_address:port')", new ParserErrorInfo(46, "SQL46010", "HADOOP"));
+
+            // CREATE with extra CREDENTIAL option after LOCATION (only LOCATION allowed, no additional options)
+            //
+            ParserTestUtils.ErrorTestFabricDW("CREATE EXTERNAL DATA SOURCE eds1 WITH (LOCATION = 'protocol://ip_address:port', CREDENTIAL = cred1)", new ParserErrorInfo(78, "SQL46010", ","));
+
+            // CREATE with extra PUSHDOWN option after LOCATION
+            //
+            ParserTestUtils.ErrorTestFabricDW("CREATE EXTERNAL DATA SOURCE eds1 WITH (LOCATION = 'protocol://ip_address:port', PUSHDOWN = ON)", new ParserErrorInfo(78, "SQL46010", ","));
+
+            // CREATE with extra RESOURCE_MANAGER_LOCATION option after LOCATION
+            //
+            ParserTestUtils.ErrorTestFabricDW("CREATE EXTERNAL DATA SOURCE eds1 WITH (LOCATION = 'protocol://ip_address:port', RESOURCE_MANAGER_LOCATION = 'ip_address:port')", new ParserErrorInfo(78, "SQL46010", ","));
+
+            // CREATE with extra DATABASE_NAME option after LOCATION
+            //
+            ParserTestUtils.ErrorTestFabricDW("CREATE EXTERNAL DATA SOURCE eds1 WITH (LOCATION = 'someServer', DATABASE_NAME = 'someDatabase')", new ParserErrorInfo(62, "SQL46010", ","));
+
+            // CREATE with extra CONNECTION_OPTIONS after LOCATION
+            //
+            ParserTestUtils.ErrorTestFabricDW("CREATE EXTERNAL DATA SOURCE eds1 WITH (LOCATION = 'protocol://ip_address:port', CONNECTION_OPTIONS = 'some_options')", new ParserErrorInfo(78, "SQL46010", ","));
         }
 
 
@@ -5295,6 +5319,24 @@ select 1",
             ParserTestUtils.ErrorTest130("ALTER EXTERNAL DATA SOURCE eds1 SET LOCATION = 'someServer', DATABASE_NAME = someDatabase, SHARD_MAP_NAME = 'someShardMap', CREDENTIAL = someCred", new ParserErrorInfo(61, "SQL46010", "DATABASE_NAME"));
             ParserTestUtils.ErrorTest130("ALTER EXTERNAL DATA SOURCE eds1 SET LOCATION = 'someServer', DATABASE_NAME = 'someDatabase', SHARD_MAP_NAME = someShardMap, CREDENTIAL = someCred", new ParserErrorInfo(93, "SQL46010", "SHARD_MAP_NAME"));
             ParserTestUtils.ErrorTest130("ALTER EXTERNAL DATA SOURCE eds1 SET LOCATION = 'someServer', DATABASE_NAME = 'someDatabase', SHARD_MAP_NAME = 'someShardMap', CREDENTIAL = 'someCred'", new ParserErrorInfo(126, "SQL46010", "CREDENTIAL"));
+
+            // ALTER with unsupported option instead of LOCATION
+            //
+            ParserTestUtils.ErrorTestFabricDW("ALTER EXTERNAL DATA SOURCE eds1 SET RESOURCE_MANAGER_LOCATION = 'ip_address:port'", new ParserErrorInfo(36, "SQL46005", "LOCATION", "RESOURCE_MANAGER_LOCATION"));
+            ParserTestUtils.ErrorTestFabricDW("ALTER EXTERNAL DATA SOURCE eds1 SET DATABASE_NAME = 'someDb'", new ParserErrorInfo(36, "SQL46005", "LOCATION", "DATABASE_NAME"));
+            ParserTestUtils.ErrorTestFabricDW("ALTER EXTERNAL DATA SOURCE eds1 SET CONNECTION_OPTIONS = 'some_options'", new ParserErrorInfo(36, "SQL46005", "LOCATION", "CONNECTION_OPTIONS"));
+            ParserTestUtils.ErrorTestFabricDW("ALTER EXTERNAL DATA SOURCE eds1 SET SHARD_MAP_NAME = 'someShardMap'", new ParserErrorInfo(36, "SQL46005", "LOCATION", "SHARD_MAP_NAME"));
+
+            // ALTER with unsupported option where the value is not a string literal
+            //
+            ParserTestUtils.ErrorTestFabricDW("ALTER EXTERNAL DATA SOURCE eds1 SET PUSHDOWN = ON", new ParserErrorInfo(47, "SQL46010", "ON"));
+            ParserTestUtils.ErrorTestFabricDW("ALTER EXTERNAL DATA SOURCE eds1 SET CREDENTIAL = cred1", new ParserErrorInfo(49, "SQL46010", "cred1"));
+
+            // ALTER with LOCATION followed by extra unsupported options (comma not expected after LOCATION value)
+            //
+            ParserTestUtils.ErrorTestFabricDW("ALTER EXTERNAL DATA SOURCE eds1 SET LOCATION = 'sqlserver://10.10.10.10:1433', PUSHDOWN = ON", new ParserErrorInfo(77, "SQL46010", ","));
+            ParserTestUtils.ErrorTestFabricDW("ALTER EXTERNAL DATA SOURCE eds1 SET LOCATION = 'sqlserver://10.10.10.10:1433', CREDENTIAL = cred1", new ParserErrorInfo(77, "SQL46010", ","));
+            ParserTestUtils.ErrorTestFabricDW("ALTER EXTERNAL DATA SOURCE eds1 SET LOCATION = 'sqlserver://10.10.10.10:1433', DATABASE_NAME = 'someDb'", new ParserErrorInfo(77, "SQL46010", ","));
         }
 
 
@@ -7059,6 +7101,7 @@ WHEN NOT MATCHED BY SOURCE THEN DELETE OUTPUT inserted.*, deleted.*;";
                                                 RETURN @first + ' ' + @last
                                             END;";
             ParserTestUtils.ErrorTestFabricDW(scalarFunctionSyntax2, new ParserErrorInfo(scalarFunctionSyntax2.IndexOf("INLINE"), "SQL46010", "INLINE"));
+
             string scalarFunctionSyntax3 = @"CREATE OR ALTER FUNCTION dbo.CountProducts
                                             (
                                                 @ProductTable AS dbo.ProductType READONLY
@@ -7097,11 +7140,22 @@ WHEN NOT MATCHED BY SOURCE THEN DELETE OUTPUT inserted.*, deleted.*;";
         [SqlStudioTestCategory(Category.UnitTest)]
         public void IdentityColumnNegativeTestsFabricDW()
         {
-            string identityColumnSyntax = @"CREATE TABLE TestTable1 (ID INT IDENTITY(1,1), Name VARCHAR(50));";
-            ParserTestUtils.ErrorTestFabricDW(identityColumnSyntax, new ParserErrorInfo(40, "SQL46010", "("));
+            string identityColumnSyntax = @"CREATE TABLE TestTable1 (
+                                                ID INT IDENTITY(1,1),
+                                                Name VARCHAR(50)
+                                            );
+                                            ";
+            string token = "IDENTITY";
+            int errorOffSet = identityColumnSyntax.IndexOf(token) + token.Length;
+            ParserTestUtils.ErrorTestFabricDW(identityColumnSyntax, new ParserErrorInfo(errorOffSet, "SQL46010", "("));
 
-            string identityColumnSyntax2 = @"CREATE TABLE TestTable2 (RecordID BIGINT IDENTITY(100,5), Description NVARCHAR(200));";
-            ParserTestUtils.ErrorTestFabricDW(identityColumnSyntax2, new ParserErrorInfo(49, "SQL46010", "("));
+            string identityColumnSyntax2 = @"CREATE TABLE TestTable2 (
+                                                RecordID BIGINT IDENTITY(100,5),
+                                                Description NVARCHAR(200)
+                                            );
+                                            ";
+            errorOffSet = identityColumnSyntax2.IndexOf(token) + token.Length;
+            ParserTestUtils.ErrorTestFabricDW(identityColumnSyntax2, new ParserErrorInfo(errorOffSet, "SQL46010", "("));
         }
 
         /// <summary>
@@ -7445,10 +7499,9 @@ WHEN NOT MATCHED BY SOURCE THEN DELETE OUTPUT inserted.*, deleted.*;";
                 "SELECT * FROM VECTOR_SEARCH(TABLE = tbl1, COLUMN = col1, SIMILAR_TO = query_vector)",
                 new ParserErrorInfo(82, "SQL46010", ")"));
 
-            // Missing required parameters: TOP_N
-            ParserTestUtils.ErrorTest170(
-                "SELECT * FROM VECTOR_SEARCH(TABLE = tbl1, COLUMN = col1, SIMILAR_TO = query_vector, METRIC = 'dot')",
-                new ParserErrorInfo(98, "SQL46010", ")"));
+            // TOP_N is now OPTIONAL per SQL Server 2025 (commit 12d3e8fc)
+            // The following test case has been removed as it tested for TOP_N being mandatory
+            // which is no longer the case. VECTOR_SEARCH now accepts queries without TOP_N.
 
             // Invalid order: COLUMN before TABLE
             ParserTestUtils.ErrorTest170(

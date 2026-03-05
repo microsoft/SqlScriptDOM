@@ -4808,5 +4808,6 @@
     <Member Name="SimilarTo" Type="ScalarExpression" Summary="The vector used for search." />
     <Member Name="Metric" Type="StringLiteral" Summary="The distance metric to use for the search." />
     <Member Name="TopN" Type="ScalarExpression" Summary="The maximum number of similar vectors that must be returned." />
+    <Member Name="ForceAnnOnly" Type="bool" Summary="Whether the WITH (FORCE_ANN_ONLY) hint is specified." />
   </Class>
 </Types>
