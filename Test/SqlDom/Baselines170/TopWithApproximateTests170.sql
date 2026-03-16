@@ -1,0 +1,27 @@
+SELECT TOP 10 WITH APPROXIMATE *
+FROM Orders
+ORDER BY OrderDate;
+
+SELECT TOP 10 WITH APPROXIMATE *
+FROM Orders
+ORDER BY OrderDate;
+
+SELECT TOP (10) WITH APPROXIMATE *
+FROM Orders
+ORDER BY OrderDate;
+
+SELECT TOP (LEN(DB_NAME())) WITH APPROXIMATE *
+FROM Orders
+ORDER BY OrderDate;
+
+SELECT TOP 5 WITH APPROXIMATE OrderID,
+                              CustomerName,
+                              OrderDate
+FROM Orders
+ORDER BY OrderDate DESC;
+
+DECLARE @top AS INT = 20;
+
+SELECT TOP (@top) WITH APPROXIMATE *
+FROM Products
+ORDER BY Price;

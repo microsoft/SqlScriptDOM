@@ -19,10 +19,19 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
                 GenerateSpaceAndKeyword(TSqlTokenType.Percent); 
             }
 
-            if (node.WithTies)
+            if (node.WithTies || node.WithApproximate)
             {
                 GenerateSpaceAndKeyword(TSqlTokenType.With);
-                GenerateSpaceAndIdentifier(CodeGenerationSupporter.Ties); 
+                
+                if (node.WithApproximate)
+                {
+                    GenerateSpaceAndIdentifier(CodeGenerationSupporter.Approximate);
+                }
+                
+                if (node.WithTies)
+                {
+                    GenerateSpaceAndIdentifier(CodeGenerationSupporter.Ties); 
+                }
             }
         }
     }

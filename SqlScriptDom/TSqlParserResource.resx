@@ -631,4 +631,7 @@
   <data name="SQL46144Message" xml:space="preserve">
     <value>Required parameter {0} must be provided.</value>
   </data>
+  <data name="SQL46145Message" xml:space="preserve">
+    <value>OFFSET clause cannot be used with FETCH APPROXIMATE. Use FETCH APPROXIMATE without OFFSET.</value>
+  </data>
 </root>

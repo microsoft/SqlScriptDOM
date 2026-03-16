@@ -143,6 +143,8 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         internal const string Atomic = "ATOMIC";
         internal const string Append = "APPEND";
         internal const string AppendOnly = "APPEND_ONLY";
+        internal const string Approximate = "APPROXIMATE";
+        internal const string Approx = "APPROX";
         internal const string Avg = "AVG";
         internal const string Attested = "ATTESTED";
         internal const string AuditGuid = "AUDIT_GUID";
