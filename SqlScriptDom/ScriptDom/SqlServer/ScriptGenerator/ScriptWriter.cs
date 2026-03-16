@@ -321,7 +321,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
             }
 
             // generate aligned token stream
-            List<TSqlParserToken> tokens = new List<TSqlParserToken>();
+            List<TSqlParserToken> tokens = new List<TSqlParserToken>(_scriptWriterElements.Count);
 
             Int32 offset = 0;
             for (Int32 index = 0; index < _scriptWriterElements.Count; ++index)
