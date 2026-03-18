@@ -3630,10 +3630,12 @@
     <Member Name="Expression" Type="ScalarExpression" Summary="The expression."/>
     <Member Name="Percent" Type="bool" Summary="True if PERCENT keyword was used."/>
     <Member Name="WithTies" Type="bool" Summary="True is WITH TIES keywords were used. Important: The interpreter has to check there is an order by clause."/>
+    <Member Name="WithApproximate" Type="bool" Summary="True if WITH APPROXIMATE (or APPROX) keyword was used. Introduced in SQL Server 2025 for approximate query processing."/>
   </Class>
   <Class Name="OffsetClause" Summary="This class represents an offset/fetch filter, that can be used in select statements for paging the result set.">
     <Member Name="OffsetExpression" Type="ScalarExpression" Summary="Expression for number fo rows to skip."/>
     <Member Name="FetchExpression" Type="ScalarExpression" Summary="Expression for number fo rows to return."/>
+    <Member Name="WithApproximate" Type="bool" Summary="True if FETCH APPROXIMATE (or APPROX) keyword was used. Only valid in SQL Server 2025 (170) and above. Note: APPROXIMATE is not valid with OFFSET; only FETCH APPROXIMATE is supported."/>
   </Class>
   <Class Name="UnaryExpression" Base="ScalarExpression" Summary="An expression that has a single expression as child.">
     <Member Name="UnaryExpressionType" Type="UnaryExpressionType" GenerateUpdatePositionInfoCall="false" Summary="The type of the expression."/>

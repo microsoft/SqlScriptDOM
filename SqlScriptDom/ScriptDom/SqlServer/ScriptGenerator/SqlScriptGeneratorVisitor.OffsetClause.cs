@@ -14,13 +14,27 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
             AlignmentPoint start = new AlignmentPoint();
             MarkAndPushAlignmentPoint(start);
 
-            GenerateIdentifier(CodeGenerationSupporter.Offset);
-            GenerateSpaceAndFragmentIfNotNull(node.OffsetExpression);
-            GenerateSpaceAndIdentifier(CodeGenerationSupporter.Rows);
+            if (node.OffsetExpression != null)
+            {
+                GenerateIdentifier(CodeGenerationSupporter.Offset);
+                GenerateSpaceAndFragmentIfNotNull(node.OffsetExpression);
+                GenerateSpaceAndIdentifier(CodeGenerationSupporter.Rows);
+            }
 
             if (node.FetchExpression != null)
             {
-                GenerateSpaceAndKeyword(TSqlTokenType.Fetch);
+                if (node.OffsetExpression != null)
+                {
+                    GenerateSpace();
+                }
+                
+                GenerateKeyword(TSqlTokenType.Fetch);
+                
+                if (node.WithApproximate)
+                {
+                    GenerateSpaceAndIdentifier(CodeGenerationSupporter.Approximate);
+                }
+                
                 GenerateSpaceAndIdentifier(CodeGenerationSupporter.Next);
                 GenerateSpaceAndFragmentIfNotNull(node.FetchExpression);
                 GenerateSpaceAndIdentifier(CodeGenerationSupporter.Rows);

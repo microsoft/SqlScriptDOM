@@ -1330,6 +1330,15 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to OFFSET clause cannot be used with FETCH APPROXIMATE. Use FETCH APPROXIMATE without OFFSET..
+        /// </summary>
+        internal static string SQL46145Message {
+            get {
+                return ResourceManager.GetString("SQL46145Message", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to User-defined.
         /// </summary>
         internal static string UserDefined {

@@ -7832,5 +7832,50 @@ WHEN NOT MATCHED BY SOURCE THEN DELETE OUTPUT inserted.*, deleted.*;";
                 "SELECT AI_TRANSLATE('1', '2', '3')",
                 new ParserErrorInfo(28, "SQL46010", ","));
         }
+
+        /// <summary>
+        /// Negative test for OFFSET with FETCH APPROXIMATE - SQL46145 error
+        /// OFFSET clause cannot be used with FETCH APPROXIMATE (introduced in SQL Server 2025)
+        /// </summary>
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void OffsetWithFetchApproximateError()
+        {
+            // OFFSET + FETCH APPROXIMATE is invalid
+            ParserTestUtils.ErrorTest170(
+                "SELECT * FROM MyTable ORDER BY id OFFSET 5 ROWS FETCH APPROXIMATE NEXT 10 ROWS ONLY;",
+                new ParserErrorInfo(34, "SQL46145"));
+        }
+
+        /// <summary>
+        /// Negative test for combining TIES with APPROXIMATE - syntax error
+        /// APPROXIMATE and TIES are mutually exclusive (introduced in SQL Server 2025)
+        /// </summary>
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TopWithTiesAndApproximateError()
+        {
+            // Cannot use both TIES and APPROXIMATE together
+            ParserTestUtils.ErrorTest170(
+                "SELECT TOP 10 WITH TIES WITH APPROXIMATE * FROM MyTable ORDER BY id;",
+                new ParserErrorInfo(24, "SQL46010", "WITH"));
+        }
+
+        /// <summary>
+        /// Negative test for OFFSET with FETCH APPROX (abbreviated) - SQL46145 error
+        /// Verifies that abbreviated APPROX keyword also triggers validation
+        /// </summary>
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void OffsetWithFetchApproxError()
+        {
+            // OFFSET + FETCH APPROX (abbreviated) is invalid
+            ParserTestUtils.ErrorTest170(
+                "SELECT * FROM MyTable ORDER BY id OFFSET 10 ROWS FETCH APPROX NEXT 5 ROWS ONLY;",
+                new ParserErrorInfo(34, "SQL46145"));
+        }
     }
 }

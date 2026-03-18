@@ -109,5 +109,21 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
             
             return false;
         }
+
+        /// <summary>
+        /// Validates that OFFSET is not used with FETCH APPROXIMATE.
+        /// SQL Server does not support combining OFFSET with FETCH APPROXIMATE.
+        /// </summary>
+        /// <param name="offsetClause">The offset clause to validate.</param>
+        protected void ValidateFetchApproximate(OffsetClause offsetClause)
+        {
+            if (offsetClause != null && 
+                offsetClause.WithApproximate && 
+                offsetClause.OffsetExpression != null)
+            {
+                ThrowParseErrorException("SQL46145", offsetClause, 
+                    TSqlParserResource.SQL46145Message);
+            }
+        }
     }
 }

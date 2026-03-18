@@ -18389,33 +18389,99 @@ offsetClause returns [OffsetClause vResult = this.FragmentFactory.CreateFragment
     ScalarExpression vExpression;
 }
     :
-        tOffset:Identifier vExpression = expression
-        {
-            Match(tOffset, CodeGenerationSupporter.Offset);
-            UpdateTokenInfo(vResult,tOffset);
-            vResult.OffsetExpression = vExpression;
-        }
-        tOffsetRowOrRows:Identifier
-        {
-            Match(tOffsetRowOrRows, CodeGenerationSupporter.Row, CodeGenerationSupporter.Rows);
-            UpdateTokenInfo(vResult,tOffsetRowOrRows);
-        }
         (
-            options {greedy=true;} : //Greedy due to conflict with FETCH statements
-            tFetch:Fetch tFirstOrNext:Identifier vExpression = expression
+            // Pattern 1: OFFSET with optional FETCH
+            tOffset:Identifier vExpression = expression
             {
-                UpdateTokenInfo(vResult,tFetch);
-                Match(tFirstOrNext, CodeGenerationSupporter.First, CodeGenerationSupporter.Next);
-                UpdateTokenInfo(vResult,tFirstOrNext);
+                Match(tOffset, CodeGenerationSupporter.Offset);
+                UpdateTokenInfo(vResult,tOffset);
+                vResult.OffsetExpression = vExpression;
+            }
+            tOffsetRowOrRows:Identifier
+            {
+                Match(tOffsetRowOrRows, CodeGenerationSupporter.Row, CodeGenerationSupporter.Rows);
+                UpdateTokenInfo(vResult,tOffsetRowOrRows);
+            }
+            (
+                options {greedy=true;} : //Greedy due to conflict with FETCH statements
+                tFetch:Fetch
+                tFirstOrNext:Identifier
+                {
+                    // Check if this is APPROXIMATE/APPROX before FIRST/NEXT
+                    if (TryMatch(tFirstOrNext, CodeGenerationSupporter.Approximate) ||
+                        TryMatch(tFirstOrNext, CodeGenerationSupporter.Approx))
+                    {
+                        vResult.WithApproximate = true;
+                        UpdateTokenInfo(vResult,tFirstOrNext);
+                        
+                        // Consume the actual FIRST/NEXT token
+                        tFirstOrNext = LT(1);
+                        consume();
+                        Match(tFirstOrNext, CodeGenerationSupporter.First, CodeGenerationSupporter.Next);
+                        UpdateTokenInfo(vResult,tFirstOrNext);
+                    }
+                    else
+                    {
+                        // This is the FIRST/NEXT token directly
+                        Match(tFirstOrNext, CodeGenerationSupporter.First, CodeGenerationSupporter.Next);
+                        UpdateTokenInfo(vResult,tFirstOrNext);
+                    }
+                }
+                vExpression = expression
+                {
+                    vResult.FetchExpression = vExpression;
+                }
+                tFetchRowOrRows:Identifier tOnly:Identifier
+                {
+                    Match(tFetchRowOrRows, CodeGenerationSupporter.Row, CodeGenerationSupporter.Rows);
+                    Match(tOnly, CodeGenerationSupporter.Only);
+                    UpdateTokenInfo(vResult, tOnly);
+                    
+                    // Validate: OFFSET cannot be used with FETCH APPROXIMATE
+                    ValidateFetchApproximate(vResult);
+                }
+            )?
+        |
+            // Pattern 2: Standalone FETCH (APPROXIMATE only in TSql170+)
+            tFetch2:Fetch
+            {
+                UpdateTokenInfo(vResult,tFetch2);
+            }
+            tFirstOrNext2:Identifier
+            {
+                // Check if this is APPROXIMATE/APPROX before FIRST/NEXT
+                if (TryMatch(tFirstOrNext2, CodeGenerationSupporter.Approximate) ||
+                    TryMatch(tFirstOrNext2, CodeGenerationSupporter.Approx))
+                {
+                    vResult.WithApproximate = true;
+                    UpdateTokenInfo(vResult,tFirstOrNext2);
+                    
+                    // Consume the actual FIRST/NEXT token
+                    tFirstOrNext2 = LT(1);
+                    consume();
+                    Match(tFirstOrNext2, CodeGenerationSupporter.First, CodeGenerationSupporter.Next);
+                    UpdateTokenInfo(vResult,tFirstOrNext2);
+                }
+                else
+                {
+                    // This is the FIRST/NEXT token directly
+                    Match(tFirstOrNext2, CodeGenerationSupporter.First, CodeGenerationSupporter.Next);
+                    UpdateTokenInfo(vResult,tFirstOrNext2);
+                }
+            }
+            vExpression = expression
+            {
                 vResult.FetchExpression = vExpression;
             }
-            tFetchRowOrRows:Identifier tOnly:Identifier
+            tFetchRowOrRows2:Identifier tOnly2:Identifier
             {
-                Match(tFetchRowOrRows, CodeGenerationSupporter.Row, CodeGenerationSupporter.Rows);
-                Match(tOnly, CodeGenerationSupporter.Only);
-                UpdateTokenInfo(vResult, tOnly);
+                Match(tFetchRowOrRows2, CodeGenerationSupporter.Row, CodeGenerationSupporter.Rows);
+                Match(tOnly2, CodeGenerationSupporter.Only);
+                UpdateTokenInfo(vResult, tOnly2);
+                
+                // No validation needed for standalone FETCH APPROXIMATE (no OFFSET present)
             }
-        )?
+        )
     ;
 
 // This rule corresponds to topn in Sql Server grammar.
@@ -18447,9 +18513,18 @@ topRowFilter returns [TopRowFilter vResult = this.FragmentFactory.CreateFragment
         (
             With tId:Identifier
             {
-                Match(tId,CodeGenerationSupporter.Ties);
-                UpdateTokenInfo(vResult,tId);
-                vResult.WithTies = true;
+                if (TryMatch(tId, CodeGenerationSupporter.Approximate) ||
+                    TryMatch(tId, CodeGenerationSupporter.Approx))
+                {
+                    UpdateTokenInfo(vResult,tId);
+                    vResult.WithApproximate = true;
+                }
+                else
+                {
+                    Match(tId,CodeGenerationSupporter.Ties);
+                    UpdateTokenInfo(vResult,tId);
+                    vResult.WithTies = true;
+                }
             }
         )?
     ;
