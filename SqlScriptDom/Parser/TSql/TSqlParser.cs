@@ -59,6 +59,8 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
                     return new TSqlFabricDWParser(initialQuotedIdentifiers);
                 case SqlVersion.Sql170:
                     return new TSql170Parser(initialQuotedIdentifiers);
+                case SqlVersion.Sql180:
+                    return new TSql180Parser(initialQuotedIdentifiers);
                 default:
                     throw new ArgumentException(String.Format(CultureInfo.CurrentCulture, SqlScriptGeneratorResource.UnknownEnumValue, tsqlParserVersion, "TSqlParserVersion"), "tsqlParserVersion");
             }

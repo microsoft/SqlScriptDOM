@@ -13,6 +13,7 @@
     <GLexerParserCompile Include="$(SQLSCRIPTDOM)\Parser\TSql\TSql160.g" />
     <GLexerParserCompile Include="$(SQLSCRIPTDOM)\Parser\TSql\TSqlFabricDW.g" />
     <GLexerParserCompile Include="$(SQLSCRIPTDOM)\Parser\TSql\TSql170.g" />
+    <GLexerParserCompile Include="$(SQLSCRIPTDOM)\Parser\TSql\TSql180.g" />
   </ItemGroup>
   <Target Name="CreateCsGenIntermediateOutputPath" AfterTargets="BuildGenerateSources" BeforeTargets="CoreCompile">
     <MakeDir Directories="$(CsGenIntermediateOutputPath)" Condition="!Exists('$(CsGenIntermediateOutputPath)')" />

@@ -36,6 +36,7 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                 { SqlVersion.Sql150, typeof(TSql150Parser) },
                 { SqlVersion.Sql160, typeof(TSql160Parser) },
                 { SqlVersion.Sql170, typeof(TSql170Parser) },
+                { SqlVersion.Sql180, typeof(TSql180Parser) },
                 { SqlVersion.SqlFabricDW, typeof(TSqlFabricDWParser) }
             };
 

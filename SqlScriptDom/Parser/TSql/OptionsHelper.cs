@@ -128,6 +128,8 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
                     return SqlVersionFlags.TSql160;
                 case SqlVersion.Sql170:
                     return SqlVersionFlags.TSql170;
+                case SqlVersion.Sql180:
+                    return SqlVersionFlags.TSql180;
                 case SqlVersion.SqlFabricDW:
                     return SqlVersionFlags.TSqlFabricDW;
                 default:
