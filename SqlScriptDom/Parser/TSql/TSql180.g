@@ -3377,7 +3377,7 @@ alterDbOnOffOption returns [OnOffDatabaseOption vResult = FragmentFactory.Create
 }
     : tOption:Identifier
         {
-            vResult.OptionKind = OnOffSimpleDbOptionsHelper.Instance.ParseOption(tOption, SqlVersionFlags.TSql170);
+            vResult.OptionKind = OnOffSimpleDbOptionsHelper.Instance.ParseOption(tOption, SqlVersionFlags.TSql180);
         }
         (
             EqualsSign

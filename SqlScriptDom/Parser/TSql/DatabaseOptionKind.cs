@@ -99,7 +99,12 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
 
         ManualCutover               = 69,
         PerformCutover              = 70,
-        OptimizedLocking            = 71
+        OptimizedLocking            = 71,
+
+        // T-SQL 170 On/Off options
+
+        // T-SQL 180 On/Off options
+        AutomaticIndexCompaction    = 72
     }
 
 #pragma warning restore 1591
