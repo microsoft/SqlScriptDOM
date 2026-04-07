@@ -18,8 +18,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
 
             NewLineAndIndent();
             MarkAndPushAlignmentPoint(whileBody);
-            GenerateFragmentIfNotNull(node.Statement);
-            GenerateSemiColonWhenNecessary(node.Statement);
+            GenerateStatementWithSemiColon(node.Statement);
             PopAlignmentPoint();
         }
     }

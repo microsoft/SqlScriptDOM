@@ -18,8 +18,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
 
             NewLineAndIndent();
             MarkAndPushAlignmentPoint(branchStatements);
-            GenerateFragmentIfNotNull(node.ThenStatement);
-            GenerateSemiColonWhenNecessary(node.ThenStatement);
+            GenerateStatementWithSemiColon(node.ThenStatement);
             PopAlignmentPoint();
 
             if (node.ElseStatement != null)
@@ -28,8 +27,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
                 GenerateKeyword(TSqlTokenType.Else);
                 NewLineAndIndent();
                 MarkAndPushAlignmentPoint(branchStatements);
-                GenerateFragmentIfNotNull(node.ElseStatement);
-                GenerateSemiColonWhenNecessary(node.ElseStatement);
+                GenerateStatementWithSemiColon(node.ElseStatement);
                 PopAlignmentPoint();
             }
         }

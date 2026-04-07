@@ -13,9 +13,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
         {
             foreach (TSqlStatement statement in node.Statements)
             {
-                GenerateFragmentIfNotNull(statement);
-
-                GenerateSemiColonWhenNecessary(statement);
+                GenerateStatementWithSemiColon(statement);
 
                 if (statement is TSqlStatementSnippet == false)
                 {
