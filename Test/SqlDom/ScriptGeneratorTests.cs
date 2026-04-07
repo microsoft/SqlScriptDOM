@@ -1256,6 +1256,102 @@ SELECT id, name FROM archived_users;";
                 $"inner_q alias should appear before outer_q alias. inner_q at {innerQAliasIdx}, outer_q at {outerQAliasIdx}");
         }
 
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestPreserveCommentsEnabled_SemicolonBeforeTrailingComment()
+        {
+            // Test that semicolons are placed BEFORE trailing single-line comments,
+            // not after them (which would make the semicolon part of the comment text).
+            // Bug fix: previously "SELECT 1 -- comment;" was generated instead of "SELECT 1; -- comment"
+            var sqlWithComments = "SELECT 1 -- trailing comment";
+            var parser = new TSql170Parser(true);
+            var fragment = parser.Parse(new StringReader(sqlWithComments), out var errors);
+
+            Assert.AreEqual(0, errors.Count);
+
+            var generatorOptions = new SqlScriptGeneratorOptions
+            {
+                PreserveComments = true,
+                IncludeSemicolons = true
+            };
+            var generator = new Sql170ScriptGenerator(generatorOptions);
+            generator.GenerateScript(fragment, out var generatedSql);
+
+            // The semicolon must appear BEFORE the trailing comment
+            int semicolonIndex = generatedSql.IndexOf(";");
+            int commentIndex = generatedSql.IndexOf("-- trailing comment");
+
+            Assert.IsTrue(semicolonIndex >= 0, "Semicolon should be present in output. Actual: " + generatedSql);
+            Assert.IsTrue(commentIndex >= 0, "Trailing comment should be preserved. Actual: " + generatedSql);
+            Assert.IsTrue(semicolonIndex < commentIndex,
+                $"Semicolon should appear before trailing comment. Semicolon at {semicolonIndex}, comment at {commentIndex}. Actual: " + generatedSql);
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestPreserveCommentsEnabled_SemicolonBeforeTrailingComment_MultipleStatements()
+        {
+            // Test semicolon placement with multiple statements each having trailing comments
+            var sqlWithComments = @"SELECT 1 -- first comment
+SELECT 2 -- second comment";
+            var parser = new TSql170Parser(true);
+            var fragment = parser.Parse(new StringReader(sqlWithComments), out var errors);
+
+            Assert.AreEqual(0, errors.Count);
+
+            var generatorOptions = new SqlScriptGeneratorOptions
+            {
+                PreserveComments = true,
+                IncludeSemicolons = true
+            };
+            var generator = new Sql170ScriptGenerator(generatorOptions);
+            generator.GenerateScript(fragment, out var generatedSql);
+
+            // Both comments should be preserved
+            Assert.IsTrue(generatedSql.Contains("-- first comment"),
+                "First trailing comment should be preserved. Actual: " + generatedSql);
+            Assert.IsTrue(generatedSql.Contains("-- second comment"),
+                "Second trailing comment should be preserved. Actual: " + generatedSql);
+
+            // Verify semicolons appear before their respective comments, not after
+            Assert.IsFalse(generatedSql.Contains("-- first comment;"),
+                "Semicolon should not appear after first comment text. Actual: " + generatedSql);
+            Assert.IsFalse(generatedSql.Contains("-- second comment;"),
+                "Semicolon should not appear after second comment text. Actual: " + generatedSql);
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestPreserveCommentsEnabled_SemicolonBeforeTrailingBlockComment()
+        {
+            // Test semicolon placement with trailing block comments
+            var sqlWithComments = "SELECT 1 /* trailing block comment */";
+            var parser = new TSql170Parser(true);
+            var fragment = parser.Parse(new StringReader(sqlWithComments), out var errors);
+
+            Assert.AreEqual(0, errors.Count);
+
+            var generatorOptions = new SqlScriptGeneratorOptions
+            {
+                PreserveComments = true,
+                IncludeSemicolons = true
+            };
+            var generator = new Sql170ScriptGenerator(generatorOptions);
+            generator.GenerateScript(fragment, out var generatedSql);
+
+            // The semicolon must appear BEFORE the trailing block comment
+            int semicolonIndex = generatedSql.IndexOf(";");
+            int commentIndex = generatedSql.IndexOf("/* trailing block comment */");
+
+            Assert.IsTrue(semicolonIndex >= 0, "Semicolon should be present in output. Actual: " + generatedSql);
+            Assert.IsTrue(commentIndex >= 0, "Trailing block comment should be preserved. Actual: " + generatedSql);
+            Assert.IsTrue(semicolonIndex < commentIndex,
+                $"Semicolon should appear before trailing block comment. Semicolon at {semicolonIndex}, comment at {commentIndex}. Actual: " + generatedSql);
+        }
+
         #endregion
     }
 }

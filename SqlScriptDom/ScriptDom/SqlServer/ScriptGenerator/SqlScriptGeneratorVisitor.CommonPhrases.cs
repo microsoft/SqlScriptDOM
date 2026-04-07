@@ -440,6 +440,46 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
             }
         }
 
+        /// <summary>
+        /// Generates a statement fragment with semicolon placed before any trailing comments.
+        /// This prevents semicolons from being appended after single-line comments (-- style),
+        /// which would make them part of the comment text.
+        /// </summary>
+        protected void GenerateStatementWithSemiColon(TSqlStatement statement)
+        {
+            if (statement == null)
+            {
+                return;
+            }
+
+            // Handle comments before
+            HandleCommentsBeforeFragment(statement);
+
+            // Suppress trailing comment emission during statement body generation
+            // so that the semicolon can be placed before trailing comments.
+            // Only suppress for fragments at the statement boundary (LastTokenIndex).
+            bool previousSuppressState = _suppressTrailingComments;
+            int previousSuppressIndex = _suppressTrailingCommentsAfterIndex;
+            if (_options.PreserveComments && _generateSemiColon && !StatementsThatCannotHaveSemiColon.Contains(statement.GetType()))
+            {
+                _suppressTrailingComments = true;
+                _suppressTrailingCommentsAfterIndex = statement.LastTokenIndex;
+            }
+
+            // Generate the statement body
+            statement.Accept(this);
+
+            // Restore suppression state and emit semicolon before trailing comments
+            _suppressTrailingComments = previousSuppressState;
+            _suppressTrailingCommentsAfterIndex = previousSuppressIndex;
+
+            // Semicolon BEFORE trailing comments
+            GenerateSemiColonWhenNecessary(statement);
+
+            // Now emit trailing comments (after the semicolon)
+            HandleCommentsAfterFragment(statement);
+        }
+		
         protected void GenerateCommaSeparatedWithClause<T>(IList<T> fragments, bool indent, bool includeParentheses) where T : TSqlFragment
         {
             if (fragments != null && fragments.Count > 0)
