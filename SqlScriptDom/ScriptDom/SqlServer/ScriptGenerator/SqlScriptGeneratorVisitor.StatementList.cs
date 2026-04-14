@@ -29,8 +29,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
                         }
                     }
 
-                    GenerateFragmentIfNotNull(statement);
-                    GenerateSemiColonWhenNecessary(statement);
+                    GenerateStatementWithSemiColon(statement);
                 }
             }
         }

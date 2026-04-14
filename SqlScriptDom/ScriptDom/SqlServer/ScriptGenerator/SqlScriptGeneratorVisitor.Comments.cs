@@ -33,6 +33,20 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
         /// </summary>
         private bool _leadingCommentsEmitted = false;
 
+        /// <summary>
+        /// When true, suppresses trailing comment emission in HandleCommentsAfterFragment
+        /// for fragments whose LastTokenIndex matches or exceeds _suppressTrailingCommentsAfterIndex.
+        /// Used by GenerateStatementWithSemiColon to defer trailing comments until after
+        /// the semicolon has been placed, without affecting inter-clause comments.
+        /// </summary>
+        private bool _suppressTrailingComments = false;
+
+        /// <summary>
+        /// The LastTokenIndex of the statement for which trailing comments are being suppressed.
+        /// Only comments after this index are suppressed.
+        /// </summary>
+        private int _suppressTrailingCommentsAfterIndex = -1;
+
         #endregion
 
         #region Comment Preservation Methods
@@ -48,6 +62,8 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
             _lastProcessedTokenIndex = -1;
             _emittedComments.Clear();
             _leadingCommentsEmitted = false;
+            _suppressTrailingComments = false;
+            _suppressTrailingCommentsAfterIndex = -1;
         }
 
         /// <summary>
@@ -189,6 +205,16 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
         {
             if (!_options.PreserveComments || _currentTokenStream == null || fragment == null)
             {
+                return;
+            }
+
+            // When trailing comments are suppressed (e.g., during statement body generation
+            // before semicolon placement), skip emitting trailing comments only for fragments
+            // whose last token is at or past the statement boundary. Inter-clause comments
+            // (within the statement) are still emitted normally.
+            if (_suppressTrailingComments && fragment.LastTokenIndex >= _suppressTrailingCommentsAfterIndex)
+            {
+                UpdateLastProcessedIndex(fragment);
                 return;
             }
 
