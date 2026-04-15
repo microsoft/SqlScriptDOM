@@ -34,6 +34,17 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
 
         private static readonly antlr.collections.impl.BitSet _ddlStatementBeginnerTokens = new antlr.collections.impl.BitSet(2);
 
+        private static readonly HashSet<string> _datePartFirstArgumentBuiltInFunctions = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        {
+            "DATEADD",
+            "DATEDIFF",
+            "DATEDIFF_BIG",
+            "DATENAME",
+            "DATEPART",
+            "DATETRUNC",
+            "DATE_BUCKET"
+        };
+
         const int LookAhead = 2;
 
         //private static HashSet<string> _languageString = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
@@ -1977,6 +1988,48 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
                 callTarget.MultiPartIdentifier = multiPartIdentifier;
                 functionCall.CallTarget = callTarget;
             }
+        }
+
+        protected void NormalizeDatePartFirstArgument(FunctionCall functionCall)
+        {
+            if (functionCall == null ||
+                functionCall.FunctionName == null ||
+                functionCall.Parameters == null ||
+                functionCall.Parameters.Count == 0 ||
+                !_datePartFirstArgumentBuiltInFunctions.Contains(functionCall.FunctionName.Value))
+            {
+                return;
+            }
+
+            ColumnReferenceExpression firstParameter = functionCall.Parameters[0] as ColumnReferenceExpression;
+            if (firstParameter == null ||
+                firstParameter.ColumnType != ColumnType.Regular ||
+                firstParameter.MultiPartIdentifier == null ||
+                firstParameter.MultiPartIdentifier.Count != 1 ||
+                firstParameter.MultiPartIdentifier.Identifiers == null ||
+                firstParameter.MultiPartIdentifier.Identifiers.Count != 1)
+            {
+                return;
+            }
+
+            Identifier firstIdentifier = firstParameter.MultiPartIdentifier.Identifiers[0];
+            if (firstIdentifier == null)
+            {
+                return;
+            }
+
+            IdentifierLiteral identifierLiteral = FragmentFactory.CreateFragment<IdentifierLiteral>();
+            if (firstIdentifier.QuoteType == QuoteType.NotQuoted)
+            {
+                identifierLiteral.SetUnquotedIdentifier(firstIdentifier.Value);
+            }
+            else
+            {
+                identifierLiteral.SetIdentifier(Identifier.EncodeIdentifier(firstIdentifier.Value, firstIdentifier.QuoteType));
+            }
+
+            identifierLiteral.UpdateTokenInfo(firstParameter);
+            functionCall.Parameters[0] = identifierLiteral;
         }
 
         protected void VerifyColumnDataType(ColumnDefinition column)
