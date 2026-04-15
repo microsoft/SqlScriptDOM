@@ -33172,6 +33172,9 @@ builtInFunctionCall returns [FunctionCall vResult = FragmentFactory.CreateFragme
         |
             aggregateBuiltInFunctionCall[vResult]
         )
+        {
+            NormalizeDatePartFirstArgument(vResult);
+        }
     ;
 
 jsonArrayBuiltInFunctionCall [FunctionCall vParent]

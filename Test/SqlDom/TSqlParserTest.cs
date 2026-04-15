@@ -601,6 +601,41 @@ EXPAND VIEWS)";
         [TestMethod]
         [Priority(0)]
         [SqlStudioTestCategory(Category.UnitTest)]
+        [Timeout(GlobalConstants.DefaultTestTimeout)]
+        public void DateDiffDatePartIsIdentifierLiteralIn170Parser()
+        {
+            const string input = "SELECT DATEDIFF(mm, ColA, ColB) FROM my_table;";
+            IList<ParseError> errors;
+            TSqlScript script = (TSqlScript)new TSql170Parser(true).Parse(new StringReader(input), out errors);
+
+            Assert.AreEqual(0, errors.Count, "Unexpected parsing error");
+
+            SelectStatement selectStatement = script.Batches[0].Statements[0] as SelectStatement;
+            Assert.IsNotNull(selectStatement);
+
+            QuerySpecification querySpecification = selectStatement.QueryExpression as QuerySpecification;
+            Assert.IsNotNull(querySpecification);
+
+            SelectScalarExpression selectScalarExpression = querySpecification.SelectElements[0] as SelectScalarExpression;
+            Assert.IsNotNull(selectScalarExpression);
+
+            FunctionCall functionCall = selectScalarExpression.Expression as FunctionCall;
+            Assert.IsNotNull(functionCall);
+            Assert.IsTrue(string.Equals(functionCall.FunctionName.Value, "DATEDIFF", StringComparison.OrdinalIgnoreCase));
+            Assert.AreEqual(3, functionCall.Parameters.Count);
+
+            Assert.IsInstanceOfType(functionCall.Parameters[0], typeof(IdentifierLiteral));
+            IdentifierLiteral datePartLiteral = functionCall.Parameters[0] as IdentifierLiteral;
+            Assert.IsNotNull(datePartLiteral);
+            Assert.IsTrue(string.Equals(datePartLiteral.Value, "mm", StringComparison.OrdinalIgnoreCase));
+
+            Assert.IsInstanceOfType(functionCall.Parameters[1], typeof(ColumnReferenceExpression));
+            Assert.IsInstanceOfType(functionCall.Parameters[2], typeof(ColumnReferenceExpression));
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void FieldQuoteParsingIn160ParserTest()
         {
             TSql160Parser parser = new TSql160Parser(true); IList<ParseError> errors;
