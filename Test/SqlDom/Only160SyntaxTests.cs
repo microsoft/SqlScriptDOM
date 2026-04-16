@@ -41,6 +41,7 @@ namespace SqlStudio.Tests.UTSqlScriptDom
             new ParserTest160("AlterFunctionJsonObjectTests160.sql", nErrors80: 1, nErrors90: 1, nErrors100: 1, nErrors110: 1, nErrors120: 1, nErrors130: 1, nErrors140: 1, nErrors150: 1),
             new ParserTest160("ComplexJsonObjectFunctionTests160.sql"),
             new ParserTest160("TestTrimReturn160.sql", nErrors80: 1, nErrors90: 0, nErrors100: 0, nErrors110: 0, nErrors120: 0, nErrors130: 0, nErrors140: 0, nErrors150: 0),
+            new ParserTest160("TrimFromClauseReturnTests160.sql"),
             new ParserTest160("TestJsonArrayReturn160.sql", nErrors80: 1, nErrors90: 0, nErrors100: 0, nErrors110: 0, nErrors120: 0, nErrors130: 0, nErrors140: 0, nErrors150: 0),
             new ParserTest160(scriptFilename: "IgnoreRespectNullsSyntaxTests160.sql", nErrors80: 12, nErrors90: 8, nErrors100: 8, nErrors110: 8, nErrors120: 8, nErrors130: 8, nErrors140: 8, nErrors150: 8),
             new ParserTest160(scriptFilename: "FuzzyStringMatchingTests160.sql",  nErrors80: 0, nErrors90: 0, nErrors100: 0, nErrors110: 0, nErrors120: 0, nErrors130: 0, nErrors140: 0, nErrors150: 0),

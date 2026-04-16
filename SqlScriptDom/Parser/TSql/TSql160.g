@@ -31483,6 +31483,9 @@ expressionPrimary [ExpressionFlags expressionFlags] returns [PrimaryExpression v
             {NextTokenMatches(CodeGenerationSupporter.JsonArray) && (LA(2) == LeftParenthesis)}?
             vResult=jsonArrayCall
         |
+            {NextTokenMatches(CodeGenerationSupporter.Trim) && (LA(2) == LeftParenthesis)}?
+            vResult=trimCall
+        |
             (Identifier LeftParenthesis)=>
             vResult=builtInFunctionCall
         |
@@ -32166,6 +32169,28 @@ builtInFunctionCall returns [FunctionCall vResult = FragmentFactory.CreateFragme
          || vResult.FunctionName.Value.ToUpper(CultureInfo.InvariantCulture) == CodeGenerationSupporter.Lag
          || vResult.FunctionName.Value.ToUpper(CultureInfo.InvariantCulture) == CodeGenerationSupporter.Lead))}?
             ignoreRespectNullsRegularBuiltInFunctionCall[vResult]
+        |
+            regularBuiltInFunctionCall[vResult]
+        |
+            aggregateBuiltInFunctionCall[vResult]
+        )
+    ;
+
+trimCall returns [FunctionCall vResult = FragmentFactory.CreateFragment<FunctionCall>()]
+{
+    Identifier vIdentifier;
+}
+    :    vIdentifier=nonQuotedIdentifier
+        {
+            Match(vIdentifier, CodeGenerationSupporter.Trim);
+            vResult.FunctionName = vIdentifier;
+        }
+        LeftParenthesis
+        (
+            {NextTokenMatches(CodeGenerationSupporter.Leading) || NextTokenMatches(CodeGenerationSupporter.Trailing) || NextTokenMatches(CodeGenerationSupporter.Both)}?
+            trim3ArgsBuiltInFunctionCall[vResult]
+        |
+            trimBuiltInFunctionCall[vResult]
         |
             regularBuiltInFunctionCall[vResult]
         |
