@@ -1,6 +1,6 @@
 # Guidelines for Adding New Parser Versions to SqlScriptDOM
 
-This guide provides step-by-step instructions for adding support for a new SQL Server version parser to the SqlScriptDOM library. This pattern was established from the TSql180 parser implementation for SQL Server Yellowstone (vnext).
+This guide provides step-by-step instructions for adding support for a new SQL Server version parser to the SqlScriptDOM library. This pattern was established from the TSql180 parser
 
 ## When to Use This Guide
 
@@ -27,7 +27,6 @@ SqlScriptDOM uses a version numbering scheme that corresponds to SQL Server vers
 - TSql150 = SQL Server 2019
 - TSql160 = SQL Server 2022
 - TSql170 = SQL Server 2025
-- TSql180 = SQL Server Yellowstone (vnext)
 
 **Naming Pattern**: `TSql{CompatibilityLevel}` where CompatibilityLevel is typically `(MajorVersion - 1900) * 10`
 
@@ -47,7 +46,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         // ... existing versions ...
         
         /// <summary>
-        /// Sql 18.0 mode (SQL Server Yellowstone/vnext).
+        /// Sql 18.0 mode
         /// </summary>
         Sql180 = 11,
     }
@@ -268,7 +267,7 @@ using Microsoft.SqlServer.TransactSql.ScriptDom.Versioning;
 namespace Microsoft.SqlServer.TransactSql.ScriptDom
 {
     /// <summary>
-    /// The TSql Parser for 18.0 (SQL Server Yellowstone/vnext).
+    /// The TSql Parser for 18.0
     /// </summary>
     [Serializable]
     public class TSql180Parser : TSqlParser
@@ -444,7 +443,7 @@ using Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator;
 namespace Microsoft.SqlServer.TransactSql.ScriptDom
 {
     /// <summary>
-    /// Script generator for T-SQL 180 (SQL Server Yellowstone/vnext)
+    /// Script generator for T-SQL 180
     /// </summary>
     public sealed class Sql180ScriptGenerator : SqlScriptGenerator
     {
