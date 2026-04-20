@@ -28,6 +28,7 @@ ScriptDom is a library for parsing and generating T-SQL scripts. It is primarily
 - `Test/SqlDom/` — unit tests, baselines and test scripts. See `Only170SyntaxTests.cs`, `TestScripts/`, and `Baselines170/`.
 - `.github/instructions/testing.guidelines.instructions.md` — comprehensive testing framework guide with patterns and best practices.
 - `.github/instructions/function.guidelines.instructions.md` — specialized guide for adding new T-SQL system functions.
+- `.github/instructions/database_option.guidelines.instructions.md` — specialized guide for adding database options (ALTER/CREATE DATABASE SET options).
 
 ## Developer workflow & conventions (typical change cycle)
 1. Add/modify grammar rule(s) in the correct `TSql*.g` (pick the _version_ the syntax belongs to).
@@ -202,6 +203,7 @@ include: .github/instructions/parser.guidelines.instructions.md
 include: .github/instructions/function.guidelines.instructions.md
 include: .github/instructions/new_data_types.guidelines.instructions.md
 include: .github/instructions/new_index_types.guidelines.instructions.md
+include: .github/instructions/database_option.guidelines.instructions.md
 include: .github/instructions/debugging_workflow.guidelines.instructions.md
 include: .github/instructions/grammer.guidelines.instructions.md
 include: .github/instructions/testing.guidelines.instructions.md

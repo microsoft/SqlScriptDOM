@@ -64,7 +64,9 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
             AddOptionMapping(DatabaseOptionKind.Ledger, CodeGenerationSupporter.Ledger, SqlVersionFlags.TSql160AndAbove);
 
             // 170 options
-            // TODO: add any new 170 options here
+
+            // 180 options
+            AddOptionMapping(DatabaseOptionKind.AutomaticIndexCompaction, CodeGenerationSupporter.AutomaticIndexCompaction, SqlVersionFlags.TSql180AndAbove);
 
         }
 
@@ -83,6 +85,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
                 case DatabaseOptionKind.NestedTriggers:
                 case DatabaseOptionKind.TransformNoiseWords:
                 case DatabaseOptionKind.Ledger:
+                case DatabaseOptionKind.AutomaticIndexCompaction:
                     return true;
                 default:
                     return false;

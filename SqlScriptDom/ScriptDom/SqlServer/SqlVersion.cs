@@ -66,5 +66,10 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         /// Sql Fabric DW mode.
         /// </summary>
         SqlFabricDW = 10,
+
+        /// <summary>
+        /// Sql 18.0 mode.
+        /// </summary>
+        Sql180 = 11,
     }
 }

@@ -155,6 +155,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         internal const string AutoClose = "AUTO_CLOSE";
         internal const string AutoCreateStatistics = "AUTO_CREATE_STATISTICS";
         internal const string AutoDrop = "AUTO_DROP";
+        internal const string AutomaticIndexCompaction = "AUTOMATIC_INDEX_COMPACTION";
         internal const string AutogrowAllFiles = "AUTOGROW_ALL_FILES";
         internal const string AutogrowSingleFile = "AUTOGROW_SINGLE_FILE";
         internal const string Automatic = "AUTOMATIC";

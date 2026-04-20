@@ -7877,5 +7877,179 @@ WHEN NOT MATCHED BY SOURCE THEN DELETE OUTPUT inserted.*, deleted.*;";
                 "SELECT * FROM MyTable ORDER BY id OFFSET 10 ROWS FETCH APPROX NEXT 5 ROWS ONLY;",
                 new ParserErrorInfo(34, "SQL46145"));
         }
+
+        /// <summary>
+        /// Negative tests for VECTOR_SEARCH syntax with TSql180Parser.
+        /// Mirrors VectorSearchErrorTest170 but validates against the 180 parser
+        /// which has TOP_N as optional and supports WITH (FORCE_ANN_ONLY).
+        /// </summary>
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void VectorSearchErrorTest180()
+        {
+            // Missing required parameters: TABLE
+            ParserTestUtils.ErrorTest180(
+                "SELECT * FROM VECTOR_SEARCH()",
+                new ParserErrorInfo(28, "SQL46010", ")"));
+
+            // Missing required parameters: COLUMN
+            ParserTestUtils.ErrorTest180(
+                "SELECT * FROM VECTOR_SEARCH(TABLE = tbl1)",
+                new ParserErrorInfo(40, "SQL46010", ")"));
+
+            // Missing required parameters: SIMILAR_TO
+            ParserTestUtils.ErrorTest180(
+                "SELECT * FROM VECTOR_SEARCH(TABLE = tbl1, COLUMN = col1)",
+                new ParserErrorInfo(55, "SQL46010", ")"));
+
+            // Missing required parameters: METRIC
+            ParserTestUtils.ErrorTest180(
+                "SELECT * FROM VECTOR_SEARCH(TABLE = tbl1, COLUMN = col1, SIMILAR_TO = query_vector)",
+                new ParserErrorInfo(82, "SQL46010", ")"));
+
+            // TOP_N is OPTIONAL in TSql180 - no error when omitted (SQL Server 2025+)
+            // VECTOR_SEARCH without TOP_N is valid; no test case for missing TOP_N here.
+
+            // Invalid order: COLUMN before TABLE
+            ParserTestUtils.ErrorTest180(
+                "SELECT * FROM VECTOR_SEARCH(COLUMN = col1, TABLE = tbl1, SIMILAR_TO = query_vector, METRIC = 'dot', TOP_N = 5)",
+                new ParserErrorInfo(28, "SQL46010", "COLUMN"));
+
+            // Invalid order: SIMILAR_TO before COLUMN
+            ParserTestUtils.ErrorTest180(
+                "SELECT * FROM VECTOR_SEARCH(TABLE = tbl1, SIMILAR_TO = query_vector, COLUMN = col1, METRIC = 'dot', TOP_N = 5)",
+                new ParserErrorInfo(42, "SQL46010", "SIMILAR_TO"));
+
+            // Invalid order: METRIC before SIMILAR_TO
+            ParserTestUtils.ErrorTest180(
+                "SELECT * FROM VECTOR_SEARCH(TABLE = tbl1, COLUMN = col1, METRIC = 'dot', SIMILAR_TO = query_vector, TOP_N = 5)",
+                new ParserErrorInfo(57, "SQL46005", "SIMILAR_TO", "METRIC"));
+
+            // Invalid value: TABLE = 'tbl1' (should be identifier, not string)
+            ParserTestUtils.ErrorTest180(
+                "SELECT * FROM VECTOR_SEARCH(TABLE = 'tbl1', COLUMN = col1, SIMILAR_TO = query_vector, METRIC = 'dot', TOP_N = 5)",
+                new ParserErrorInfo(36, "SQL46010", "'tbl1'"));
+
+            // Invalid value: TABLE = 123 (should be identifier, not integer)
+            ParserTestUtils.ErrorTest180(
+                "SELECT * FROM VECTOR_SEARCH(TABLE = 123, COLUMN = col1, SIMILAR_TO = query_vector, METRIC = 'dot', TOP_N = 5)",
+                new ParserErrorInfo(36, "SQL46010", "123"));
+
+            // Invalid value: COLUMN = 'col1' (should be identifier, not string)
+            ParserTestUtils.ErrorTest180(
+                "SELECT * FROM VECTOR_SEARCH(TABLE = tbl1, COLUMN = 'col1', SIMILAR_TO = query_vector, METRIC = 'dot', TOP_N = 5)",
+                new ParserErrorInfo(51, "SQL46010", "'col1'"));
+
+            // Invalid value: COLUMN = 123 (should be identifier, not integer)
+            ParserTestUtils.ErrorTest180(
+                "SELECT * FROM VECTOR_SEARCH(TABLE = tbl1, COLUMN = 123, SIMILAR_TO = query_vector, METRIC = 'dot', TOP_N = 5)",
+                new ParserErrorInfo(51, "SQL46010", "123"));
+
+            // Invalid value: METRIC = dot (should be string literal)
+            ParserTestUtils.ErrorTest180(
+                "SELECT * FROM VECTOR_SEARCH(TABLE = tbl1, COLUMN = col1, SIMILAR_TO = query_vector, METRIC = dot, TOP_N = 5)",
+                new ParserErrorInfo(93, "SQL46010", "dot"));
+
+            // Invalid value: METRIC = 'invalid_value' (should be either 'cosine', 'dot', or 'euclidean')
+            ParserTestUtils.ErrorTest180(
+                "SELECT * FROM VECTOR_SEARCH(TABLE = tbl1, COLUMN = col1, SIMILAR_TO = query_vector, METRIC = 'invalid_value', TOP_N = 5)",
+                new ParserErrorInfo(93, "SQL46010", "'invalid_value'"));
+
+            // Invalid value: TOP_N = '5' (should be integer, not string)
+            ParserTestUtils.ErrorTest180(
+                "SELECT * FROM VECTOR_SEARCH(TABLE = tbl1, COLUMN = col1, SIMILAR_TO = query_vector, METRIC = 'dot', TOP_N = '5')",
+                new ParserErrorInfo(108, "SQL46010", "'5'"));
+
+            // Invalid value: TOP_N = -5 (should be positive integer)
+            ParserTestUtils.ErrorTest180(
+                "SELECT * FROM VECTOR_SEARCH(TABLE = tbl1, COLUMN = col1, SIMILAR_TO = query_vector, METRIC = 'dot', TOP_N = -5)",
+                new ParserErrorInfo(108, "SQL46010", "-"));
+
+            // Missing value after equals for TABLE
+            ParserTestUtils.ErrorTest180(
+                "SELECT * FROM VECTOR_SEARCH(TABLE = , COLUMN = col1, SIMILAR_TO = query_vector, METRIC = 'dot', TOP_N = 5)",
+                new ParserErrorInfo(36, "SQL46010", ","));
+
+            // Missing value after equals for COLUMN
+            ParserTestUtils.ErrorTest180(
+                "SELECT * FROM VECTOR_SEARCH(TABLE = tbl1, COLUMN = , SIMILAR_TO = query_vector, METRIC = 'dot', TOP_N = 5)",
+                new ParserErrorInfo(51, "SQL46010", ","));
+
+            // Missing value after equals for SIMILAR_TO
+            ParserTestUtils.ErrorTest180(
+                "SELECT * FROM VECTOR_SEARCH(TABLE = tbl1, COLUMN = col1, SIMILAR_TO = , METRIC = 'dot', TOP_N = 5)",
+                new ParserErrorInfo(70, "SQL46010", ","));
+
+            // Missing value after equals for METRIC
+            ParserTestUtils.ErrorTest180(
+                "SELECT * FROM VECTOR_SEARCH(TABLE = tbl1, COLUMN = col1, SIMILAR_TO = query_vector, METRIC = , TOP_N = 5)",
+                new ParserErrorInfo(93, "SQL46010", ","));
+
+            // Extra parameter after TOP_N
+            ParserTestUtils.ErrorTest180(
+                "SELECT * FROM VECTOR_SEARCH(TABLE = tbl1, COLUMN = col1, SIMILAR_TO = query_vector, METRIC = 'dot', TOP_N = 5, EXTRA_PARAM = 'value')",
+                new ParserErrorInfo(109, "SQL46010", ","));
+
+            // Extra comma at end
+            ParserTestUtils.ErrorTest180(
+                "SELECT * FROM VECTOR_SEARCH(TABLE = tbl1, COLUMN = col1, SIMILAR_TO = query_vector, METRIC = 'dot', TOP_N = 5,)",
+                new ParserErrorInfo(109, "SQL46010", ","));
+
+            // Function call with constant input, not keyword params
+            ParserTestUtils.ErrorTest180(
+                "SELECT * FROM VECTOR_SEARCH('tbl1', 'col1', 'query_vector', 'dot', 5)",
+                new ParserErrorInfo(28, "SQL46010", "'tbl1'"));
+
+            // Subquery not allowed in SIMILAR_TO parameter
+            ParserTestUtils.ErrorTest180(
+                "SELECT * FROM VECTOR_SEARCH(TABLE = graphnode, COLUMN = embedding, SIMILAR_TO = (SELECT TOP 1 embedding FROM GTQuery), METRIC = 'euclidean', TOP_N = 20) AS ann",
+                new ParserErrorInfo(80, "SQL46098"));
+        }
+
+        /// <summary>
+        /// Negative test for OFFSET with FETCH APPROXIMATE - SQL46145 error (TSql180)
+        /// OFFSET clause cannot be used with FETCH APPROXIMATE (introduced in SQL Server 2025)
+        /// </summary>
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void OffsetWithFetchApproximateError180()
+        {
+            // OFFSET + FETCH APPROXIMATE is invalid
+            ParserTestUtils.ErrorTest180(
+                "SELECT * FROM MyTable ORDER BY id OFFSET 5 ROWS FETCH APPROXIMATE NEXT 10 ROWS ONLY;",
+                new ParserErrorInfo(34, "SQL46145"));
+        }
+
+        /// <summary>
+        /// Negative test for OFFSET with FETCH APPROX (abbreviated) - SQL46145 error (TSql180)
+        /// Verifies that abbreviated APPROX keyword also triggers validation
+        /// </summary>
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void OffsetWithFetchApproxError180()
+        {
+            // OFFSET + FETCH APPROX (abbreviated) is invalid
+            ParserTestUtils.ErrorTest180(
+                "SELECT * FROM MyTable ORDER BY id OFFSET 10 ROWS FETCH APPROX NEXT 5 ROWS ONLY;",
+                new ParserErrorInfo(34, "SQL46145"));
+        }
+
+        /// <summary>
+        /// Negative test for combining TIES with APPROXIMATE - syntax error (TSql180)
+        /// APPROXIMATE and TIES are mutually exclusive (introduced in SQL Server 2025)
+        /// </summary>
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TopWithTiesAndApproximateError180()
+        {
+            // Cannot use both TIES and APPROXIMATE together
+            ParserTestUtils.ErrorTest180(
+                "SELECT TOP 10 WITH TIES WITH APPROXIMATE * FROM MyTable ORDER BY id;",
+                new ParserErrorInfo(24, "SQL46010", "WITH"));
+        }
     }
 }

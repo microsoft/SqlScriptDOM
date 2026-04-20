@@ -32,6 +32,7 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                 new TSql150Parser(quotedIdentifiers),
                 new TSql160Parser(quotedIdentifiers),
                 new TSql170Parser(quotedIdentifiers),
+                new TSql180Parser(quotedIdentifiers),
                 new TSqlFabricDWParser(quotedIdentifiers));
         }
 
@@ -69,6 +70,8 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                     return new Sql160ScriptGenerator(options);
                 case SqlVersion.Sql170:
                     return new Sql170ScriptGenerator(options);
+                case SqlVersion.Sql180:
+                    return new Sql180ScriptGenerator(options);
                 case SqlVersion.SqlFabricDW:
                     return new SqlFabricDWScriptGenerator(options);
                 default:
@@ -272,6 +275,14 @@ namespace SqlStudio.Tests.UTSqlScriptDom
             ErrorTest(parser170, testScript, expectedErrors);
         }
 
+        internal static void ErrorTest180(string testScript, params ParserErrorInfo[] expectedErrors)
+        {
+            const bool quotedIdentifiers = true;
+
+            TSql180Parser parser180 = new TSql180Parser(quotedIdentifiers);
+            ErrorTest(parser180, testScript, expectedErrors);
+        }
+
         internal static void ErrorTestFabricDW(string testScript, params ParserErrorInfo[] expectedErrors)
         {
             const bool quotedIdentifiers = true;
@@ -454,3 +465,4 @@ namespace SqlStudio.Tests.UTSqlScriptDom
         }
     }
 }
+
