@@ -16550,6 +16550,9 @@ regularBuiltInFunctionCall [FunctionCall vParent]
     :
         (
             expressionList[vParent, vParent.Parameters]
+            {
+                NormalizeDatePartFunctionFirstParameter(vParent);
+            }
         |
             vColumn=starColumnReferenceExpression
             {

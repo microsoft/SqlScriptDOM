@@ -157,6 +157,37 @@ namespace SqlStudio.Tests.UTSqlScriptDom
         [TestMethod]
         [Priority(0)]
         [SqlStudioTestCategory(Category.UnitTest)]
+        public void DatePartFunctionParametersAreIdentifierLiteralsTest()
+        {
+            TSql160Parser parser = new TSql160Parser(true);
+
+            VerifyDatePartParameter(parser, "SELECT DATEDIFF(mm, ColA, ColB) FROM my_table;", "mm");
+            VerifyDatePartParameter(parser, "SELECT DATEADD(day, 1, ColA) FROM my_table;", "day");
+            VerifyDatePartParameter(parser, "SELECT DATEDIFF_BIG(second, ColA, ColB) FROM my_table;", "second");
+            VerifyDatePartParameter(parser, "SELECT DATENAME(month, ColA) FROM my_table;", "month");
+            VerifyDatePartParameter(parser, "SELECT DATEPART(wk, ColA) FROM my_table;", "wk");
+            VerifyDatePartParameter(parser, "SELECT DATE_BUCKET(WEEK, 10, ColA) FROM my_table;", "WEEK");
+            VerifyDatePartParameter(parser, "SELECT DATETRUNC(year, ColA) FROM my_table;", "year");
+        }
+
+        private static void VerifyDatePartParameter(TSqlParser parser, string sql, string expectedDatePart)
+        {
+            TSqlFragment fragment = parser.Parse(new System.IO.StringReader(sql), out System.Collections.Generic.IList<ParseError> errors);
+
+            Assert.AreEqual(0, errors.Count, sql);
+            TSqlScript script = (TSqlScript)fragment;
+            SelectStatement select = (SelectStatement)script.Batches[0].Statements[0];
+            QuerySpecification query = (QuerySpecification)select.QueryExpression;
+            SelectScalarExpression selectExpression = (SelectScalarExpression)query.SelectElements[0];
+            FunctionCall functionCall = (FunctionCall)selectExpression.Expression;
+
+            Assert.IsInstanceOfType(functionCall.Parameters[0], typeof(IdentifierLiteral), sql);
+            Assert.AreEqual(expectedDatePart, ((IdentifierLiteral)functionCall.Parameters[0]).Value, sql);
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void TSql160SyntaxIn150ParserTest()
         {
             TSql150Parser parser = new TSql150Parser(true);
