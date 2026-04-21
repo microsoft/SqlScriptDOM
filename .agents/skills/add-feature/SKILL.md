@@ -10,9 +10,9 @@ platforms: "SQL Server, Azure SQL DB, Fabric, Fabric DW, VNext"
 
 This skill helps add new T-SQL features to the ScriptDOM parser by:
 1. **Interviewing** you about the feature and target platform (SQL Server, Azure SQL DB, Fabric, Fabric DW, VNext)
-2. **Determining the latest parser version** from `SqlVersionFlags.cs` (currently TSql170)
+2. **Determining the latest parser version** from `SqlVersionFlags.cs`
 3. **Routing** you to the appropriate parser:
-   - SQL Server → version-specific parser (TSql120-170)
+   - SQL Server → version-specific parser (TSql120-180)
    - Azure SQL DB/Fabric/VNext → latest parser version
    - Fabric DW → separate TSqlFabricDW parser
 4. **Classifying** the change type (grammar, validation, function, data type, etc.)
@@ -33,7 +33,7 @@ Ask the user these questions to understand the feature:
    - **Azure SQL Database** (uses latest parser version)
    - **Fabric** (uses latest parser version)
    - **Fabric DW** (uses separate TSqlFabricDW parser)
-   - **VNext** (future version, uses latest parser version)
+   - **VNext** (future version, uses latest parser version unless repo instructions say otherwise)
 
 3. **If SQL Server, which version introduced this feature?**
    - SQL Server 2014 (TSql120)
@@ -42,7 +42,8 @@ Ask the user these questions to understand the feature:
    - SQL Server 2019 (TSql150)
    - SQL Server 2022 (TSql160)
    - SQL Server 2025 (TSql170)
-   - *(Skip if Azure SQL DB, Fabric, or VNext - these use latest version)*
+   - SQL Server vNext (TSql180)
+   - *(Skip if Azure SQL DB, Fabric, or VNext - these use TSql180 by default)*
 
 4. **Do you have example T-SQL syntax or Microsoft documentation links?**
    - This helps verify the exact syntax requirements
@@ -124,7 +125,7 @@ For grammar changes (Types B, C, D, E, G), follow this workflow:
 ### 3.1 Identify Target Grammar File
 
 **First, determine the latest parser version:**
-Check `SqlScriptDom/Parser/TSql/SqlVersionFlags.cs` for the highest TSql version enum value (currently TSql170).
+Check `SqlScriptDom/Parser/TSql/SqlVersionFlags.cs` for the highest TSql version enum value.
 
 **Then select the appropriate grammar file:**
 
@@ -135,9 +136,10 @@ Check `SqlScriptDom/Parser/TSql/SqlVersionFlags.cs` for the highest TSql version
 - SQL 2019+: TSql150.g
 - SQL 2022+: TSql160.g
 - SQL 2025+: TSql170.g
+- SQL Server vNext: TSql180.g
 
 #### For Azure SQL Database, Fabric, VNext:
-- Use the **latest parser version** (e.g., TSql170.g)
+- Use the **latest parser version** (currently TSql180.g)
 - Check `SqlVersionFlags.cs` to confirm the highest version
 
 #### For Fabric DW:
@@ -174,7 +176,7 @@ If adding new AST nodes:
 
 ### 4.2 Add Test Method
 
-#### For SQL Server versions (TSql120-170):
+#### For SQL Server versions (TSql120-180):
 In `Test/SqlDom/Only<version>SyntaxTests.cs`:
 
 ```csharp
@@ -191,8 +193,8 @@ Add to the `OnlyFabricDWTestInfos` array in `Test/SqlDom/OnlyFabricDWSyntaxTests
 ```csharp
 new ParserTestFabricDW("YourFeatureFabricDW.sql", 
     nErrors80: X, nErrors90: Y, nErrors100: Z, 
-    nErrors110: A, nErrors120: B, nErrors130: C, 
-    nErrors140: D, nErrors150: E, nErrors160: F, nErrors170: G),
+   nErrors110: A, nErrors120: B, nErrors130: C, 
+   nErrors140: D, nErrors150: E, nErrors160: F, nErrors170: G, nErrors180: H),
 ```
 *(Set expected error counts for each parser version)*
 
