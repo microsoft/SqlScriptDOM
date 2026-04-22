@@ -1,3 +1,9 @@
+---
+name: adding_new_parser
+description: "Guidance for adding new parser versions to SqlScriptDOM."
+user-invocable: false
+---
+
 # Guidelines for Adding New Parser Versions to SqlScriptDOM
 
 This guide provides step-by-step instructions for adding support for a new SQL Server version parser to the SqlScriptDOM library. This pattern was established from the TSql180 parser
@@ -785,10 +791,10 @@ When adding a new parser version, ensure you complete:
 
 ## Related Documentation
 
-- [Testing Guidelines](testing.guidelines.instructions.md) - How to add tests for new syntax
-- [Bug Fixing Guidelines](bug_fixing.guidelines.instructions.md) - How to add new grammar rules
-- [Grammar Guidelines](grammer.guidelines.instructions.md) - ANTLR v2 grammar patterns
-- [Validation Fix Guidelines](Validation_fix.guidelines.instructions.md) - Version-gated validation
+- [Testing Guidelines](../testing/SKILL.md) - How to add tests for new syntax
+- [Bug Fixing Guidelines](../bug_fixing/SKILL.md) - How to add new grammar rules
+- [Grammar Guidelines](../grammer/SKILL.md) - ANTLR v2 grammar patterns
+- [Validation Fix Guidelines](../grammar_validation/SKILL.md) - Version-gated validation
 
 ## References
 

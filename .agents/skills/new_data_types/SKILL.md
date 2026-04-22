@@ -1,3 +1,9 @@
+---
+name: new_data_types
+description: "Guidance for adding new SQL Server data types to SqlScriptDOM."
+user-invocable: false
+---
+
 # Guidelines for Adding New Data Types to SqlScriptDOM
 
 This guide provides step-by-step instructions for adding support for completely new SQL Server data types to the SqlScriptDOM parser. This pattern was established from the Vector data type implementation (commits 38a0971 and cd69b78).
@@ -11,9 +17,9 @@ Use this pattern when:
 - ✅ The data type is **introduced in a specific SQL Server version**
 
 **Do NOT use this guide for:**
-- ❌ Modifying existing data types (use [validation_fix.guidelines.instructions.md](validation_fix.guidelines.instructions.md))
-- ❌ Adding function syntax (use [function.guidelines.instructions.md](function.guidelines.instructions.md))
-- ❌ Simple keyword additions (use [bug_fixing.guidelines.instructions.md](bug_fixing.guidelines.instructions.md))
+- ❌ Modifying existing data types (use [grammar_validation/SKILL.md](../grammar_validation/SKILL.md))
+- ❌ Adding function syntax (use [function/SKILL.md](../function/SKILL.md))
+- ❌ Simple keyword additions (use [bug_fixing/SKILL.md](../bug_fixing/SKILL.md))
 
 ## Real-World Example: Vector Data Type
 
@@ -416,10 +422,10 @@ public override void ExplicitVisit(ComplexDataTypeReference node)
 
 ## Related Guides
 
-- [bug_fixing.guidelines.instructions.md](bug_fixing.guidelines.instructions.md) - For general grammar modifications
-- [function.guidelines.instructions.md](function.guidelines.instructions.md) - For adding system functions
-- [validation_fix.guidelines.instructions.md](validation_fix.guidelines.instructions.md) - For validation-only issues
-- [testing.guidelines.instructions.md](testing.guidelines.instructions.md) - For comprehensive testing strategies
+- [bug_fixing/SKILL.md](../bug_fixing/SKILL.md) - For general grammar modifications
+- [function/SKILL.md](../function/SKILL.md) - For adding system functions
+- [grammar_validation/SKILL.md](../grammar_validation/SKILL.md) - For validation-only issues
+- [testing/SKILL.md](../testing/SKILL.md) - For comprehensive testing strategies
 
 ## Real-World Examples
 

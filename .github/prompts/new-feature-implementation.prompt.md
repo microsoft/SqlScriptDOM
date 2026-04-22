@@ -10,7 +10,7 @@ Use the [canonical add-feature skill](../../.agents/skills/add-feature/SKILL.md)
 - Implement the requested SQL Server feature end to end.
 - Start by asking the discovery questions defined in the shared skill.
 - Classify the request into the correct feature type before editing code.
-- Follow the matching file in `.github/instructions/` for implementation, tests, and validation.
+- Follow the matching skill in `.agents/skills/` for implementation, tests, and validation.
 - Treat `TSql180` as the current vNext/latest parser target.
 - Use the exact T-SQL syntax supplied by the user when creating tests.
 

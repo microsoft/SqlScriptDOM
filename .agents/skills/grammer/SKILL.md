@@ -1,3 +1,9 @@
+---
+name: grammer
+description: "Common grammar extension patterns for SqlScriptDOM."
+user-invocable: false
+---
+
 # Grammar Extension Patterns for SqlScriptDOM
 
 This guide documents common patterns for extending the SqlScriptDOM parser grammar to support new syntax or enhance existing functionality.
@@ -268,4 +274,4 @@ public override void ExplicitVisit(NewFunctionCall node)
 - **REGEXP_LIKE Predicate**: Boolean parentheses recognition pattern
 - **EVENT SESSION Predicates**: Function-style vs operator-style predicates
 
-For detailed step-by-step examples, see [BUG_FIXING_GUIDE.md](BUG_FIXING_GUIDE.md).
+For detailed step-by-step examples, see [bug_fixing/SKILL.md](../bug_fixing/SKILL.md).

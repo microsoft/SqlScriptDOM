@@ -1,3 +1,9 @@
+---
+name: grammar_validation
+description: "Guidance for fixing version-gated validation issues in SqlScriptDOM."
+user-invocable: false
+---
+
 # Validation-Based Bug Fix Guide for SqlScriptDOM
 
 This guide covers bugs where the **grammar already supports the syntax**, but the parser incorrectly rejects it due to validation logic. This is different from grammar-level fixes where you need to add new parsing rules.
@@ -11,8 +17,8 @@ Use this pattern when:
 - ✅ The feature was **added in a newer SQL Server version** but is rejected even in the correct parser
 
 **Do NOT use this guide when:**
-- ❌ Grammar rules need to be added/modified (use [bug_fixing.guidelines.instructions.md](bug_fixing.guidelines.instructions.md) instead)
-- ❌ AST nodes need to be created (use [grammer.guidelines.instructions.md](grammer.guidelines.instructions.md))
+- ❌ Grammar rules need to be added/modified (use [bug_fixing/SKILL.md](../bug_fixing/SKILL.md) instead)
+- ❌ AST nodes need to be created (use [grammer/SKILL.md](../grammer/SKILL.md))
 - ❌ The syntax never existed in SQL Server
 
 ## Real-World Example: ALTER TABLE RESUMABLE Option
@@ -338,9 +344,9 @@ new ParserTestXXX("TestFile.sql",
 
 ## Related Guides
 
-- [bug_fixing.guidelines.instructions.md](bug_fixing.guidelines.instructions.md) - For grammar-level fixes
-- [grammer.guidelines.instructions.md](grammer.guidelines.instructions.md) - For extending existing grammar
-- [parser.guidelines.instructions.md](parser.guidelines.instructions.md) - For parentheses recognition issues
+- [bug_fixing/SKILL.md](../bug_fixing/SKILL.md) - For grammar-level fixes
+- [grammer/SKILL.md](../grammer/SKILL.md) - For extending existing grammar
+- [parser/SKILL.md](../parser/SKILL.md) - For parentheses recognition issues
 
 ## Real-World Examples
 

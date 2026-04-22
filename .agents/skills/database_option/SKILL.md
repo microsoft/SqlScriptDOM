@@ -1,3 +1,9 @@
+---
+name: database_option
+description: "Guidance for adding database options to SqlScriptDOM."
+user-invocable: false
+---
+
 # Adding Database Options to ScriptDOM
 
 This guide covers how to add new database options to `ALTER DATABASE` and `CREATE DATABASE` statements in ScriptDOM.

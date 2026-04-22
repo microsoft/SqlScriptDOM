@@ -1,3 +1,9 @@
+---
+name: function
+description: "Guidance for adding new system functions to the SqlScriptDOM parser."
+user-invocable: false
+---
+
 # Guidelines for Adding New System Functions to SqlScriptDOM Parser
 
 This guide provides comprehensive instructions for adding new T-SQL system functions to the SqlScriptDOM parser, incorporating lessons learned from fixing JSON function parsing in RETURN statements.

@@ -1,3 +1,9 @@
+---
+name: testing
+description: "Guidance for adding and validating SqlScriptDOM parser tests."
+user-invocable: false
+---
+
 # Testing Guidelines for SqlScriptDOM
 
 This guide provides comprehensive instructions for adding and running tests in the SqlScriptDOM parser, based on the testing framework patterns and best practices.
@@ -358,7 +364,7 @@ SQL46010: Incorrect syntax near 'YOUR_TOKEN'. at offset 45, line 2, column 15
 **Solutions**:
 - Check grammar rules for your syntax
 - Verify syntactic predicates are in correct order
-- For RETURN statement issues, see [Function Guidelines](function.guidelines.instructions.md)
+- For RETURN statement issues, see [Function Guidelines](../function/SKILL.md)
 
 #### 4. Missing Baseline Files
 ```

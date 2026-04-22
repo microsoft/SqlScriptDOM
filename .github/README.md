@@ -5,11 +5,11 @@ Welcome to the SqlScriptDOM documentation! This folder contains comprehensive gu
 ## 🚀 Quick Start
 
 **New to the project?** Start here:
-1. Read [copilot-instructions.md](copilot-instructions.md) - Main project documentation
-2. Browse [debugging_workflow.guidelines.instructions.md](instructions/debugging_workflow.guidelines.instructions.md) - Visual quick reference
+1. Read [AGENTS.md](../AGENTS.md) - Main project documentation
+2. Browse [debugging_workflow/SKILL.md](../.agents/skills/debugging_workflow/SKILL.md) - Visual quick reference
 
 **Fixing a bug?** Start here:
-1. Open [debugging_workflow.guidelines.instructions.md](instructions/debugging_workflow.guidelines.instructions.md) - Identify bug type
+1. Open [debugging_workflow/SKILL.md](../.agents/skills/debugging_workflow/SKILL.md) - Identify bug type
 2. Follow the flowchart to the appropriate guide
 3. Use the step-by-step instructions
 
@@ -17,7 +17,7 @@ Welcome to the SqlScriptDOM documentation! This folder contains comprehensive gu
 
 ### Core Documentation
 
-#### [copilot-instructions.md](copilot-instructions.md) - **START HERE**
+#### [AGENTS.md](../AGENTS.md) - **START HERE**
 **Purpose**: Main project documentation and overview  
 **Contains**:
 - Project structure and key files
@@ -33,7 +33,7 @@ Welcome to the SqlScriptDOM documentation! This folder contains comprehensive gu
 
 ### Quick Reference
 
-#### [debugging_workflow.guidelines.instructions.md](instructions/debugging_workflow.guidelines.instructions.md) - **QUICK REFERENCE**
+#### [debugging_workflow/SKILL.md](../.agents/skills/debugging_workflow/SKILL.md) - **QUICK REFERENCE**
 **Purpose**: Visual guide for quick bug diagnosis  
 **Contains**:
 - Diagnostic flowchart
@@ -49,7 +49,7 @@ Welcome to the SqlScriptDOM documentation! This folder contains comprehensive gu
 
 ### Specialized Fix Guides
 
-#### [Validation_fix.guidelines.instructions.md](instructions/Validation_fix.guidelines.instructions.md) - Most Common Fix Type ⭐
+#### [grammar_validation/SKILL.md](../.agents/skills/grammar_validation/SKILL.md) - Most Common Fix Type ⭐
 **Purpose**: Fixing validation-based bugs  
 **When to use**:
 - ✅ Error: "Option 'X' is not valid..." or "Feature not supported..."
@@ -67,7 +67,7 @@ Welcome to the SqlScriptDOM documentation! This folder contains comprehensive gu
 
 ---
 
-#### [bug_fixing.guidelines.instructions.md](instructions/bug_fixing.guidelines.instructions.md) - Grammar Changes
+#### [bug_fixing/SKILL.md](../.agents/skills/bug_fixing/SKILL.md) - Grammar Changes
 **Purpose**: Adding new syntax or modifying parser grammar  
 **When to use**:
 - ✅ Error: "Incorrect syntax near..." or "Unexpected token..."
@@ -87,7 +87,7 @@ Welcome to the SqlScriptDOM documentation! This folder contains comprehensive gu
 
 ---
 
-#### [parser.guidelines.instructions.md](instructions/parser.guidelines.instructions.md)
+#### [parser/SKILL.md](../.agents/skills/parser/SKILL.md)
 **Purpose**: Fixing parentheses recognition issues  
 **When to use**:
 - ✅ `WHERE PREDICATE(...)` works
@@ -104,7 +104,7 @@ Welcome to the SqlScriptDOM documentation! This folder contains comprehensive gu
 
 ---
 
-#### [grammer.guidelines.instructions.md](instructions/grammer.guidelines.instructions.md)
+#### [grammer/SKILL.md](../.agents/skills/grammer/SKILL.md)
 **Purpose**: Common patterns for extending existing grammar  
 **When to use**:
 - ✅ Need to extend literal types to accept expressions
@@ -119,22 +119,6 @@ Welcome to the SqlScriptDOM documentation! This folder contains comprehensive gu
 
 **Complexity**: ⭐⭐⭐ Medium  
 **Typical time**: 3-6 hours
-
----
-
-### Meta Documentation
-
-#### [documentation.guidelines.instructions.md](instructions/documentation.guidelines.instructions.md)
-**Purpose**: Summary of documentation improvements  
-**Contains**:
-- What was improved and why
-- Before/after comparison
-- Real-world validation (ALTER TABLE RESUMABLE)
-- Lessons learned
-
-**When to read**: If you want to understand the documentation structure and evolution
-
----
 
 ## 🎯 Bug Type Decision Tree
 
@@ -169,34 +153,34 @@ Welcome to the SqlScriptDOM documentation! This folder contains comprehensive gu
 
 | Error Message | Bug Type | Guide | Complexity |
 |--------------|----------|-------|------------|
-| "Option 'X' is not valid in statement Y" | Validation | [Validation_fix.guidelines.instructions.md](instructions/Validation_fix.guidelines.instructions.md) | ⭐ Easy |
-| "Feature 'X' not supported in version Y" | Validation | [Validation_fix.guidelines.instructions.md](instructions/Validation_fix.guidelines.instructions.md) | ⭐ Easy |
-| "Incorrect syntax near keyword" | Grammar | [bug_fixing.guidelines.instructions.md](instructions/bug_fixing.guidelines.instructions.md) | ⭐⭐⭐ Medium |
-| "Unexpected token" | Grammar | [bug_fixing.guidelines.instructions.md](instructions/bug_fixing.guidelines.instructions.md) | ⭐⭐⭐ Medium |
-| Syntax error with parentheses only | Predicate Recognition | [parser.guidelines.instructions.md](instructions/parser.guidelines.instructions.md) | ⭐⭐ Easy-Medium |
-| Need to extend literal to expression | Grammar Extension | [GRAMMAR_EXTENSION_PATTERNS](GRAMMAR_EXTENSION_PATTERNS.md) | ⭐⭐⭐ Medium |
+| "Option 'X' is not valid in statement Y" | Validation | [grammar_validation/SKILL.md](../.agents/skills/grammar_validation/SKILL.md) | ⭐ Easy |
+| "Feature 'X' not supported in version Y" | Validation | [grammar_validation/SKILL.md](../.agents/skills/grammar_validation/SKILL.md) | ⭐ Easy |
+| "Incorrect syntax near keyword" | Grammar | [bug_fixing/SKILL.md](../.agents/skills/bug_fixing/SKILL.md) | ⭐⭐⭐ Medium |
+| "Unexpected token" | Grammar | [bug_fixing/SKILL.md](../.agents/skills/bug_fixing/SKILL.md) | ⭐⭐⭐ Medium |
+| Syntax error with parentheses only | Predicate Recognition | [parser/SKILL.md](../.agents/skills/parser/SKILL.md) | ⭐⭐ Easy-Medium |
+| Need to extend literal to expression | Grammar Extension | [grammer/SKILL.md](../.agents/skills/grammer/SKILL.md) | ⭐⭐⭐ Medium |
 
 ## 🔍 Common Scenarios
 
 ### Scenario 1: New SQL Server Feature Not Recognized
 **Example**: `ALTER TABLE ... WITH (RESUMABLE = ON)` fails  
 **Likely Issue**: Validation blocking the option  
-**Start With**: [VALIDATION_FIX_GUIDE.md](VALIDATION_FIX_GUIDE.md)
+**Start With**: [grammar_validation/SKILL.md](../.agents/skills/grammar_validation/SKILL.md)
 
 ### Scenario 2: New T-SQL Keyword Not Parsed
 **Example**: `CREATE EXTERNAL TABLE` not recognized  
 **Likely Issue**: Grammar doesn't have rules for this syntax  
-**Start With**: [BUG_FIXING_GUIDE.md](BUG_FIXING_GUIDE.md)
+**Start With**: [bug_fixing/SKILL.md](../.agents/skills/bug_fixing/SKILL.md)
 
 ### Scenario 3: Function Works Sometimes, Fails with Parentheses
 **Example**: `WHERE REGEXP_LIKE(...)` fails  
 **Likely Issue**: Predicate recognition  
-**Start With**: [PARSER_PREDICATE_RECOGNITION_FIX.md](PARSER_PREDICATE_RECOGNITION_FIX.md)
+**Start With**: [parser/SKILL.md](../.agents/skills/parser/SKILL.md)
 
 ### Scenario 4: Parameter Support Needed
 **Example**: `TOP_N = @parameter` should work  
 **Likely Issue**: Need to extend from literal to expression  
-**Start With**: [GRAMMAR_EXTENSION_PATTERNS.md](GRAMMAR_EXTENSION_PATTERNS.md)
+**Start With**: [grammer/SKILL.md](../.agents/skills/grammer/SKILL.md)
 
 ## 🛠️ Essential Commands
 
@@ -228,26 +212,26 @@ grep -r "RESUMABLE" Test/SqlDom/TestScripts/
 ## 🎓 Learning Path
 
 ### Beginner Path (Understanding the Project)
-1. [copilot-instructions.md](copilot-instructions.md) - Read "Key points" section
-2. [debugging_workflow.guidelines.instructions.md](instructions/debugging_workflow.guidelines.instructions.md) - Understand bug types
-3. [Validation_fix.guidelines.instructions.md](instructions/Validation_fix.guidelines.instructions.md) - Follow ALTER TABLE RESUMABLE example
+1. [AGENTS.md](../AGENTS.md) - Read "Key Points" section
+2. [debugging_workflow/SKILL.md](../.agents/skills/debugging_workflow/SKILL.md) - Understand bug types
+3. [grammar_validation/SKILL.md](../.agents/skills/grammar_validation/SKILL.md) - Follow ALTER TABLE RESUMABLE example
 4. Try fixing a validation bug yourself
 
 **Time**: 2-3 hours
 
 ### Intermediate Path (Grammar Changes)
 1. Review beginner path first
-2. [bug_fixing.guidelines.instructions.md](instructions/bug_fixing.guidelines.instructions.md) - Complete workflow
-3. [grammer.guidelines.instructions.md](instructions/grammer.guidelines.instructions.md) - Common patterns
-4. [copilot-instructions.md](copilot-instructions.md) - "Grammar Gotchas" section
+2. [bug_fixing/SKILL.md](../.agents/skills/bug_fixing/SKILL.md) - Complete workflow
+3. [grammer/SKILL.md](../.agents/skills/grammer/SKILL.md) - Common patterns
+4. [AGENTS.md](../AGENTS.md) - "Grammar Gotchas And Common Pitfalls" section
 5. Try adding a simple new keyword
 
 **Time**: 4-6 hours
 
 ### Advanced Path (Complex Features)
 1. Master beginner and intermediate paths
-2. [bug_fixing.guidelines.instructions.md](instructions/bug_fixing.guidelines.instructions.md) - AST modifications
-3. [grammer.guidelines.instructions.md](instructions/grammer.guidelines.instructions.md) - All patterns
+2. [bug_fixing/SKILL.md](../.agents/skills/bug_fixing/SKILL.md) - AST modifications
+3. [grammer/SKILL.md](../.agents/skills/grammer/SKILL.md) - All patterns
 4. Study existing complex features (e.g., VECTOR_SEARCH)
 5. Implement a new statement type
 

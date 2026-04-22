@@ -1,6 +1,12 @@
+---
+name: bug_fixing
+description: "Guidance for fixing parser bugs in SqlScriptDOM."
+user-invocable: false
+---
+
 # Bug Fixing Guide for SqlScriptDOM
 
-This guide provides a summary of the typical workflow for fixing a bug in the SqlScriptDOM parser, based on practical experience. For a more comprehensive overview of the project structure and code generation, please refer to the main [Copilot / AI instructions for SqlScriptDOM](../copilot-instructions.md).
+This guide provides a summary of the typical workflow for fixing a bug in the SqlScriptDOM parser, based on practical experience. For a more comprehensive overview of the project structure and code generation, refer to the main [AGENTS.md](../../../AGENTS.md).
 
 ## Before You Start: Identify the Bug Type
 
@@ -9,7 +15,7 @@ This guide provides a summary of the typical workflow for fixing a bug in the Sq
 1. **Validation Issues**: Syntax is already parseable but incorrectly rejected
    - Error: "Option 'X' is not valid..." or "Feature 'Y' not supported..."
    - Example: ALTER TABLE RESUMABLE works in ALTER INDEX but not ALTER TABLE
-   - **→ Use [grammar_validation.guidelines.instructions.md](grammar_validation.guidelines.instructions.md) instead of this guide**
+    - **→ Use [grammar_validation/SKILL.md](../grammar_validation/SKILL.md) instead of this guide**
 
 2. **Grammar Issues**: Parser doesn't recognize the syntax at all (THIS guide)
    - Error: "Incorrect syntax near..." or "Unexpected token..."
@@ -18,7 +24,7 @@ This guide provides a summary of the typical workflow for fixing a bug in the Sq
 
 3. **Predicate Recognition**: Identifier predicates fail with parentheses
    - Error: `WHERE REGEXP_LIKE(...)` works but `WHERE (REGEXP_LIKE(...))` fails
-   - **→ Use [parser.guidelines.instructions.md](parser.guidelines.instructions.md)**
+    - **→ Use [parser/SKILL.md](../parser/SKILL.md)**
 
 ## Summary of the Bug-Fixing Workflow
 
@@ -208,7 +214,7 @@ If you encounter a bug where:
 
 This is likely a **parser predicate recognition issue**. The grammar and AST are correct, but the `IsNextRuleBooleanParenthesis()` function doesn't recognize the identifier-based predicate.
 
-**Solution**: Follow the [Parser Predicate Recognition Fix Guide](parser.guidelines.instructions.md) instead of the standard grammar modification workflow.
+**Solution**: Follow the [Parser Predicate Recognition Fix Guide](../parser/SKILL.md) instead of the standard grammar modification workflow.
 
 ## Decision Tree: Which Guide to Use?
 
@@ -217,23 +223,23 @@ Start: You have a parsing bug
 │
 ├─→ Error: "Option 'X' is not valid..." or "Feature not supported..."
 │   └─→ Does similar syntax work elsewhere? (e.g., ALTER INDEX works)
-│       └─→ YES: Use [grammar_validation.guidelines.instructions.md](grammar_validation.guidelines.instructions.md)
+│       └─→ YES: Use [grammar_validation/SKILL.md](../grammar_validation/SKILL.md)
 │
 ├─→ Error: "Incorrect syntax near..." or parser doesn't recognize syntax
 │   └─→ Does the grammar need new rules or AST nodes?
-│       └─→ YES: Use this guide (BUG_FIXING_GUIDE.md)
+│       └─→ YES: Use this guide
 │
 └─→ Error: Parentheses cause failure with identifier predicates
     └─→ Does `WHERE PREDICATE(...)` work but `WHERE (PREDICATE(...))` fail?
-        └─→ YES: Use [parser.guidelines.instructions.md](parser.guidelines.instructions.md)
+        └─→ YES: Use [parser/SKILL.md](../parser/SKILL.md)
 ```
 
 ## Quick Reference: Fix Types by Symptom
 
 | Symptom | Fix Type | Guide | Files Modified |
 |---------|----------|-------|----------------|
-| "Option 'X' is not valid in statement Y" | Validation | [grammar_validation.guidelines.instructions.md](grammar_validation.guidelines.instructions.md) | `TSql80ParserBaseInternal.cs` |
+| "Option 'X' is not valid in statement Y" | Validation | [grammar_validation/SKILL.md](../grammar_validation/SKILL.md) | `TSql80ParserBaseInternal.cs` |
 | "Incorrect syntax near keyword" | Grammar | This guide | `TSql*.g`, `Ast.xml`, Script generators |
-| Parentheses break identifier predicates | Predicate Recognition | [parser.guidelines.instructions.md](parser.guidelines.instructions.md) | `TSql80ParserBaseInternal.cs` |
-| Literal needs to become expression | Grammar Extension | [grammer.guidelines.instructions.md](grammer.guidelines.instructions.md) | `Ast.xml`, `TSql*.g` |
+| Parentheses break identifier predicates | Predicate Recognition | [parser/SKILL.md](../parser/SKILL.md) | `TSql80ParserBaseInternal.cs` |
+| Literal needs to become expression | Grammar Extension | [grammer/SKILL.md](../grammer/SKILL.md) | `Ast.xml`, `TSql*.g` |
 

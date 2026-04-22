@@ -14,11 +14,11 @@ Use it for:
 - confirming which parser version should support the syntax
 - adding or updating regression coverage in the existing ScriptDOM test framework
 
-Do not use it for broad feature design. If the verification shows missing parser support, route the implementation work to the appropriate repo instruction:
-- [bug_fixing.guidelines.instructions.md](../../../.github/instructions/bug_fixing.guidelines.instructions.md)
-- [grammar_validation.guidelines.instructions.md](../../../.github/instructions/grammar_validation.guidelines.instructions.md)
-- [parser.guidelines.instructions.md](../../../.github/instructions/parser.guidelines.instructions.md)
-- [testing.guidelines.instructions.md](../../../.github/instructions/testing.guidelines.instructions.md)
+Do not use it for broad feature design. If the verification shows missing parser support, route the implementation work to the appropriate repo skill:
+- [bug_fixing/SKILL.md](../bug_fixing/SKILL.md)
+- [grammar_validation/SKILL.md](../grammar_validation/SKILL.md)
+- [parser/SKILL.md](../parser/SKILL.md)
+- [testing/SKILL.md](../testing/SKILL.md)
 
 ## Core Rules
 

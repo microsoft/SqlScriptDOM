@@ -69,7 +69,7 @@ Based on the answers, classify the feature into one of these types:
 - Error message says "Option 'X' is not valid..." or "Feature 'Y' not supported..."
 - The grammar may already parse it, but validation blocks it
 
-**→ Route to:** [grammar_validation.guidelines.instructions.md](../../instructions/grammar_validation.guidelines.instructions.md)
+**→ Route to:** [grammar_validation/SKILL.md](../grammar_validation/SKILL.md)
 
 ### Type B: New Grammar/Syntax
 **Indicators:**
@@ -77,35 +77,35 @@ Based on the answers, classify the feature into one of these types:
 - Error says "Incorrect syntax near..." or "Unexpected token..."
 - Parser doesn't recognize the syntax at all
 
-**→ Route to:** [bug_fixing.guidelines.instructions.md](../../instructions/bug_fixing.guidelines.instructions.md)
+**→ Route to:** [bug_fixing/SKILL.md](../bug_fixing/SKILL.md)
 
 ### Type C: New System Function
 **Indicators:**
 - Adding a new built-in T-SQL function (e.g., JSON_OBJECT, STRING_AGG)
 - May need special handling for RETURN statement contexts
 
-**→ Route to:** [function.guidelines.instructions.md](../../instructions/function.guidelines.instructions.md)
+**→ Route to:** [function/SKILL.md](../function/SKILL.md)
 
 ### Type D: New Data Type
 **Indicators:**
 - Adding a completely new SQL Server data type (e.g., VECTOR, GEOGRAPHY)
 - Requires custom parameter syntax (e.g., `VECTOR(1536, FLOAT32)`)
 
-**→ Route to:** [new_data_types.guidelines.instructions.md](../../instructions/new_data_types.guidelines.instructions.md)
+**→ Route to:** [new_data_types/SKILL.md](../new_data_types/SKILL.md)
 
 ### Type E: New Index Type
 **Indicators:**
 - Adding a new CREATE INDEX variant (e.g., VECTOR INDEX, JSON INDEX)
 - Requires specialized syntax different from standard indexes
 
-**→ Route to:** [new_index_types.guidelines.instructions.md](../../instructions/new_index_types.guidelines.instructions.md)
+**→ Route to:** [new_index_types/SKILL.md](../new_index_types/SKILL.md)
 
 ### Type F: Parser Predicate Recognition (Parentheses)
 **Indicators:**
 - Identifier-based predicate works without parentheses but fails with them
 - Error near closing parenthesis: `WHERE (REGEXP_LIKE(...))` fails
 
-**→ Route to:** [parser.guidelines.instructions.md](../../instructions/parser.guidelines.instructions.md)
+**→ Route to:** [parser/SKILL.md](../parser/SKILL.md)
 
 ### Type G: Database Option (ALTER/CREATE DATABASE SET)
 **Indicators:**
@@ -114,7 +114,7 @@ Based on the answers, classify the feature into one of these types:
 - Complex option with sub-options (e.g., `SET CHANGE_TRACKING (AUTO_CLEANUP = ON)`)
 - Enum-based option (e.g., `SET RECOVERY FULL`)
 
-**→ Route to:** [database_option.guidelines.instructions.md](../../instructions/database_option.guidelines.instructions.md)
+**→ Route to:** [database_option/SKILL.md](../database_option/SKILL.md)
 
 ---
 
@@ -146,7 +146,7 @@ Check `SqlScriptDom/Parser/TSql/SqlVersionFlags.cs` for the highest TSql version
 - Use **TSqlFabricDW.g** (separate parser with Fabric-specific syntax)
 
 ### 3.2 Grammar Development Patterns
-**Reference:** [grammar.guidelines.instructions.md](../../instructions/grammar.guidelines.instructions.md)
+**Reference:** [grammer/SKILL.md](../grammer/SKILL.md)
 
 Key patterns:
 - Use `this.FragmentFactory.CreateFragment<Type>()` for AST nodes
@@ -164,7 +164,7 @@ If adding new AST nodes:
 
 ## Step 4: Testing
 
-**Reference:** [testing.guidelines.instructions.md](../../instructions/testing.guidelines.instructions.md)
+**Reference:** [testing/SKILL.md](../testing/SKILL.md)
 
 ### 4.1 Create Test Files
 1. **Input Script**: `Test/SqlDom/TestScripts/YourFeature.sql`
@@ -219,7 +219,7 @@ dotnet test Test/SqlDom/UTSqlScriptDom.csproj -c Debug
 
 ## Step 5: Debugging and Troubleshooting
 
-**Reference:** [debugging_workflow.guidelines.instructions.md](../../instructions/debugging_workflow.guidelines.instructions.md)
+**Reference:** [debugging_workflow/SKILL.md](../debugging_workflow/SKILL.md)
 
 Common issues:
 - **Tests fail after grammar changes**: Likely modified a shared rule - create specialized version

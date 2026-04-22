@@ -1,3 +1,9 @@
+---
+name: parser
+description: "Guidance for fixing parser predicate recognition issues in SqlScriptDOM."
+user-invocable: false
+---
+
 # Parser Predicate Recognition Bug Fix Guide
 
 This guide documents the specific pattern for fixing bugs where identifier-based predicates (like `REGEXP_LIKE`) are not properly recognized when wrapped in parentheses in boolean expressions.

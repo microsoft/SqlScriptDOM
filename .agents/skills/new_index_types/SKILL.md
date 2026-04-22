@@ -1,3 +1,9 @@
+---
+name: new_index_types
+description: "Guidance for adding new SQL Server index types to SqlScriptDOM."
+user-invocable: false
+---
+
 # Guidelines for Adding New Index Types to SqlScriptDOM
 
 This guide provides step-by-step instructions for adding support for new SQL Server index types to the SqlScriptDOM parser. This pattern was established from the JSON and Vector index implementations found in SQL Server 2025 (TSql170).
@@ -11,8 +17,8 @@ Use this pattern when:
 - ✅ The index type is **introduced in a specific SQL Server version**
 
 **Do NOT use this guide for:**
-- ❌ Adding new index options to existing index types (use [validation_fix.guidelines.instructions.md](validation_fix.guidelines.instructions.md))
-- ❌ Adding standard indexes with new keywords (use [bug_fixing.guidelines.instructions.md](bug_fixing.guidelines.instructions.md))
+- ❌ Adding new index options to existing index types (use [grammar_validation/SKILL.md](../grammar_validation/SKILL.md))
+- ❌ Adding standard indexes with new keywords (use [bug_fixing/SKILL.md](../bug_fixing/SKILL.md))
 - ❌ Adding function or data type syntax (use respective guides)
 
 ## Real-World Examples: JSON and Vector Indexes
@@ -517,10 +523,10 @@ For index types that support filegroups or partitioning:
 
 ## Related Guides
 
-- [bug_fixing.guidelines.instructions.md](bug_fixing.guidelines.instructions.md) - For general grammar modifications
-- [new_data_types.guidelines.instructions.md](new_data_types.guidelines.instructions.md) - For adding new data types
-- [validation_fix.guidelines.instructions.md](validation_fix.guidelines.instructions.md) - For validation-only issues
-- [testing.guidelines.instructions.md](testing.guidelines.instructions.md) - For comprehensive testing strategies
+- [bug_fixing/SKILL.md](../bug_fixing/SKILL.md) - For general grammar modifications
+- [new_data_types/SKILL.md](../new_data_types/SKILL.md) - For adding new data types
+- [grammar_validation/SKILL.md](../grammar_validation/SKILL.md) - For validation-only issues
+- [testing/SKILL.md](../testing/SKILL.md) - For comprehensive testing strategies
 
 ## Real-World Examples
 

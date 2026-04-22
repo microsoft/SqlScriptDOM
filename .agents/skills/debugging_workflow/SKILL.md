@@ -1,3 +1,9 @@
+---
+name: debugging_workflow
+description: "Quick-reference workflow for diagnosing SqlScriptDOM parser issues."
+user-invocable: false
+---
+
 # ScriptDOM Debugging Workflow - Quick Reference
 
 This is a visual guide for quickly diagnosing and fixing bugs in SqlScriptDOM. Use this as your first stop when encountering a parsing issue.
@@ -53,7 +59,7 @@ grep -r "RESUMABLE" Test/SqlDom/TestScripts/
 # → It's a validation issue!
 ```
 
-**Solution:** [Validation_fix.guidelines.instructions.md](Validation_fix.guidelines.instructions.md)
+**Solution:** [grammar_validation/SKILL.md](../grammar_validation/SKILL.md)
 **Files to Check:** `TSql80ParserBaseInternal.cs` (validation methods)
 
 ---
@@ -71,7 +77,7 @@ grep -r "YourKeyword" SqlScriptDom/Parser/TSql/*.g
 # Not found? → It's a grammar issue!
 ```
 
-**Solution:** [bug_fixing.guidelines.instructions.md](bug_fixing.guidelines.instructions.md)
+**Solution:** [bug_fixing/SKILL.md](../bug_fixing/SKILL.md)
 **Files to Modify:** `TSql*.g`, `Ast.xml`, Script generators
 
 ---
@@ -90,7 +96,7 @@ echo "SELECT 1 WHERE (REGEXP_LIKE('a', 'b'));" > test2.sql
 # Second one fails? → Predicate recognition issue!
 ```
 
-**Solution:** [parser.guidelines.instructions.md](parser.guidelines.instructions.md)
+**Solution:** [parser/SKILL.md](../parser/SKILL.md)
 **Files to Modify:** `TSql80ParserBaseInternal.cs` (`IsNextRuleBooleanParenthesis()`)
 
 ---
@@ -233,19 +239,19 @@ dotnet test Test/SqlDom/UTSqlScriptDom.csproj -c Debug -v detailed
 
 | You Need To... | Use This Guide | Estimated Complexity |
 |---------------|----------------|---------------------|
-| Fix "option not valid" error | [Validation_fix.guidelines.instructions.md](Validation_fix.guidelines.instructions.md) | ⭐ Easy |
-| Add new SQL keyword/operator | [bug_fixing.guidelines.instructions.md](bug_fixing.guidelines.instructions.md) | ⭐⭐⭐ Medium |
-| Fix parentheses with predicates | [parser.guidelines.instructions.md](parser.guidelines.instructions.md) | ⭐⭐ Easy-Medium |
-| Extend literal to expression | [grammer.guidelines.instructions.md](grammer.guidelines.instructions.md) | ⭐⭐⭐ Medium |
-| Add new statement type | [bug_fixing.guidelines.instructions.md](bug_fixing.guidelines.instructions.md) | ⭐⭐⭐⭐ Hard |
+| Fix "option not valid" error | [grammar_validation/SKILL.md](../grammar_validation/SKILL.md) | ⭐ Easy |
+| Add new SQL keyword/operator | [bug_fixing/SKILL.md](../bug_fixing/SKILL.md) | ⭐⭐⭐ Medium |
+| Fix parentheses with predicates | [parser/SKILL.md](../parser/SKILL.md) | ⭐⭐ Easy-Medium |
+| Extend literal to expression | [grammer/SKILL.md](../grammer/SKILL.md) | ⭐⭐⭐ Medium |
+| Add new statement type | [bug_fixing/SKILL.md](../bug_fixing/SKILL.md) | ⭐⭐⭐⭐ Hard |
 
 ## 📚 Related Documentation
 
-- [copilot-instructions.md](../copilot-instructions.md) - Main project documentation
-- [Validation_fix.guidelines.instructions.md](Validation_fix.guidelines.instructions.md) - Version-gated validation fixes
-- [bug_fixing.guidelines.instructions.md](bug_fixing.guidelines.instructions.md) - Grammar modifications and AST updates
-- [grammer.guidelines.instructions.md](grammer.guidelines.instructions.md) - Common extension patterns
-- [parser.guidelines.instructions.md](parser.guidelines.instructions.md) - Parentheses recognition
+- [AGENTS.md](../../../AGENTS.md) - Main project documentation
+- [grammar_validation/SKILL.md](../grammar_validation/SKILL.md) - Version-gated validation fixes
+- [bug_fixing/SKILL.md](../bug_fixing/SKILL.md) - Grammar modifications and AST updates
+- [grammer/SKILL.md](../grammer/SKILL.md) - Common extension patterns
+- [parser/SKILL.md](../parser/SKILL.md) - Parentheses recognition
 
 ---
 
