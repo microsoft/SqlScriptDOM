@@ -17,10 +17,6 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
             GenerateSpaceAndIdentifier(CodeGenerationSupporter.Model);
             GenerateCreateExternalModelStatementBody(node);
         }
-        protected static Dictionary<ExternalModelTypeOption, string> _externalModelTypeOption = new Dictionary<ExternalModelTypeOption, string>()
-        {
-            {ExternalModelTypeOption.EMBEDDINGS, CodeGenerationSupporter.Embeddings}
-        };
 
         protected void GenerateCreateExternalModelStatementBody(CreateExternalModelStatement node)
         {
@@ -54,17 +50,15 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
             }
 
             // external model Model Type options
-            if (node.ModelType == ExternalModelTypeOption.EMBEDDINGS)
+            if (node.ModelType != null)
             {
                 if (!ifFirst)
                 {
                     GenerateSymbol(TSqlTokenType.Comma);
                 }
                 ifFirst = false;
-                ExternalModelTypeOption typeOption = ExternalModelTypeOption.EMBEDDINGS;
-                string externalModelTypeOption = GetValueForEnumKey(_externalModelTypeOption, typeOption);
                 NewLine();
-                GenerateNameEqualsValue(CodeGenerationSupporter.ModelType, externalModelTypeOption);
+                GenerateNameEqualsValue(CodeGenerationSupporter.ModelType, node.ModelType);
             }
 
             // external model name options

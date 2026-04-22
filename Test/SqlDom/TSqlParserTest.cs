@@ -438,6 +438,43 @@ PERIOD FOR SYSTEM_TIME(date1, date2)"
         [Priority(0)]
         [Timeout(GlobalConstants.DefaultTestTimeout)]
         [SqlStudioTestCategory(Category.UnitTest)]
+        public void ExternalModelTypeIsParsedAsIdentifierFragment()
+        {
+            const string createInput = @"CREATE EXTERNAL MODEL simple_model
+WITH (
+LOCATION = '/models/simple',
+API_FORMAT = 'OpenAI',
+MODEL_TYPE = EMBEDDINGS,
+MODEL = 'gpt-3.5-turbo'
+);";
+
+            IList<ParseError> errors = null;
+            TSqlScript script = (TSqlScript)new TSql180Parser(true).Parse(new StringReader(createInput), out errors);
+
+            Assert.AreEqual(0, errors.Count);
+
+            CreateExternalModelStatement createStatement = (CreateExternalModelStatement)script.Batches[0].Statements[0];
+            Assert.IsNotNull(createStatement.ModelType);
+            Assert.AreEqual(CodeGenerationSupporter.Embeddings, createStatement.ModelType.Value);
+
+            const string alterInput = @"ALTER EXTERNAL MODEL simple_model
+SET (
+MODEL_TYPE = EMBEDDINGS
+);";
+
+            script = (TSqlScript)new TSql180Parser(true).Parse(new StringReader(alterInput), out errors);
+
+            Assert.AreEqual(0, errors.Count);
+
+            AlterExternalModelStatement alterStatement = (AlterExternalModelStatement)script.Batches[0].Statements[0];
+            Assert.IsNotNull(alterStatement.ModelType);
+            Assert.AreEqual(CodeGenerationSupporter.Embeddings, alterStatement.ModelType.Value);
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [Timeout(GlobalConstants.DefaultTestTimeout)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void ParsingNativelyCompiledStoredProceduresWithAtomicBlock()
         {
             string input = "";

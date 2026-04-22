@@ -1364,7 +1364,7 @@
     <Member Name="Name" Type="Identifier" Summary="The external model name."/>
     <Member Name="Location" Type="Literal" Summary="The external model location name."/>
     <Member Name="ApiFormat" Type="Literal" Summary="The external model api format name."/>
-    <Member Name="ModelType" Type="ExternalModelTypeOption?" GenerateUpdatePositionInfoCall="false" Summary="The external model type name."/>
+    <Member Name="ModelType" Type="Identifier" Summary="The external model type name."/>
     <Member Name="ModelName" Type="Literal" Summary="The external model name to be used to generate embeddings."/>
     <Member Name="Credential" Type="Identifier" Summary="The external model credentials name."/>
     <Member Name="Parameters" Type="Literal" Summary="The external model parameters as key-value pairs."/>

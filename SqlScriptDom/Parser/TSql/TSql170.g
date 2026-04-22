@@ -24152,6 +24152,9 @@ StringLiteral vApiFormat;
 ;
 
 externalModelModelType[ExternalModelStatement vParent]
+{
+    Identifier vModelTypeOption;
+}
   :
         tModelType:Identifier
         {
@@ -24164,7 +24167,10 @@ externalModelModelType[ExternalModelStatement vParent]
             {
                 if (TryMatch(tEmbeddings, CodeGenerationSupporter.Embeddings))
                 {
-                    vParent.ModelType = ExternalModelTypeOption.EMBEDDINGS;
+                    vModelTypeOption = this.FragmentFactory.CreateFragment<Identifier>();
+                    UpdateTokenInfo(vModelTypeOption, tEmbeddings);
+                    vModelTypeOption.SetUnquotedIdentifier(tEmbeddings.getText());
+                    vParent.ModelType = vModelTypeOption;
                     UpdateTokenInfo(vParent, tEmbeddings);
                 }
                 else
