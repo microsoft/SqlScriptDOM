@@ -22,6 +22,7 @@ namespace SqlStudio.Tests.UTSqlScriptDom
             new ParserTest140("OptimizerHintsTests140.sql", 6, 6, 6, 6, 6, 0),
             new ParserTest140("WithinGroupTests140.sql", 4, 4, 4, 2, 2, 0),
             new ParserTest140("TrimBuiltInTest140.sql", 10, 2, 10, 10, 10, 10),
+            new ParserTest140("TrimFromReturnTests140.sql"),
             new ParserTest140("AlterTableAlterColumnStatementTests140.sql", 14, 14, 14, 14, 14, 12),
             new ParserTest140("BulkInsertStatementTests140.sql", 12, 12, 12, 12, 12, 12),
             new ParserTest140("OpenRowsetBulkStatementTests140.sql", 9, 9, 9, 9, 9, 9),
