@@ -1979,6 +1979,51 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
             }
         }
 
+        protected void NormalizeDatePartFunctionFirstParameter(FunctionCall functionCall)
+        {
+            if (functionCall == null ||
+                functionCall.FunctionName == null ||
+                String.IsNullOrEmpty(functionCall.FunctionName.Value) ||
+                functionCall.Parameters == null ||
+                functionCall.Parameters.Count == 0 ||
+                !IsDatePartFunction(functionCall.FunctionName.Value))
+            {
+                return;
+            }
+
+            ColumnReferenceExpression columnReference = functionCall.Parameters[0] as ColumnReferenceExpression;
+            if (columnReference == null ||
+                columnReference.MultiPartIdentifier == null ||
+                columnReference.MultiPartIdentifier.Count != 1)
+            {
+                return;
+            }
+
+            Identifier identifier = columnReference.MultiPartIdentifier[0];
+            IdentifierLiteral literal = FragmentFactory.CreateFragment<IdentifierLiteral>();
+            literal.Value = identifier.Value;
+            literal.QuoteType = identifier.QuoteType;
+            literal.UpdateTokenInfo(columnReference);
+            functionCall.Parameters[0] = literal;
+        }
+
+        private static bool IsDatePartFunction(string functionName)
+        {
+            switch (functionName.ToUpper(CultureInfo.InvariantCulture))
+            {
+                case CodeGenerationSupporter.DateAdd:
+                case CodeGenerationSupporter.DateBucket:
+                case CodeGenerationSupporter.DateDiff:
+                case CodeGenerationSupporter.DateDiffBig:
+                case CodeGenerationSupporter.DateName:
+                case CodeGenerationSupporter.DatePart:
+                case CodeGenerationSupporter.DateTrunc:
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
         protected void VerifyColumnDataType(ColumnDefinition column)
         {
             // If the scalarDataType is not parsed, the ColumnIdentifier has to be a timestamp.
