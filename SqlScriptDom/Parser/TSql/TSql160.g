@@ -31483,6 +31483,9 @@ expressionPrimary [ExpressionFlags expressionFlags] returns [PrimaryExpression v
             {NextTokenMatches(CodeGenerationSupporter.JsonArray) && (LA(2) == LeftParenthesis)}?
             vResult=jsonArrayCall
         |
+            {NextTokenMatches(CodeGenerationSupporter.Trim) && (LA(2) == LeftParenthesis) && (LA(3) != Star)}?
+            vResult=trimCall
+        |
             (Identifier LeftParenthesis)=>
             vResult=builtInFunctionCall
         |
@@ -32529,6 +32532,24 @@ jsonArrayCall returns [FunctionCall vResult = this.FragmentFactory.CreateFragmen
         }
         LeftParenthesis
         jsonArrayBuiltInFunctionCall[vResult]
+    ;
+
+trimCall returns [FunctionCall vResult = this.FragmentFactory.CreateFragment<FunctionCall>()]
+{
+    Identifier vIdentifier;
+}
+    :    vIdentifier=nonQuotedIdentifier
+        {
+            Match(vIdentifier, CodeGenerationSupporter.Trim);
+            vResult.FunctionName = vIdentifier;
+        }
+        LeftParenthesis
+        (
+            {NextTokenMatches(CodeGenerationSupporter.Leading) || NextTokenMatches(CodeGenerationSupporter.Trailing) || NextTokenMatches(CodeGenerationSupporter.Both)}?
+            trim3ArgsBuiltInFunctionCall[vResult]
+        |
+            trimBuiltInFunctionCall[vResult]
+        )
     ;
 
 coalesceExpression [ExpressionFlags expressionFlags] returns [CoalesceExpression vResult = this.FragmentFactory.CreateFragment<CoalesceExpression>()]

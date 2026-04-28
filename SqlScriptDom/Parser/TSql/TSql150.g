@@ -30886,6 +30886,9 @@ expressionPrimary [ExpressionFlags expressionFlags] returns [PrimaryExpression v
             {NextTokenMatches(CodeGenerationSupporter.IIf) && (LA(2) == LeftParenthesis)}?
             vResult=iIfCall
         |
+            {NextTokenMatches(CodeGenerationSupporter.Trim) && (LA(2) == LeftParenthesis) && (LA(3) != Star)}?
+            vResult=trimCall
+        |
             (Identifier LeftParenthesis)=>
             vResult=builtInFunctionCall
         |
@@ -31381,6 +31384,19 @@ builtInFunctionCall returns [FunctionCall vResult = FragmentFactory.CreateFragme
         |
             aggregateBuiltInFunctionCall[vResult]
         )
+    ;
+
+trimCall returns [FunctionCall vResult = this.FragmentFactory.CreateFragment<FunctionCall>()]
+{
+    Identifier vIdentifier;
+}
+    :   vIdentifier=nonQuotedIdentifier
+        {
+            Match(vIdentifier, CodeGenerationSupporter.Trim);
+            vResult.FunctionName = vIdentifier;
+        }
+        LeftParenthesis
+        trimBuiltInFunctionCall[vResult]
     ;
 
 regularBuiltInFunctionCall [FunctionCall vParent]

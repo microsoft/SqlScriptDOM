@@ -456,7 +456,7 @@ WITH
 
             // Cannot use key:value pair with another non JSON_OBJECT Syntax
             ParserTestUtils.ErrorTest160("SELECT TRIM('name':'value','type':1)",
-               new ParserErrorInfo(18, "SQL46010", ":"));
+               new ParserErrorInfo(12, "SQL46010", "'name'"));
 
             // Cannot use Absent On Null with another non JSON_OBJECT Syntax
             ParserTestUtils.ErrorTest160("SELECT TRIM('name' ABSENT ON NULL)",
