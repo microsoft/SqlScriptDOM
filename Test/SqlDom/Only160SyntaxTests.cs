@@ -36,6 +36,7 @@ namespace SqlStudio.Tests.UTSqlScriptDom
             new ParserTest160("BitManipulationFunctionTests160.sql", nErrors80: 0, nErrors90: 0, nErrors100: 0, nErrors110: 0, nErrors120: 0, nErrors130: 0, nErrors140: 0, nErrors150: 0),
             new ParserTest160("ShiftOperatorTests160.sql", nErrors80: 3, nErrors90: 3, nErrors100: 3, nErrors110: 3, nErrors120: 3, nErrors130: 3, nErrors140: 3, nErrors150: 3),
             new ParserTest160("BuiltInFunctionTests160.sql", nErrors80: 1, nErrors90: 1, nErrors100: 2, nErrors110: 0, nErrors120: 0, nErrors130: 0, nErrors140: 0, nErrors150: 0),
+            new ParserTest160("DatePartFunctionTests160.sql", nErrors80: 0, nErrors90: 0, nErrors100: 0, nErrors110: 0, nErrors120: 0, nErrors130: 0, nErrors140: 0, nErrors150: 0),
             new ParserTest160("TrimFunctionTests160.sql", nErrors80: 7, nErrors90: 7, nErrors100: 7, nErrors110: 7, nErrors120: 7, nErrors130: 7, nErrors140: 4, nErrors150: 4),
             new ParserTest160("JsonFunctionTests160.sql", nErrors80: 9, nErrors90: 8, nErrors100: 14, nErrors110: 14, nErrors120: 14, nErrors130: 14, nErrors140: 14, nErrors150: 14),
             new ParserTest160("AlterFunctionJsonObjectTests160.sql", nErrors80: 1, nErrors90: 1, nErrors100: 1, nErrors110: 1, nErrors120: 1, nErrors130: 1, nErrors140: 1, nErrors150: 1),
@@ -161,16 +162,36 @@ namespace SqlStudio.Tests.UTSqlScriptDom
         {
             TSql160Parser parser = new TSql160Parser(true);
 
-            VerifyDatePartParameter(parser, "SELECT DATEDIFF(mm, ColA, ColB) FROM my_table;", "mm");
-            VerifyDatePartParameter(parser, "SELECT DATEADD(day, 1, ColA) FROM my_table;", "day");
-            VerifyDatePartParameter(parser, "SELECT DATEDIFF_BIG(second, ColA, ColB) FROM my_table;", "second");
-            VerifyDatePartParameter(parser, "SELECT DATENAME(month, ColA) FROM my_table;", "month");
-            VerifyDatePartParameter(parser, "SELECT DATEPART(wk, ColA) FROM my_table;", "wk");
-            VerifyDatePartParameter(parser, "SELECT DATE_BUCKET(WEEK, 10, ColA) FROM my_table;", "WEEK");
-            VerifyDatePartParameter(parser, "SELECT DATETRUNC(year, ColA) FROM my_table;", "year");
+            VerifyDatePartParameter(parser, "SELECT DATEDIFF(mm, ColA, ColB) FROM my_table;", "mm", 3);
+            VerifyDatePartParameter(parser, "SELECT DATEADD(day, 1, ColA) FROM my_table;", "day", 3);
+            VerifyDatePartParameter(parser, "SELECT DATEDIFF_BIG(second, ColA, ColB) FROM my_table;", "second", 3);
+            VerifyDatePartParameter(parser, "SELECT DATENAME(month, ColA) FROM my_table;", "month", 2);
+            VerifyDatePartParameter(parser, "SELECT DATEPART(wk, ColA) FROM my_table;", "wk", 2);
+            VerifyDatePartParameter(parser, "SELECT DATE_BUCKET(WEEK, 10, ColA) FROM my_table;", "WEEK", 3);
+            VerifyDatePartParameter(parser, "SELECT DATE_BUCKET(DAY, 10, ColA, ColB) FROM my_table;", "DAY", 4);
+            VerifyDatePartParameter(parser, "SELECT DATETRUNC(year, ColA) FROM my_table;", "year", 2);
+
+            VerifyNonDatePartParameter(parser, "SELECT ABS(ColA) FROM my_table;");
+            VerifyNonDatePartParameter(parser, "SELECT UPPER(ColA) FROM my_table;");
         }
 
-        private static void VerifyDatePartParameter(TSqlParser parser, string sql, string expectedDatePart)
+        private static void VerifyDatePartParameter(TSqlParser parser, string sql, string expectedDatePart, int expectedParameterCount)
+        {
+            FunctionCall functionCall = GetFirstSelectFunctionCall(parser, sql);
+
+            Assert.AreEqual(expectedParameterCount, functionCall.Parameters.Count, sql);
+            Assert.IsInstanceOfType(functionCall.Parameters[0], typeof(IdentifierLiteral), sql);
+            Assert.AreEqual(expectedDatePart, ((IdentifierLiteral)functionCall.Parameters[0]).Value, sql);
+        }
+
+        private static void VerifyNonDatePartParameter(TSqlParser parser, string sql)
+        {
+            FunctionCall functionCall = GetFirstSelectFunctionCall(parser, sql);
+
+            Assert.IsInstanceOfType(functionCall.Parameters[0], typeof(ColumnReferenceExpression), sql);
+        }
+
+        private static FunctionCall GetFirstSelectFunctionCall(TSqlParser parser, string sql)
         {
             TSqlFragment fragment = parser.Parse(new System.IO.StringReader(sql), out System.Collections.Generic.IList<ParseError> errors);
 
@@ -179,10 +200,7 @@ namespace SqlStudio.Tests.UTSqlScriptDom
             SelectStatement select = (SelectStatement)script.Batches[0].Statements[0];
             QuerySpecification query = (QuerySpecification)select.QueryExpression;
             SelectScalarExpression selectExpression = (SelectScalarExpression)query.SelectElements[0];
-            FunctionCall functionCall = (FunctionCall)selectExpression.Expression;
-
-            Assert.IsInstanceOfType(functionCall.Parameters[0], typeof(IdentifierLiteral), sql);
-            Assert.AreEqual(expectedDatePart, ((IdentifierLiteral)functionCall.Parameters[0]).Value, sql);
+            return (FunctionCall)selectExpression.Expression;
         }
 
         [TestMethod]
