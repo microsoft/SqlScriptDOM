@@ -2157,6 +2157,41 @@ GO
         }
 
         /// <summary>
+        /// Negative tests for invalid OVER clause syntax.
+        /// Tests for issue: Invalid OVER clause parses successfully
+        /// OVER clause with just a column reference in parentheses should fail.
+        /// </summary>
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void InvalidOverClauseNegativeTest()
+        {
+            // OVER clause with just an identifier in parentheses is invalid
+            // Valid syntax is either OVER identifier (window name reference without parens)
+            // or OVER (PARTITION BY ...) or OVER (ORDER BY ...) or OVER ()
+            // The error occurs at the closing paren when no clauses follow the window name
+            // Note: Error message shows the identifier value without quotes
+            //
+            ParserTestUtils.ErrorTest160("SELECT COUNT(*) OVER([col]) FROM t1",
+                new ParserErrorInfo(26, "SQL46010", "col"));
+            ParserTestUtils.ErrorTest170("SELECT COUNT(*) OVER([col]) FROM t1",
+                new ParserErrorInfo(26, "SQL46010", "col"));
+            ParserTestUtils.ErrorTest180("SELECT COUNT(*) OVER([col]) FROM t1",
+                new ParserErrorInfo(26, "SQL46010", "col"));
+
+            // Another variant with a regular identifier
+            ParserTestUtils.ErrorTest160("SELECT SUM(Amount) OVER(MyColumn) FROM t1",
+                new ParserErrorInfo(32, "SQL46010", "MyColumn"));
+            ParserTestUtils.ErrorTest170("SELECT SUM(Amount) OVER(MyColumn) FROM t1",
+                new ParserErrorInfo(32, "SQL46010", "MyColumn"));
+            
+            // This should also fail for aggregate functions
+            ParserTestUtils.ErrorTest160("SELECT AVG(Value) OVER(col1) FROM t1",
+                new ParserErrorInfo(27, "SQL46010", "col1"));
+        }
+
+
+        /// <summary>
         /// Negative tests for IS [NOT] DISTINCT FROM syntax.
         /// </summary>
         [TestMethod]

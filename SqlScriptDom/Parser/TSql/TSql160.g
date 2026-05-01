@@ -31967,6 +31967,11 @@ overClause returns [OverClause vResult]
         )?
         tRParen:RightParenthesis
         {
+            // Window name inside parentheses requires at least one clause (PARTITION BY, ORDER BY, or window frame)
+            if (vResult.WindowName != null && vResult.Partitions.Count == 0 && vResult.OrderByClause == null && vResult.WindowFrameClause == null)
+            {
+                ThrowParseErrorException("SQL46010", tRParen, TSqlParserResource.SQL46010Message, vResult.WindowName.Value);
+            }
             UpdateTokenInfo(vResult,tRParen);
         }
     |   vResult = overClauseWithWindow
@@ -31989,7 +31994,7 @@ overClauseWithWindow returns [OverClause vResult = FragmentFactory.CreateFragmen
 
 overClauseNoOrderBy returns [OverClause vResult]
     :
-        vResult = overClauseBeginning
+        vResult = overClauseBeginningNoWindowName
         tRParen:RightParenthesis
         {
             UpdateTokenInfo(vResult,tRParen);
@@ -32019,6 +32024,25 @@ overClauseBeginning returns [OverClause vResult = FragmentFactory.CreateFragment
             }
             By expressionList[vResult, vResult.Partitions]
         )?
+    ;
+
+overClauseBeginningNoWindowName returns [OverClause vResult = FragmentFactory.CreateFragment<OverClause>()]
+    :
+        tOver:Over
+        {
+            UpdateTokenInfo(vResult,tOver);
+        }
+        LeftParenthesis
+        (
+            (Identifier By) => 
+            tPartition:Identifier
+            {
+                Match(tPartition, CodeGenerationSupporter.Partition);
+            }
+            By expressionList[vResult, vResult.Partitions]
+        |
+            /* empty - allow OVER() with no PARTITION BY */
+        )
     ;
 
 windowFrameClause returns [WindowFrameClause vResult = FragmentFactory.CreateFragment<WindowFrameClause>()]

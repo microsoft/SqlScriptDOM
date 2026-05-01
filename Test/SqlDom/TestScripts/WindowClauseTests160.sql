@@ -78,3 +78,13 @@ GROUP BY t.c1
 WINDOW Win1 AS (PARTITION BY t.c1)
 ORDER BY t.c1
 GO
+
+-- checking COUNT(*) with WINDOW clause and window name reference (without parentheses)
+SELECT COUNT(*) OVER Win1 FROM tb1
+WINDOW Win1 AS (PARTITION BY c1)
+GO
+
+-- checking COUNT(*) with partial window specification (window name inside parentheses)
+SELECT COUNT(*) OVER (Win1 ORDER BY c1) FROM tb1
+WINDOW Win1 AS (PARTITION BY c1)
+GO
