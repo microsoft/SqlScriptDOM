@@ -13385,6 +13385,19 @@ autoDropStatisticsOption returns [OnOffStatisticsOption vResult = this.FragmentF
         }
     ;
 
+persistSamplePercentStatisticsOption returns [OnOffStatisticsOption vResult = this.FragmentFactory.CreateFragment<OnOffStatisticsOption>()]
+{
+    OptionState vOptionState;
+}
+    : tOption:Identifier EqualsSign vOptionState=optionOnOff[vResult]
+        {
+            Match(tOption, CodeGenerationSupporter.PersistSamplePercent);
+            vResult.OptionKind = StatisticsOptionKind.PersistSamplePercent;
+            vResult.OptionState = vOptionState;
+            UpdateTokenInfo(vResult, tOption);
+        }
+    ;
+
 createStatisticsStatementWithOption[ref bool isConflictingOption] returns [StatisticsOption vResult]
     :
         {NextTokenMatches(CodeGenerationSupporter.Incremental)}?
@@ -13392,6 +13405,9 @@ createStatisticsStatementWithOption[ref bool isConflictingOption] returns [Stati
     |
         {NextTokenMatches(CodeGenerationSupporter.AutoDrop)}?
         vResult = autoDropStatisticsOption
+    |
+        {NextTokenMatches(CodeGenerationSupporter.PersistSamplePercent)}?
+        vResult = persistSamplePercentStatisticsOption
     |
         vResult = sampleStatisticsOption[ref isConflictingOption]
     |
@@ -13450,6 +13466,8 @@ updateStatisticsStatementWithOption [ref bool isConflictingOption] returns [Stat
         vResult = incrementalStatisticsOption
     |   {NextTokenMatches(CodeGenerationSupporter.AutoDrop)}?
         vResult = autoDropStatisticsOption
+    |   {NextTokenMatches(CodeGenerationSupporter.PersistSamplePercent)}?
+        vResult = persistSamplePercentStatisticsOption
     |   vResult = sampleStatisticsOption[ref isConflictingOption]
     |
         {NextTokenMatches(CodeGenerationSupporter.StatsStream)}?

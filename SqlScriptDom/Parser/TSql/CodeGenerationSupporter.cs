@@ -778,6 +778,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         internal const string Period = "PERIOD";
         internal const string PermissionSet = "PERMISSION_SET";
         internal const string PerNode = "PER_NODE";
+        internal const string PersistSamplePercent = "PERSIST_SAMPLE_PERCENT";
         internal const string Persisted = "PERSISTED";
         internal const string PhysicalOnly = "PHYSICAL_ONLY";
         internal const string PhysName = "PHYSNAME";

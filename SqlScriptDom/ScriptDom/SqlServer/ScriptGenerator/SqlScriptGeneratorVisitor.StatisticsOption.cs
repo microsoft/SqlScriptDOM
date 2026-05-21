@@ -81,6 +81,9 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
                 case StatisticsOptionKind.AutoDrop:
                     optionName = CodeGenerationSupporter.AutoDrop;
                     break;
+                case StatisticsOptionKind.PersistSamplePercent:
+                    optionName = CodeGenerationSupporter.PersistSamplePercent;
+                    break;
                 default:
                     System.Diagnostics.Debug.Assert(false, "invalid option encountered");
                     break;
