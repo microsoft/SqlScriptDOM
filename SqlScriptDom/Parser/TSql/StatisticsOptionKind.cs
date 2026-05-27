@@ -30,6 +30,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         Rows = 11,
         Incremental = 12,
         AutoDrop = 13,
+        PersistSamplePercent = 14,
     }
 
 #pragma warning restore 1591
