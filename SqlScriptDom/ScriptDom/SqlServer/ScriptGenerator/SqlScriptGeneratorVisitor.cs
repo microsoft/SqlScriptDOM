@@ -70,6 +70,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
 
         protected void NewLine()
         {
+            FlushDeferredTrailingSingleLineComments();
             _writer.NewLine();
         }
 

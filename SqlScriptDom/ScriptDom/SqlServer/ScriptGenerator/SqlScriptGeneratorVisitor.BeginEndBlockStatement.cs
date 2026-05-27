@@ -20,6 +20,9 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
             GenerateFragmentIfNotNull(node.StatementList);
             PopAlignmentPoint();
 
+            // Emit any comments sitting between the last inner statement and END.
+            EmitCommentsUntilNextNonTriviaToken();
+
             NewLine();
             GenerateKeyword(TSqlTokenType.End); 
         }

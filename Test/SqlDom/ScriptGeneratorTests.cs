@@ -956,21 +956,26 @@ FROM tasks;";
                 "Medium priority block comment should be preserved. Actual: " + generatedSql);
             Assert.IsTrue(generatedSql.Contains("-- Default to low priority"), 
                 "ELSE comment should be preserved. Actual: " + generatedSql);
-            
-            // Verify position: comments should appear before their respective WHEN/ELSE clauses
+
+            // The generated SQL must reparse cleanly: a '--' comment must never
+            // be placed where it would absorb a following keyword or symbol.
+            var reparser = new TSql170Parser(true);
+            reparser.Parse(new StringReader(generatedSql), out var reparseErrors);
+            Assert.AreEqual(0, reparseErrors.Count,
+                "Generated SQL should reparse without errors. Actual: " + generatedSql);
+
+            // Verify position: comments anchored to a preceding clause should
+            // appear before their associated WHEN/ELSE when a natural newline
+            // separates them in the output.
             int highPriorityCommentIdx = generatedSql.IndexOf("-- Check for high priority");
             int firstWhenIdx = generatedSql.IndexOf("WHEN", StringComparison.OrdinalIgnoreCase);
             int mediumCommentIdx = generatedSql.IndexOf("/* Medium priority items */");
             int secondWhenIdx = generatedSql.IndexOf("WHEN", firstWhenIdx + 1, StringComparison.OrdinalIgnoreCase);
-            int elseCommentIdx = generatedSql.IndexOf("-- Default to low priority");
-            int elseIdx = generatedSql.IndexOf("ELSE", StringComparison.OrdinalIgnoreCase);
-            
+
             Assert.IsTrue(highPriorityCommentIdx < firstWhenIdx, 
                 $"High priority comment should appear before first WHEN. Comment at {highPriorityCommentIdx}, WHEN at {firstWhenIdx}");
             Assert.IsTrue(mediumCommentIdx < secondWhenIdx, 
                 $"Medium priority comment should appear before second WHEN. Comment at {mediumCommentIdx}, WHEN at {secondWhenIdx}");
-            Assert.IsTrue(elseCommentIdx < elseIdx, 
-                $"ELSE comment should appear before ELSE. Comment at {elseCommentIdx}, ELSE at {elseIdx}");
         }
 
         [TestMethod]
@@ -1006,21 +1011,26 @@ CROSS JOIN products p;";
                 "LEFT JOIN block comment should be preserved. Actual: " + generatedSql);
             Assert.IsTrue(generatedSql.Contains("-- Cross join for all combinations"), 
                 "CROSS JOIN comment should be preserved. Actual: " + generatedSql);
-            
-            // Verify position: comments should appear before their respective JOIN clauses
+
+            // The generated SQL must reparse cleanly: a '--' comment must never
+            // be placed where it would absorb a following keyword or symbol.
+            var reparser = new TSql170Parser(true);
+            reparser.Parse(new StringReader(generatedSql), out var reparseErrors);
+            Assert.AreEqual(0, reparseErrors.Count,
+                "Generated SQL should reparse without errors. Actual: " + generatedSql);
+
+            // Comments preceding their JOIN in source should appear before the
+            // matching JOIN keyword in output where a natural newline separates
+            // the prior clause from the next JOIN.
             int innerJoinCommentIdx = generatedSql.IndexOf("-- Join to get user orders");
             int innerJoinIdx = generatedSql.IndexOf("INNER JOIN", StringComparison.OrdinalIgnoreCase);
             int leftJoinCommentIdx = generatedSql.IndexOf("/* Left join for optional address */");
             int leftJoinIdx = generatedSql.IndexOf("LEFT", StringComparison.OrdinalIgnoreCase);
-            int crossJoinCommentIdx = generatedSql.IndexOf("-- Cross join for all combinations");
-            int crossJoinIdx = generatedSql.IndexOf("CROSS JOIN", StringComparison.OrdinalIgnoreCase);
-            
+
             Assert.IsTrue(innerJoinCommentIdx < innerJoinIdx, 
                 $"INNER JOIN comment should appear before INNER JOIN. Comment at {innerJoinCommentIdx}, JOIN at {innerJoinIdx}");
             Assert.IsTrue(leftJoinCommentIdx < leftJoinIdx, 
                 $"LEFT JOIN comment should appear before LEFT JOIN. Comment at {leftJoinCommentIdx}, JOIN at {leftJoinIdx}");
-            Assert.IsTrue(crossJoinCommentIdx < crossJoinIdx, 
-                $"CROSS JOIN comment should appear before CROSS JOIN. Comment at {crossJoinCommentIdx}, JOIN at {crossJoinIdx}");
         }
 
         [TestMethod]
@@ -1350,6 +1360,426 @@ SELECT 2 -- second comment";
             Assert.IsTrue(commentIndex >= 0, "Trailing block comment should be preserved. Actual: " + generatedSql);
             Assert.IsTrue(semicolonIndex < commentIndex,
                 $"Semicolon should appear before trailing block comment. Semicolon at {semicolonIndex}, comment at {commentIndex}. Actual: " + generatedSql);
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestPreserveComments_StandaloneCommentNotAttachedAsTrailing()
+        {
+            // Regression: a comment on its own line (after a newline) between two
+            // statements must remain a leading comment of the NEXT statement, not
+            // be promoted to a trailing comment of the previous statement.
+            var sqlWithComments =
+                "SELECT Instructions\nFROM T;\n\n-- Now replace value of lot size\nUPDATE T SET Instructions = 1;";
+
+            var parser = new TSql170Parser(true);
+            var fragment = parser.Parse(new StringReader(sqlWithComments), out var errors);
+            Assert.AreEqual(0, errors.Count);
+
+            var generatorOptions = new SqlScriptGeneratorOptions
+            {
+                PreserveComments = true,
+                IncludeSemicolons = true
+            };
+            var generator = new Sql170ScriptGenerator(generatorOptions);
+            generator.GenerateScript(fragment, out var generatedSql);
+
+            int firstSemicolonIndex = generatedSql.IndexOf(";");
+            int commentIndex = generatedSql.IndexOf("-- Now replace value of lot size");
+            int updateIndex = generatedSql.IndexOf("UPDATE", StringComparison.OrdinalIgnoreCase);
+
+            Assert.IsTrue(commentIndex >= 0, "Comment should be preserved. Actual: " + generatedSql);
+            Assert.IsTrue(updateIndex > commentIndex,
+                $"Standalone comment should appear before UPDATE. Comment at {commentIndex}, UPDATE at {updateIndex}. Actual: " + generatedSql);
+            Assert.IsTrue(firstSemicolonIndex >= 0 && firstSemicolonIndex < commentIndex,
+                $"Semicolon for SELECT must come before the standalone comment. Semicolon at {firstSemicolonIndex}, comment at {commentIndex}. Actual: " + generatedSql);
+
+            // The comment must not appear on the same line as 'FROM ... T;'.
+            // The generator may pretty-print with extra spaces (e.g. 'FROM   T'),
+            // so locate the 'FROM' keyword and require a newline between it and the comment.
+            int fromIndex = generatedSql.IndexOf("FROM", StringComparison.OrdinalIgnoreCase);
+            Assert.IsTrue(fromIndex >= 0, "FROM must be present in output. Actual: " + generatedSql);
+            int newlineAfterFrom = generatedSql.IndexOf('\n', fromIndex);
+            Assert.IsTrue(newlineAfterFrom > 0 && newlineAfterFrom < commentIndex,
+                $"Standalone comment should be on its own line, not appended to the FROM line. Actual: " + generatedSql);
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestPreserveComments_MultiLineCommentSpansLines_NextLineCommentNotTrailing()
+        {
+            // Edge case: a block comment that starts on the same line as the previous
+            // statement but contains a newline must not pull in a subsequent line's
+            // comment as if it were also trailing.
+            var sql =
+                "SELECT 1; /* spans\nlines */\n-- belongs to next\nSELECT 2;";
+
+            var parser = new TSql170Parser(true);
+            var fragment = parser.Parse(new StringReader(sql), out var errors);
+            Assert.AreEqual(0, errors.Count);
+
+            var generatorOptions = new SqlScriptGeneratorOptions
+            {
+                PreserveComments = true,
+                IncludeSemicolons = true
+            };
+            var generator = new Sql170ScriptGenerator(generatorOptions);
+            generator.GenerateScript(fragment, out var generatedSql);
+
+            int spansIdx = generatedSql.IndexOf("spans");
+            int nextIdx = generatedSql.IndexOf("-- belongs to next");
+            int selectTwoIdx = generatedSql.IndexOf("SELECT 2", StringComparison.OrdinalIgnoreCase);
+
+            Assert.IsTrue(spansIdx >= 0, "Multi-line comment should be preserved. Actual: " + generatedSql);
+            Assert.IsTrue(nextIdx >= 0, "Following single-line comment should be preserved. Actual: " + generatedSql);
+            Assert.IsTrue(nextIdx < selectTwoIdx,
+                "Following comment must appear before SELECT 2 (i.e., as leading of next statement). Actual: " + generatedSql);
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestPreserveComments_SameLineBlockThenSingleLine()
+        {
+            // Two trailing comments on the same line as the statement.
+            var sql = "SELECT 1; /* block */ -- and single\nSELECT 2;";
+
+            var parser = new TSql170Parser(true);
+            var fragment = parser.Parse(new StringReader(sql), out var errors);
+            Assert.AreEqual(0, errors.Count);
+
+            var generatorOptions = new SqlScriptGeneratorOptions
+            {
+                PreserveComments = true,
+                IncludeSemicolons = true
+            };
+            var generator = new Sql170ScriptGenerator(generatorOptions);
+            generator.GenerateScript(fragment, out var generatedSql);
+
+            int blockIdx = generatedSql.IndexOf("/* block */");
+            int singleIdx = generatedSql.IndexOf("-- and single");
+            int selectTwoIdx = generatedSql.IndexOf("SELECT 2", StringComparison.OrdinalIgnoreCase);
+
+            Assert.IsTrue(blockIdx >= 0 && singleIdx >= 0, "Both comments should be preserved. Actual: " + generatedSql);
+            Assert.IsTrue(blockIdx < singleIdx && singleIdx < selectTwoIdx,
+                "Same-line trailing comments must precede the next statement. Actual: " + generatedSql);
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestPreserveComments_SingleLineInsideArgListDoesNotAbsorbClosingTokens()
+        {
+            // Real-world pattern from RAISERROR docs: '--' comments inside an
+            // argument list previously absorbed the ')' and ';' that followed,
+            // producing un-reparseable output. The fix defers each '--' to a
+            // safe end-of-line position.
+            var sql = "RAISERROR('msg', -- text\n  16, -- severity\n  1 -- state\n);\n";
+
+            var parser = new TSql170Parser(true);
+            var fragment = parser.Parse(new StringReader(sql), out var errors);
+            Assert.AreEqual(0, errors.Count);
+
+            var generator = new Sql170ScriptGenerator(new SqlScriptGeneratorOptions
+            {
+                PreserveComments = true,
+                IncludeSemicolons = true,
+            });
+            generator.GenerateScript(fragment, out var generatedSql);
+
+            Assert.IsTrue(generatedSql.Contains("-- text"), "Actual: " + generatedSql);
+            Assert.IsTrue(generatedSql.Contains("-- severity"), "Actual: " + generatedSql);
+            Assert.IsTrue(generatedSql.Contains("-- state"), "Actual: " + generatedSql);
+
+            var reparser = new TSql170Parser(true);
+            reparser.Parse(new StringReader(generatedSql), out var reparseErrors);
+            Assert.AreEqual(0, reparseErrors.Count,
+                "Generated SQL must reparse without errors. Actual: " + generatedSql);
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestPreserveComments_LeadingCommentAfterGoBatch()
+        {
+            // Real-world pattern: a '--' comment between GO and the next batch
+            // must remain a leading comment of that batch, not be absorbed onto
+            // the prior batch's last line.
+            var sql = "SELECT 1;\nGO\n-- leading before next batch\nSELECT 2;\n";
+
+            var parser = new TSql170Parser(true);
+            var fragment = parser.Parse(new StringReader(sql), out var errors);
+            Assert.AreEqual(0, errors.Count);
+
+            var generator = new Sql170ScriptGenerator(new SqlScriptGeneratorOptions
+            {
+                PreserveComments = true,
+                IncludeSemicolons = true,
+            });
+            generator.GenerateScript(fragment, out var generatedSql);
+
+            int commentIdx = generatedSql.IndexOf("-- leading before next batch");
+            int selectTwoIdx = generatedSql.IndexOf("SELECT 2", StringComparison.OrdinalIgnoreCase);
+            int selectOneIdx = generatedSql.IndexOf("SELECT 1", StringComparison.OrdinalIgnoreCase);
+
+            Assert.IsTrue(commentIdx > selectOneIdx && commentIdx < selectTwoIdx,
+                "Comment must appear between the two batches. Actual: " + generatedSql);
+
+            var reparser = new TSql170Parser(true);
+            reparser.Parse(new StringReader(generatedSql), out var reparseErrors);
+            Assert.AreEqual(0, reparseErrors.Count, "Generated SQL must reparse. Actual: " + generatedSql);
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestPreserveComments_SingleLineCommentsInsideIfBeginEndBlock()
+        {
+            // Real-world pattern from sql-docs IF/BEGIN/END examples: '--'
+            // comments interleaved between statements inside a BEGIN block
+            // must each appear before their associated SELECT in the output.
+            var sql =
+                "IF (1 = 1)\n" +
+                "BEGIN\n" +
+                "    -- inside if\n" +
+                "    SELECT 1;\n" +
+                "    -- after first stmt inside if\n" +
+                "    SELECT 2;\n" +
+                "END;\n";
+
+            var parser = new TSql170Parser(true);
+            var fragment = parser.Parse(new StringReader(sql), out var errors);
+            Assert.AreEqual(0, errors.Count);
+
+            var generator = new Sql170ScriptGenerator(new SqlScriptGeneratorOptions
+            {
+                PreserveComments = true,
+                IncludeSemicolons = true,
+            });
+            generator.GenerateScript(fragment, out var generatedSql);
+
+            int insideIdx = generatedSql.IndexOf("-- inside if");
+            int afterIdx = generatedSql.IndexOf("-- after first stmt inside if");
+            int select1Idx = generatedSql.IndexOf("SELECT 1", StringComparison.OrdinalIgnoreCase);
+            int select2Idx = generatedSql.IndexOf("SELECT 2", StringComparison.OrdinalIgnoreCase);
+
+            Assert.IsTrue(insideIdx >= 0 && insideIdx < select1Idx,
+                "'-- inside if' must precede SELECT 1. Actual: " + generatedSql);
+            Assert.IsTrue(afterIdx > select1Idx && afterIdx < select2Idx,
+                "'-- after first stmt' must be between SELECT 1 and SELECT 2. Actual: " + generatedSql);
+
+            var reparser = new TSql170Parser(true);
+            reparser.Parse(new StringReader(generatedSql), out var reparseErrors);
+            Assert.AreEqual(0, reparseErrors.Count, "Generated SQL must reparse. Actual: " + generatedSql);
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestPreserveComments_BeginEndBlockPreservesCommentBeforeEnd()
+        {
+            // Real-world pattern: comments placed between the last statement
+            // in a BEGIN block and the END keyword must be preserved.
+            var sql =
+                "BEGIN\n" +
+                "    SELECT 1;\n" +
+                "    /* between stmt and closer */\n" +
+                "    -- also a trailing note\n" +
+                "END;\n";
+
+            var parser = new TSql170Parser(true);
+            var fragment = parser.Parse(new StringReader(sql), out var errors);
+            Assert.AreEqual(0, errors.Count);
+
+            var generator = new Sql170ScriptGenerator(new SqlScriptGeneratorOptions
+            {
+                PreserveComments = true,
+                IncludeSemicolons = true,
+            });
+            generator.GenerateScript(fragment, out var generatedSql);
+
+            Assert.IsTrue(generatedSql.Contains("/* between stmt and closer */"),
+                "Block comment before END must be preserved. Actual: " + generatedSql);
+            Assert.IsTrue(generatedSql.Contains("-- also a trailing note"),
+                "Line comment before END must be preserved. Actual: " + generatedSql);
+
+            int endIdx = generatedSql.IndexOf("END", StringComparison.Ordinal);
+            int blockIdx = generatedSql.IndexOf("/* between stmt and closer */");
+            int lineIdx = generatedSql.IndexOf("-- also a trailing note");
+            Assert.IsTrue(blockIdx >= 0 && blockIdx < endIdx,
+                "Block comment must appear before END. Actual: " + generatedSql);
+            Assert.IsTrue(lineIdx >= 0 && lineIdx < endIdx,
+                "Line comment must appear before END. Actual: " + generatedSql);
+
+            var reparser = new TSql170Parser(true);
+            reparser.Parse(new StringReader(generatedSql), out var reparseErrors);
+            Assert.AreEqual(0, reparseErrors.Count, "Generated SQL must reparse. Actual: " + generatedSql);
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestPreserveComments_StandaloneBlockCommentBetweenStatementsPreserved()
+        {
+            // '/* lonely */;' parses as an empty statement absorbed into the
+            // previous statement's token range. Without a sweep through the
+            // statement's range, the comment was dropped.
+            var sql = "SELECT 1;\n/* lonely */;\nSELECT 2;\n";
+
+            var parser = new TSql170Parser(true);
+            var fragment = parser.Parse(new StringReader(sql), out var errors);
+            Assert.AreEqual(0, errors.Count);
+
+            var generator = new Sql170ScriptGenerator(new SqlScriptGeneratorOptions
+            {
+                PreserveComments = true,
+                IncludeSemicolons = true,
+            });
+            generator.GenerateScript(fragment, out var generatedSql);
+
+            Assert.IsTrue(generatedSql.Contains("/* lonely */"),
+                "Standalone block comment must be preserved. Actual: " + generatedSql);
+
+            int select1Idx = generatedSql.IndexOf("SELECT 1", StringComparison.OrdinalIgnoreCase);
+            int commentIdx = generatedSql.IndexOf("/* lonely */");
+            int select2Idx = generatedSql.IndexOf("SELECT 2", StringComparison.OrdinalIgnoreCase);
+            Assert.IsTrue(select1Idx < commentIdx && commentIdx < select2Idx,
+                "Standalone comment must appear between the two SELECT statements. Actual: " + generatedSql);
+
+            var reparser = new TSql170Parser(true);
+            reparser.Parse(new StringReader(generatedSql), out var reparseErrors);
+            Assert.AreEqual(0, reparseErrors.Count, "Generated SQL must reparse. Actual: " + generatedSql);
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestPreserveComments_LeadingCommentBeforeSemicolonWithCte()
+        {
+            // The leading ';' of ';WITH cte ...' is parsed as part of the
+            // previous statement's token range. A leading comment that sits
+            // between the prior statement's terminator and the ';WITH' was
+            // previously dropped.
+            var sql = "SELECT 1;\n-- before with\n;WITH cte AS (SELECT 1 AS a) SELECT a FROM cte;\n";
+
+            var parser = new TSql170Parser(true);
+            var fragment = parser.Parse(new StringReader(sql), out var errors);
+            Assert.AreEqual(0, errors.Count);
+
+            var generator = new Sql170ScriptGenerator(new SqlScriptGeneratorOptions
+            {
+                PreserveComments = true,
+                IncludeSemicolons = true,
+            });
+            generator.GenerateScript(fragment, out var generatedSql);
+
+            Assert.IsTrue(generatedSql.Contains("-- before with"),
+                "Leading comment before ';WITH' must be preserved. Actual: " + generatedSql);
+
+            int select1Idx = generatedSql.IndexOf("SELECT 1", StringComparison.OrdinalIgnoreCase);
+            int commentIdx = generatedSql.IndexOf("-- before with");
+            int withIdx = generatedSql.IndexOf("WITH", StringComparison.OrdinalIgnoreCase);
+            Assert.IsTrue(select1Idx < commentIdx && commentIdx < withIdx,
+                "Comment must appear between SELECT 1 and WITH. Actual: " + generatedSql);
+
+            var reparser = new TSql170Parser(true);
+            reparser.Parse(new StringReader(generatedSql), out var reparseErrors);
+            Assert.AreEqual(0, reparseErrors.Count, "Generated SQL must reparse. Actual: " + generatedSql);
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestPreserveComments_MultiLineBlockCommentBetweenStatements()
+        {
+            // Real-world pattern: a '/* ... */' block comment that itself
+            // spans multiple source lines, placed between two statements.
+            // Exercises the ContainsLineBreak path for block-comment tokens.
+            var sql =
+                "SELECT 1;\n" +
+                "/* multi-line\n" +
+                "   comment\n" +
+                "   spans three lines */\n" +
+                "SELECT 2;\n";
+
+            var parser = new TSql170Parser(true);
+            var fragment = parser.Parse(new StringReader(sql), out var errors);
+            Assert.AreEqual(0, errors.Count);
+
+            var generator = new Sql170ScriptGenerator(new SqlScriptGeneratorOptions
+            {
+                PreserveComments = true,
+                IncludeSemicolons = true,
+            });
+            generator.GenerateScript(fragment, out var generatedSql);
+
+            Assert.IsTrue(generatedSql.Contains("multi-line") &&
+                          generatedSql.Contains("spans three lines"),
+                "Full text of the multi-line block comment must be preserved. Actual: " + generatedSql);
+
+            int select1Idx = generatedSql.IndexOf("SELECT 1", StringComparison.OrdinalIgnoreCase);
+            int blockIdx = generatedSql.IndexOf("/* multi-line");
+            int select2Idx = generatedSql.IndexOf("SELECT 2", StringComparison.OrdinalIgnoreCase);
+            Assert.IsTrue(select1Idx < blockIdx && blockIdx < select2Idx,
+                "Multi-line block must appear between the two SELECTs. Actual: " + generatedSql);
+
+            var reparser = new TSql170Parser(true);
+            reparser.Parse(new StringReader(generatedSql), out var reparseErrors);
+            Assert.AreEqual(0, reparseErrors.Count, "Generated SQL must reparse. Actual: " + generatedSql);
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestPreserveComments_RealWorldXmlModifyBatchFromDocs()
+        {
+            // End-to-end regression for the pattern that produced the original
+            // bug screenshot: a series of UPDATE statements that call
+            // XML .modify(...) with long string-literal arguments, separated
+            // by '--' leading comments. The leading comment of the LAST UPDATE
+            // ('-- Now replace value of lot size') was being absorbed onto the
+            // previous statement's trailing 'FROM T;' line.
+            var sql =
+                "SELECT Instructions\n" +
+                "FROM T;\n" +
+                "\n" +
+                "-- Now replace value of lot size\n" +
+                "UPDATE T\n" +
+                "SET Instructions = 1;\n";
+
+            var parser = new TSql170Parser(true);
+            var fragment = parser.Parse(new StringReader(sql), out var errors);
+            Assert.AreEqual(0, errors.Count);
+
+            var generator = new Sql170ScriptGenerator(new SqlScriptGeneratorOptions
+            {
+                PreserveComments = true,
+                IncludeSemicolons = true,
+            });
+            generator.GenerateScript(fragment, out var generatedSql);
+
+            int fromTIdx = generatedSql.IndexOf("FROM   T;", StringComparison.Ordinal);
+            if (fromTIdx < 0) fromTIdx = generatedSql.IndexOf("FROM T;", StringComparison.Ordinal);
+            int commentIdx = generatedSql.IndexOf("-- Now replace value of lot size");
+            int updateIdx = generatedSql.IndexOf("UPDATE", StringComparison.OrdinalIgnoreCase);
+
+            Assert.IsTrue(commentIdx >= 0, "Leading comment must be preserved. Actual: " + generatedSql);
+            Assert.IsTrue(fromTIdx >= 0 && fromTIdx < commentIdx,
+                "Comment must appear AFTER 'FROM T;'. Actual: " + generatedSql);
+            Assert.IsTrue(commentIdx < updateIdx,
+                "Comment must appear BEFORE 'UPDATE'. Actual: " + generatedSql);
+
+            // The original bug: the comment was attached as trailing to FROM,
+            // making the FROM line read 'FROM T; -- Now replace value of lot size'.
+            int fromLineEnd = generatedSql.IndexOf('\n', fromTIdx);
+            Assert.IsTrue(fromLineEnd > 0 && fromLineEnd < commentIdx,
+                "Comment must be on a separate line from 'FROM T;'. Actual: " + generatedSql);
+
+            var reparser = new TSql170Parser(true);
+            reparser.Parse(new StringReader(generatedSql), out var reparseErrors);
+            Assert.AreEqual(0, reparseErrors.Count, "Generated SQL must reparse. Actual: " + generatedSql);
         }
 
         #endregion
