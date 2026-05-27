@@ -335,6 +335,169 @@ namespace SqlStudio.Tests.UTSqlScriptDom
             Assert.AreEqual(sqlText, generatedSqlText);
         }
 
+        #region Generator Whitespace Regression Tests
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestAlterTableAddColumnThenIndex_EmitsSeparatorBeforeIndex()
+        {
+            // Verbatim sample from docs/relational-databases/in-memory-oltp/
+            // altering-memory-optimized-tables.md (line 119). Generator was
+            // omitting the separator between the trailing column constraint
+            // ('NOT NULL') and the inline INDEX, producing 'NOT NULLINDEX
+            // ix_Customer' which fails to reparse.
+            var sql =
+                "ALTER TABLE Sales.SalesOrderDetail_inmem  \n" +
+                "       ADD    CustomerID int NOT NULL DEFAULT -1 WITH VALUES,  \n" +
+                "              ShipMethodID int NOT NULL DEFAULT -1 WITH VALUES,  \n" +
+                "              INDEX ix_Customer (CustomerID);  \n" +
+                "GO  \n";
+
+            var parser = new TSql170Parser(true);
+            var fragment = parser.Parse(new StringReader(sql), out var parseErrors);
+            Assert.AreEqual(0, parseErrors.Count, "Input must parse.");
+
+            var generator = new Sql170ScriptGenerator(new SqlScriptGeneratorOptions
+            {
+                IncludeSemicolons = true,
+            });
+            generator.GenerateScript(fragment, out var generated);
+
+            Assert.IsFalse(generated.Contains("NULLINDEX"),
+                "Column constraint 'NULL' must not run into the 'INDEX' keyword. Actual:\n" + generated);
+            Assert.IsTrue(generated.Contains("INDEX ix_Customer"),
+                "INDEX keyword must be present and separated. Actual:\n" + generated);
+
+            var reparser = new TSql170Parser(true);
+            reparser.Parse(new StringReader(generated), out var reparseErrors);
+            Assert.AreEqual(0, reparseErrors.Count,
+                "Generated SQL must reparse. Actual:\n" + generated);
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestAlterTableAddIndexOnly_EmitsNoLeadingSeparator()
+        {
+            // Verbatim sample from docs/relational-databases/in-memory-oltp/
+            // altering-memory-optimized-tables.md (line 111). With no preceding
+            // column or constraint, the generator must NOT emit a leading
+            // comma before the INDEX (which would produce invalid syntax).
+            var sql =
+                "ALTER TABLE Sales.SalesOrderDetail_inmem  \n" +
+                "       ADD INDEX ix_ModifiedDate (ModifiedDate);  \n" +
+                "GO  \n";
+
+            var parser = new TSql170Parser(true);
+            var fragment = parser.Parse(new StringReader(sql), out var parseErrors);
+            Assert.AreEqual(0, parseErrors.Count, "Input must parse.");
+
+            var generator = new Sql170ScriptGenerator(new SqlScriptGeneratorOptions
+            {
+                IncludeSemicolons = true,
+            });
+            generator.GenerateScript(fragment, out var generated);
+
+            Assert.IsFalse(generated.Contains("ADD ,") || generated.Contains("ADD\n,"),
+                "ADD must not be followed by a stray separator. Actual:\n" + generated);
+            Assert.IsTrue(generated.Contains("ADD INDEX ix_ModifiedDate"),
+                "INDEX clause must follow ADD directly. Actual:\n" + generated);
+
+            var reparser = new TSql170Parser(true);
+            reparser.Parse(new StringReader(generated), out var reparseErrors);
+            Assert.AreEqual(0, reparseErrors.Count,
+                "Generated SQL must reparse. Actual:\n" + generated);
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestWindowDefinition_RefWindowFollowedByPartitionByEmitsSpace()
+        {
+            // Verbatim sample from docs/t-sql/queries/select-window-transact-sql.md
+            // (line 312). Generator was emitting 'win2PARTITION' (no space)
+            // because the visitor didn't separate the inherited window-name
+            // reference from the PARTITION keyword.
+            var sql =
+                "ALTER DATABASE AdventureWorks2025\n" +
+                "SET COMPATIBILITY_LEVEL = 160;\n" +
+                "GO\n" +
+                "\n" +
+                "USE AdventureWorks2025;\n" +
+                "GO\n" +
+                "\n" +
+                "SELECT SalesOrderID AS OrderNumber,\n" +
+                "       ProductID,\n" +
+                "       OrderQty AS Qty,\n" +
+                "       SUM(OrderQty) OVER win2 AS Total,\n" +
+                "       AVG(OrderQty) OVER win1 AS Avg\n" +
+                "FROM Sales.SalesOrderDetail\n" +
+                "WHERE SalesOrderID IN (43659, 43664)\n" +
+                "      AND ProductID LIKE '71%'\n" +
+                "WINDOW win1 AS (win3),\n" +
+                "       win2 AS (ORDER BY SalesOrderID, ProductID),\n" +
+                "       win3 AS (win2 PARTITION BY SalesOrderID);\n";
+
+            var parser = new TSql170Parser(true);
+            var fragment = parser.Parse(new StringReader(sql), out var parseErrors);
+            Assert.AreEqual(0, parseErrors.Count, "Input must parse.");
+
+            var generator = new Sql170ScriptGenerator(new SqlScriptGeneratorOptions
+            {
+                IncludeSemicolons = true,
+            });
+            generator.GenerateScript(fragment, out var generated);
+
+            Assert.IsFalse(generated.Contains("win2PARTITION"),
+                "Window-name reference must not run into PARTITION keyword. Actual:\n" + generated);
+            Assert.IsTrue(generated.Contains("win2 PARTITION"),
+                "Generated window must read 'win2 PARTITION'. Actual:\n" + generated);
+
+            var reparser = new TSql170Parser(true);
+            reparser.Parse(new StringReader(generated), out var reparseErrors);
+            Assert.AreEqual(0, reparseErrors.Count,
+                "Generated SQL must reparse. Actual:\n" + generated);
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestWindowDefinition_RefWindowFollowedByOrderByEmitsSpace()
+        {
+            // Same bug class as above, exercised through the ORDER BY branch.
+            // 'WINDOW name AS (refname ORDER BY ...)' must not emit
+            // 'refnameORDER'. This shape isn't in the docs but the same code
+            // path can produce it; included as belt-and-suspenders coverage.
+            var sql =
+                "SELECT SalesOrderID, SUM(OrderQty) OVER win2 AS Total\n" +
+                "FROM   Sales.SalesOrderDetail\n" +
+                "WINDOW win1 AS (PARTITION BY ProductID),\n" +
+                "       win2 AS (win1 ORDER BY SalesOrderID);";
+
+            var parser = new TSql170Parser(true);
+            var fragment = parser.Parse(new StringReader(sql), out var parseErrors);
+            Assert.AreEqual(0, parseErrors.Count, "Input must parse.");
+
+            var generator = new Sql170ScriptGenerator(new SqlScriptGeneratorOptions
+            {
+                IncludeSemicolons = true,
+            });
+            generator.GenerateScript(fragment, out var generated);
+
+            Assert.IsFalse(generated.Contains("win1ORDER"),
+                "Window-name reference must not run into ORDER keyword. Actual:\n" + generated);
+            Assert.IsTrue(generated.Contains("win1 ORDER"),
+                "Generated window must read 'win1 ORDER'. Actual:\n" + generated);
+
+            var reparser = new TSql170Parser(true);
+            reparser.Parse(new StringReader(generated), out var reparseErrors);
+            Assert.AreEqual(0, reparseErrors.Count,
+                "Generated SQL must reparse. Actual:\n" + generated);
+        }
+
+        #endregion
+
         #region Comment Preservation Tests
 
         [TestMethod]

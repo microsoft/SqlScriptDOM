@@ -61,6 +61,16 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
                 ExplicitVisit((SystemTimePeriodDefinition)node.Definition.SystemTimePeriod);
             }
 
+            if ((node.Definition.ColumnDefinitions.Count > 0
+                    || node.Definition.TableConstraints.Count > 0
+                    || node.Definition.SystemTimePeriod != null)
+                && node.Definition.Indexes != null
+                && node.Definition.Indexes.Count > 0)
+            {
+                GenerateSymbolAndSpace(TSqlTokenType.Comma);
+                NewLine();
+            }
+
             if (node.Definition.Indexes != null && node.Definition.Indexes.Count > 0)
             {
                 GenerateCommaSeparatedList(node.Definition.Indexes, true);
