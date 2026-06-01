@@ -649,6 +649,45 @@ EXPAND VIEWS)";
             }
         }
 
+        [TestMethod]
+        [Priority(0)]
+        [Timeout(GlobalConstants.DefaultTestTimeout)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void CopyOptionFirstTokenIndexTest()
+        {
+            string input = @"
+COPY INTO #Test
+FROM 'https://xxxx.blob.core.windows.net/raw/'
+WITH (
+    FILE_TYPE = 'CSV',
+    IDENTITY_INSERT = 'ON'
+);";
+            TSql130Parser parser = new TSql130Parser(true);
+            IList<ParseError> errors;
+            TSqlScript script = (TSqlScript)parser.Parse(new System.IO.StringReader(input), out errors);
+            Assert.AreEqual(0, errors.Count);
+
+            var copyStatement = script.Batches[0].Statements[0] as CopyStatement;
+            Assert.IsNotNull(copyStatement);
+            Assert.AreEqual(2, copyStatement.Options.Count);
+
+            // Verify first option: FILE_TYPE = 'CSV'
+            var option1 = copyStatement.Options[0];
+            Assert.AreEqual(CopyOptionKind.File_Type, option1.Kind);
+            // First token should be FILE_TYPE
+            Assert.AreEqual("FILE_TYPE", option1.ScriptTokenStream[option1.FirstTokenIndex].Text);
+            // Last token should be 'CSV'
+            Assert.AreEqual("'CSV'", option1.ScriptTokenStream[option1.LastTokenIndex].Text);
+
+            // Verify second option: IDENTITY_INSERT = 'ON'
+            var option2 = copyStatement.Options[1];
+            Assert.AreEqual(CopyOptionKind.Identity_Insert, option2.Kind);
+            // First token should be IDENTITY_INSERT
+            Assert.AreEqual("IDENTITY_INSERT", option2.ScriptTokenStream[option2.FirstTokenIndex].Text);
+            // Last token should be 'ON'
+            Assert.AreEqual("'ON'", option2.ScriptTokenStream[option2.LastTokenIndex].Text);
+        }
+
         void VerifyTokenTypesAndOffsets(IList<TSqlParserToken> tokens, TSqlTokenType[] tokenTypes, int[] zeroBasedTokenOffsets, int offsetShift)
         {
             Assert.AreEqual<int>(tokenTypes.Length, tokens.Count);

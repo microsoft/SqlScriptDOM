@@ -22607,16 +22607,19 @@ copyOption [ref Int32 encountered] returns [CopyOption vResult = FragmentFactory
     {
         vResult.Kind = CopyIdentifierOrValueOptionsHelper.Instance.ParseOption(tOption);
         CheckCopyOptionDuplication(ref encountered, vResult.Kind, tOption);
+        UpdateTokenInfo(vResult, tOption);
     }
     | tIdentityInsert:IdentityInsert
     {
         vResult.Kind = CopyOptionKind.Identity_Insert;
         CheckCopyOptionDuplication(ref encountered, vResult.Kind, tIdentityInsert);
+        UpdateTokenInfo(vResult, tIdentityInsert);
     }
     | tCredential:Credential
     {
         vResult.Kind = CopyOptionKind.Credential;
         CheckCopyOptionDuplication(ref encountered, vResult.Kind, tCredential);
+        UpdateTokenInfo(vResult, tCredential);
     }
     )
     EqualsSign
@@ -22624,6 +22627,7 @@ copyOption [ref Int32 encountered] returns [CopyOption vResult = FragmentFactory
     vValue = singleValueTypeCopyOption
     {
         CopyIdentifierOrValueOptionsHelper.Instance.AssignValueToCopyOption(vResult, (SingleValueTypeCopyOption) vValue);
+        vResult.UpdateTokenInfo(vValue);
     }
     |
     vValue = copyCredentialOption
@@ -22632,6 +22636,7 @@ copyOption [ref Int32 encountered] returns [CopyOption vResult = FragmentFactory
         CopyIdentifierOrValueOptionsHelper.Instance.ValidateCopyCredential((CopyCredentialOption)vValue))
         {
             vResult.Value = (CopyCredentialOption) vValue;
+            vResult.UpdateTokenInfo(vValue);
         }
         else
         {
