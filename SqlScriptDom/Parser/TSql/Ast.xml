@@ -1,4 +1,4 @@
-﻿<?xml version="1.0"?>
+<?xml version="1.0"?>
 <!--
  <copyright file="Ast.xml" company="Microsoft">
          Copyright (c) Microsoft Corporation.  All rights reserved.
@@ -1364,7 +1364,7 @@
     <Member Name="Name" Type="Identifier" Summary="The external model name."/>
     <Member Name="Location" Type="Literal" Summary="The external model location name."/>
     <Member Name="ApiFormat" Type="Literal" Summary="The external model api format name."/>
-    <Member Name="ModelType" Type="ExternalModelTypeOption?" GenerateUpdatePositionInfoCall="false" Summary="The external model type name."/>
+    <Member Name="ModelType" Type="ExternalModelTypeOption" Summary="The external model type name."/>
     <Member Name="ModelName" Type="Literal" Summary="The external model name to be used to generate embeddings."/>
     <Member Name="Credential" Type="Identifier" Summary="The external model credentials name."/>
     <Member Name="Parameters" Type="Literal" Summary="The external model parameters as key-value pairs."/>
@@ -1379,6 +1379,9 @@
   </Class>
   <Class Name="AlterExternalModelStatement" Base="ExternalModelStatement" Summary="Represents a ALTER EXTERNAL MODEL statement.">
     <InheritedClass Name="ExternalModelStatement"/>
+  </Class>
+  <Class Name="ExternalModelTypeOption" Base="TSqlFragment" Summary="Represents the MODEL_TYPE option in CREATE/ALTER EXTERNAL MODEL.">
+    <Member Name="OptionKind" Type="ExternalModelTypeOptionKind" GenerateUpdatePositionInfoCall="false" Summary="The option kind."/>
   </Class>
 
   <Class Name="ExternalFileFormatStatement" Abstract="true" Base="TSqlStatement" Summary="Base class for all external file format statement objects.">
