@@ -4658,6 +4658,28 @@
     <InheritedMember Name="IndexOptions" ContainerClass="IndexStatement" />
     <Member Name="OnFileGroupOrPartitionScheme" Type="FileGroupOrPartitionScheme" Summary="The filegroup or partition scheme. Might be null."/>
   </Class>
+  <Class Name="SemanticIndexChunkOption" Summary="Represents a chunk option in a CHUNK_USING clause of a semantic index column.">
+    <Member Name="OptionKind" Type="SemanticIndexChunkOptionKind" GenerateUpdatePositionInfoCall="false" Summary="The kind of chunk option (Type, Size, or Overlap)."/>
+    <Member Name="Value" Type="IdentifierOrValueExpression" Summary="The value of the chunk option."/>
+  </Class>
+  <Class Name="SemanticIndexColumn" Summary="Represents a column definition in a CREATE SEMANTIC INDEX statement.">
+    <Member Name="ColumnName" Type="Identifier" Summary="The column name."/>
+    <Member Name="SearchType" Type="SemanticIndexSearchType" GenerateUpdatePositionInfoCall="false" Summary="The search type (vector, fulltext, hybrid). NotSpecified if not specified."/>
+    <Member Name="TypeColumnName" Type="Identifier" Summary="The TYPE COLUMN name. Optional may be null."/>
+    <Member Name="Language" Type="IdentifierOrValueExpression" Summary="The LANGUAGE term. Optional may be null."/>
+    <Member Name="ChunkOptions" Type="SemanticIndexChunkOption" Collection="true" Summary="The CHUNK_USING options. Optional may have zero elements."/>
+  </Class>
+  <Class Name="CreateSemanticIndexStatement" Base="IndexStatement" Summary="Represents the CREATE SEMANTIC INDEX statement.">
+    <InheritedMember Name="Name" ContainerClass="IndexStatement" />
+    <InheritedMember Name="OnName" ContainerClass="IndexStatement" />
+    <Member Name="Columns" Type="SemanticIndexColumn" Collection="true" Summary="The column definitions."/>
+    <Member Name="ExternalModelName" Type="Identifier" Summary="The external model name. Optional may be null."/>
+    <Member Name="ExternalModelParameters" Type="StringLiteral" Summary="The PARAMETERS value for the external model. Optional may be null."/>
+    <Member Name="VectorIndexOptions" Type="IndexOption" Collection="true" Summary="The VECTOR_INDEX options (METRIC, TYPE). Optional may have zero elements."/>
+    <Member Name="FulltextStoplistOption" Type="StopListFullTextIndexOption" Summary="The FULLTEXT_STOPLIST option. Optional may be null."/>
+    <InheritedMember Name="IndexOptions" ContainerClass="IndexStatement" />
+    <Member Name="OnFileGroupOrPartitionScheme" Type="FileGroupOrPartitionScheme" Summary="The filegroup or partition scheme. Might be null."/>
+  </Class>
   <Class Name="WindowFrameClause" Summary="Represents the specification of window bounds for windowing aggregates.">
     <Member Name="Top" Type="WindowDelimiter" Summary="Top boundary of the window."/>
     <Member Name="Bottom" Type="WindowDelimiter" Summary="Bottom boundary of the window. Optional may be null."/>

@@ -204,6 +204,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         internal const string ChangeTable = "CHANGETABLE";
         internal const string ChangeTracking = "CHANGE_TRACKING";
         internal const string ChangeTrackingContext = "CHANGE_TRACKING_CONTEXT";
+        internal const string Chapter = "CHAPTER";
         internal const string Char = "CHAR";
         internal const string CharacterSet = "CHARACTER_SET";
         internal const string CheckConstraints = "CHECK_CONSTRAINTS";
@@ -214,6 +215,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         internal const string ChecksumAgg = "CHECKSUM_AGG";
         internal const string ChunkSize = "CHUNK_SIZE";
         internal const string ChunkType = "CHUNK_TYPE";
+        internal const string ChunkUsing = "CHUNK_USING";
         internal const string ModularSum = "MODULAR_SUM";
         internal const string Classifier = "CLASSIFIER";
         internal const string Classification = "CLASSIFICATION";
@@ -394,6 +396,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         internal const string Extension = "EXTENSION";
         internal const string External = "EXTERNAL";
         internal const string ExternalAccess = "EXTERNAL_ACCESS";
+        internal const string ExternalModel = "EXTERNAL_MODEL";
         internal const string ExternalMonitor = "EXTERNAL_MONITOR";
         internal const string Extract = "EXTRACT";
         internal const string FailOperation = "FAIL_OPERATION";
@@ -465,6 +468,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         internal const string Full = "FULL";
         internal const string FullScan = "FULLSCAN";
         internal const string Fulltext = "FULLTEXT";
+        internal const string FulltextStopList = "FULLTEXT_STOPLIST";
         internal const string General = "GENERAL";
         internal const string GenerateSeries = "GENERATE_SERIES";
         internal const string Generated = "GENERATED";
@@ -499,6 +503,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         internal const string Hidden = "HIDDEN";
         internal const string High = "HIGH";
         internal const string Hint = "HINT";
+        internal const string Hybrid = "HYBRID";
         internal const string Histogram = "HISTOGRAM";
         internal const string HistogramSteps = "HISTOGRAM_STEPS";
         internal const string HistoryRetentionPeriod = "HISTORY_RETENTION_PERIOD";
@@ -755,6 +760,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         internal const string PageCount = "PAGECOUNT";
         internal const string PageVerify = "PAGE_VERIFY";
         internal const string PagLock = "PAGLOCK";
+        internal const string Paragraph = "PARAGRAPH";
         internal const string Param = "PARAM";
         internal const string Parameter = "PARAMETER";
         internal const string Parameters = "PARAMETERS";
@@ -926,6 +932,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         internal const string Scroll = "SCROLL";
         internal const string ScrollLocks = "SCROLL_LOCKS";
         internal const string Search = "SEARCH";
+        internal const string SearchType = "SEARCH_TYPE";
         internal const string Secondary = "SECONDARY";
         internal const string SecondaryRole = "SECONDARY_ROLE";
         internal const string Seconds = "SECONDS";
@@ -935,6 +942,8 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         internal const string SecurityLog = "SECURITY_LOG";
         internal const string Selective = "SELECTIVE";
         internal const string Self = "SELF";
+        internal const string Semantic = "SEMANTIC";
+        internal const string Sentence = "SENTENCE";
         internal const string SemiColon = ";";
         internal const string Send = "SEND";
         internal const string Sensitivity = "SENSITIVITY";
@@ -1123,6 +1132,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         internal const string Varp = "VARP";
         internal const string VDevNo = "VDEVNO";
         internal const string Vector = "Vector";
+        internal const string VectorIndex = "VECTOR_INDEX";
         internal const string VectorSearch = "VECTOR_SEARCH";
         internal const string Verbose = "VERBOSE";
         internal const string VerboseLogging = "VerboseLogging";

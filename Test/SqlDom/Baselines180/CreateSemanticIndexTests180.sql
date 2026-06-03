@@ -1,0 +1,78 @@
+CREATE SEMANTIC INDEX SI_Basic
+    ON dbo.Documents (content)
+    WITH (EXTERNAL_MODEL = MyModel);
+
+CREATE SEMANTIC INDEX SI_Vector
+    ON dbo.books (summary SEARCH_TYPE = VECTOR)
+    WITH (EXTERNAL_MODEL = MyModel);
+
+CREATE SEMANTIC INDEX SI_Multi
+    ON dbo.books (summary SEARCH_TYPE = VECTOR, title SEARCH_TYPE = VECTOR)
+    WITH (EXTERNAL_MODEL = MyModel);
+
+CREATE SEMANTIC INDEX SI_Hybrid
+    ON dbo.books (content SEARCH_TYPE = HYBRID, title SEARCH_TYPE = FULLTEXT)
+    WITH (EXTERNAL_MODEL = MyModel);
+
+CREATE SEMANTIC INDEX SI_TypeCol
+    ON dbo.Documents (content TYPE COLUMN content_type)
+    WITH (EXTERNAL_MODEL = MyModel);
+
+CREATE SEMANTIC INDEX SI_Lang
+    ON dbo.Documents (content LANGUAGE English)
+    WITH (EXTERNAL_MODEL = MyModel);
+
+CREATE SEMANTIC INDEX SI_Chunk
+    ON dbo.Documents (content CHUNK_USING(TYPE = paragraph, SIZE = 500, OVERLAP = 50))
+    WITH (EXTERNAL_MODEL = MyModel);
+
+CREATE SEMANTIC INDEX SI_Full
+    ON dbo.Documents (content SEARCH_TYPE = VECTOR TYPE COLUMN content_type LANGUAGE English CHUNK_USING(TYPE = sentence, SIZE = 1000))
+    WITH (EXTERNAL_MODEL = MyModel);
+
+CREATE SEMANTIC INDEX SI_Model
+    ON dbo.books (summary SEARCH_TYPE = VECTOR)
+    WITH (EXTERNAL_MODEL = OpenAIModel);
+
+CREATE SEMANTIC INDEX SI_ModelParen
+    ON dbo.books (summary SEARCH_TYPE = VECTOR)
+    WITH (EXTERNAL_MODEL = MyModel);
+
+CREATE SEMANTIC INDEX SI_ModelParams
+    ON dbo.books (summary SEARCH_TYPE = VECTOR)
+    WITH (EXTERNAL_MODEL = MyModel (PARAMETERS = '{"dimension": 1536}'));
+
+CREATE SEMANTIC INDEX SI_VecOpts
+    ON dbo.books (summary SEARCH_TYPE = VECTOR)
+    WITH (EXTERNAL_MODEL = OpenAIModel, VECTOR_INDEX (METRIC = 'COSINE'));
+
+CREATE SEMANTIC INDEX SI_StopOff
+    ON dbo.books (content SEARCH_TYPE = FULLTEXT)
+    WITH (FULLTEXT_STOPLIST = OFF);
+
+CREATE SEMANTIC INDEX SI_StopSys
+    ON dbo.books (content SEARCH_TYPE = FULLTEXT)
+    WITH (FULLTEXT_STOPLIST = SYSTEM);
+
+CREATE SEMANTIC INDEX SI_StopName
+    ON dbo.books (content SEARCH_TYPE = FULLTEXT)
+    WITH (FULLTEXT_STOPLIST = MyStoplist);
+
+CREATE SEMANTIC INDEX SI_MaxDop
+    ON dbo.books (summary SEARCH_TYPE = VECTOR)
+    WITH (EXTERNAL_MODEL = OpenAIModel, MAXDOP = 4);
+
+CREATE SEMANTIC INDEX SI_DropEx
+    ON dbo.books (summary SEARCH_TYPE = VECTOR)
+    WITH (EXTERNAL_MODEL = OpenAIModel, DROP_EXISTING = ON);
+
+CREATE SEMANTIC INDEX SI_FG
+    ON dbo.books (summary SEARCH_TYPE = VECTOR)
+    WITH (EXTERNAL_MODEL = OpenAIModel)
+    ON [PRIMARY];
+
+CREATE SEMANTIC INDEX SI_Complete
+    ON dbo.books (summary SEARCH_TYPE = VECTOR, title SEARCH_TYPE = FULLTEXT CHUNK_USING(TYPE = fixed, SIZE = 200, OVERLAP = 25))
+    WITH (EXTERNAL_MODEL = OpenAIModel (PARAMETERS = '{"api_key": "test"}'), VECTOR_INDEX (METRIC = 'COSINE', TYPE = 'DISKANN'), FULLTEXT_STOPLIST = SYSTEM, MAXDOP = 8, DROP_EXISTING = OFF)
+    ON [PRIMARY];
+

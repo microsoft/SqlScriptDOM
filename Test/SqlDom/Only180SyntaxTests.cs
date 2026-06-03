@@ -14,7 +14,8 @@ namespace SqlStudio.Tests.UTSqlScriptDom
         {
             new ParserTest180("AutomaticIndexCompactionTests180.sql", nErrors80: 2, nErrors90: 2, nErrors100: 2, nErrors110: 2, nErrors120: 2, nErrors130: 2, nErrors140: 2, nErrors150: 2, nErrors160: 2, nErrors170: 2),
             new ParserTest180("TrimFromReturnTests160.sql"),
-            new ParserTest180("PersistSamplePercentStatisticsTests130.sql")
+            new ParserTest180("PersistSamplePercentStatisticsTests130.sql"),
+            new ParserTest180("CreateSemanticIndexTests180.sql"),
         };
 
         private static readonly ParserTest[] SqlAzure180_TestInfos =

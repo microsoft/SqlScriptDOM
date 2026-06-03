@@ -70,6 +70,27 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
                     return TSql170ParserBaseInternal.ParseSecurityObjectKind(identifier1, identifier2);
             }
         }
+
+        /// <summary>
+        /// Validates that EXTERNAL_MODEL is specified when CREATE SEMANTIC INDEX contains vector or hybrid columns.
+        /// Vector and hybrid search types require an external model for embeddings.
+        /// NotSpecified defaults to Vector, so EXTERNAL_MODEL is required unless ALL columns are explicitly Fulltext.
+        /// </summary>
+        /// <param name="statement">The CREATE SEMANTIC INDEX statement to validate.</param>
+        protected static void ValidateSemanticIndexExternalModel(CreateSemanticIndexStatement statement)
+        {
+            // EXTERNAL_MODEL is NOT required only when ALL columns are explicitly FULLTEXT
+            // If any column is Vector, Hybrid, or NotSpecified (defaults to Vector), EXTERNAL_MODEL is required
+            bool allColumnsAreFulltext = statement.Columns.All(col =>
+                col.SearchType == SemanticIndexSearchType.Fulltext);
+
+            // EXTERNAL_MODEL is required unless all columns are explicitly fulltext
+            if (!allColumnsAreFulltext && statement.ExternalModelName == null)
+            {
+                ThrowParseErrorException("SQL46144", statement,
+                    TSqlParserResource.SQL46144Message, "EXTERNAL_MODEL");
+            }
+        }
     }
 }
 
