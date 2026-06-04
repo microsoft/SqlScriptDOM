@@ -18,6 +18,13 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
 
             GenerateFragmentIfNotNull(node.RefWindowName);
             bool partitionByClauseExists = node.Partitions.Count > 0;
+
+            // 'win2PARTITION' / 'win2ORDER' would otherwise tokenize as one identifier.
+            if (node.RefWindowName != null && (partitionByClauseExists || node.OrderByClause != null))
+            {
+                GenerateSpace();
+            }
+
             if (partitionByClauseExists)
             {
                 GenerateIdentifier(CodeGenerationSupporter.Partition);

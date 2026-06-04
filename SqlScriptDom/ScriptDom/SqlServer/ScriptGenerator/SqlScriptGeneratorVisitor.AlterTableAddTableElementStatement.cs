@@ -61,6 +61,18 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
                 ExplicitVisit((SystemTimePeriodDefinition)node.Definition.SystemTimePeriod);
             }
 
+            // Separate preceding elements from inline indexes with a comma
+            // and newline to avoid token concatenation (e.g. 'NOT NULLINDEX').
+            if ((node.Definition.ColumnDefinitions.Count > 0
+                    || node.Definition.TableConstraints.Count > 0
+                    || node.Definition.SystemTimePeriod != null)
+                && node.Definition.Indexes != null
+                && node.Definition.Indexes.Count > 0)
+            {
+                GenerateSymbolAndSpace(TSqlTokenType.Comma);
+                NewLine();
+            }
+
             if (node.Definition.Indexes != null && node.Definition.Indexes.Count > 0)
             {
                 GenerateCommaSeparatedList(node.Definition.Indexes, true);
