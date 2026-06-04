@@ -34,18 +34,20 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
         private bool _leadingCommentsEmitted = false;
 
         /// <summary>
-        /// When true, suppresses trailing comment emission in HandleCommentsAfterFragment
-        /// for fragments whose LastTokenIndex matches or exceeds _suppressTrailingCommentsAfterIndex.
-        /// Used by GenerateStatementWithSemiColon to defer trailing comments until after
-        /// the semicolon has been placed, without affecting inter-clause comments.
+        /// When true, defers trailing comments for fragments at or past
+        /// _suppressTrailingCommentsAfterIndex until after the semicolon.
+        /// Set by GenerateStatementWithSemiColon.
         /// </summary>
         private bool _suppressTrailingComments = false;
 
-        /// <summary>
-        /// The LastTokenIndex of the statement for which trailing comments are being suppressed.
-        /// Only comments after this index are suppressed.
-        /// </summary>
+        /// <summary>Statement boundary used by _suppressTrailingComments.</summary>
         private int _suppressTrailingCommentsAfterIndex = -1;
+
+        /// <summary>
+        /// Buffer of '--' trailing comments awaiting the next NewLine. A '--'
+        /// comment is only safe at end-of-line.
+        /// </summary>
+        private readonly List<string> _deferredTrailingSingleLineComments = new List<string>();
 
         #endregion
 
@@ -64,6 +66,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
             _leadingCommentsEmitted = false;
             _suppressTrailingComments = false;
             _suppressTrailingCommentsAfterIndex = -1;
+            _deferredTrailingSingleLineComments.Clear();
         }
 
         /// <summary>
@@ -127,9 +130,9 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
         }
 
         /// <summary>
-        /// Emits trailing comments that appear immediately after the fragment.
+        /// Emits trailing comments after the fragment, scanning across newlines.
+        /// Each comment's own-line vs same-line placement is preserved from source.
         /// </summary>
-        /// <param name="fragment">The fragment that was just generated.</param>
         protected void EmitTrailingComments(TSqlFragment fragment)
         {
             if (!_options.PreserveComments || _currentTokenStream == null || fragment == null)
@@ -143,23 +146,229 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
                 return;
             }
 
-            // Scan for comments immediately following the fragment
+            int prevEmittedSourceIndex = lastTokenIndex;
             for (int i = lastTokenIndex + 1; i < _currentTokenStream.Count; i++)
             {
                 var token = _currentTokenStream[i];
-                
-                if (IsCommentToken(token) && !_emittedComments.Contains(token))
+
+                if (IsCommentToken(token))
                 {
-                    EmitCommentToken(token, isLeading: false);
-                    _emittedComments.Add(token);
-                    _lastProcessedTokenIndex = i;
+                    if (!_emittedComments.Contains(token))
+                    {
+                        bool ownLine = SourceGapContainsNewline(prevEmittedSourceIndex, i);
+                        EmitTrailingCommentToken(token, ownLine);
+                        _emittedComments.Add(token);
+                        _lastProcessedTokenIndex = i;
+                        prevEmittedSourceIndex = i;
+                    }
+                    continue;
                 }
-                else if (token.TokenType != TSqlTokenType.WhiteSpace)
+
+                if (token.TokenType == TSqlTokenType.WhiteSpace)
                 {
-                    // Stop at next non-whitespace, non-comment token
-                    break;
+                    continue;
+                }
+
+                // Any other token (including ';') ends the window.
+                break;
+            }
+        }
+
+        /// <summary>
+        /// Trailing-comment scan limited to the fragment's last source line.
+        /// Used after statement-ending semicolons so a comment on a later line
+        /// remains a leading comment of the next statement.
+        /// </summary>
+        protected void EmitSameLineTrailingComments(TSqlFragment fragment)
+        {
+            if (!_options.PreserveComments || _currentTokenStream == null || fragment == null)
+            {
+                return;
+            }
+
+            int lastTokenIndex = fragment.LastTokenIndex;
+            if (lastTokenIndex < 0 || lastTokenIndex >= _currentTokenStream.Count)
+            {
+                return;
+            }
+
+            for (int i = lastTokenIndex + 1; i < _currentTokenStream.Count; i++)
+            {
+                var token = _currentTokenStream[i];
+
+                if (token.TokenType == TSqlTokenType.WhiteSpace)
+                {
+                    if (ContainsLineBreak(token.Text))
+                    {
+                        break;
+                    }
+                    continue;
+                }
+
+                if (IsCommentToken(token))
+                {
+                    if (!_emittedComments.Contains(token))
+                    {
+                        EmitTrailingCommentToken(token, ownLine: false);
+                        _emittedComments.Add(token);
+                        _lastProcessedTokenIndex = i;
+
+                        // A '--' comment or a newline-spanning '/* */' ends the line.
+                        if (token.TokenType == TSqlTokenType.SingleLineComment ||
+                            ContainsLineBreak(token.Text))
+                        {
+                            break;
+                        }
+                    }
+                    continue;
+                }
+
+                break;
+            }
+        }
+
+        /// <summary>True if any whitespace token between fromIndex and toIndex contains a line break.</summary>
+        private bool SourceGapContainsNewline(int fromIndex, int toIndex)
+        {
+            for (int j = fromIndex + 1; j < toIndex; j++)
+            {
+                var t = _currentTokenStream[j];
+                if (t.TokenType == TSqlTokenType.WhiteSpace && ContainsLineBreak(t.Text))
+                {
+                    return true;
                 }
             }
+            return false;
+        }
+
+        /// <summary>
+        /// Emits any unemitted comments whose token index falls within the
+        /// statement's source token range (up to and including LastTokenIndex).
+        /// Catches floating comments inside a statement whose '/' or ';' has been
+        /// absorbed into this statement (e.g. '/* */;' or leading ';WITH').
+        /// </summary>
+        protected void EmitUnemittedCommentsThroughStatementEnd(TSqlStatement statement)
+        {
+            if (!_options.PreserveComments || _currentTokenStream == null || statement == null)
+            {
+                return;
+            }
+
+            int endInclusive = statement.LastTokenIndex;
+            if (endInclusive < 0 || endInclusive >= _currentTokenStream.Count)
+            {
+                return;
+            }
+
+            for (int i = _lastProcessedTokenIndex + 1; i <= endInclusive; i++)
+            {
+                var t = _currentTokenStream[i];
+                if (IsCommentToken(t) && !_emittedComments.Contains(t))
+                {
+                    EmitTrailingCommentToken(t, ownLine: true);
+                    _emittedComments.Add(t);
+                }
+            }
+
+            if (endInclusive > _lastProcessedTokenIndex)
+            {
+                _lastProcessedTokenIndex = endInclusive;
+            }
+        }
+
+        /// <summary>
+        /// Emits unemitted comments in the trivia run starting at
+        /// _lastProcessedTokenIndex+1; stops at the first non-whitespace,
+        /// non-comment token. For use before a container emits a closing
+        /// keyword like END.
+        /// </summary>
+        protected void EmitCommentsUntilNextNonTriviaToken()
+        {
+            if (!_options.PreserveComments || _currentTokenStream == null)
+            {
+                return;
+            }
+
+            for (int i = _lastProcessedTokenIndex + 1; i < _currentTokenStream.Count; i++)
+            {
+                var t = _currentTokenStream[i];
+
+                if (IsCommentToken(t))
+                {
+                    if (!_emittedComments.Contains(t))
+                    {
+                        EmitTrailingCommentToken(t, ownLine: true);
+                        _emittedComments.Add(t);
+                        _lastProcessedTokenIndex = i;
+                    }
+                    continue;
+                }
+
+                if (t.TokenType == TSqlTokenType.WhiteSpace)
+                {
+                    continue;
+                }
+
+                break;
+            }
+        }
+
+        /// <summary>
+        /// Emits a trailing comment. '--' comments are deferred to the next
+        /// NewLine; block comments are written inline immediately.
+        /// </summary>
+        private void EmitTrailingCommentToken(TSqlParserToken token, bool ownLine)
+        {
+            if (token == null)
+            {
+                return;
+            }
+
+            if (token.TokenType == TSqlTokenType.SingleLineComment)
+            {
+                _deferredTrailingSingleLineComments.Add(token.Text);
+                return;
+            }
+
+            if (ownLine)
+            {
+                _writer.NewLine();
+            }
+            else
+            {
+                _writer.AddToken(ScriptGeneratorSupporter.CreateWhitespaceToken(1));
+            }
+
+            _writer.AddToken(new TSqlParserToken(token.TokenType, token.Text));
+        }
+
+        /// <summary>
+        /// Writes deferred '--' trailing comments at end-of-line. Called from
+        /// the visitor's NewLine helper before each newline, and at end-of-script.
+        /// </summary>
+        internal void FlushDeferredTrailingSingleLineComments()
+        {
+            if (_deferredTrailingSingleLineComments.Count == 0)
+            {
+                return;
+            }
+
+            for (int i = 0; i < _deferredTrailingSingleLineComments.Count; i++)
+            {
+                _writer.AddToken(ScriptGeneratorSupporter.CreateWhitespaceToken(1));
+                _writer.AddToken(new TSqlParserToken(
+                    TSqlTokenType.SingleLineComment,
+                    _deferredTrailingSingleLineComments[i]));
+
+                // The final '--' is terminated by the caller's pending newline;
+                // earlier ones need their own.
+                if (i < _deferredTrailingSingleLineComments.Count - 1)
+                {
+                    _writer.NewLine();
+                }
+            }
+
+            _deferredTrailingSingleLineComments.Clear();
         }
 
         /// <summary>
@@ -208,17 +417,13 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
                 return;
             }
 
-            // When trailing comments are suppressed (e.g., during statement body generation
-            // before semicolon placement), skip emitting trailing comments only for fragments
-            // whose last token is at or past the statement boundary. Inter-clause comments
-            // (within the statement) are still emitted normally.
+            // Defer until after the semicolon when at statement boundary.
             if (_suppressTrailingComments && fragment.LastTokenIndex >= _suppressTrailingCommentsAfterIndex)
             {
                 UpdateLastProcessedIndex(fragment);
                 return;
             }
 
-            // Emit trailing comments and update tracking
             EmitTrailingComments(fragment);
             UpdateLastProcessedIndex(fragment);
         }
@@ -276,6 +481,9 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
         /// </summary>
         protected void EmitRemainingComments()
         {
+            // Flush deferred '--' comments at end-of-script.
+            FlushDeferredTrailingSingleLineComments();
+
             if (!_options.PreserveComments || _currentTokenStream == null)
             {
                 return;
@@ -303,6 +511,12 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
             return token != null &&
                    (token.TokenType == TSqlTokenType.SingleLineComment ||
                     token.TokenType == TSqlTokenType.MultilineComment);
+        }
+
+        /// <summary>True if the text contains '\n' or '\r'.</summary>
+        private static bool ContainsLineBreak(string text)
+        {
+            return text != null && (text.IndexOf('\n') >= 0 || text.IndexOf('\r') >= 0);
         }
 
         #endregion

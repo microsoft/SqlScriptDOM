@@ -473,11 +473,25 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
             _suppressTrailingComments = previousSuppressState;
             _suppressTrailingCommentsAfterIndex = previousSuppressIndex;
 
+            // Sweep any comments inside the statement's token range that no
+            // inner-fragment scan emitted (e.g. comments between an absorbed
+            // ';' separator and the statement's last token).
+            EmitUnemittedCommentsThroughStatementEnd(statement);
+
             // Semicolon BEFORE trailing comments
             GenerateSemiColonWhenNecessary(statement);
 
-            // Now emit trailing comments (after the semicolon)
-            HandleCommentsAfterFragment(statement);
+            // Only same-line trailing comments belong after the semicolon; a
+            // comment on a later line is a leading comment of the next statement.
+            if (_options.PreserveComments && _currentTokenStream != null)
+            {
+                EmitSameLineTrailingComments(statement);
+                UpdateLastProcessedIndex(statement);
+            }
+            else
+            {
+                HandleCommentsAfterFragment(statement);
+            }
         }
 		
         protected void GenerateCommaSeparatedWithClause<T>(IList<T> fragments, bool indent, bool includeParentheses) where T : TSqlFragment
