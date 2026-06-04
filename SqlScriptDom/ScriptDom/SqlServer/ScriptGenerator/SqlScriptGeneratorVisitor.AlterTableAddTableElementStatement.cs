@@ -61,6 +61,8 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
                 ExplicitVisit((SystemTimePeriodDefinition)node.Definition.SystemTimePeriod);
             }
 
+            // Separate preceding elements from inline indexes with a comma
+            // and newline to avoid token concatenation (e.g. 'NOT NULLINDEX').
             if ((node.Definition.ColumnDefinitions.Count > 0
                     || node.Definition.TableConstraints.Count > 0
                     || node.Definition.SystemTimePeriod != null)
