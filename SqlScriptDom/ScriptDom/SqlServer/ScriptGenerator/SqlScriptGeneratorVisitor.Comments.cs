@@ -319,6 +319,11 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
         /// </summary>
         private void EmitTrailingCommentToken(TSqlParserToken token, bool ownLine)
         {
+            if (token == null)
+            {
+                return;
+            }
+
             if (token.TokenType == TSqlTokenType.SingleLineComment)
             {
                 _deferredTrailingSingleLineComments.Add(token.Text);
