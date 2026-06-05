@@ -1,4 +1,4 @@
-﻿//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 // <copyright file="CodeGenerationSupporter.cs" company="Microsoft">
 //         Copyright (c) Microsoft Corporation.  All rights reserved.
 // </copyright>
@@ -972,6 +972,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         internal const string Signature = "SIGNATURE";
         internal const string SimilarTo = "SIMILAR_TO";
         internal const string Simple = "SIMPLE";
+        internal const string Single = "SINGLE";
         internal const string SingleBlob = "SINGLE_BLOB";
         internal const string SingleClob = "SINGLE_CLOB";
         internal const string SingleNClob = "SINGLE_NCLOB";
