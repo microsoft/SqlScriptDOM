@@ -541,6 +541,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         internal const string Intermediate = "INTERMEDIATE";
         internal const string IntervalLengthMinutes = "INTERVAL_LENGTH_MINUTES";
         internal const string Insensitive = "INSENSITIVE";
+        internal const string InvokeExternalApi = "INVOKE_EXTERNAL_API";
         internal const string IRowset = "IROWSET";
         internal const string Isolation = "ISOLATION";
         internal const string Job = "JOB";

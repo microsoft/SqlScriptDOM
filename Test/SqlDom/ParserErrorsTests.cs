@@ -7946,6 +7946,45 @@ WHEN NOT MATCHED BY SOURCE THEN DELETE OUTPUT inserted.*, deleted.*;";
         }
 
         /// <summary>
+        /// Negative tests for CREATE/ALTER FUNCTION ... AS EXTERNAL FUNCTION syntax in Fabric DW.
+        /// </summary>
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void ExternalFunctionNegativeTestsFabricDW()
+        {
+            // Missing external name after EXTERNAL FUNCTION
+            ParserTestUtils.ErrorTestFabricDW(
+                "CREATE FUNCTION dbo.f AS EXTERNAL FUNCTION",
+                new ParserErrorInfo(42, "SQL46029"));
+
+            // Missing FUNCTION keyword after EXTERNAL
+            ParserTestUtils.ErrorTestFabricDW(
+                "CREATE FUNCTION dbo.f AS EXTERNAL mySet.myFn",
+                new ParserErrorInfo(34, "SQL46010", "mySet"));
+
+            // Three-part external name not allowed
+            ParserTestUtils.ErrorTestFabricDW(
+                "CREATE FUNCTION dbo.f AS EXTERNAL FUNCTION db.mySet.myFn",
+                new ParserErrorInfo(51, "SQL46010", "."));
+
+            // RETURNS without a data type
+            ParserTestUtils.ErrorTestFabricDW(
+                "CREATE FUNCTION dbo.f RETURNS AS EXTERNAL FUNCTION mySet.myFn",
+                new ParserErrorInfo(22, "SQL46010", "RETURNS"));
+
+            // ALTER: missing external name
+            ParserTestUtils.ErrorTestFabricDW(
+                "ALTER FUNCTION dbo.f AS EXTERNAL FUNCTION",
+                new ParserErrorInfo(41, "SQL46029"));
+
+            // CREATE OR ALTER: missing FUNCTION keyword after EXTERNAL
+            ParserTestUtils.ErrorTestFabricDW(
+                "CREATE OR ALTER FUNCTION dbo.f AS EXTERNAL mySet.myFn",
+                new ParserErrorInfo(43, "SQL46010", "mySet"));
+        }
+
+        /// <summary>
         /// Negative test for OFFSET with FETCH APPROXIMATE - SQL46145 error
         /// OFFSET clause cannot be used with FETCH APPROXIMATE (introduced in SQL Server 2025)
         /// </summary>

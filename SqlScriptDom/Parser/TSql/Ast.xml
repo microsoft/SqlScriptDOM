@@ -794,6 +794,30 @@
     <InheritedMember Name="MethodSpecifier" ContainerClass ="ProcedureStatementBodyBase" />
     <InheritedMember Name="OrderHint" ContainerClass ="FunctionStatementBody" />
   </Class>
+  <Class Name="ExternalFunctionStatement" Base="TSqlStatement" Abstract="true" Summary="Represents the CREATE/ALTER FUNCTION ... AS EXTERNAL FUNCTION statement.">
+    <Member Name="Name" Type="SchemaObjectName" Summary="The name of the function being created or altered. Can at most be a two part name."/>
+    <Member Name="Parameters" Type="ProcedureParameter" Collection="true" Summary="Parameters which can be passed to the external function."/>
+    <Member Name="ReturnType" Type="DataTypeReference" Summary="Optional RETURNS clause specifying the data type returned by the external function."/>
+    <Member Name="ExternalName" Type="SchemaObjectName" Summary="The external function reference of the form functionSetName.functionName."/>
+  </Class>
+  <Class Name="CreateExternalFunctionStatement" Base="ExternalFunctionStatement" Summary="Represents the CREATE FUNCTION ... AS EXTERNAL FUNCTION statement.">
+    <InheritedMember Name="Name" ContainerClass ="ExternalFunctionStatement" />
+    <InheritedMember Name="Parameters" ContainerClass ="ExternalFunctionStatement" />
+    <InheritedMember Name="ReturnType" ContainerClass ="ExternalFunctionStatement" />
+    <InheritedMember Name="ExternalName" ContainerClass ="ExternalFunctionStatement" />
+  </Class>
+  <Class Name="AlterExternalFunctionStatement" Base="ExternalFunctionStatement" Summary="Represents the ALTER FUNCTION ... AS EXTERNAL FUNCTION statement.">
+    <InheritedMember Name="Name" ContainerClass ="ExternalFunctionStatement" />
+    <InheritedMember Name="Parameters" ContainerClass ="ExternalFunctionStatement" />
+    <InheritedMember Name="ReturnType" ContainerClass ="ExternalFunctionStatement" />
+    <InheritedMember Name="ExternalName" ContainerClass ="ExternalFunctionStatement" />
+  </Class>
+  <Class Name="CreateOrAlterExternalFunctionStatement" Base="ExternalFunctionStatement" Summary="Represents the CREATE OR ALTER FUNCTION ... AS EXTERNAL FUNCTION statement.">
+    <InheritedMember Name="Name" ContainerClass ="ExternalFunctionStatement" />
+    <InheritedMember Name="Parameters" ContainerClass ="ExternalFunctionStatement" />
+    <InheritedMember Name="ReturnType" ContainerClass ="ExternalFunctionStatement" />
+    <InheritedMember Name="ExternalName" ContainerClass ="ExternalFunctionStatement" />
+  </Class>
   <Class Name="CreateRuleStatement" Base="TSqlStatement" Summary="Represents the Create Rule statement.">
     <Member Name="Name" Type="SchemaObjectName" Summary="Represents the name. DatabaseName is disallowed here, has to equal String.Empty or null."/>
     <Member Name="Expression" Type="BooleanExpression" Summary="Expression that is the rule."/>
@@ -4827,6 +4851,12 @@
     <InheritedClass Name="PrimaryExpression" />
     <Member Name="Input" Type="ScalarExpression" Summary="Text to translate; variable or column reference." />
     <Member Name="Language" Type="ScalarExpression" Summary="Target language; typically string literal or identifier." />
+  </Class>
+  <Class Name="InvokeExternalApiFunctionCall" Base="PrimaryExpression" Summary="Represents INVOKE_EXTERNAL_API(...) function call.">
+    <InheritedClass Name="PrimaryExpression" />
+    <Member Name="FunctionSetName" Type="StringLiteral" Summary="Function set name (string literal, required)." />
+    <Member Name="FunctionName" Type="StringLiteral" Summary="Function name (string literal, required)." />
+    <Member Name="Arguments" Type="ScalarExpression" Collection="true" Summary="Optional additional arguments passed to the external API." />
   </Class>
   <Class Name="VectorSearchTableReference" Base="TableReferenceWithAlias" Summary="Represents the VECTOR_SEARCH table-valued function call.">
     <InheritedClass Name="TableReferenceWithAlias" />

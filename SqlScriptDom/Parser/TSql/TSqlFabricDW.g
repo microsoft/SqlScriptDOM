@@ -730,7 +730,9 @@ lastStatement returns [TSqlStatement vResult = null]
     | vResult=createRuleStatement
     | vResult=createViewStatement
     | vResult=alterViewStatement
+    | (Create Function schemaObjectNonEmptyTwoPartName (LeftParenthesis (functionParameter (Comma functionParameter)*)? RightParenthesis)? (Identifier scalarDataType)? As External) => vResult=createExternalFunctionStatement
     | vResult=createFunctionStatement
+    | (Alter Function schemaObjectNonEmptyTwoPartName (LeftParenthesis (functionParameter (Comma functionParameter)*)? RightParenthesis)? (Identifier scalarDataType)? As External) => vResult=alterExternalFunctionStatement
     | vResult=alterFunctionStatement
     | vResult=createSchemaStatement
     | vResult=createIdentifierStatement
@@ -770,7 +772,8 @@ alterIdentifierStatement returns [TSqlStatement vResult]
 createOrAlterStatements returns [TSqlStatement vResult]
     : tCreate:Create Or Alter
         (
-            vResult = createOrAlterFunctionStatement
+            (Function schemaObjectNonEmptyTwoPartName (LeftParenthesis (functionParameter (Comma functionParameter)*)? RightParenthesis)? (Identifier scalarDataType)? As External) => vResult = createOrAlterExternalFunctionStatement
+          | vResult = createOrAlterFunctionStatement
           | vResult = createOrAlterProcedureStatement
           | vResult = createOrAlterTriggerStatement
           | vResult = createOrAlterViewStatement
@@ -12993,6 +12996,83 @@ createOrAlterFunctionStatement returns [CreateOrAlterFunctionStatement vResult =
             {
                 vResult = null;
             }
+        }
+    ;
+
+createExternalFunctionStatement returns [CreateExternalFunctionStatement vResult = this.FragmentFactory.CreateFragment<CreateExternalFunctionStatement>()]
+    : tCreate:Create
+        {
+            UpdateTokenInfo(vResult, tCreate);
+        }
+        externalFunctionStatementBody[vResult]
+    ;
+
+alterExternalFunctionStatement returns [AlterExternalFunctionStatement vResult = this.FragmentFactory.CreateFragment<AlterExternalFunctionStatement>()]
+    : tAlter:Alter
+        {
+            UpdateTokenInfo(vResult, tAlter);
+        }
+        externalFunctionStatementBody[vResult]
+    ;
+
+createOrAlterExternalFunctionStatement returns [CreateOrAlterExternalFunctionStatement vResult = this.FragmentFactory.CreateFragment<CreateOrAlterExternalFunctionStatement>()]
+    :   externalFunctionStatementBody[vResult]
+    ;
+
+externalFunctionStatementBody[ExternalFunctionStatement vResult]
+{
+    SchemaObjectName vName;
+    SchemaObjectName vExternalName;
+    DataTypeReference vReturnType;
+    ProcedureParameter vParameter;
+}
+    : tFunction:Function
+        {
+            UpdateTokenInfo(vResult, tFunction);
+        }
+        vName=schemaObjectNonEmptyTwoPartName
+        {
+            vResult.Name = vName;
+        }
+        (
+            LeftParenthesis
+            (
+                vParameter=functionParameter
+                {
+                    AddAndUpdateTokenInfo(vResult, vResult.Parameters, vParameter);
+                }
+                ( Comma vParameter=functionParameter
+                    {
+                        AddAndUpdateTokenInfo(vResult, vResult.Parameters, vParameter);
+                    }
+                )*
+            )?
+            RightParenthesis
+        )?
+        (
+            {NextTokenMatches(CodeGenerationSupporter.Returns)}?
+            tReturns:Identifier vReturnType=scalarDataType
+            {
+                Match(tReturns, CodeGenerationSupporter.Returns);
+                UpdateTokenInfo(vResult, tReturns);
+                vResult.ReturnType = vReturnType;
+            }
+        )?
+        tAs:As
+        {
+            UpdateTokenInfo(vResult, tAs);
+        }
+        tExternal:External
+        {
+            UpdateTokenInfo(vResult, tExternal);
+        }
+        tExternalFunction:Function
+        {
+            UpdateTokenInfo(vResult, tExternalFunction);
+        }
+        vExternalName=schemaObjectNonEmptyTwoPartName
+        {
+            vResult.ExternalName = vExternalName;
         }
     ;
 
@@ -31492,6 +31572,9 @@ expressionPrimary [ExpressionFlags expressionFlags] returns [PrimaryExpression v
             {NextTokenMatches(CodeGenerationSupporter.AITranslate) && (LA(2) == LeftParenthesis)}?
             vResult=aiTranslateFunctionCall
         |
+            {NextTokenMatches(CodeGenerationSupporter.InvokeExternalApi) && (LA(2) == LeftParenthesis)}?
+            vResult=invokeExternalApiFunctionCall
+        |
             (Identifier LeftParenthesis)=>
             vResult=builtInFunctionCall
         |
@@ -32304,6 +32387,43 @@ aiTranslateFunctionCall returns [AITranslateFunctionCall vResult = this.Fragment
             vResult.Language = vLang;
         }
         RightParenthesis
+    ;
+
+// INVOKE_EXTERNAL_API('<functionSetName>', '<functionName>' [, <arg1> [, <arg2> ... ]])
+// functionSetName and functionName must be string literals.
+// Remaining arguments are optional scalar expressions.
+invokeExternalApiFunctionCall
+    returns [InvokeExternalApiFunctionCall vResult = this.FragmentFactory.CreateFragment<InvokeExternalApiFunctionCall>()]
+{
+    StringLiteral vFunctionSetName;
+    StringLiteral vFunctionName;
+    ScalarExpression vArg;
+}
+    :
+        tFunc:Identifier LeftParenthesis
+        {
+            Match(tFunc, CodeGenerationSupporter.InvokeExternalApi);
+            UpdateTokenInfo(vResult, tFunc);
+        }
+        vFunctionSetName=stringLiteral
+        {
+            vResult.FunctionSetName = vFunctionSetName;
+        }
+        Comma
+        vFunctionName=stringLiteral
+        {
+            vResult.FunctionName = vFunctionName;
+        }
+        (
+            Comma vArg=expression
+            {
+                AddAndUpdateTokenInfo(vResult, vResult.Arguments, vArg);
+            }
+        )*
+        tRParen:RightParenthesis
+        {
+            UpdateTokenInfo(vResult, tRParen);
+        }
     ;
 
 // TODO, olegr: Add more checks for allowed functions here - there are quite some in SQL Server parser
