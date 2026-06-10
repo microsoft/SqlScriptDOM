@@ -1,4 +1,4 @@
-﻿//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 // <copyright file="SqlScriptGeneratorVisitor.CreateExternalModelStatement.cs" company="Microsoft">
 //         Copyright (c) Microsoft Corporation.  All rights reserved.
 // </copyright>
@@ -17,9 +17,9 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
             GenerateSpaceAndIdentifier(CodeGenerationSupporter.Model);
             GenerateCreateExternalModelStatementBody(node);
         }
-        protected static Dictionary<ExternalModelTypeOption, string> _externalModelTypeOption = new Dictionary<ExternalModelTypeOption, string>()
+        protected static Dictionary<ExternalModelTypeOptionKind, string> _externalModelTypeOptionKind = new Dictionary<ExternalModelTypeOptionKind, string>()
         {
-            {ExternalModelTypeOption.EMBEDDINGS, CodeGenerationSupporter.Embeddings}
+            {ExternalModelTypeOptionKind.Embeddings, CodeGenerationSupporter.Embeddings}
         };
 
         protected void GenerateCreateExternalModelStatementBody(CreateExternalModelStatement node)
@@ -54,17 +54,15 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
             }
 
             // external model Model Type options
-            if (node.ModelType == ExternalModelTypeOption.EMBEDDINGS)
+            if (node.ModelType != null)
             {
                 if (!ifFirst)
                 {
                     GenerateSymbol(TSqlTokenType.Comma);
                 }
                 ifFirst = false;
-                ExternalModelTypeOption typeOption = ExternalModelTypeOption.EMBEDDINGS;
-                string externalModelTypeOption = GetValueForEnumKey(_externalModelTypeOption, typeOption);
                 NewLine();
-                GenerateNameEqualsValue(CodeGenerationSupporter.ModelType, externalModelTypeOption);
+                GenerateFragmentIfNotNull(node.ModelType);
             }
 
             // external model name options
@@ -117,6 +115,12 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
 
             NewLine();
             GenerateKeyword(TSqlTokenType.RightParenthesis);
+        }
+
+        public override void ExplicitVisit(ExternalModelTypeOption node)
+        {
+            string optionKindString = GetValueForEnumKey(_externalModelTypeOptionKind, node.OptionKind);
+            GenerateNameEqualsValue(CodeGenerationSupporter.ModelType, optionKindString);
         }
     }
 }

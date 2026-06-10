@@ -24170,11 +24170,15 @@ StringLiteral vApiFormat;
 ;
 
 externalModelModelType[ExternalModelStatement vParent]
+{
+    ExternalModelTypeOption vModelTypeOption = null;
+}
   :
         tModelType:Identifier
         {
             Match(tModelType, CodeGenerationSupporter.ModelType);
-            UpdateTokenInfo(vParent, tModelType);
+            vModelTypeOption = this.FragmentFactory.CreateFragment<ExternalModelTypeOption>();
+            UpdateTokenInfo(vModelTypeOption, tModelType);
         }
         EqualsSign
         (
@@ -24182,8 +24186,10 @@ externalModelModelType[ExternalModelStatement vParent]
             {
                 if (TryMatch(tEmbeddings, CodeGenerationSupporter.Embeddings))
                 {
-                    vParent.ModelType = ExternalModelTypeOption.EMBEDDINGS;
-                    UpdateTokenInfo(vParent, tEmbeddings);
+                    vModelTypeOption.OptionKind = ExternalModelTypeOptionKind.Embeddings;
+                    UpdateTokenInfo(vModelTypeOption, tEmbeddings);
+                    vParent.ModelType = vModelTypeOption;
+                    vParent.UpdateTokenInfo(vModelTypeOption);
                 }
                 else
                 {

@@ -392,5 +392,37 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                 ParserTest.ParseAndVerify(parser, scriptGen, ti._scriptFilename, ti._result100);
             }
         }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestExternalModelModelTypeVisitor()
+        {
+            string sql = "CREATE EXTERNAL MODEL simple_model WITH (LOCATION = '/models/simple', API_FORMAT = 'OpenAI', MODEL_TYPE = EMBEDDINGS, MODEL = 'gpt-3.5-turbo');";
+            TSql170Parser parser = new TSql170Parser(true);
+            IList<ParseError> errors;
+            TSqlFragment fragment = parser.Parse(new StringReader(sql), out errors);
+            
+            Assert.AreEqual(0, errors.Count);
+            Assert.IsNotNull(fragment);
+            
+            // Collect all visited fragments using a custom visitor
+            var visitor = new ExternalModelTypeOptionVisitor();
+            fragment.Accept(visitor);
+            
+            Assert.AreEqual(1, visitor.VisitedOptions.Count);
+            Assert.AreEqual(ExternalModelTypeOptionKind.Embeddings, visitor.VisitedOptions[0].OptionKind);
+        }
+        
+        private class ExternalModelTypeOptionVisitor : TSqlFragmentVisitor
+        {
+            public List<ExternalModelTypeOption> VisitedOptions { get; } = new List<ExternalModelTypeOption>();
+            
+            public override void Visit(ExternalModelTypeOption node)
+            {
+                VisitedOptions.Add(node);
+                base.Visit(node);
+            }
+        }
     }
 }

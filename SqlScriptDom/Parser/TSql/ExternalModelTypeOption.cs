@@ -1,4 +1,4 @@
-﻿//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 // <copyright file="ExternalModelTypeOption.cs" company="Microsoft">
 //         Copyright (c) Microsoft Corporation.  All rights reserved.
 // </copyright>
@@ -11,14 +11,14 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
 
     /// <summary>
     /// The enumeration specifies the external model type
-    /// Currently, we support EMBEDDINGS only.
+    /// Currently, we support Embeddings only.
     /// </summary>
-    public enum ExternalModelTypeOption
+    public enum ExternalModelTypeOptionKind
     {
         /// <summary>
         /// MODEL_TYPE = EMBEDDINGS
         /// </summary>
-        EMBEDDINGS = 0,
+        Embeddings = 0,
 
     }
 
