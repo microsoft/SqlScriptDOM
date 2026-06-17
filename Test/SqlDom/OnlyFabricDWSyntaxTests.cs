@@ -25,6 +25,8 @@ namespace SqlStudio.Tests.UTSqlScriptDom
             new ParserTestFabricDW("AiGenerateResponseTestsFabricDW.sql", nErrors80: 3, nErrors90: 1, nErrors100: 2, nErrors110: 2, nErrors120: 2, nErrors130: 0, nErrors140: 0, nErrors150: 0, nErrors160: 0, nErrors170: 0, nErrors180: 0),
             new ParserTestFabricDW("AiSummarizeTestsFabricDW.sql", nErrors80: 2, nErrors90: 1, nErrors100: 2, nErrors110: 2, nErrors120: 2, nErrors130: 0, nErrors140: 0, nErrors150: 0, nErrors160: 0, nErrors170: 0, nErrors180: 0),
             new ParserTestFabricDW("AiTranslateTestsFabricDW.sql", nErrors80: 3, nErrors90: 1, nErrors100: 2, nErrors110: 2, nErrors120: 2, nErrors130: 0, nErrors140: 0, nErrors150: 0, nErrors160: 0, nErrors170: 0, nErrors180: 0),
+            new ParserTestFabricDW("InvokeExternalApiTestsFabricDW.sql", nErrors80: 2, nErrors90: 1, nErrors100: 0, nErrors110: 0, nErrors120: 0, nErrors130: 0, nErrors140: 0, nErrors150: 0, nErrors160: 0, nErrors170: 0, nErrors180: 0),
+            new ParserTestFabricDW("ExternalFunctionTestsFabricDW.sql", nErrors80: 12, nErrors90: 4, nErrors100: 4, nErrors110: 4, nErrors120: 4, nErrors130: 11, nErrors140: 11, nErrors150: 11, nErrors160: 11, nErrors170: 11, nErrors180: 0),
         };
 
         [TestMethod]

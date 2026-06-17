@@ -890,6 +890,9 @@ create2005Statements returns [TSqlStatement vResult = null]
             {NextTokenMatches(CodeGenerationSupporter.Vector)}?
             vResult=createVectorIndexStatement[null, null]
         |
+            {NextTokenMatches(CodeGenerationSupporter.Semantic)}?
+            vResult=createSemanticIndexStatement
+        |
             {NextTokenMatches(CodeGenerationSupporter.Contract)}?
             vResult=createContractStatement
         |
@@ -17132,6 +17135,232 @@ createVectorIndexStatement [IToken tUnique, bool? isClustered] returns [CreateVe
     )?
     ;
 
+createSemanticIndexStatement returns [CreateSemanticIndexStatement vResult = FragmentFactory.CreateFragment<CreateSemanticIndexStatement>()]
+{
+    Identifier vIdentifier;
+    SchemaObjectName vSchemaObjectName;
+    SemanticIndexColumn vColumn;
+    FileGroupOrPartitionScheme vFileGroupOrPartitionScheme;
+}
+    : tSemantic:Identifier tIndex:Index vIdentifier=identifier
+    {
+        Match(tSemantic, CodeGenerationSupporter.Semantic);
+        vResult.Name = vIdentifier;
+    }
+    tOn:On vSchemaObjectName=schemaObjectThreePartName
+    {
+        vResult.OnName = vSchemaObjectName;
+    }
+    LeftParenthesis
+    vColumn=semanticIndexColumnDefinition
+    {
+        AddAndUpdateTokenInfo(vResult, vResult.Columns, vColumn);
+    }
+    (
+        Comma vColumn=semanticIndexColumnDefinition
+        {
+            AddAndUpdateTokenInfo(vResult, vResult.Columns, vColumn);
+        }
+    )*
+    tRParen:RightParenthesis
+    {
+        UpdateTokenInfo(vResult, tRParen);
+    }
+    (
+        // Greedy due to conflict with withCommonTableExpressionsAndXmlNamespaces
+        options {greedy = true; } :
+        With LeftParenthesis
+        semanticIndexWithOptions[vResult]
+        RightParenthesis
+    )?
+    (
+        On vFileGroupOrPartitionScheme=filegroupOrPartitionScheme
+        {
+            vResult.OnFileGroupOrPartitionScheme = vFileGroupOrPartitionScheme;
+        }
+    )?
+    {
+        // Validate that EXTERNAL_MODEL is specified for vector/hybrid columns
+        ValidateSemanticIndexExternalModel(vResult);
+    }
+    ;
+
+semanticIndexColumnDefinition returns [SemanticIndexColumn vResult = FragmentFactory.CreateFragment<SemanticIndexColumn>()]
+{
+    Identifier vIdentifier;
+    IdentifierOrValueExpression vValue;
+}
+    : vIdentifier=identifier
+    {
+        vResult.ColumnName = vIdentifier;
+    }
+    (
+        {NextTokenMatches(CodeGenerationSupporter.SearchType)}?
+        tSearchType:Identifier EqualsSign tSearchTypeValue:Identifier
+        {
+            Match(tSearchType, CodeGenerationSupporter.SearchType);
+            if (TryMatch(tSearchTypeValue, CodeGenerationSupporter.Vector))
+                vResult.SearchType = SemanticIndexSearchType.Vector;
+            else if (TryMatch(tSearchTypeValue, CodeGenerationSupporter.Fulltext))
+                vResult.SearchType = SemanticIndexSearchType.Fulltext;
+            else
+            {
+                Match(tSearchTypeValue, CodeGenerationSupporter.Hybrid);
+                vResult.SearchType = SemanticIndexSearchType.Hybrid;
+            }
+        }
+    )?
+    (
+        {NextTokenMatches(CodeGenerationSupporter.Type)}?
+        Identifier Column vIdentifier=identifier
+        {
+            vResult.TypeColumnName = vIdentifier;
+        }
+    )?
+    (
+        {NextTokenMatches(CodeGenerationSupporter.Language)}?
+        tLang:Identifier vValue=stringOrIdentifier
+        {
+            Match(tLang, CodeGenerationSupporter.Language);
+            vResult.Language = vValue;
+        }
+    )?
+    (
+        {NextTokenMatches(CodeGenerationSupporter.ChunkUsing)}?
+        tChunkUsing:Identifier LeftParenthesis
+        {
+            Match(tChunkUsing, CodeGenerationSupporter.ChunkUsing);
+        }
+        semanticIndexChunkOptions[vResult]
+        RightParenthesis
+    )?
+    ;
+
+semanticIndexChunkOptions [SemanticIndexColumn vParent]
+{
+    SemanticIndexChunkOption vOption;
+}
+    : vOption=semanticIndexChunkOption
+    {
+        AddAndUpdateTokenInfo(vParent, vParent.ChunkOptions, vOption);
+    }
+    (
+        Comma vOption=semanticIndexChunkOption
+        {
+            AddAndUpdateTokenInfo(vParent, vParent.ChunkOptions, vOption);
+        }
+    )*
+    ;
+
+semanticIndexChunkOption returns [SemanticIndexChunkOption vResult = FragmentFactory.CreateFragment<SemanticIndexChunkOption>()]
+{
+    IdentifierOrValueExpression vValue;
+}
+    : tOption:Identifier EqualsSign vValue=identifierOrInteger
+    {
+        if (TryMatch(tOption, CodeGenerationSupporter.Type))
+            vResult.OptionKind = SemanticIndexChunkOptionKind.Type;
+        else if (TryMatch(tOption, CodeGenerationSupporter.Size))
+            vResult.OptionKind = SemanticIndexChunkOptionKind.Size;
+        else
+        {
+            Match(tOption, CodeGenerationSupporter.Overlap);
+            vResult.OptionKind = SemanticIndexChunkOptionKind.Overlap;
+        }
+        vResult.Value = vValue;
+    }
+    ;
+
+semanticIndexWithOptions [CreateSemanticIndexStatement vParent]
+    : semanticIndexWithOption[vParent]
+    (
+        Comma semanticIndexWithOption[vParent]
+    )*
+    ;
+
+semanticIndexWithOption [CreateSemanticIndexStatement vParent]
+{
+    IndexOption vIndexOption;
+    Identifier vIdentifier;
+    StringLiteral vStringLiteral;
+}
+    :
+    (
+        {NextTokenMatches(CodeGenerationSupporter.ExternalModel)}?
+        tExtModel:Identifier EqualsSign
+        {
+            Match(tExtModel, CodeGenerationSupporter.ExternalModel);
+        }
+        (
+            LeftParenthesis vIdentifier=identifier RightParenthesis
+            {
+                vParent.ExternalModelName = vIdentifier;
+            }
+        |
+            vIdentifier=identifier
+            {
+                vParent.ExternalModelName = vIdentifier;
+            }
+        )
+        (
+            LeftParenthesis tParams:Identifier EqualsSign vStringLiteral=stringLiteral RightParenthesis
+            {
+                Match(tParams, CodeGenerationSupporter.Parameters);
+                vParent.ExternalModelParameters = vStringLiteral;
+            }
+        )?
+    |
+        {NextTokenMatches(CodeGenerationSupporter.VectorIndex)}?
+        tVecIdx:Identifier LeftParenthesis
+        {
+            Match(tVecIdx, CodeGenerationSupporter.VectorIndex);
+        }
+        vIndexOption=semanticIndexVectorOption
+        {
+            AddAndUpdateTokenInfo(vParent, vParent.VectorIndexOptions, vIndexOption);
+        }
+        (
+            Comma vIndexOption=semanticIndexVectorOption
+            {
+                AddAndUpdateTokenInfo(vParent, vParent.VectorIndexOptions, vIndexOption);
+            }
+        )*
+        RightParenthesis
+    |
+        {NextTokenMatches(CodeGenerationSupporter.FulltextStopList)}?
+        tStoplist:Identifier EqualsSign
+        {
+            Match(tStoplist, CodeGenerationSupporter.FulltextStopList);
+        }
+        (
+            tOff:Off
+            {
+                StopListFullTextIndexOption vStopOpt = FragmentFactory.CreateFragment<StopListFullTextIndexOption>();
+                vStopOpt.OptionKind = FullTextIndexOptionKind.StopList;
+                vStopOpt.IsOff = true;
+                UpdateTokenInfo(vStopOpt, tStoplist);
+                UpdateTokenInfo(vStopOpt, tOff);
+                vParent.FulltextStoplistOption = vStopOpt;
+            }
+        |
+            vIdentifier=identifier
+            {
+                StopListFullTextIndexOption vStopOpt = FragmentFactory.CreateFragment<StopListFullTextIndexOption>();
+                vStopOpt.OptionKind = FullTextIndexOptionKind.StopList;
+                vStopOpt.IsOff = false;
+                vStopOpt.StopListName = vIdentifier;
+                UpdateTokenInfo(vStopOpt, tStoplist);
+                vParent.FulltextStoplistOption = vStopOpt;
+            }
+        )
+    |
+        vIndexOption=indexOption
+        {
+            AddAndUpdateTokenInfo(vParent, vParent.IndexOptions, vIndexOption);
+        }
+    )
+    ;
+
 indexKeyColumnList[CreateIndexStatement vParent]
 {
     ColumnWithSortOrder vColumnWithSortOrder;
@@ -28281,6 +28510,15 @@ xmlCompressionOption returns [XmlCompressionOption vResult = FragmentFactory.Cre
                 UpdateTokenInfo(vResult, tRParen);
             }
         )?
+    ;
+
+semanticIndexVectorOption returns [IndexOption vResult = null]
+    :
+        {NextTokenMatches(CodeGenerationSupporter.Metric)}?
+        vResult=vectorMetricOption
+    |
+        {NextTokenMatches(CodeGenerationSupporter.Type)}?
+        vResult=vectorTypeOption
     ;
 
 vectorMetricOption returns [VectorMetricIndexOption vResult = FragmentFactory.CreateFragment<VectorMetricIndexOption>()]

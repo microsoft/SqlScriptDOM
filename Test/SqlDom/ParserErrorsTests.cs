@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using Microsoft.SqlServer.TransactSql.ScriptDom;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -4633,6 +4634,82 @@ select 1",
         }
 
         /// <summary>
+        /// Negative tests for CREATE SEMANTIC INDEX statement
+        /// </summary>
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void CreateSemanticIndexStatementErrorTest()
+        {
+            // Semantic Index syntax should not be supported in SQL Server versions prior to 180
+            ParserTestUtils.ErrorTest170("CREATE SEMANTIC INDEX idx1 ON dbo.t1 (col1)",
+                new ParserErrorInfo(7, "SQL46010", "SEMANTIC"));
+            ParserTestUtils.ErrorTest160("CREATE SEMANTIC INDEX idx1 ON dbo.t1 (col1)",
+                new ParserErrorInfo(7, "SQL46010", "SEMANTIC"));
+            ParserTestUtils.ErrorTest150("CREATE SEMANTIC INDEX idx1 ON dbo.t1 (col1)",
+                new ParserErrorInfo(7, "SQL46010", "SEMANTIC"));
+            ParserTestUtils.ErrorTest140("CREATE SEMANTIC INDEX idx1 ON dbo.t1 (col1)",
+                new ParserErrorInfo(7, "SQL46010", "SEMANTIC"));
+            ParserTestUtils.ErrorTest130("CREATE SEMANTIC INDEX idx1 ON dbo.t1 (col1)",
+                new ParserErrorInfo(7, "SQL46010", "SEMANTIC"));
+            ParserTestUtils.ErrorTest120("CREATE SEMANTIC INDEX idx1 ON dbo.t1 (col1)",
+                new ParserErrorInfo(7, "SQL46010", "SEMANTIC"));
+            ParserTestUtils.ErrorTest110("CREATE SEMANTIC INDEX idx1 ON dbo.t1 (col1)",
+                new ParserErrorInfo(7, "SQL46010", "SEMANTIC"));
+
+            // Test malformed syntax in TSql180
+            TSql180Parser parser180 = new TSql180Parser(true);
+
+            // Missing index name
+            ParserTestUtils.ErrorTest(parser180, "CREATE SEMANTIC INDEX ON dbo.t1 (col1)",
+                new ParserErrorInfo(22, "SQL46010", "ON"));
+
+            // Missing table name
+            ParserTestUtils.ErrorTest(parser180, "CREATE SEMANTIC INDEX idx1 ON (col1)",
+                new ParserErrorInfo(30, "SQL46010", "("));
+
+            // Missing column list
+            ParserTestUtils.ErrorTest(parser180, "CREATE SEMANTIC INDEX idx1 ON dbo.t1",
+                new ParserErrorInfo(36, "SQL46029"));
+
+            // Empty column list
+            ParserTestUtils.ErrorTest(parser180, "CREATE SEMANTIC INDEX idx1 ON dbo.t1 ()",
+                new ParserErrorInfo(38, "SQL46010", ")"));
+
+            // Invalid SEARCH_TYPE value
+            ParserTestUtils.ErrorTest(parser180, "CREATE SEMANTIC INDEX idx1 ON dbo.t1 (col1 SEARCH_TYPE=invalid)",
+                new ParserErrorInfo(55, "SQL46005", "HYBRID", "invalid"));
+
+            // Invalid CHUNK_USING option
+            ParserTestUtils.ErrorTest(parser180, "CREATE SEMANTIC INDEX idx1 ON dbo.t1 (col1 CHUNK_USING(BADOPT = 100))",
+                new ParserErrorInfo(55, "SQL46005", "OVERLAP", "BADOPT"));
+
+            // EXTERNAL_MODEL is required when SEARCH_TYPE is not specified (defaults to vector)
+            ParserTestUtils.ErrorTest(parser180, "CREATE SEMANTIC INDEX idx1 ON dbo.t1 (col1)",
+                new ParserErrorInfo(22, "SQL46144", "EXTERNAL_MODEL"));
+
+            // EXTERNAL_MODEL is required for vector columns
+            ParserTestUtils.ErrorTest(parser180, "CREATE SEMANTIC INDEX idx1 ON dbo.t1 (col1 SEARCH_TYPE = VECTOR)",
+                new ParserErrorInfo(22, "SQL46144", "EXTERNAL_MODEL"));
+
+            // EXTERNAL_MODEL is required for hybrid columns
+            ParserTestUtils.ErrorTest(parser180, "CREATE SEMANTIC INDEX idx1 ON dbo.t1 (col1 SEARCH_TYPE = HYBRID)",
+                new ParserErrorInfo(22, "SQL46144", "EXTERNAL_MODEL"));
+
+            // EXTERNAL_MODEL is required when at least one column is vector
+            ParserTestUtils.ErrorTest(parser180, "CREATE SEMANTIC INDEX idx1 ON dbo.t1 (col1 SEARCH_TYPE = FULLTEXT, col2 SEARCH_TYPE = VECTOR)",
+                new ParserErrorInfo(22, "SQL46144", "EXTERNAL_MODEL"));
+
+            // EXTERNAL_MODEL is required when at least one column has no SEARCH_TYPE (defaults to vector)
+            ParserTestUtils.ErrorTest(parser180, "CREATE SEMANTIC INDEX idx1 ON dbo.t1 (col1 SEARCH_TYPE = FULLTEXT, col2)",
+                new ParserErrorInfo(22, "SQL46144", "EXTERNAL_MODEL"));
+
+            // Multiple vector columns without EXTERNAL_MODEL
+            ParserTestUtils.ErrorTest(parser180, "CREATE SEMANTIC INDEX idx1 ON dbo.t1 (col1 SEARCH_TYPE = VECTOR, col2 SEARCH_TYPE = VECTOR)",
+                new ParserErrorInfo(22, "SQL46144", "EXTERNAL_MODEL"));
+        }
+
+        /// <summary>
         /// Check that the value of MAXDOP index option is within range
         /// </summary>
         [TestMethod]
@@ -7866,6 +7943,45 @@ WHEN NOT MATCHED BY SOURCE THEN DELETE OUTPUT inserted.*, deleted.*;";
             ParserTestUtils.ErrorTestFabricDW(
                 "SELECT AI_TRANSLATE('1', '2', '3')",
                 new ParserErrorInfo(28, "SQL46010", ","));
+        }
+
+        /// <summary>
+        /// Negative tests for CREATE/ALTER FUNCTION ... AS EXTERNAL FUNCTION syntax in Fabric DW.
+        /// </summary>
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void ExternalFunctionNegativeTestsFabricDW()
+        {
+            // Missing external name after EXTERNAL FUNCTION
+            ParserTestUtils.ErrorTestFabricDW(
+                "CREATE FUNCTION dbo.f AS EXTERNAL FUNCTION",
+                new ParserErrorInfo(42, "SQL46029"));
+
+            // Missing FUNCTION keyword after EXTERNAL
+            ParserTestUtils.ErrorTestFabricDW(
+                "CREATE FUNCTION dbo.f AS EXTERNAL mySet.myFn",
+                new ParserErrorInfo(34, "SQL46010", "mySet"));
+
+            // Three-part external name not allowed
+            ParserTestUtils.ErrorTestFabricDW(
+                "CREATE FUNCTION dbo.f AS EXTERNAL FUNCTION db.mySet.myFn",
+                new ParserErrorInfo(51, "SQL46010", "."));
+
+            // RETURNS without a data type
+            ParserTestUtils.ErrorTestFabricDW(
+                "CREATE FUNCTION dbo.f RETURNS AS EXTERNAL FUNCTION mySet.myFn",
+                new ParserErrorInfo(22, "SQL46010", "RETURNS"));
+
+            // ALTER: missing external name
+            ParserTestUtils.ErrorTestFabricDW(
+                "ALTER FUNCTION dbo.f AS EXTERNAL FUNCTION",
+                new ParserErrorInfo(41, "SQL46029"));
+
+            // CREATE OR ALTER: missing FUNCTION keyword after EXTERNAL
+            ParserTestUtils.ErrorTestFabricDW(
+                "CREATE OR ALTER FUNCTION dbo.f AS EXTERNAL mySet.myFn",
+                new ParserErrorInfo(43, "SQL46010", "mySet"));
         }
 
         /// <summary>
