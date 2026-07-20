@@ -17,9 +17,9 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
             GenerateSpaceAndIdentifier(CodeGenerationSupporter.Model);
             GenerateCreateExternalModelStatementBody(node);
         }
-        protected static Dictionary<ExternalModelTypeOptionKind, string> _externalModelTypeOptionKind = new Dictionary<ExternalModelTypeOptionKind, string>()
+        protected static Dictionary<ExternalModelTypeOption, string> _externalModelTypeOption = new Dictionary<ExternalModelTypeOption, string>()
         {
-            {ExternalModelTypeOptionKind.Embeddings, CodeGenerationSupporter.Embeddings}
+            {ExternalModelTypeOption.EMBEDDINGS, CodeGenerationSupporter.Embeddings}
         };
 
         protected void GenerateCreateExternalModelStatementBody(CreateExternalModelStatement node)
@@ -54,7 +54,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
             }
 
             // external model Model Type options
-            if (node.ModelType != null)
+            if (node.ModelTypeSpecification != null)
             {
                 if (!ifFirst)
                 {
@@ -62,7 +62,18 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
                 }
                 ifFirst = false;
                 NewLine();
-                GenerateFragmentIfNotNull(node.ModelType);
+                GenerateFragmentIfNotNull(node.ModelTypeSpecification);
+            }
+            else if (node.ModelType != null)
+            {
+                if (!ifFirst)
+                {
+                    GenerateSymbol(TSqlTokenType.Comma);
+                }
+                ifFirst = false;
+                NewLine();
+                string externalModelTypeOption = GetValueForEnumKey(_externalModelTypeOption, node.ModelType.Value);
+                GenerateNameEqualsValue(CodeGenerationSupporter.ModelType, externalModelTypeOption);
             }
 
             // external model name options
@@ -117,9 +128,9 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
             GenerateKeyword(TSqlTokenType.RightParenthesis);
         }
 
-        public override void ExplicitVisit(ExternalModelTypeOption node)
+        public override void ExplicitVisit(ExternalModelTypeSpecification node)
         {
-            string optionKindString = GetValueForEnumKey(_externalModelTypeOptionKind, node.OptionKind);
+            string optionKindString = GetValueForEnumKey(_externalModelTypeOption, node.OptionKind);
             GenerateNameEqualsValue(CodeGenerationSupporter.ModelType, optionKindString);
         }
     }

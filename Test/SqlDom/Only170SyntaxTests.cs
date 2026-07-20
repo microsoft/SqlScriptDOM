@@ -407,18 +407,24 @@ namespace SqlStudio.Tests.UTSqlScriptDom
             Assert.IsNotNull(fragment);
             
             // Collect all visited fragments using a custom visitor
-            var visitor = new ExternalModelTypeOptionVisitor();
+            var visitor = new ExternalModelTypeSpecificationVisitor();
             fragment.Accept(visitor);
             
             Assert.AreEqual(1, visitor.VisitedOptions.Count);
-            Assert.AreEqual(ExternalModelTypeOptionKind.Embeddings, visitor.VisitedOptions[0].OptionKind);
+            Assert.AreEqual(ExternalModelTypeOption.EMBEDDINGS, visitor.VisitedOptions[0].OptionKind);
+
+            // Legacy enum member must still be populated for backward compatibility
+            var createStatement = ((TSqlScript)fragment).Batches[0].Statements[0] as CreateExternalModelStatement;
+            Assert.IsNotNull(createStatement);
+            Assert.AreEqual(ExternalModelTypeOption.EMBEDDINGS, createStatement.ModelType);
+            Assert.IsNotNull(createStatement.ModelTypeSpecification);
         }
         
-        private class ExternalModelTypeOptionVisitor : TSqlFragmentVisitor
+        private class ExternalModelTypeSpecificationVisitor : TSqlFragmentVisitor
         {
-            public List<ExternalModelTypeOption> VisitedOptions { get; } = new List<ExternalModelTypeOption>();
+            public List<ExternalModelTypeSpecification> VisitedOptions { get; } = new List<ExternalModelTypeSpecification>();
             
-            public override void Visit(ExternalModelTypeOption node)
+            public override void Visit(ExternalModelTypeSpecification node)
             {
                 VisitedOptions.Add(node);
                 base.Visit(node);

@@ -10,16 +10,15 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
 #pragma warning disable 1591
 
     /// <summary>
-    /// The enumeration specifies the external model type
-    /// Currently, we support Embeddings only.
+    /// The enumeration specifies the external model type.
+    /// Currently, we support EMBEDDINGS only.
     /// </summary>
-    public enum ExternalModelTypeOptionKind
+    public enum ExternalModelTypeOption
     {
         /// <summary>
         /// MODEL_TYPE = EMBEDDINGS
         /// </summary>
-        Embeddings = 0,
-
+        EMBEDDINGS = 0,
     }
 
 #pragma warning restore 1591

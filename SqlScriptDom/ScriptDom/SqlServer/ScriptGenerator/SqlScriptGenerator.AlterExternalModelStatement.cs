@@ -53,7 +53,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
             }
 
             // external model Model Type options
-            if (node.ModelType != null)
+            if (node.ModelTypeSpecification != null)
             {
                 if (!ifFirst)
                 {
@@ -61,7 +61,18 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
                 }
                 ifFirst = false;
                 NewLine();
-                GenerateFragmentIfNotNull(node.ModelType);
+                GenerateFragmentIfNotNull(node.ModelTypeSpecification);
+            }
+            else if (node.ModelType != null)
+            {
+                if (!ifFirst)
+                {
+                    GenerateSymbol(TSqlTokenType.Comma);
+                }
+                ifFirst = false;
+                NewLine();
+                string externalModelTypeOption = GetValueForEnumKey(_externalModelTypeOption, node.ModelType.Value);
+                GenerateNameEqualsValue(CodeGenerationSupporter.ModelType, externalModelTypeOption);
             }
 
             // external model name options
