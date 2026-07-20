@@ -8202,5 +8202,35 @@ WHEN NOT MATCHED BY SOURCE THEN DELETE OUTPUT inserted.*, deleted.*;";
                 "SELECT TOP 10 WITH TIES WITH APPROXIMATE * FROM MyTable ORDER BY id;",
                 new ParserErrorInfo(24, "SQL46010", "WITH"));
         }
+
+        /// <summary>
+        /// Negative test for Fabric Query Hints - syntax error (TSql170)
+        /// Verifies malformed hints produce expected parser errors
+        /// </summary>
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void FabricQueryHintsErrorTest170()
+        {
+            // Missing NODE keyword in FORCE SINGLE NODE PLAN
+            ParserTestUtils.ErrorTest170(
+                "SELECT OrderDateKey FROM FactInternetSales OPTION (FORCE SINGLE PLAN);",
+                new ParserErrorInfo(64, "SQL46010", "PLAN"));
+
+            // Missing PLAN keyword in FORCE DISTRIBUTED PLAN
+            ParserTestUtils.ErrorTest170(
+                "SELECT OrderDateKey FROM FactInternetSales OPTION (FORCE DISTRIBUTED);",
+                new ParserErrorInfo(68, "SQL46010", ")"));
+
+            // Non-string literal in FOR TIMESTAMP AS OF
+            ParserTestUtils.ErrorTest170(
+                "SELECT OrderDateKey FROM FactInternetSales OPTION (FOR TIMESTAMP AS OF 12345);",
+                new ParserErrorInfo(71, "SQL46010", "12345"));
+
+            // Missing OF keyword in FOR TIMESTAMP AS OF
+            ParserTestUtils.ErrorTest170(
+                "SELECT OrderDateKey FROM FactInternetSales OPTION (FOR TIMESTAMP AS '2024-03-13T19:39:35.28');",
+                new ParserErrorInfo(68, "SQL46010", "'2024-03-13T19:39:35.28'"));
+        }
     }
 }
