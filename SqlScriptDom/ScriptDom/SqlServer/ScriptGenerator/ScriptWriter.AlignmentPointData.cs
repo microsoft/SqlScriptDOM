@@ -35,6 +35,16 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
             public Int32 Offset { get; set; }
             public String Name { get; private set; }
 
+            // Tab-layout data (only used when IndentationMode is Tabs). TabTarget is the column the
+            // content following this alignment point is snapped to (a tab stop); TabShift is how far
+            // that content is shifted right versus the space layout; MaxLeftTabShift accumulates the
+            // TabShift of this point's left neighbours; and AbsorbsSeparator is set when this point is
+            // immediately followed by a single separator space that the tab run replaces.
+            public Int32 TabTarget { get; set; }
+            public Int32 TabShift { get; set; }
+            public Int32 MaxLeftTabShift { get; set; }
+            public Boolean AbsorbsSeparator { get; set; }
+
             public void AddLeftPoint(AlignmentPointData ap, Int32 width)
             {
                 Int32 currentWidth;

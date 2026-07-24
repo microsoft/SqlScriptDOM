@@ -64,6 +64,39 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
         }
 
         /// <summary>
+        /// Retrieves a version of the specified identifier string, in the identifier casing format specified.
+        /// </summary>
+        /// <param name="str">The identifier string to get a specially cased version of</param>
+        /// <param name="casing">The identifier casing method to use</param>
+        /// <returns>A version of the string in the casing format specified in <paramref name="casing"/></returns>
+        [SuppressMessage("Microsoft.Globalization", "CA1308:NormalizeStringsToUppercase")]
+        public static string GetCasedString(string str, IdentifierCasing casing)
+        {
+            // Empty (or null) values are returned unchanged: there is nothing to recase, and PascalCase
+            // would otherwise index str[0] and throw during script generation.
+            if (string.IsNullOrEmpty(str))
+            {
+                return str;
+            }
+
+            switch (casing)
+            {
+                case IdentifierCasing.Preserve:
+                    return str;
+                case IdentifierCasing.Lowercase:
+                    return str.ToLowerInvariant();
+                case IdentifierCasing.Uppercase:
+                    return str.ToUpperInvariant();
+                case IdentifierCasing.PascalCase:
+                    return GetPascalCase(str);
+                default:
+                    Debug.Fail("Invalid IdentifierCasing value");
+                    break;
+            }
+            return str;
+        }
+
+        /// <summary>
         /// Retrieves a Pascal Cased version of the string
         /// </summary>
         /// <param name="str">The string to pascal case</param>
@@ -185,6 +218,21 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
         {
             // Build the whitespace
             String ws = new String(' ', count);
+
+            // Create a whitespace token and add it to the layout table
+            return new TSqlParserToken(TSqlTokenType.WhiteSpace, ws);
+        }
+
+        /// <summary>
+        /// Create a whitespace token consisting of tab characters (used for indentation when
+        /// <see cref="SqlScriptGeneratorOptions.IndentationMode"/> is <see cref="IndentationMode.Tabs"/>).
+        /// </summary>
+        /// <param name="count">number of tab characters</param>
+        /// <returns></returns>
+        public static TSqlParserToken CreateTabToken(Int32 count)
+        {
+            // Build the tab whitespace
+            String ws = new String('\t', count);
 
             // Create a whitespace token and add it to the layout table
             return new TSqlParserToken(TSqlTokenType.WhiteSpace, ws);

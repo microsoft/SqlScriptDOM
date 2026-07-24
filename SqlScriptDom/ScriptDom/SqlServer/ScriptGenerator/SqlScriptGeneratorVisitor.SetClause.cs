@@ -33,15 +33,63 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
                 Indent();
             }
 
+            bool leadingComma = _options.MultilineSetClauseItems && _options.CommaPlacement == CommaPlacement.Leading;
+
+            if (!leadingComma)
+            {
+                // Default / trailing behavior: unchanged from the original implementation so the
+                // generated output is identical when CommaPlacement is Trailing (the default).
+                GenerateKeyword(TSqlTokenType.Set);
+
+                MarkClauseBodyAlignmentWhenNecessary(true, alignmentPoint);
+
+                GenerateSpace();
+
+                AlignmentPoint setItems = new AlignmentPoint();
+                MarkAndPushAlignmentPoint(setItems);
+                GenerateCommaSeparatedList(setClauses, _options.MultilineSetClauseItems);
+                PopAlignmentPoint();
+                return;
+            }
+
+            // Leading comma placement (opt-in). Anchor the newlines produced between SET items at
+            // the start of the SET clause (rather than at the item column). This lets leading
+            // commas be right-aligned so they end just before the aligned item column, mirroring
+            // the SELECT list, while the item column itself is established by the setItems
+            // alignment point marked on every item. Pushing a single alignment point also keeps
+            // the '=' sign alignment points (resolved by name within this scope) shared across all
+            // items.
+            AlignmentPoint clauseStart = new AlignmentPoint();
+            MarkAndPushAlignmentPoint(clauseStart);
+
             GenerateKeyword(TSqlTokenType.Set);
 
             MarkClauseBodyAlignmentWhenNecessary(true, alignmentPoint);
 
             GenerateSpace();
 
-            AlignmentPoint setItems = new AlignmentPoint();
-            MarkAndPushAlignmentPoint(setItems);
-            GenerateCommaSeparatedList(setClauses, _options.MultilineSetClauseItems);
+            AlignmentPoint items = new AlignmentPoint();
+            bool firstItem = true;
+            foreach (SetClause setClause in setClauses)
+            {
+                if (firstItem)
+                {
+                    Mark(items);
+                    firstItem = false;
+                }
+                else
+                {
+                    NewLine();
+                    GenerateRightAlignedCommaSeparator();
+
+                    // Each multi-line item starts a new line, so re-mark the item alignment point
+                    // to keep continuation items aligned under the first item.
+                    Mark(items);
+                }
+
+                GenerateFragmentIfNotNull(setClause);
+            }
+
             PopAlignmentPoint();
         }
 

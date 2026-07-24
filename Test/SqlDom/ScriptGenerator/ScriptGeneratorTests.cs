@@ -635,6 +635,124 @@ namespace SqlStudio.Tests.UTSqlScriptDom
         [TestMethod]
         [Priority(0)]
         [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestPreserveCommentsDoesNotBreakColumnDefinitionAlignment()
+        {
+            // Regression: enabling PreserveComments must not defeat AlignColumnDefinitionFields.
+            // When there are no comments in the input, the generated script must be identical
+            // whether PreserveComments is on or off, and the column fields must stay aligned.
+            const string sql =
+                "CREATE TABLE dbo.t (id INT NOT NULL, long_column_name DECIMAL(10, 2) NULL, c VARCHAR(20) NOT NULL);";
+
+            const string expected =
+@"CREATE TABLE dbo.t (
+    id               INT             NOT NULL,
+    long_column_name DECIMAL (10, 2) NULL,
+    c                VARCHAR (20)    NOT NULL
+);";
+
+            // Aligned output must be produced when PreserveComments is enabled (AssertGenerated also
+            // verifies the generated script reparses without errors)...
+            ScriptGeneratorTestHelper.AssertGenerated(
+                sql,
+                new SqlScriptGeneratorOptions { AlignColumnDefinitionFields = true, PreserveComments = true },
+                expected);
+
+            // ...and it must match the output produced with PreserveComments disabled (no comments present).
+            ScriptGeneratorTestHelper.AssertGenerated(
+                sql,
+                new SqlScriptGeneratorOptions { AlignColumnDefinitionFields = true, PreserveComments = false },
+                expected);
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestPreserveCommentsKeepsColumnDefinitionAlignmentWithTrailingComments()
+        {
+            // Each column has a trailing '--' comment. With PreserveComments enabled the comments
+            // must be preserved and the column definition fields must remain aligned.
+            const string sql =
+@"CREATE TABLE dbo.t (
+    id INT NOT NULL, -- the identifier
+    long_column_name DECIMAL(10, 2) NULL, -- a decimal value
+    c VARCHAR(20) NOT NULL -- a string
+);";
+
+            const string expected =
+@"CREATE TABLE dbo.t (
+    id               INT             NOT NULL, -- the identifier
+    long_column_name DECIMAL (10, 2) NULL, -- a decimal value
+    c                VARCHAR (20)    NOT NULL -- a string
+);";
+
+            // AssertGenerated also verifies the generated script (comments included) reparses cleanly.
+            ScriptGeneratorTestHelper.AssertGenerated(
+                sql,
+                new SqlScriptGeneratorOptions { AlignColumnDefinitionFields = true, PreserveComments = true },
+                expected);
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestPreserveCommentsColumnAlignmentIsIsolatedPerTable()
+        {
+            // Two CREATE TABLE column lists are rendered in the same enclosing scope. Each table's
+            // column fields must align only against that table's own columns; the wide column names
+            // in the first table must not widen the (independently aligned) second table.
+            const string sql =
+@"CREATE TABLE dbo.wide (a_very_long_column_name INT NOT NULL, b INT NULL);
+CREATE TABLE dbo.t (x INT NOT NULL, y INT NULL);";
+
+            const string expected =
+@"CREATE TABLE dbo.wide (
+    a_very_long_column_name INT NOT NULL,
+    b                       INT NULL
+);
+
+CREATE TABLE dbo.t (
+    x INT NOT NULL,
+    y INT NULL
+);";
+
+            ScriptGeneratorTestHelper.AssertGenerated(
+                sql,
+                new SqlScriptGeneratorOptions { AlignColumnDefinitionFields = true, PreserveComments = true },
+                expected);
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestPreserveCommentsMultilineViewColumnsWithEmptyAlignmentScope()
+        {
+            // CREATE VIEW generates its multiline column list without first pushing an enclosing
+            // alignment point, so the list-level named scope is pushed while the newline-restoration
+            // stack is empty. This exercises the null newline-point path (PushNamedAlignmentScope
+            // reusing "no current point", and the null guard in NewLine): it must not throw and must
+            // still emit each column on its own line with PreserveComments enabled.
+            const string sql = "CREATE VIEW dbo.v (col1, long_column_name, c) AS SELECT 1, 2, 3;";
+
+            const string expected =
+@"CREATE VIEW dbo.v (
+    col1,
+    long_column_name,
+    c
+)
+AS
+SELECT 1,
+       2,
+       3;";
+
+            ScriptGeneratorTestHelper.AssertGenerated(
+                sql,
+                new SqlScriptGeneratorOptions { MultilineViewColumnsList = true, PreserveComments = true },
+                expected);
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void TestPreserveCommentsEnabled_MultipleStatements()
         {
             // Test comments between multiple statements
@@ -1219,18 +1337,56 @@ CROSS JOIN products p;";
             Assert.AreEqual(0, reparseErrors.Count,
                 "Generated SQL should reparse without errors. Actual: " + generatedSql);
 
-            // Comments preceding their JOIN in source should appear before the
-            // matching JOIN keyword in output where a natural newline separates
-            // the prior clause from the next JOIN.
+            // CRITICAL ASSERTIONS: Comments must appear BEFORE their JOIN keywords
+            // and NOT be on the same line as the previous table reference
+            
+            // Find the comment for INNER JOIN
             int innerJoinCommentIdx = generatedSql.IndexOf("-- Join to get user orders");
             int innerJoinIdx = generatedSql.IndexOf("INNER JOIN", StringComparison.OrdinalIgnoreCase);
-            int leftJoinCommentIdx = generatedSql.IndexOf("/* Left join for optional address */");
-            int leftJoinIdx = generatedSql.IndexOf("LEFT", StringComparison.OrdinalIgnoreCase);
-
+            Assert.IsTrue(innerJoinCommentIdx >= 0, "INNER JOIN comment must exist");
             Assert.IsTrue(innerJoinCommentIdx < innerJoinIdx, 
-                $"INNER JOIN comment should appear before INNER JOIN. Comment at {innerJoinCommentIdx}, JOIN at {innerJoinIdx}");
+                $"INNER JOIN comment MUST appear before INNER JOIN keyword. Comment at {innerJoinCommentIdx}, JOIN at {innerJoinIdx}. Generated SQL:\n{generatedSql}");
+            
+            // Ensure comment is on its own line BEFORE INNER JOIN, not trailing after "users u"
+            string beforeInnerJoinComment = generatedSql.Substring(0, innerJoinCommentIdx);
+            int lastNewlineBeforeComment = Math.Max(
+                beforeInnerJoinComment.LastIndexOf("\n"),
+                beforeInnerJoinComment.LastIndexOf("\r")
+            );
+            string lineBeforeComment = lastNewlineBeforeComment >= 0 
+                ? beforeInnerJoinComment.Substring(lastNewlineBeforeComment).Trim()
+                : beforeInnerJoinComment.Trim();
+            
+            Assert.IsFalse(lineBeforeComment.Contains("users") && lineBeforeComment.Contains("--"),
+                $"Comment should NOT be trailing on the 'users u' line. Line before comment: '{lineBeforeComment}'. Generated SQL:\n{generatedSql}");
+            
+            // Verify there's a newline between the comment and INNER JOIN
+            string betweenCommentAndJoin = generatedSql.Substring(
+                innerJoinCommentIdx + "-- Join to get user orders".Length,
+                innerJoinIdx - (innerJoinCommentIdx + "-- Join to get user orders".Length)
+            );
+            Assert.IsTrue(betweenCommentAndJoin.Contains("\n") || betweenCommentAndJoin.Contains("\r"),
+                $"There must be a newline between comment and INNER JOIN. Text between: '{betweenCommentAndJoin}'. Generated SQL:\n{generatedSql}");
+            
+            // Same checks for LEFT JOIN comment
+            int leftJoinCommentIdx = generatedSql.IndexOf("/* Left join for optional address */");
+            int leftJoinIdx = generatedSql.IndexOf("LEFT JOIN", StringComparison.OrdinalIgnoreCase);
+            Assert.IsTrue(leftJoinCommentIdx >= 0, "LEFT JOIN comment must exist");
             Assert.IsTrue(leftJoinCommentIdx < leftJoinIdx, 
-                $"LEFT JOIN comment should appear before LEFT JOIN. Comment at {leftJoinCommentIdx}, JOIN at {leftJoinIdx}");
+                $"LEFT JOIN comment MUST appear before LEFT JOIN keyword. Comment at {leftJoinCommentIdx}, JOIN at {leftJoinIdx}. Generated SQL:\n{generatedSql}");
+            
+            // Verify comment is on its own line, not trailing after previous JOIN
+            string beforeLeftJoinComment = generatedSql.Substring(0, leftJoinCommentIdx);
+            int lastNewlineBeforeLeftComment = Math.Max(
+                beforeLeftJoinComment.LastIndexOf("\n"),
+                beforeLeftJoinComment.LastIndexOf("\r")
+            );
+            string lineBeforeLeftComment = lastNewlineBeforeLeftComment >= 0 
+                ? beforeLeftJoinComment.Substring(lastNewlineBeforeLeftComment).Trim()
+                : beforeLeftJoinComment.Trim();
+            
+            Assert.IsFalse(lineBeforeLeftComment.Contains("JOIN") && lineBeforeLeftComment.Contains("/*"),
+                $"Comment should NOT be trailing on the previous JOIN line. Line before comment: '{lineBeforeLeftComment}'. Generated SQL:\n{generatedSql}");
         }
 
         [TestMethod]
@@ -1409,16 +1565,42 @@ SELECT id, name FROM archived_users;";
             Assert.IsTrue(generatedSql.Contains("/* Combine with archived users */"), 
                 "UNION block comment should be preserved. Actual: " + generatedSql);
             
-            // Verify position: comments should appear at correct positions relative to queries
+            // CRITICAL ASSERTIONS: Comments must appear BEFORE UNION keyword
+            // and NOT be on the same line as the previous SELECT statement
+            
             int firstQueryCommentIdx = generatedSql.IndexOf("-- First query: active users");
             int firstSelectIdx = generatedSql.IndexOf("SELECT", StringComparison.OrdinalIgnoreCase);
             int unionCommentIdx = generatedSql.IndexOf("/* Combine with archived users */");
             int unionIdx = generatedSql.IndexOf("UNION", StringComparison.OrdinalIgnoreCase);
             
+            Assert.IsTrue(firstQueryCommentIdx >= 0, "First query comment must exist");
             Assert.IsTrue(firstQueryCommentIdx < firstSelectIdx, 
-                $"First query comment should appear before first SELECT. Comment at {firstQueryCommentIdx}, SELECT at {firstSelectIdx}");
+                $"First query comment MUST appear before first SELECT. Comment at {firstQueryCommentIdx}, SELECT at {firstSelectIdx}. Generated SQL:\n{generatedSql}");
+            
+            Assert.IsTrue(unionCommentIdx >= 0, "UNION comment must exist");
             Assert.IsTrue(unionCommentIdx < unionIdx, 
-                $"UNION comment should appear before UNION. Comment at {unionCommentIdx}, UNION at {unionIdx}");
+                $"UNION comment MUST appear before UNION keyword. Comment at {unionCommentIdx}, UNION at {unionIdx}. Generated SQL:\n{generatedSql}");
+            
+            // Ensure UNION comment is on its own line BEFORE UNION, not trailing after previous SELECT
+            string beforeUnionComment = generatedSql.Substring(0, unionCommentIdx);
+            int lastNewlineBeforeUnionComment = Math.Max(
+                beforeUnionComment.LastIndexOf("\n"),
+                beforeUnionComment.LastIndexOf("\r")
+            );
+            string lineBeforeUnionComment = lastNewlineBeforeUnionComment >= 0 
+                ? beforeUnionComment.Substring(lastNewlineBeforeUnionComment).Trim()
+                : beforeUnionComment.Trim();
+            
+            Assert.IsFalse(lineBeforeUnionComment.Contains("SELECT") && lineBeforeUnionComment.Contains("/*"),
+                $"UNION comment should NOT be trailing on the previous SELECT line. Line before comment: '{lineBeforeUnionComment}'. Generated SQL:\n{generatedSql}");
+            
+            // Verify there's a newline between the comment and UNION keyword
+            string betweenCommentAndUnion = generatedSql.Substring(
+                unionCommentIdx + "/* Combine with archived users */".Length,
+                unionIdx - (unionCommentIdx + "/* Combine with archived users */".Length)
+            );
+            Assert.IsTrue(betweenCommentAndUnion.Contains("\n") || betweenCommentAndUnion.Contains("\r"),
+                $"There must be a newline between comment and UNION. Text between: '{betweenCommentAndUnion}'. Generated SQL:\n{generatedSql}");
         }
 
         [TestMethod]
@@ -1735,6 +1917,87 @@ SELECT 2 -- second comment";
         [TestMethod]
         [Priority(0)]
         [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestPreserveCommentsEnabled_MultipleCommentsInTableDefinition()
+        {
+            var sqlWithComments = @"CREATE TABLE dbo.VETask 
+(
+Id INT,
+TaskNo INT,
+Status INT,
+--IsActive BIT NOT NULL CONSTRAINT DF_VETask_IsActive DEFAULT 1
+CONSTRAINT PK_VETask PRIMARY KEY CLUSTERED (Id),
+--CONSTRAINT UQ_VETask_TaskNo UNIQUE (TaskNo)
+INDEX IX_VETask_Status NONCLUSTERED (Status)
+);";
+            var parser = new TSql170Parser(true);
+            var fragment = parser.Parse(new StringReader(sqlWithComments), out var errors);
+
+            Assert.AreEqual(0, errors.Count, "Input SQL should parse without errors");
+
+            var generatorOptions = new SqlScriptGeneratorOptions
+            {
+                PreserveComments = true
+            };
+            var generator = new Sql170ScriptGenerator(generatorOptions);
+            generator.GenerateScript(fragment, out var generatedSql);
+
+            // CRITICAL ASSERTIONS: Comments must NOT merge with previous lines
+            // and CONSTRAINT must NOT merge with "Status INT" line
+            
+            // 1. Comment should NOT be trailing on Status INT line
+            Assert.IsFalse(generatedSql.Contains("Status INT --IsActive"), 
+                "Comment should NOT be trailing on Status INT line (no comma)");
+            Assert.IsFalse(generatedSql.Contains("Status INT, --IsActive"),
+                "Comment should NOT be trailing on Status INT line (with comma)");
+            Assert.IsFalse(generatedSql.Contains("Status INT,  --IsActive"),
+                "Comment should NOT be trailing on Status INT line (with comma and space)");
+            
+            // 2. CONSTRAINT must NOT be on the same line as Status INT
+            Assert.IsFalse(generatedSql.Contains("Status INT CONSTRAINT"),
+                $"CONSTRAINT keyword must NOT merge with Status INT line. Generated SQL:\n{generatedSql}");
+            Assert.IsFalse(generatedSql.Contains("Status INT, CONSTRAINT"),
+                $"CONSTRAINT keyword must NOT be on same line as Status INT (with comma). Generated SQL:\n{generatedSql}");
+                
+            // 3. Comment must appear BEFORE CONSTRAINT on its own line
+            int commentIdx = generatedSql.IndexOf("--IsActive BIT NOT NULL");
+            int constraintIdx = generatedSql.IndexOf("CONSTRAINT PK_VETask", StringComparison.OrdinalIgnoreCase);
+            
+            Assert.IsTrue(commentIdx >= 0, "Comment for IsActive column must exist");
+            Assert.IsTrue(constraintIdx >= 0, "CONSTRAINT PK_VETask must exist");
+            Assert.IsTrue(commentIdx < constraintIdx,
+                $"Comment must appear BEFORE CONSTRAINT. Comment at {commentIdx}, CONSTRAINT at {constraintIdx}. Generated SQL:\n{generatedSql}");
+            
+            // 4. Verify Status INT is on a separate line from the comment
+            int statusIdx = generatedSql.IndexOf("Status INT", StringComparison.OrdinalIgnoreCase);
+            Assert.IsTrue(statusIdx >= 0, "Status INT column must exist");
+            
+            // Extract the line containing "Status INT"
+            int lineStartIdx = statusIdx;
+            while (lineStartIdx > 0 && generatedSql[lineStartIdx - 1] != '\n' && generatedSql[lineStartIdx - 1] != '\r')
+            {
+                lineStartIdx--;
+            }
+            int lineEndIdx = statusIdx;
+            while (lineEndIdx < generatedSql.Length && generatedSql[lineEndIdx] != '\n' && generatedSql[lineEndIdx] != '\r')
+            {
+                lineEndIdx++;
+            }
+            string statusLine = generatedSql.Substring(lineStartIdx, lineEndIdx - lineStartIdx).Trim();
+            
+            Assert.IsFalse(statusLine.Contains("--"),
+                $"Status INT line must NOT contain the comment. Actual line: '{statusLine}'. Generated SQL:\n{generatedSql}");
+            Assert.IsFalse(statusLine.Contains("CONSTRAINT"),
+                $"Status INT line must NOT contain CONSTRAINT keyword. Actual line: '{statusLine}'. Generated SQL:\n{generatedSql}");
+
+            var reparser = new TSql170Parser(true);
+            reparser.Parse(new StringReader(generatedSql), out var reparseErrors);
+            Assert.AreEqual(0, reparseErrors.Count, $"Generated SQL must reparse without errors. Generated SQL:\n{generatedSql}");
+        }
+
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void TestPreserveComments_SingleLineCommentsInsideIfBeginEndBlock()
         {
             // Real-world pattern from sql-docs IF/BEGIN/END examples: '--'
@@ -1980,6 +2243,954 @@ SELECT 2 -- second comment";
             var reparser = new TSql170Parser(true);
             reparser.Parse(new StringReader(generatedSql), out var reparseErrors);
             Assert.AreEqual(0, reparseErrors.Count, "Generated SQL must reparse. Actual: " + generatedSql);
+        }
+
+        #endregion
+
+        #region CommaPlacement
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestCommaPlacementDefaultIsTrailing()
+        {
+            Assert.AreEqual(CommaPlacement.Trailing, new SqlScriptGeneratorOptions().CommaPlacement);
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestCommaPlacementLeadingSelectList()
+        {
+            var sql = "SELECT a, b, c FROM t;";
+            var parser = new TSql170Parser(true);
+            var fragment = parser.Parse(new StringReader(sql), out var errors);
+            Assert.AreEqual(0, errors.Count);
+
+            var generator = new Sql170ScriptGenerator(new SqlScriptGeneratorOptions
+            {
+                CommaPlacement = CommaPlacement.Leading
+            });
+            generator.GenerateScript(fragment, out var generated);
+
+            // Leading comma style for a keyword-aligned list: the columns stay aligned with the
+            // first element and each comma is placed two columns before them.
+            string expected =
+                "SELECT a" + Environment.NewLine +
+                "     , b" + Environment.NewLine +
+                "     , c" + Environment.NewLine +
+                "FROM   t;" + Environment.NewLine + Environment.NewLine;
+            Assert.AreEqual(expected, generated);
+
+            var reparser = new TSql170Parser(true);
+            reparser.Parse(new StringReader(generated), out var reErrors);
+            Assert.AreEqual(0, reErrors.Count, "Generated SQL must reparse. Actual:\n" + generated);
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestCommaPlacementTrailingSelectList()
+        {
+            var sql = "SELECT a, b, c FROM t;";
+            var parser = new TSql170Parser(true);
+            var fragment = parser.Parse(new StringReader(sql), out var errors);
+            Assert.AreEqual(0, errors.Count);
+
+            var generator = new Sql170ScriptGenerator(new SqlScriptGeneratorOptions
+            {
+                CommaPlacement = CommaPlacement.Trailing
+            });
+            generator.GenerateScript(fragment, out var generated);
+
+            // Trailing comma style (default): the comma is placed at the end of each line.
+            string expected =
+                "SELECT a," + Environment.NewLine +
+                "       b," + Environment.NewLine +
+                "       c" + Environment.NewLine +
+                "FROM   t;" + Environment.NewLine + Environment.NewLine;
+            Assert.AreEqual(expected, generated);
+
+            var reparser = new TSql170Parser(true);
+            reparser.Parse(new StringReader(generated), out var reErrors);
+            Assert.AreEqual(0, reErrors.Count, "Generated SQL must reparse. Actual:\n" + generated);
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestCommaPlacementLeadingParenthesizedList()
+        {
+            var sql = "CREATE TABLE t (a INT, b INT, c INT);";
+            var parser = new TSql170Parser(true);
+            var fragment = parser.Parse(new StringReader(sql), out var errors);
+            Assert.AreEqual(0, errors.Count);
+
+            var generator = new Sql170ScriptGenerator(new SqlScriptGeneratorOptions
+            {
+                CommaPlacement = CommaPlacement.Leading
+            });
+            generator.GenerateScript(fragment, out var generated);
+
+            // Leading comma style in a parenthesized (CREATE TABLE) column list.
+            // Elements stay at the list indentation level (4); the comma is indented two
+            // characters fewer (column 2), per the CommaPlacement=Leading rule.
+            string expected =
+                "CREATE TABLE t (" + Environment.NewLine +
+                "    a INT" + Environment.NewLine +
+                "  , b INT" + Environment.NewLine +
+                "  , c INT" + Environment.NewLine +
+                ");" + Environment.NewLine + Environment.NewLine;
+            Assert.AreEqual(expected, generated);
+
+            var reparser = new TSql170Parser(true);
+            reparser.Parse(new StringReader(generated), out var reErrors);
+            Assert.AreEqual(0, reErrors.Count, "Generated SQL must reparse. Actual:\n" + generated);
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestCommaPlacementTrailingParenthesizedList()
+        {
+            var sql = "CREATE TABLE t (a INT, b INT, c INT);";
+            var parser = new TSql170Parser(true);
+            var fragment = parser.Parse(new StringReader(sql), out var errors);
+            Assert.AreEqual(0, errors.Count);
+
+            var generator = new Sql170ScriptGenerator(new SqlScriptGeneratorOptions
+            {
+                CommaPlacement = CommaPlacement.Trailing
+            });
+            generator.GenerateScript(fragment, out var generated);
+
+            // Trailing comma style (default) in a parenthesized (CREATE TABLE) column list:
+            // each comma follows the element on the same line and the elements stay at the
+            // list indentation level (4).
+            string expected =
+                "CREATE TABLE t (" + Environment.NewLine +
+                "    a INT," + Environment.NewLine +
+                "    b INT," + Environment.NewLine +
+                "    c INT" + Environment.NewLine +
+                ");" + Environment.NewLine + Environment.NewLine;
+            Assert.AreEqual(expected, generated);
+
+            var reparser = new TSql170Parser(true);
+            reparser.Parse(new StringReader(generated), out var reErrors);
+            Assert.AreEqual(0, reErrors.Count, "Generated SQL must reparse. Actual:\n" + generated);
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestCommaPlacementLeadingInsertTargets()
+        {
+            // The INSERT column target list is always emitted as a single-line parenthesized
+            // list (via GenerateParenthesisedCommaSeparatedList), and CommaPlacement only affects
+            // multi-line lists. MultilineInsertTargetsList is not consumed by the INSERT visitor,
+            // so the targets stay on one line and CommaPlacement = Leading has no visual effect:
+            // the output is identical to the trailing case below.
+            var sql = "INSERT INTO t (a, b, c) VALUES (1, 2, 3);";
+            var parser = new TSql170Parser(true);
+            var fragment = parser.Parse(new StringReader(sql), out var errors);
+            Assert.AreEqual(0, errors.Count);
+
+            var generator = new Sql170ScriptGenerator(new SqlScriptGeneratorOptions
+            {
+                CommaPlacement = CommaPlacement.Leading,
+                MultilineInsertTargetsList = true
+            });
+            generator.GenerateScript(fragment, out var generated);
+
+            string expected =
+                "INSERT  INTO t (a, b, c)" + Environment.NewLine +
+                "VALUES        (1, 2, 3);" + Environment.NewLine + Environment.NewLine;
+            Assert.AreEqual(expected, generated);
+
+            var reparser = new TSql170Parser(true);
+            reparser.Parse(new StringReader(generated), out var reErrors);
+            Assert.AreEqual(0, reErrors.Count, "Generated SQL must reparse. Actual:\n" + generated);
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestCommaPlacementTrailingInsertTargets()
+        {
+            // Same output as the leading case: because the INSERT target list renders on a
+            // single line (CommaPlacement only affects multi-line lists, and
+            // MultilineInsertTargetsList is not consumed here), leading and trailing placement
+            // produce identical text.
+            var sql = "INSERT INTO t (a, b, c) VALUES (1, 2, 3);";
+            var parser = new TSql170Parser(true);
+            var fragment = parser.Parse(new StringReader(sql), out var errors);
+            Assert.AreEqual(0, errors.Count);
+
+            var generator = new Sql170ScriptGenerator(new SqlScriptGeneratorOptions
+            {
+                CommaPlacement = CommaPlacement.Trailing,
+                MultilineInsertTargetsList = true
+            });
+            generator.GenerateScript(fragment, out var generated);
+
+            string expected =
+                "INSERT  INTO t (a, b, c)" + Environment.NewLine +
+                "VALUES        (1, 2, 3);" + Environment.NewLine + Environment.NewLine;
+            Assert.AreEqual(expected, generated);
+
+            var reparser = new TSql170Parser(true);
+            reparser.Parse(new StringReader(generated), out var reErrors);
+            Assert.AreEqual(0, reErrors.Count, "Generated SQL must reparse. Actual:\n" + generated);
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestCommaPlacementLeadingInsertSources()
+        {
+            // The INSERT source (VALUES) row list is a multi-line comma-separated list, so
+            // CommaPlacement = Leading places each continuation row's comma at the start of its
+            // line. (The rows are not aligned under the first row: this list is emitted via the
+            // newline comma-list path, so continuation rows begin at column 0.)
+            var sql = "INSERT INTO t (a, b, c) VALUES (1, 2, 3), (4, 5, 6), (7, 8, 9);";
+            var parser = new TSql170Parser(true);
+            var fragment = parser.Parse(new StringReader(sql), out var errors);
+            Assert.AreEqual(0, errors.Count);
+
+            var generator = new Sql170ScriptGenerator(new SqlScriptGeneratorOptions
+            {
+                CommaPlacement = CommaPlacement.Leading,
+                MultilineInsertSourcesList = true
+            });
+            generator.GenerateScript(fragment, out var generated);
+
+            string expected =
+                "INSERT  INTO t (a, b, c)" + Environment.NewLine +
+                "VALUES        (1, 2, 3)" + Environment.NewLine +
+                ", (4, 5, 6)" + Environment.NewLine +
+                ", (7, 8, 9);" + Environment.NewLine + Environment.NewLine;
+            Assert.AreEqual(expected, generated);
+
+            var reparser = new TSql170Parser(true);
+            reparser.Parse(new StringReader(generated), out var reErrors);
+            Assert.AreEqual(0, reErrors.Count, "Generated SQL must reparse. Actual:\n" + generated);
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestCommaPlacementTrailingInsertSources()
+        {
+            // The INSERT source (VALUES) row list with CommaPlacement = Trailing (default):
+            // each row's comma follows it at the end of the line.
+            var sql = "INSERT INTO t (a, b, c) VALUES (1, 2, 3), (4, 5, 6), (7, 8, 9);";
+            var parser = new TSql170Parser(true);
+            var fragment = parser.Parse(new StringReader(sql), out var errors);
+            Assert.AreEqual(0, errors.Count);
+
+            var generator = new Sql170ScriptGenerator(new SqlScriptGeneratorOptions
+            {
+                CommaPlacement = CommaPlacement.Trailing,
+                MultilineInsertSourcesList = true
+            });
+            generator.GenerateScript(fragment, out var generated);
+
+            string expected =
+                "INSERT  INTO t (a, b, c)" + Environment.NewLine +
+                "VALUES        (1, 2, 3)," + Environment.NewLine +
+                "(4, 5, 6)," + Environment.NewLine +
+                "(7, 8, 9);" + Environment.NewLine + Environment.NewLine;
+            Assert.AreEqual(expected, generated);
+
+            var reparser = new TSql170Parser(true);
+            reparser.Parse(new StringReader(generated), out var reErrors);
+            Assert.AreEqual(0, reErrors.Count, "Generated SQL must reparse. Actual:\n" + generated);
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestCommaPlacementLeadingViewColumns()
+        {
+            // The CREATE VIEW column list is a parenthesized, indented list (like CREATE TABLE):
+            // with CommaPlacement = Leading the columns stay at the list indentation level (4)
+            // and each comma is indented two characters fewer (column 2). The SELECT list in the
+            // view body is keyword-aligned, so its leading commas sit two columns before the
+            // aligned expression column.
+            var sql = "CREATE VIEW v (a, b, c) AS SELECT 1, 2, 3;";
+            var parser = new TSql170Parser(true);
+            var fragment = parser.Parse(new StringReader(sql), out var errors);
+            Assert.AreEqual(0, errors.Count);
+
+            var generator = new Sql170ScriptGenerator(new SqlScriptGeneratorOptions
+            {
+                CommaPlacement = CommaPlacement.Leading,
+                MultilineViewColumnsList = true
+            });
+            generator.GenerateScript(fragment, out var generated);
+
+            string expected =
+                "CREATE VIEW v (" + Environment.NewLine +
+                "    a" + Environment.NewLine +
+                "  , b" + Environment.NewLine +
+                "  , c" + Environment.NewLine +
+                ")" + Environment.NewLine +
+                "AS" + Environment.NewLine +
+                "SELECT 1" + Environment.NewLine +
+                "     , 2" + Environment.NewLine +
+                "     , 3;" + Environment.NewLine + Environment.NewLine;
+            Assert.AreEqual(expected, generated);
+
+            var reparser = new TSql170Parser(true);
+            reparser.Parse(new StringReader(generated), out var reErrors);
+            Assert.AreEqual(0, reErrors.Count, "Generated SQL must reparse. Actual:\n" + generated);
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestCommaPlacementTrailingViewColumns()
+        {
+            // Trailing comma style (default): the CREATE VIEW column list keeps each comma on the
+            // element's line at the list indentation level (4), and the SELECT list in the view
+            // body places each comma at the end of its line.
+            var sql = "CREATE VIEW v (a, b, c) AS SELECT 1, 2, 3;";
+            var parser = new TSql170Parser(true);
+            var fragment = parser.Parse(new StringReader(sql), out var errors);
+            Assert.AreEqual(0, errors.Count);
+
+            var generator = new Sql170ScriptGenerator(new SqlScriptGeneratorOptions
+            {
+                CommaPlacement = CommaPlacement.Trailing,
+                MultilineViewColumnsList = true
+            });
+            generator.GenerateScript(fragment, out var generated);
+
+            string expected =
+                "CREATE VIEW v (" + Environment.NewLine +
+                "    a," + Environment.NewLine +
+                "    b," + Environment.NewLine +
+                "    c" + Environment.NewLine +
+                ")" + Environment.NewLine +
+                "AS" + Environment.NewLine +
+                "SELECT 1," + Environment.NewLine +
+                "       2," + Environment.NewLine +
+                "       3;" + Environment.NewLine + Environment.NewLine;
+            Assert.AreEqual(expected, generated);
+
+            var reparser = new TSql170Parser(true);
+            reparser.Parse(new StringReader(generated), out var reErrors);
+            Assert.AreEqual(0, reErrors.Count, "Generated SQL must reparse. Actual:\n" + generated);
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestCommaPlacementLeadingSetClauseItems()
+        {
+            // The UPDATE SET item list is keyword-aligned: with CommaPlacement = Leading the items
+            // stay aligned with the first item and each comma is placed two columns before them
+            // (the '=' signs remain aligned via a separate alignment point), matching the SELECT
+            // list behavior.
+            var sql = "UPDATE t SET a = 1, b = 2, c = 3;";
+            var parser = new TSql170Parser(true);
+            var fragment = parser.Parse(new StringReader(sql), out var errors);
+            Assert.AreEqual(0, errors.Count);
+
+            var generator = new Sql170ScriptGenerator(new SqlScriptGeneratorOptions
+            {
+                CommaPlacement = CommaPlacement.Leading,
+                MultilineSetClauseItems = true
+            });
+            generator.GenerateScript(fragment, out var generated);
+
+            string expected =
+                "UPDATE t" + Environment.NewLine +
+                "SET    a = 1" + Environment.NewLine +
+                "     , b = 2" + Environment.NewLine +
+                "     , c = 3;" + Environment.NewLine + Environment.NewLine;
+            Assert.AreEqual(expected, generated);
+
+            var reparser = new TSql170Parser(true);
+            reparser.Parse(new StringReader(generated), out var reErrors);
+            Assert.AreEqual(0, reErrors.Count, "Generated SQL must reparse. Actual:\n" + generated);
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestCommaPlacementTrailingSetClauseItems()
+        {
+            // Trailing comma style (default): the UPDATE SET items stay aligned with the first
+            // item and each comma follows the item at the end of its line.
+            var sql = "UPDATE t SET a = 1, b = 2, c = 3;";
+            var parser = new TSql170Parser(true);
+            var fragment = parser.Parse(new StringReader(sql), out var errors);
+            Assert.AreEqual(0, errors.Count);
+
+            var generator = new Sql170ScriptGenerator(new SqlScriptGeneratorOptions
+            {
+                CommaPlacement = CommaPlacement.Trailing,
+                MultilineSetClauseItems = true
+            });
+            generator.GenerateScript(fragment, out var generated);
+
+            string expected =
+                "UPDATE t" + Environment.NewLine +
+                "SET    a = 1," + Environment.NewLine +
+                "       b = 2," + Environment.NewLine +
+                "       c = 3;" + Environment.NewLine + Environment.NewLine;
+            Assert.AreEqual(expected, generated);
+
+            var reparser = new TSql170Parser(true);
+            reparser.Parse(new StringReader(generated), out var reErrors);
+            Assert.AreEqual(0, reErrors.Count, "Generated SQL must reparse. Actual:\n" + generated);
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestCommaPlacementLeadingSingleColumnHasNoComma()
+        {
+            // A list with a single element must never emit a comma regardless of placement.
+            var sql = "SELECT a FROM t;";
+            var parser = new TSql170Parser(true);
+            var fragment = parser.Parse(new StringReader(sql), out var errors);
+            Assert.AreEqual(0, errors.Count);
+
+            var generator = new Sql170ScriptGenerator(new SqlScriptGeneratorOptions
+            {
+                CommaPlacement = CommaPlacement.Leading
+            });
+            generator.GenerateScript(fragment, out var generated);
+
+            // A list with a single element must never emit a comma regardless of placement.
+            string expected =
+                "SELECT a" + Environment.NewLine +
+                "FROM   t;" + Environment.NewLine + Environment.NewLine;
+            Assert.AreEqual(expected, generated);
+
+            var reparser = new TSql170Parser(true);
+            reparser.Parse(new StringReader(generated), out var reErrors);
+            Assert.AreEqual(0, reErrors.Count, "Generated SQL must reparse. Actual:\n" + generated);
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestCommaPlacementLeadingWithPreserveCommentsDoesNotAbsorbComma()
+        {
+            // Interaction rule (FeedbackTicket 3016816 "SQL Formatter reformats leading
+            // commas to invalid SQL"): with
+            // CommaPlacement = Leading and PreserveComments = true, a line comment trailing
+            // an element must not cause the following comma to land on the comment line
+            // (which would comment out the comma). The comma belongs on the next element's line.
+            var sql =
+                "SELECT col1, -- first column" + Environment.NewLine +
+                "       col2, -- second column" + Environment.NewLine +
+                "       col3" + Environment.NewLine +
+                "FROM t;";
+            var parser = new TSql170Parser(true);
+            var fragment = parser.Parse(new StringReader(sql), out var errors);
+            Assert.AreEqual(0, errors.Count);
+
+            var generator = new Sql170ScriptGenerator(new SqlScriptGeneratorOptions
+            {
+                CommaPlacement = CommaPlacement.Leading,
+                PreserveComments = true
+            });
+            generator.GenerateScript(fragment, out var generated);
+
+            // The full generated script: each line comment stays on its element's line, and the
+            // leading comma is placed at the start of the next element's line (before a column,
+            // never before a comment), so the comment is never commented out and the script
+            // reparses cleanly.
+            string expected =
+                "SELECT col1 -- first column" + Environment.NewLine +
+                "     , col2 -- second column" + Environment.NewLine +
+                "     , col3" + Environment.NewLine +
+                "FROM   t;" + Environment.NewLine + Environment.NewLine;
+            Assert.AreEqual(expected, generated);
+
+            // The generated script must reparse cleanly.
+            var reparser = new TSql170Parser(true);
+            reparser.Parse(new StringReader(generated), out var reErrors);
+            Assert.AreEqual(0, reErrors.Count, "Generated SQL must reparse. Actual:\n" + generated);
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestCommaPlacementTrailingWithPreserveCommentsKeepsCommentsAfterComma()
+        {
+            // Counterpart to TestCommaPlacementLeadingWithPreserveCommentsDoesNotAbsorbComma
+            // (FeedbackTicket 3016816 "SQL Formatter reformats leading commas to invalid SQL"). With
+            // CommaPlacement = Trailing (default) and PreserveComments = true, each trailing comma
+            // stays on the element's line and its line comment follows the comma, so the generated
+            // script still reparses cleanly.
+            var sql =
+                "SELECT col1, -- first column" + Environment.NewLine +
+                "       col2, -- second column" + Environment.NewLine +
+                "       col3" + Environment.NewLine +
+                "FROM t;";
+            var parser = new TSql170Parser(true);
+            var fragment = parser.Parse(new StringReader(sql), out var errors);
+            Assert.AreEqual(0, errors.Count);
+
+            var generator = new Sql170ScriptGenerator(new SqlScriptGeneratorOptions
+            {
+                CommaPlacement = CommaPlacement.Trailing,
+                PreserveComments = true
+            });
+            generator.GenerateScript(fragment, out var generated);
+
+            // The full generated script: the trailing comma stays on the element's line and its
+            // line comment follows the comma on that same line, so the script reparses cleanly.
+            string expected =
+                "SELECT col1, -- first column" + Environment.NewLine +
+                "       col2, -- second column" + Environment.NewLine +
+                "       col3" + Environment.NewLine +
+                "FROM   t;" + Environment.NewLine + Environment.NewLine;
+            Assert.AreEqual(expected, generated);
+
+            // The generated script must reparse cleanly.
+            var reparser = new TSql170Parser(true);
+            reparser.Parse(new StringReader(generated), out var reErrors);
+            Assert.AreEqual(0, reErrors.Count, "Generated SQL must reparse. Actual:\n" + generated);
+        }
+
+        // ---- Interaction rule: CommaPlacement = Leading has no visual effect when the
+        // ---- corresponding Multiline* option is false (the list stays on a single line).
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestCommaPlacementLeadingSelectListMultilineFalse()
+        {
+            // With MultilineSelectElementsList = false the SELECT list is emitted on a single
+            // line, so CommaPlacement = Leading has no visual effect (commas remain inline).
+            var sql = "SELECT a, b, c FROM t;";
+            var parser = new TSql170Parser(true);
+            var fragment = parser.Parse(new StringReader(sql), out var errors);
+            Assert.AreEqual(0, errors.Count);
+
+            var generator = new Sql170ScriptGenerator(new SqlScriptGeneratorOptions
+            {
+                CommaPlacement = CommaPlacement.Leading,
+                MultilineSelectElementsList = false
+            });
+            generator.GenerateScript(fragment, out var generated);
+
+            string expected =
+                "SELECT a, b, c" + Environment.NewLine +
+                "FROM   t;" + Environment.NewLine + Environment.NewLine;
+            Assert.AreEqual(expected, generated);
+
+            var reparser = new TSql170Parser(true);
+            reparser.Parse(new StringReader(generated), out var reErrors);
+            Assert.AreEqual(0, reErrors.Count, "Generated SQL must reparse. Actual:\n" + generated);
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestCommaPlacementLeadingViewColumnsMultilineFalse()
+        {
+            // With MultilineViewColumnsList = false the VIEW column list is emitted as a single
+            // parenthesized line, so CommaPlacement = Leading has no visual effect there. (The
+            // SELECT body still honors leading placement via MultilineSelectElementsList, which
+            // defaults to true.)
+            var sql = "CREATE VIEW v (a, b, c) AS SELECT 1, 2, 3;";
+            var parser = new TSql170Parser(true);
+            var fragment = parser.Parse(new StringReader(sql), out var errors);
+            Assert.AreEqual(0, errors.Count);
+
+            var generator = new Sql170ScriptGenerator(new SqlScriptGeneratorOptions
+            {
+                CommaPlacement = CommaPlacement.Leading,
+                MultilineViewColumnsList = false,
+                MultilineSelectElementsList = false
+            });
+            generator.GenerateScript(fragment, out var generated);
+
+            string expected =
+                "CREATE VIEW v (a, b, c)" + Environment.NewLine +
+                "AS" + Environment.NewLine +
+                "SELECT 1, 2, 3;" + Environment.NewLine + Environment.NewLine;
+            Assert.AreEqual(expected, generated);
+
+            var reparser = new TSql170Parser(true);
+            reparser.Parse(new StringReader(generated), out var reErrors);
+            Assert.AreEqual(0, reErrors.Count, "Generated SQL must reparse. Actual:\n" + generated);
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestCommaPlacementLeadingSetClauseItemsMultilineFalse()
+        {
+            // With MultilineSetClauseItems = false the UPDATE SET item list is emitted on a
+            // single line, so CommaPlacement = Leading has no visual effect (commas remain
+            // inline).
+            var sql = "UPDATE t SET a = 1, b = 2, c = 3;";
+            var parser = new TSql170Parser(true);
+            var fragment = parser.Parse(new StringReader(sql), out var errors);
+            Assert.AreEqual(0, errors.Count);
+
+            var generator = new Sql170ScriptGenerator(new SqlScriptGeneratorOptions
+            {
+                CommaPlacement = CommaPlacement.Leading,
+                MultilineSetClauseItems = false
+            });
+            generator.GenerateScript(fragment, out var generated);
+
+            string expected =
+                "UPDATE t" + Environment.NewLine +
+                "SET    a = 1, b = 2, c = 3;" + Environment.NewLine + Environment.NewLine;
+            Assert.AreEqual(expected, generated);
+
+            var reparser = new TSql170Parser(true);
+            reparser.Parse(new StringReader(generated), out var reErrors);
+            Assert.AreEqual(0, reErrors.Count, "Generated SQL must reparse. Actual:\n" + generated);
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestCommaPlacementLeadingInsertTargetsMultilineFalse()
+        {
+            // The INSERT target list is always emitted on a single line, so CommaPlacement =
+            // Leading has no visual effect regardless of MultilineInsertTargetsList.
+            var sql = "INSERT INTO t (a, b, c) VALUES (1, 2, 3);";
+            var parser = new TSql170Parser(true);
+            var fragment = parser.Parse(new StringReader(sql), out var errors);
+            Assert.AreEqual(0, errors.Count);
+
+            var generator = new Sql170ScriptGenerator(new SqlScriptGeneratorOptions
+            {
+                CommaPlacement = CommaPlacement.Leading,
+                MultilineInsertTargetsList = false
+            });
+            generator.GenerateScript(fragment, out var generated);
+
+            string expected =
+                "INSERT  INTO t (a, b, c)" + Environment.NewLine +
+                "VALUES        (1, 2, 3);" + Environment.NewLine + Environment.NewLine;
+            Assert.AreEqual(expected, generated);
+
+            var reparser = new TSql170Parser(true);
+            reparser.Parse(new StringReader(generated), out var reErrors);
+            Assert.AreEqual(0, reErrors.Count, "Generated SQL must reparse. Actual:\n" + generated);
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestCommaPlacementLeadingInsertSourcesMultilineFalse()
+        {
+            // The INSERT source (VALUES) row list is always emitted multi-line (the generator
+            // does not gate it on MultilineInsertSourcesList), so setting that option to false
+            // does NOT collapse it to one line: CommaPlacement = Leading still applies to the
+            // row separators.
+            var sql = "INSERT INTO t (a, b, c) VALUES (1, 2, 3), (4, 5, 6), (7, 8, 9);";
+            var parser = new TSql170Parser(true);
+            var fragment = parser.Parse(new StringReader(sql), out var errors);
+            Assert.AreEqual(0, errors.Count);
+
+            var generator = new Sql170ScriptGenerator(new SqlScriptGeneratorOptions
+            {
+                CommaPlacement = CommaPlacement.Leading,
+                MultilineInsertSourcesList = false
+            });
+            generator.GenerateScript(fragment, out var generated);
+
+            string expected =
+                "INSERT  INTO t (a, b, c)" + Environment.NewLine +
+                "VALUES        (1, 2, 3)" + Environment.NewLine +
+                ", (4, 5, 6)" + Environment.NewLine +
+                ", (7, 8, 9);" + Environment.NewLine + Environment.NewLine;
+            Assert.AreEqual(expected, generated);
+
+            var reparser = new TSql170Parser(true);
+            reparser.Parse(new StringReader(generated), out var reErrors);
+            Assert.AreEqual(0, reErrors.Count, "Generated SQL must reparse. Actual:\n" + generated);
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestCommaPlacementLeadingParenthesizedListAlwaysMultiline()
+        {
+            // The CREATE TABLE column list has no single-line toggle: it is always emitted
+            // multi-line. There is therefore no "Multiline = false" state for it, so
+            // CommaPlacement = Leading always applies (comma at indent - 2).
+            var sql = "CREATE TABLE t (a INT, b INT, c INT);";
+            var parser = new TSql170Parser(true);
+            var fragment = parser.Parse(new StringReader(sql), out var errors);
+            Assert.AreEqual(0, errors.Count);
+
+            var generator = new Sql170ScriptGenerator(new SqlScriptGeneratorOptions
+            {
+                CommaPlacement = CommaPlacement.Leading
+            });
+            generator.GenerateScript(fragment, out var generated);
+
+            string expected =
+                "CREATE TABLE t (" + Environment.NewLine +
+                "    a INT" + Environment.NewLine +
+                "  , b INT" + Environment.NewLine +
+                "  , c INT" + Environment.NewLine +
+                ");" + Environment.NewLine + Environment.NewLine;
+            Assert.AreEqual(expected, generated);
+
+            var reparser = new TSql170Parser(true);
+            reparser.Parse(new StringReader(generated), out var reErrors);
+            Assert.AreEqual(0, reErrors.Count, "Generated SQL must reparse. Actual:\n" + generated);
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestCommaPlacementLeadingIndentedOptionList()
+        {
+            // The WITH-parameter list of CREATE COLUMN MASTER KEY is generated through the indented
+            // multi-line comma-list path (GenerateCommaSeparatedList with insertNewLine and indent
+            // both true). With CommaPlacement = Leading the leading comma is emitted at the start
+            // of the next parameter's (indented) line.
+            var sql = "CREATE COLUMN MASTER KEY CMK1 WITH (KEY_STORE_PROVIDER_NAME = 'MSSQL_CERTIFICATE_STORE', KEY_PATH = 'some/path');";
+            var parser = new TSql170Parser(true);
+            var fragment = parser.Parse(new StringReader(sql), out var errors);
+            Assert.AreEqual(0, errors.Count);
+
+            var generator = new Sql170ScriptGenerator(new SqlScriptGeneratorOptions
+            {
+                CommaPlacement = CommaPlacement.Leading
+            });
+            generator.GenerateScript(fragment, out var generated);
+
+            // The continuation parameter's comma is emitted at the start of its (indented) line
+            // via the 4-arg GenerateCommaSeparatedList leading branch. The comma width is reserved
+            // inside the indentation, so the parameter stays aligned with the first parameter and
+            // the leading comma sits in the reserved columns before it.
+            string expected =
+                "CREATE COLUMN MASTER KEY CMK1" + Environment.NewLine +
+                "WITH (" + Environment.NewLine +
+                "     KEY_STORE_PROVIDER_NAME = 'MSSQL_CERTIFICATE_STORE'" + Environment.NewLine +
+                "  ,  KEY_PATH = 'some/path'" + Environment.NewLine +
+                ");" + Environment.NewLine + Environment.NewLine;
+            Assert.AreEqual(expected, generated);
+
+            var reparser = new TSql170Parser(true);
+            reparser.Parse(new StringReader(generated), out var reErrors);
+            Assert.AreEqual(0, reErrors.Count, "Generated SQL must reparse. Actual:\n" + generated);
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestCommaPlacementLeadingSetClauseItemsIndented()
+        {
+            // With IndentSetClause = true the SET keyword is indented; CommaPlacement = Leading
+            // still aligns the items and places each comma two columns before them.
+            var sql = "UPDATE t SET a = 1, b = 2, c = 3;";
+            var parser = new TSql170Parser(true);
+            var fragment = parser.Parse(new StringReader(sql), out var errors);
+            Assert.AreEqual(0, errors.Count);
+
+            var generator = new Sql170ScriptGenerator(new SqlScriptGeneratorOptions
+            {
+                CommaPlacement = CommaPlacement.Leading,
+                MultilineSetClauseItems = true,
+                IndentSetClause = true
+            });
+            generator.GenerateScript(fragment, out var generated);
+
+            string expected =
+                "UPDATE  t" + Environment.NewLine +
+                "    SET a = 1" + Environment.NewLine +
+                "      , b = 2" + Environment.NewLine +
+                "      , c = 3;" + Environment.NewLine + Environment.NewLine;
+            Assert.AreEqual(expected, generated);
+
+            var reparser = new TSql170Parser(true);
+            reparser.Parse(new StringReader(generated), out var reErrors);
+            Assert.AreEqual(0, reErrors.Count, "Generated SQL must reparse. Actual:\n" + generated);
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestCommaPlacementLeadingCreateTableWithComments()
+        {
+            // PreserveComments + CommaPlacement.Leading in an indented (CREATE TABLE) column list:
+            // each trailing line comment stays on its column's line and the leading comma is
+            // emitted at the start of the next column's line (comma at indent - 2). Verifies the
+            // comment/comma-skip fix in the indent-based leading path, not just the SELECT list.
+            var sql =
+                "CREATE TABLE t (a INT, -- first" + Environment.NewLine +
+                "b INT, -- second" + Environment.NewLine +
+                "c INT);";
+            var parser = new TSql170Parser(true);
+            var fragment = parser.Parse(new StringReader(sql), out var errors);
+            Assert.AreEqual(0, errors.Count);
+
+            var generator = new Sql170ScriptGenerator(new SqlScriptGeneratorOptions
+            {
+                CommaPlacement = CommaPlacement.Leading,
+                PreserveComments = true
+            });
+            generator.GenerateScript(fragment, out var generated);
+
+            string expected =
+                "CREATE TABLE t (" + Environment.NewLine +
+                "    a INT -- first" + Environment.NewLine +
+                "  , b INT -- second" + Environment.NewLine +
+                "  , c INT" + Environment.NewLine +
+                ");" + Environment.NewLine + Environment.NewLine;
+            Assert.AreEqual(expected, generated);
+
+            var reparser = new TSql170Parser(true);
+            reparser.Parse(new StringReader(generated), out var reErrors);
+            Assert.AreEqual(0, reErrors.Count, "Generated SQL must reparse. Actual:\n" + generated);
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestCommaPlacementLeadingWithBlockCommentTrailingElement()
+        {
+            // PreserveComments + CommaPlacement.Leading with a block comment trailing an element.
+            // Block comments are emitted inline (a different path than the deferred '--' comments),
+            // so this confirms leading placement is not broken by an inline block comment.
+            var sql = "SELECT a /* note */, b, c FROM t;";
+            var parser = new TSql170Parser(true);
+            var fragment = parser.Parse(new StringReader(sql), out var errors);
+            Assert.AreEqual(0, errors.Count);
+
+            var generator = new Sql170ScriptGenerator(new SqlScriptGeneratorOptions
+            {
+                CommaPlacement = CommaPlacement.Leading,
+                PreserveComments = true
+            });
+            generator.GenerateScript(fragment, out var generated);
+
+            string expected =
+                "SELECT a /* note */" + Environment.NewLine +
+                "     , b" + Environment.NewLine +
+                "     , c" + Environment.NewLine +
+                "FROM   t;" + Environment.NewLine + Environment.NewLine;
+            Assert.AreEqual(expected, generated);
+
+            var reparser = new TSql170Parser(true);
+            reparser.Parse(new StringReader(generated), out var reErrors);
+            Assert.AreEqual(0, reErrors.Count, "Generated SQL must reparse. Actual:\n" + generated);
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestCommaPlacementLeadingSpaceCountZero()
+        {
+            // LeadingCommaSpaceCount = 0: the comma occupies a single column (no trailing space).
+            // Items stay aligned with the first element; only the comma column shifts.
+            const string selectSql = "SELECT a, b, c FROM t;";
+            const string tableSql = "CREATE TABLE t (a INT, b INT, c INT);";
+
+            // Keyword-aligned list (SELECT): comma ends immediately before the aligned column.
+            string expectedSelect =
+                "SELECT a" + Environment.NewLine +
+                "      ,b" + Environment.NewLine +
+                "      ,c" + Environment.NewLine +
+                "FROM   t;" + Environment.NewLine + Environment.NewLine;
+
+            // Indented list (CREATE TABLE): elements stay at indentation column 4; the comma is
+            // indented one column fewer (column 3) so the comma+item still occupy 4 columns.
+            string expectedTable =
+                "CREATE TABLE t (" + Environment.NewLine +
+                "    a INT" + Environment.NewLine +
+                "   ,b INT" + Environment.NewLine +
+                "   ,c INT" + Environment.NewLine +
+                ");" + Environment.NewLine + Environment.NewLine;
+
+            AssertLeadingCommaSpaceCount(0, selectSql, expectedSelect);
+            AssertLeadingCommaSpaceCount(0, tableSql, expectedTable);
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestCommaPlacementLeadingSpaceCountOne()
+        {
+            // LeadingCommaSpaceCount = 1 (the default): comma + one space, occupying 2 columns.
+            const string selectSql = "SELECT a, b, c FROM t;";
+            const string tableSql = "CREATE TABLE t (a INT, b INT, c INT);";
+
+            string expectedSelect =
+                "SELECT a" + Environment.NewLine +
+                "     , b" + Environment.NewLine +
+                "     , c" + Environment.NewLine +
+                "FROM   t;" + Environment.NewLine + Environment.NewLine;
+
+            string expectedTable =
+                "CREATE TABLE t (" + Environment.NewLine +
+                "    a INT" + Environment.NewLine +
+                "  , b INT" + Environment.NewLine +
+                "  , c INT" + Environment.NewLine +
+                ");" + Environment.NewLine + Environment.NewLine;
+
+            AssertLeadingCommaSpaceCount(1, selectSql, expectedSelect);
+            AssertLeadingCommaSpaceCount(1, tableSql, expectedTable);
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestCommaPlacementLeadingSpaceCountTwo()
+        {
+            // LeadingCommaSpaceCount = 2: comma + two spaces, occupying 3 columns.
+            const string selectSql = "SELECT a, b, c FROM t;";
+            const string tableSql = "CREATE TABLE t (a INT, b INT, c INT);";
+
+            string expectedSelect =
+                "SELECT a" + Environment.NewLine +
+                "    ,  b" + Environment.NewLine +
+                "    ,  c" + Environment.NewLine +
+                "FROM   t;" + Environment.NewLine + Environment.NewLine;
+
+            // Elements stay at indentation column 4; the comma is indented three columns fewer
+            // (column 1) so the comma plus its two trailing spaces still occupy 4 columns.
+            string expectedTable =
+                "CREATE TABLE t (" + Environment.NewLine +
+                "    a INT" + Environment.NewLine +
+                " ,  b INT" + Environment.NewLine +
+                " ,  c INT" + Environment.NewLine +
+                ");" + Environment.NewLine + Environment.NewLine;
+
+            AssertLeadingCommaSpaceCount(2, selectSql, expectedSelect);
+            AssertLeadingCommaSpaceCount(2, tableSql, expectedTable);
+        }
+
+        // Generates the given SQL with CommaPlacement.Leading and the specified leading-comma space
+        // count, asserts the generated script matches the expectation, and that it reparses cleanly.
+        private static void AssertLeadingCommaSpaceCount(int spaceCount, string sql, string expected)
+        {
+            var parser = new TSql170Parser(true);
+            var fragment = parser.Parse(new StringReader(sql), out var errors);
+            Assert.AreEqual(0, errors.Count);
+
+            var generator = new Sql170ScriptGenerator(new SqlScriptGeneratorOptions
+            {
+                CommaPlacement = CommaPlacement.Leading,
+                LeadingCommaSpaceCount = spaceCount
+            });
+            generator.GenerateScript(fragment, out var generated);
+
+            Assert.AreEqual(expected, generated,
+                "LeadingCommaSpaceCount=" + spaceCount + " produced unexpected output. Actual:\n" + generated);
+
+            var reparser = new TSql170Parser(true);
+            reparser.Parse(new StringReader(generated), out var reErrors);
+            Assert.AreEqual(0, reErrors.Count, "Generated SQL must reparse. Actual:\n" + generated);
         }
 
         #endregion

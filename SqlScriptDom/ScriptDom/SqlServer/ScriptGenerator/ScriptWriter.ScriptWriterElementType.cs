@@ -14,6 +14,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
             AlignmentPoint,
             Token,
             NewLine,
+            RightAlignedSeparator,
         }
     }
 }

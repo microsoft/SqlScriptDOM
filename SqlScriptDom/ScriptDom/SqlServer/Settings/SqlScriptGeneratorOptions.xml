@@ -14,6 +14,19 @@
       <Option value="KeywordCasing.PascalCase">KeywordCasing_PascalCase</Option>
       <Summary>Gets or sets the keyword casing option to use during script generation</Summary>
     </Setting>
+    <Setting name="IdentifierCasing" type="IdentifierCasing" default="IdentifierCasing.Preserve">
+      <Option value="IdentifierCasing.Preserve">IdentifierCasing_Preserve</Option>
+      <Option value="IdentifierCasing.Uppercase">IdentifierCasing_UpperCase</Option>
+      <Option value="IdentifierCasing.Lowercase">IdentifierCasing_LowerCase</Option>
+      <Option value="IdentifierCasing.PascalCase">IdentifierCasing_PascalCase</Option>
+      <Summary>Gets or sets the casing applied to object identifiers during script generation. This does not affect keywords, string literals, function names, or variables.</Summary>
+    </Setting>
+    <Setting name="IdentifierBracketing" type="IdentifierBracketing" default="IdentifierBracketing.Preserve">
+      <Option value="IdentifierBracketing.Preserve">IdentifierBracketing_Preserve</Option>
+      <Option value="IdentifierBracketing.IncludeBrackets">IdentifierBracketing_IncludeBrackets</Option>
+      <Option value="IdentifierBracketing.ExcludeBrackets">IdentifierBracketing_ExcludeBrackets</Option>
+      <Summary>Gets or sets how square brackets are applied to object identifiers during script generation. IncludeBrackets wraps all identifiers in square brackets; ExcludeBrackets removes brackets from identifiers that do not require them (identifiers conflicting with reserved words for the configured SqlVersion or containing special characters retain their brackets).</Summary>
+    </Setting>
     <Setting name="SqlVersion" type="SqlVersion" default="SqlVersion.Sql90" browsable="false">
       <Summary>Gets or sets the Sql version to generate script for</Summary>
     </Setting>
@@ -21,7 +34,10 @@
       <Summary>Gets or sets the Sql engine type (All|Engine|Azure) to generate script for</Summary>
     </Setting>
     <Setting name="IndentationSize" type="int" default="4" min="0" browsable="false">
-      <Summary>Gets or sets the number of spaces to use when indenting text</Summary>
+      <Summary>Gets or sets the number of spaces to use when indenting text. In Tabs mode each tab is treated as this many columns wide when computing alignment, so the viewer's tab size must be set to this value for the generated output to appear aligned.</Summary>
+    </Setting>
+    <Setting name="IndentationMode" type="IndentationMode" default="IndentationMode.Spaces">
+      <Summary>Gets or sets whether indentation is written using spaces or tab characters. In Tabs mode the generated alignment only lines up when the viewer's tab width (for example the editor's tab size) equals IndentationSize. This setting is ignored (indentation uses spaces) when CommaPlacement is Leading.</Summary>
     </Setting>
     <Setting name="IncludeSemicolons" type="bool" default="false">
       <Title>IncludeSemicolons_Title</Title>
@@ -45,6 +61,9 @@
     </Setting>
     <Setting name="PreserveComments" type="bool" default="false">
       <Summary>Gets or sets a boolean indicating if comments from the original script should be preserved in the generated output</Summary>
+    </Setting>
+    <Setting name="CommaPlacement" type="CommaPlacement" default="CommaPlacement.Trailing">
+      <Summary>Gets or sets a value indicating whether commas in a multi-line comma-separated list are placed at the end of the line (trailing) or at the start of the next line (leading). When set to Leading, the IndentationMode setting is ignored and indentation always uses spaces.</Summary>
     </Setting>
   </SettingGroup>
   <SettingGroup name="CREATE TABLE">
@@ -74,6 +93,12 @@
     <Setting name="NewLineBeforeJoinClause" type="bool" default="true">
       <Summary>Gets or sets a boolean indicating if there should be a newline before the JOIN clause in a SELECT statement</Summary>
     </Setting>
+    <Setting name="NewLineAfterJoinKeyword" type="bool" default="true">
+      <Summary>Gets or sets a boolean indicating if there should be a newline after the JOIN keyword (before the table source). When false, the table source is kept on the same line as the JOIN keyword.</Summary>
+    </Setting>
+    <Setting name="NewLineBeforeOnClause" type="bool" default="true">
+      <Summary>Gets or sets a boolean indicating if there should be a newline before the ON keyword of a JOIN. When false, the ON keyword is kept on the same line as the table source.</Summary>
+    </Setting>
     <Setting name="NewLineBeforeOffsetClause" type="bool" default="true">
       <Summary>Gets or sets a boolean indicating if there should be a newline before the OFFSET clause</Summary>
     </Setting>
@@ -92,6 +117,12 @@
     </Setting>
     <Setting name="MultilineWherePredicatesList" type="bool" default="true">
       <Summary>Gets or sets a boolean indicating if WHERE predicates (expressions separated by AND, and OR) should be written on multiple lines</Summary>
+    </Setting>
+    <Setting name="ColumnAliasStyle" type="ColumnAliasStyle" default="ColumnAliasStyle.AsKeyword">
+      <Option value="ColumnAliasStyle.AsKeyword">ColumnAliasStyle_AsKeyword</Option>
+      <Option value="ColumnAliasStyle.EqualsSign">ColumnAliasStyle_EqualsSign</Option>
+      <Option value="ColumnAliasStyle.Preserve">ColumnAliasStyle_Preserve</Option>
+      <Summary>Gets or sets a value indicating how column aliases in SELECT projections are rendered (AS keyword, equals sign, or preserved from the original script)</Summary>
     </Setting>
   </SettingGroup>
   <SettingGroup name="CREATE/ALTER VIEW">

@@ -12,7 +12,9 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
         public override void ExplicitVisit(FileTableCollateFileNameTableOption node)
         {
             System.Diagnostics.Debug.Assert(node.OptionKind == TableOptionKind.FileTableCollateFileName, "TableOption does not match");
-            GenerateNameEqualsValue(CodeGenerationSupporter.FileTableCollateFileName, node.Value);
+            // The collation value (e.g. database_default) is a keyword Identifier fragment; do not
+            // bracket or recase it.
+            GenerateWithoutIdentifierFormatting(() => GenerateNameEqualsValue(CodeGenerationSupporter.FileTableCollateFileName, node.Value));
         }
     }
 }

@@ -212,16 +212,26 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
         // generate a comma-separated list
         protected void GenerateCommaSeparatedList<T>(IList<T> list, Boolean insertNewLine) where T : TSqlFragment
         {
+            Boolean leadingComma = insertNewLine && _options.CommaPlacement == CommaPlacement.Leading;
             GenerateList(list, delegate()
             {
-                GenerateSymbol(TSqlTokenType.Comma);
-                if (insertNewLine)
+                if (leadingComma)
                 {
                     NewLine();
+                    GenerateSymbol(TSqlTokenType.Comma);
+                    GenerateLeadingCommaSpace();
                 }
                 else
                 {
-                    GenerateSpace();
+                    GenerateSymbol(TSqlTokenType.Comma);
+                    if (insertNewLine)
+                    {
+                        NewLine();
+                    }
+                    else
+                    {
+                        GenerateSpace();
+                    }
                 }
             });
         }
@@ -229,22 +239,42 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
         // generate a comma-separated list
         protected void GenerateCommaSeparatedList<T>(IList<T> list, bool insertNewLine, bool indent, bool generateSpaces = true) where T : TSqlFragment
         {
+            Boolean leadingComma = insertNewLine && _options.CommaPlacement == CommaPlacement.Leading;
             GenerateList(list, delegate()
             {
-                GenerateSymbol(TSqlTokenType.Comma);
-                if (insertNewLine)
+                if (leadingComma)
                 {
                     NewLine();
 
                     if (indent)
                     {
-                        Indent();
+                        // Reserve the comma width inside the indentation so the item starts at the
+                        // normal indentation column (not indentation + LeadingCommaWidth), keeping
+                        // continuation items aligned with the first item.
+                        int indentColumns = _options.IndentationSize;
+                        Indent(indentColumns >= LeadingCommaWidth ? indentColumns - LeadingCommaWidth : 0);
+                    }
+
+                    GenerateSymbol(TSqlTokenType.Comma);
+                    GenerateLeadingCommaSpace();
+                }
+                else
+                {
+                    GenerateSymbol(TSqlTokenType.Comma);
+                    if (insertNewLine)
+                    {
+                        NewLine();
+
+                        if (indent)
+                        {
+                            Indent();
+                        }
+                    }
+                    else if (generateSpaces)
+                    {
+                        GenerateSpace();
                     }
                 }
-                else if (generateSpaces)
-                {
-                    GenerateSpace();
-                } 
             });
         }
 
@@ -338,6 +368,24 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
             }
 
             Boolean firstItem = true;
+
+            // When leading comma placement is requested, the comma is emitted at the start of the
+            // next line (after the newline and indentation) rather than trailing the previous item.
+            Boolean leadingComma = option.Separator == ListGenerationOption.SeparatorType.Comma
+                && option.NewLineBeforeItems
+                && _options.CommaPlacement == CommaPlacement.Leading;
+
+            Boolean pushedListNamedAlignmentScope = false;
+            if (option.NewLineBeforeItems && _options.PreserveComments)
+            {
+                // Isolate a list-level named-alignment-point scope so field alignment points (e.g.
+                // column-definition name/type/constraint) are shared across items in this list but do
+                // not leak into the enclosing scope and accidentally align across separate lists
+                // rendered later in the same parent scope.
+                PushNamedAlignmentScope();
+                pushedListNamedAlignmentScope = true;
+            }
+
             foreach (var item in list)
             {
                 if (firstItem) // do we have to produce a new line before the first item?
@@ -347,28 +395,89 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
                     {
                         NewLine();
                     }
-
-                    firstItem = false;
                 }
                 else
                 {
-                    GenerateSeparator(option);
-                    if (option.NewLineBeforeItems)
+                    if (leadingComma)
                     {
                         NewLine();
                     }
+                    else
+                    {
+                        GenerateSeparator(option);
+                        if (option.NewLineBeforeItems)
+                        {
+                            NewLine();
+                        }
+                    }
                 }
 
-                for (int indentIterator = 0; indentIterator < option.MultipleIndentItems ; indentIterator++)
-                    Indent();
+                Boolean leadingCommaThisItem = leadingComma && !firstItem;
+
+                if (!leadingCommaThisItem)
+                {
+                    // Default behavior (unchanged): indent each configured level. The separator
+                    // for this path is emitted above via GenerateSeparator, so nothing changes
+                    // here when MultipleIndentItems is greater than 0.
+                    for (int indentIterator = 0; indentIterator < option.MultipleIndentItems; indentIterator++)
+                        Indent();
+                }
+                else if (option.MultipleIndentItems >= 1)
+                {
+                    // Leading comma placement in an indented list: reserve the comma width inside
+                    // the indentation so the item stays at the normal list indentation column and
+                    // the comma is indented LeadingCommaWidth characters fewer.
+                    int listIndentColumns = option.MultipleIndentItems * _options.IndentationSize;
+                    Indent(listIndentColumns >= LeadingCommaWidth ? listIndentColumns - LeadingCommaWidth : 0);
+
+                    GenerateSymbol(TSqlTokenType.Comma);
+                    GenerateLeadingCommaSpace();
+                }
+                else
+                {
+                    // Leading comma placement in a keyword-aligned list (no fixed indentation, e.g.
+                    // the SELECT column list): the comma is emitted as a right-aligned separator so
+                    // it ends exactly before the aligned item column, keeping items aligned with
+                    // the first element and the comma just before each of them.
+                    GenerateRightAlignedCommaSeparator();
+                }
 
                 if (option.NewLineBeforeItems)
                 {
-                    // we only mark it for multiple lines
                     Mark(items);
+
+                    // Only push alignment point for NewLine() restoration when comment preservation is enabled.
+                    // This ensures NewLine() calls within items (e.g., from EmitCommentToken) can restore
+                    // to the correct indented position, without affecting general formatting.
+                    if (_options.PreserveComments)
+                    {
+                        AlignmentPoint itemScope = new AlignmentPoint();
+                        // Keep the current named-alignment-point scope so field alignment points
+                        // (e.g. column-definition name/type/constraint) stay shared across items and
+                        // continue to align across lines; the push only provides a newline-restoration
+                        // point for comment-driven newlines within the item.
+                        MarkAndPushAlignmentPointKeepingNameScope(itemScope);
+                        
+                        GenerateFragmentIfNotNull(item);
+                        
+                        PopAlignmentPoint();
+                    }
+                    else
+                    {
+                        GenerateFragmentIfNotNull(item);
+                    }
+                }
+                else
+                {
+                    GenerateFragmentIfNotNull(item);
                 }
 
-                GenerateFragmentIfNotNull(item);
+                firstItem = false;
+            }
+
+            if (pushedListNamedAlignmentScope)
+            {
+                PopNamedAlignmentScope();
             }
 
             // generate close parenthesis
@@ -432,6 +541,23 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
             _writer.AddToken(ScriptGeneratorSupporter.CreateWhitespaceToken(1));
         }
 
+        // The number of columns a leading comma occupies: one column for the comma itself plus
+        // the configured number of trailing whitespace columns (default 1, i.e. 2 columns total).
+        private Int32 LeadingCommaWidth
+        {
+            // 1 is the comma itself
+            get { return 1 + _options.LeadingCommaSpaceCount; }
+        }
+
+        // generate the whitespace that follows a leading comma (configurable width)
+        private void GenerateLeadingCommaSpace()
+        {
+            if (_options.LeadingCommaSpaceCount > 0)
+            {
+                _writer.AddToken(ScriptGeneratorSupporter.CreateWhitespaceToken(_options.LeadingCommaSpaceCount));
+            }
+        }
+
         // generate a keyword 
         protected void GenerateKeyword(TSqlTokenType keywordId)
         {
@@ -457,6 +583,13 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
         {
             // symbols are treated as keywords by the parser
             GenerateKeyword(symbolId);
+        }
+
+        // generate a comma-and-space separator that is right-aligned against the next alignment
+        // point (used for leading comma placement in keyword-aligned lists such as SELECT)
+        protected void GenerateRightAlignedCommaSeparator()
+        {
+            _writer.AddRightAlignedCommaSeparator();
         }
 
         // generate a token for a given token type and text

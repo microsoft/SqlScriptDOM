@@ -51,11 +51,9 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
         {
             GenerateFragmentIfNotNull(node.DataType);
 
-            if (node.Collation != null)
-            {
-                GenerateSpaceAndKeyword(TSqlTokenType.Collate);
-                GenerateSpaceAndFragmentIfNotNull(node.Collation);
-            }
+            // Collation names cannot be delimited or recased; GenerateSpaceAndCollation suppresses
+            // identifier formatting for them.
+            GenerateSpaceAndCollation(node.Collation);
         }
     }
 }

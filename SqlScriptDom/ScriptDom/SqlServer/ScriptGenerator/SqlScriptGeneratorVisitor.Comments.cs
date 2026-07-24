@@ -130,8 +130,41 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
         }
 
         /// <summary>
-        /// Emits trailing comments after the fragment, scanning across newlines.
-        /// Each comment's own-line vs same-line placement is preserved from source.
+        /// Emits any pending gap comments that haven't been emitted yet.
+        /// Scans forward from lastProcessedTokenIndex and emits consecutive comment tokens.
+        /// Use this before generating keywords that should have comments before them.
+        /// </summary>
+        protected void EmitPendingGapComments()
+        {
+            if (!_options.PreserveComments || _currentTokenStream == null)
+            {
+                return;
+            }
+
+            int startIndex = _lastProcessedTokenIndex + 1;
+            
+            // Emit consecutive comment tokens from the current position
+            for (int i = startIndex; i < _currentTokenStream.Count; i++)
+            {
+                var token = _currentTokenStream[i];
+                
+                if (IsCommentToken(token) && !_emittedComments.Contains(token))
+                {
+                    EmitCommentToken(token, isLeading: true);
+                    _emittedComments.Add(token);
+                    _lastProcessedTokenIndex = i;
+                }
+                else if (token.TokenType != TSqlTokenType.WhiteSpace)
+                {
+                    // Stop at first non-comment, non-whitespace token
+                    break;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Emits trailing comments after the fragment, ONLY on the same line.
+        /// Comments on their own line are left as gap comments for the next fragment.
         /// </summary>
         protected void EmitTrailingComments(TSqlFragment fragment)
         {
@@ -147,6 +180,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
             }
 
             int prevEmittedSourceIndex = lastTokenIndex;
+            bool skippedSeparatorComma = false;
             for (int i = lastTokenIndex + 1; i < _currentTokenStream.Count; i++)
             {
                 var token = _currentTokenStream[i];
@@ -156,6 +190,15 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
                     if (!_emittedComments.Contains(token))
                     {
                         bool ownLine = SourceGapContainsNewline(prevEmittedSourceIndex, i);
+                        
+                        // CRITICAL FIX: Only emit same-line trailing comments.
+                        // Comments on their own line should be left as gap comments for the next fragment.
+                        if (ownLine)
+                        {
+                            // Stop here - don't emit this comment as trailing
+                            break;
+                        }
+                        
                         EmitTrailingCommentToken(token, ownLine);
                         _emittedComments.Add(token);
                         _lastProcessedTokenIndex = i;
@@ -166,6 +209,19 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
 
                 if (token.TokenType == TSqlTokenType.WhiteSpace)
                 {
+                    continue;
+                }
+
+                // A list-separator comma on the same source line as the element does not end the
+                // element's trailing-comment window: a comment after it (e.g. 'col1, -- note') is
+                // still a trailing comment of this element and must stay on the element's line
+                // rather than being re-attributed as a leading comment of the next element. Skip a
+                // single same-line separator comma and keep scanning for the trailing comment.
+                if (token.TokenType == TSqlTokenType.Comma
+                    && !skippedSeparatorComma
+                    && !SourceGapContainsNewline(prevEmittedSourceIndex, i))
+                {
+                    skippedSeparatorComma = true;
                     continue;
                 }
 

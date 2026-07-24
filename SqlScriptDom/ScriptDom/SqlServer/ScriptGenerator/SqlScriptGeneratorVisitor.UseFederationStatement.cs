@@ -21,7 +21,9 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
             }
             else
             {
-                GenerateSpaceAndFragmentIfNotNull(node.FederationName);
+                // The federation name must be a plain identifier; it cannot be bracketed or recased.
+                // (The distribution name below is a normal identifier and is still transformed.)
+                GenerateWithoutIdentifierFormatting(() => GenerateSpaceAndFragmentIfNotNull(node.FederationName));
                 GenerateSpaceAndSymbol(TSqlTokenType.LeftParenthesis);
                 GenerateFragmentIfNotNull(node.DistributionName);
                 GenerateSpaceAndSymbol(TSqlTokenType.EqualsSign);

@@ -11,7 +11,8 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
     {
         public override void ExplicitVisit(OdbcConvertSpecification node)
         {
-            GenerateFragmentIfNotNull(node.Identifier);
+            // The ODBC data-type name is a keyword Identifier fragment; do not bracket or recase it.
+            GenerateWithoutIdentifierFormatting(() => GenerateFragmentIfNotNull(node.Identifier));
         }
     }
 }

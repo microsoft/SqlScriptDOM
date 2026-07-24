@@ -13,7 +13,8 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
         {
             GenerateSymbol(TSqlTokenType.LeftCurly);
             GenerateSpaceAndIdentifier(CodeGenerationSupporter.Fn);
-            GenerateSpaceAndFragmentIfNotNull(node.Name);
+            // The ODBC function name is a keyword Identifier fragment; do not bracket or recase it.
+            GenerateWithoutIdentifierFormatting(() => GenerateSpaceAndFragmentIfNotNull(node.Name));
 
             if (node.ParametersUsed)
             {

@@ -17,6 +17,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
         protected const String SetClauseItemFirstEqualSign = "SetClauseItemFirstEqualSign";
         protected const String SetClauseItemSecondEqualSign = "SetClauseItemSecondEqualSign";
         protected const String InsertColumns = "InsertColumns";
+        protected const String SelectColumnAliasEqualSign = "SelectColumnAliasEqualSign";
 
         #endregion
 
@@ -25,6 +26,14 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
         protected SqlScriptGeneratorOptions _options;
         protected ScriptWriter _writer;
         private Dictionary<TSqlFragment, Dictionary<String, AlignmentPoint>> _alignmentPointsForFragments;
+
+        // The alignment point used to vertically align the "=" signs of "alias = expression"
+        // column aliases for the SELECT list currently being rendered. Held as a field (rather
+        // than resolved by name through the writer's per-scope name map) so that it survives the
+        // per-item alignment scopes that GenerateFragmentList pushes when PreserveComments is
+        // enabled, allowing the "=" signs to align across all rows. Null outside a multiline,
+        // clause-body-aligned SELECT projection. Saved/restored around nested SELECT projections.
+        private AlignmentPoint _selectColumnAliasEqualSignAlignmentPoint;
 
         #endregion
 
@@ -91,6 +100,30 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
         {
             Mark(ap);
             PushAlignmentPoint(ap);
+        }
+
+        // Like MarkAndPushAlignmentPoint, but keeps the current named-alignment-point scope instead
+        // of starting a fresh one. Used when the pushed point exists only to restore indentation for
+        // comment-driven newlines and must not isolate named alignment points (e.g. column-definition
+        // field alignment) from the surrounding list, which would defeat cross-line alignment.
+        protected void MarkAndPushAlignmentPointKeepingNameScope(AlignmentPoint ap)
+        {
+            Mark(ap);
+            _writer.PushNewLineAlignmentPoint(ap, resetNameScope: false);
+        }
+
+        // Isolates named alignment points created while rendering a list so they are shared among the
+        // list's items but do not leak into the enclosing scope (which would let separate lists in the
+        // same parent scope align against each other). Adds no alignment point at the current position
+        // and leaves newline restoration unchanged.
+        protected void PushNamedAlignmentScope()
+        {
+            _writer.PushNamedAlignmentScope();
+        }
+
+        protected void PopNamedAlignmentScope()
+        {
+            _writer.PopNamedAlignmentScope();
         }
 
         protected AlignmentPoint FindOrCreateAlignmentPointByName(String apName)
