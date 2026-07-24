@@ -36,6 +36,9 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
 
             GenerateNewLineOrSpace(_options.NewLineBeforeJoinClause);
 
+            // Emit any pending gap comments before JOIN keywords
+            EmitPendingGapComments();
+
             GenerateQualifiedJoinType(node.QualifiedJoinType);
 
             if (node.JoinHint != JoinHint.None)
@@ -48,10 +51,28 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
 
             //MarkClauseBodyAlignmentWhenNecessary(_options.NewlineBeforeJoinClause);
 
-            NewLine();
+            // Both new options default to true, which reproduces the original formatting exactly:
+            // a newline after the JOIN keyword, then a newline before ON (with no extra indentation).
+            GenerateNewLineOrSpace(_options.NewLineAfterJoinKeyword);
             GenerateFragmentIfNotNull(node.SecondTableReference);
 
-            NewLine();
+            if (_options.NewLineBeforeOnClause)
+            {
+                NewLine();
+
+                // Opt-in refinement only: when the table source is kept on the JOIN line
+                // (NewLineAfterJoinKeyword = false), indent ON one level so it reads as a child of
+                // the JOIN. This branch never runs with the default options, so the default output
+                // is unchanged.
+                if (!_options.NewLineAfterJoinKeyword)
+                {
+                    Indent();
+                }
+            }
+            else
+            {
+                GenerateSpace();
+            }
             GenerateKeyword(TSqlTokenType.On); 
 
             GenerateSpaceAndFragmentIfNotNull(node.SearchCondition);

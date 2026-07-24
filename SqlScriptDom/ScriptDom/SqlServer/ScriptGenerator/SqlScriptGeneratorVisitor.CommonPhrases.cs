@@ -127,7 +127,9 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
             {
                 GenerateSpace();
                 GenerateKeyword(TSqlTokenType.Collate);
-                GenerateSpaceAndFragmentIfNotNull(collation);
+                // Collation names are stored as Identifier fragments but cannot be delimited or recased
+                // (COLLATE [name] is invalid T-SQL), so suppress identifier formatting for them.
+                GenerateWithoutIdentifierFormatting(() => GenerateSpaceAndFragmentIfNotNull(collation));
             }
         }
 
@@ -398,15 +400,81 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
             GenerateSymbol(TSqlTokenType.RightParenthesis);
         }
 
+        // True while rendering a SELECT projection list (QuerySpecification.SelectElements).
+        // Restricts the "alias = expression" ColumnAliasStyle form to real SELECT projections,
+        // because OUTPUT, OUTPUT INTO and RECEIVE reuse SelectScalarExpression but do not
+        // allow that form.
+        private bool _inSelectProjection;
+
         private void GenerateSelectElementsList(IList<SelectElement> selectElements)
         {
-            if (_options.MultilineSelectElementsList == false)
+            // SelectScalarExpression is shared with non-projection contexts (OUTPUT / OUTPUT INTO /
+            // RECEIVE). Mark that we are rendering a real SELECT projection so that column aliases
+            // may honor the ColumnAliasStyle option here (and only here). The previous value is
+            // restored so nested scalar subqueries remain independent.
+            bool previousInSelectProjection = _inSelectProjection;
+            _inSelectProjection = true;
+            try
             {
-                GenerateCommaSeparatedList(selectElements);
+                if (_options.MultilineSelectElementsList == false)
+                {
+                    GenerateCommaSeparatedList(selectElements);
+                }
+                else if (_options.ColumnAliasStyle != ColumnAliasStyle.AsKeyword && _options.AlignClauseBodies)
+                {
+                    // Push a dedicated alignment scope so that "alias = expression" equals signs
+                    // align only within this SELECT list. Nested subqueries push their own scope
+                    // and therefore align independently.
+                    AlignmentPoint selectItems = new AlignmentPoint();
+                    MarkAndPushAlignmentPoint(selectItems);
+
+                    // Hold the "=" alignment point in a field for the duration of this SELECT list.
+                    // When PreserveComments is enabled, GenerateFragmentList wraps each select
+                    // element in its own freshly pushed alignment scope (which resets the writer's
+                    // alignment-point name map), so resolving the point by name would yield a
+                    // distinct point per row and the "=" signs would not align across rows. Keeping
+                    // the point in a field lets every row share it. The previous value is restored
+                    // so nested SELECT projections align independently.
+                    AlignmentPoint previousEqualSignAlignmentPoint = _selectColumnAliasEqualSignAlignmentPoint;
+                    _selectColumnAliasEqualSignAlignmentPoint = new AlignmentPoint(SelectColumnAliasEqualSign);
+                    try
+                    {
+                        GenerateFragmentList(selectElements, ListGenerationOption.MultipleLineSelectElementOption);
+                    }
+                    finally
+                    {
+                        _selectColumnAliasEqualSignAlignmentPoint = previousEqualSignAlignmentPoint;
+                    }
+
+                    PopAlignmentPoint();
+                }
+                else
+                {
+                    GenerateFragmentList(selectElements, ListGenerationOption.MultipleLineSelectElementOption);
+                }
             }
-            else
+            finally
             {
-                GenerateFragmentList(selectElements, ListGenerationOption.MultipleLineSelectElementOption);
+                _inSelectProjection = previousInSelectProjection;
+            }
+        }
+
+        // Mark the alignment point used to vertically align the "=" signs when column aliases
+        // are rendered as "alias = expression". Only applies when the SELECT list is written
+        // on multiple lines and clause-body alignment is enabled.
+        protected void MarkColumnAliasEqualSignAlignmentWhenNecessary()
+        {
+            if (_options.MultilineSelectElementsList && _options.AlignClauseBodies)
+            {
+                // Prefer the alignment point held for the current SELECT list so that the "=" signs
+                // align across all rows even when PreserveComments pushes a per-row alignment scope.
+                // Fall back to name resolution for safety if the field was not set.
+                AlignmentPoint ap = _selectColumnAliasEqualSignAlignmentPoint
+                    ?? FindOrCreateAlignmentPointByName(SelectColumnAliasEqualSign);
+                if (ap != null)
+                {
+                    Mark(ap);
+                }
             }
         }
 

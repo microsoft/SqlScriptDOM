@@ -11,7 +11,16 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
     {
         public override void ExplicitVisit(InsertBulkColumnDefinition node)
         {
-            GenerateFragmentIfNotNull(node.Column);
+            if (node.Column != null && node.Column.DataType == null)
+            {
+                // A column with no data type is the TIMESTAMP/rowversion shorthand; its name is the
+                // TIMESTAMP keyword and cannot be bracketed or recased.
+                GenerateWithoutIdentifierFormatting(() => GenerateFragmentIfNotNull(node.Column));
+            }
+            else
+            {
+                GenerateFragmentIfNotNull(node.Column);
+            }
 
             switch (node.NullNotNull)
             {

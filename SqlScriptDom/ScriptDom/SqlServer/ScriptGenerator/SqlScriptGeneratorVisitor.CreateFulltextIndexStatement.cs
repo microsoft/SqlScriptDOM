@@ -112,9 +112,30 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
             System.Diagnostics.Debug.Assert(node.OptionKind == FullTextIndexOptionKind.StopList);
             GenerateKeywordAndSpace(TSqlTokenType.StopList);
             if (node.IsOff)
+            {
                 GenerateKeyword(TSqlTokenType.Off);
+            }
+            else if (IsSystemStopList(node.StopListName))
+            {
+                // STOPLIST = SYSTEM is a keyword option, not a user-defined stoplist name. Bracketing
+                // or recasing it ("STOPLIST [SYSTEM]") makes the parser read it as a user stoplist named
+                // SYSTEM, silently changing the meaning, so emit it without identifier formatting.
+                GenerateWithoutIdentifierFormatting(() => GenerateFragmentIfNotNull(node.StopListName));
+            }
             else
+            {
                 GenerateFragmentIfNotNull(node.StopListName);
+            }
+        }
+
+        // The STOPLIST option name is stored as an Identifier, but the unquoted value SYSTEM is the
+        // special "system stoplist" keyword rather than an object name. A delimited [SYSTEM] is a real
+        // user-defined stoplist and is left to normal identifier formatting.
+        private static bool IsSystemStopList(Identifier stopListName)
+        {
+            return stopListName != null
+                && stopListName.QuoteType == QuoteType.NotQuoted
+                && string.Equals(stopListName.Value, CodeGenerationSupporter.System, System.StringComparison.OrdinalIgnoreCase);
         }
 
         public override void ExplicitVisit(SearchPropertyListFullTextIndexOption node)

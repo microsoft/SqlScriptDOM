@@ -118,7 +118,16 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
 
             // TODO, yangg: if constraint AP is still not marked, we can mark it here or don't.  
             // either way we have some imperfect effect...check out the expression and table-declare unit tests
-            MarkForConstraintsWhenNecessary(ConstraintAP, ref firstConstraint);
+            //
+            // In Tabs mode (with a positive indentation size), when a column has no constraint the
+            // only remaining token is the comma, so marking the constraint alignment point here
+            // would just pad the column with spaces to line up commas. Skip it in that case. Spaces
+            // mode - and Tabs mode with IndentationSize <= 0, where no tabs are emitted and the
+            // layout falls back to spaces - keeps the original behavior so its output stays unchanged.
+            if (!_options.UseTabsForIndentation || _options.IndentationSize <= 0)
+            {
+                MarkForConstraintsWhenNecessary(ConstraintAP, ref firstConstraint);
+            }
         }
 
         public override void ExplicitVisit(ColumnStorageOptions node)

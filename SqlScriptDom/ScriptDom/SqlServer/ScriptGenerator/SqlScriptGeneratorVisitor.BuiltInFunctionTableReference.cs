@@ -12,7 +12,9 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
         public override void ExplicitVisit(BuiltInFunctionTableReference node)
         {
             GenerateSymbol(TSqlTokenType.DoubleColon);
-            GenerateFragmentIfNotNull(node.Name);
+            // The built-in function name is a keyword-like function name, not an object name; do not
+            // bracket or recase it (same rationale as GlobalFunctionTableReference / FunctionCall).
+            GenerateWithoutIdentifierFormatting(() => GenerateFragmentIfNotNull(node.Name));
 
             GenerateSpace();
             GenerateParenthesisedCommaSeparatedList(node.Parameters, true);

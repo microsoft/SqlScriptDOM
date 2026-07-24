@@ -27,7 +27,12 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
         public override void ExplicitVisit(FunctionCall node)
         {
             GenerateFragmentIfNotNull(node.CallTarget);
-            GenerateFragmentIfNotNull(node.FunctionName);
+
+            // Function names are not affected by the IdentifierCasing / IdentifierBracketing options
+            // (their casing is governed by a separate option), so emit the function name with
+            // identifier formatting suppressed. This has no effect under default options.
+            GenerateWithoutIdentifierFormatting(() => GenerateFragmentIfNotNull(node.FunctionName));
+
             GenerateSymbol(TSqlTokenType.LeftParenthesis);
 
             if (node.FunctionName.Value.ToUpper(CultureInfo.InvariantCulture) == CodeGenerationSupporter.Trim && 
@@ -39,7 +44,9 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
                 if (node.TrimOptions != null)
                 {
                     GenerateSpace();
-                    GenerateFragmentIfNotNull(node.TrimOptions);
+                    // LEADING/TRAILING/BOTH are stored as an Identifier fragment but are keywords, so
+                    // they must not be bracketed or recased by the identifier options.
+                    GenerateWithoutIdentifierFormatting(() => GenerateFragmentIfNotNull(node.TrimOptions));
                     GenerateSpace();
                 }
                 GenerateFragmentIfNotNull(node.Parameters[0]);
@@ -138,7 +145,9 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
                 if (node.IgnoreRespectNulls?.Count > 0)
                 {
                     GenerateSpace();
-                    GenerateSpaceSeparatedList(node.IgnoreRespectNulls);
+                    // IGNORE/RESPECT NULLS are stored as Identifier fragments but are keywords, so they
+                    // must not be bracketed or recased by the identifier options.
+                    GenerateWithoutIdentifierFormatting(() => GenerateSpaceSeparatedList(node.IgnoreRespectNulls));
                 }
 
                 GenerateSpaceAndFragmentIfNotNull(node.WithinGroupClause);
@@ -163,7 +172,9 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
         {
             if (list?.Count > 0 && list[0].Value?.ToUpper(CultureInfo.InvariantCulture) == CodeGenerationSupporter.Absent)
             {
-                GenerateSpaceSeparatedList(list);
+                // ABSENT is stored as an Identifier fragment but is a keyword, so it must not be
+                // bracketed or recased by the identifier options ('[ABSENT] ON NULL' is invalid).
+                GenerateWithoutIdentifierFormatting(() => GenerateSpaceSeparatedList(list));
                 GenerateSpace();
                 GenerateKeyword(TSqlTokenType.On);
                 GenerateSpace();

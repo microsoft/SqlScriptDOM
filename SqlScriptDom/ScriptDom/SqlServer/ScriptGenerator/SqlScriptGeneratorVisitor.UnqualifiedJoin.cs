@@ -28,6 +28,9 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
         {
             GenerateFragmentIfNotNull(node.FirstTableReference);
 
+            // Emit any pending gap comments before JOIN keywords
+            EmitPendingGapComments();
+
             List<TokenGenerator> generators = GetValueForEnumKey(_unqualifiedJoinTypeGenerators, node.UnqualifiedJoinType);
             if (generators != null)
             {

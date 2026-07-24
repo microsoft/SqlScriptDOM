@@ -34,6 +34,8 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
             if (generator != null)
             {
                 NewLine();
+                // Emit any pending gap comments before UNION/EXCEPT/INTERSECT keywords
+                EmitPendingGapComments();
                 GenerateToken(generator);
             }
 
