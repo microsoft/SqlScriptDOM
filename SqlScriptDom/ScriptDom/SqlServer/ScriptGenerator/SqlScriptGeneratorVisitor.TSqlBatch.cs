@@ -11,9 +11,15 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
     {
         public override void ExplicitVisit(TSqlBatch node)
         {
-            foreach (TSqlStatement statement in node.Statements)
+            for (int index = 0; index < node.Statements.Count; index++)
             {
+                TSqlStatement statement = node.Statements[index];
                 GenerateStatementWithSemiColon(statement);
+
+                if (index + 1 < node.Statements.Count)
+                {
+                    GenerateSeparatingSemiColonWhenNecessary(statement, node.Statements[index + 1]);
+                }
 
                 if (statement is TSqlStatementSnippet == false)
                 {

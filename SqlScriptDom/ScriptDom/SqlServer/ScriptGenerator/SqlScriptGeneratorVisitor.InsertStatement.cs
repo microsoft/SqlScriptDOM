@@ -66,8 +66,16 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
                 if (node.Columns.Count > 0)
                 {
                     MarkInsertColumnsAlignmentPointWhenNecessary(insertColumns);
-                    GenerateSpace();
-                    GenerateParenthesisedCommaSeparatedList(node.Columns);
+                    if (_options.MultilineInsertTargetsList)
+                    {
+                        ListGenerationOption option = ListGenerationOption.CreateOptionFromFormattingConfig(_options);
+                        GenerateFragmentList(node.Columns, option);
+                    }
+                    else
+                    {
+                        GenerateSpace();
+                        GenerateParenthesisedCommaSeparatedList(node.Columns);
+                    }
                 }
             }
 

@@ -22,9 +22,10 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
             }
 
             AlignmentPoint clauseBody = GetAlignmentPointForFragment(node, ClauseBody);
-            MarkClauseBodyAlignmentWhenNecessary(_options.NewLineBeforeGroupByClause, clauseBody);
-
-            GenerateSpace();
+            if (!GenerateClauseBodyStart(_options.NewLineBeforeGroupByClause, clauseBody))
+            {
+                GenerateSpace();
+            }
             GenerateCommaSeparatedList(node.GroupingSpecifications);
 
             if (node.GroupByOption != GroupByOption.None)

@@ -27,29 +27,56 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
 
             GenerateKeyword(TSqlTokenType.Select);
 
+            // The select list cannot go through GenerateClauseBodyStart because any DISTINCT/TOP
+            // modifiers are emitted between the keyword and the list: the river has to be marked
+            // right after SELECT, while the indented line break only happens after the modifiers.
+            bool indentSelectList = _options.ClauseBodyAlignment == ClauseBodyAlignment.Indented;
+
             MarkClauseBodyAlignmentWhenNecessary(true, clauseBody);
 
             GenerateUniqueRowFilter(node.UniqueRowFilter, true);
 
             GenerateSpaceAndFragmentIfNotNull(node.TopRowFilter);
 
-            GenerateSpace();
+            // In Indented mode the select list starts on its own line, one level in, while any
+            // DISTINCT/TOP modifiers stay on the SELECT line. Every other (including the default
+            // Aligned) case falls through to the original "GenerateSpace()", so the default is unchanged.
+            if (indentSelectList)
+            {
+                NewLineAndIndent();
+            }
+            else
+            {
+                GenerateSpace();
+            }
             GenerateSelectElementsList(node.SelectElements);
 
             if (intoClause != null)
             {
                 NewLine();
                 GenerateKeyword(TSqlTokenType.Into);
-                MarkClauseBodyAlignmentWhenNecessary(true, clauseBody);
-                GenerateSpaceAndFragmentIfNotNull(intoClause);
+                if (GenerateClauseBodyStart(true, clauseBody))
+                {
+                    GenerateFragmentIfNotNull(intoClause);
+                }
+                else
+                {
+                    GenerateSpaceAndFragmentIfNotNull(intoClause);
+                }
             }
 
             if (filegroupClause != null)
             {
                 NewLine();
                 GenerateKeyword(TSqlTokenType.On);
-                MarkClauseBodyAlignmentWhenNecessary(true, clauseBody);
-                GenerateSpaceAndFragmentIfNotNull(filegroupClause);
+                if (GenerateClauseBodyStart(true, clauseBody))
+                {
+                    GenerateFragmentIfNotNull(filegroupClause);
+                }
+                else
+                {
+                    GenerateSpaceAndFragmentIfNotNull(filegroupClause);
+                }
             }
 
             GenerateFromClause(node.FromClause, clauseBody);
@@ -100,8 +127,10 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
             {
                 NewLine();
                 GenerateKeyword(TSqlTokenType.For);
-                MarkClauseBodyAlignmentWhenNecessary(true, clauseBody);
-                GenerateSpace();
+                if (!GenerateClauseBodyStart(true, clauseBody))
+                {
+                    GenerateSpace();
+                }
 
                 AlignmentPoint forBody = new AlignmentPoint();
                 MarkAndPushAlignmentPoint(forBody);

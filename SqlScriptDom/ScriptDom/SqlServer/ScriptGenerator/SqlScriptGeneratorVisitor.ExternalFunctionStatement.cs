@@ -35,8 +35,18 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
             GenerateSpaceAndFragmentIfNotNull(node.Name);
             if (node.Parameters != null && node.Parameters.Count > 0)
             {
-                GenerateSpace();
-                GenerateParenthesisedCommaSeparatedList(node.Parameters);
+                if (_options.MultilineProcedureParametersList)
+                {
+                    // Opt-in: one parameter per line, indented one level.
+                    ListGenerationOption option = ListGenerationOption.CreateOptionFromFormattingConfig(_options);
+                    GenerateFragmentList(node.Parameters, option);
+                }
+                else
+                {
+                    // Default: unchanged single-line, parenthesized parameter list.
+                    GenerateSpace();
+                    GenerateParenthesisedCommaSeparatedList(node.Parameters);
+                }
             }
             if (node.ReturnType != null)
             {

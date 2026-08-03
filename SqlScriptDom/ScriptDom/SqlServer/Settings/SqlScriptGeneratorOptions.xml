@@ -107,8 +107,13 @@
     </Setting>
   </SettingGroup>
   <SettingGroup name="Alignment">
+    <Setting name="ClauseBodyAlignment" type="ClauseBodyAlignment" default="ClauseBodyAlignment.Aligned">
+      <Option value="ClauseBodyAlignment.Aligned">ClauseBodyAlignment_Aligned</Option>
+      <Option value="ClauseBodyAlignment.Indented">ClauseBodyAlignment_Indented</Option>
+      <Summary>Gets or sets how a clause body (the part after FROM, WHERE, GROUP BY, etc.) is laid out. Aligned keeps the body on the keyword's line, lining all clause bodies up under a shared column past the widest keyword. Indented puts the body on its own new line, one indent level (IndentationSize) past the keyword, so nesting grows one step per level instead of drifting right. When Indented, AlignClauseBodies is ignored.</Summary>
+    </Setting>
     <Setting name="AlignClauseBodies" type="bool" default="true">
-      <Summary>Gets or sets a boolean indicating if the bodies of FROM, WHERE, GROUP BY, etc. clauses should be aligned</Summary>
+      <Summary>Gets or sets whether clause bodies are padded to line up under a shared column. Only applies when ClauseBodyAlignment is Aligned: true pads to the aligned column, false uses a single space after the keyword. Ignored when ClauseBodyAlignment is Indented.</Summary>
     </Setting>
   </SettingGroup>
   <SettingGroup name="SELECT">
@@ -117,6 +122,9 @@
     </Setting>
     <Setting name="MultilineWherePredicatesList" type="bool" default="true">
       <Summary>Gets or sets a boolean indicating if WHERE predicates (expressions separated by AND, and OR) should be written on multiple lines</Summary>
+    </Setting>
+    <Setting name="MultilineInValuesList" type="bool" default="false">
+      <Summary>Gets or sets a boolean indicating if the values in an IN (values) predicate should be listed as a multi-line list. When false, the IN list is written on a single line.</Summary>
     </Setting>
     <Setting name="ColumnAliasStyle" type="ColumnAliasStyle" default="ColumnAliasStyle.AsKeyword">
       <Option value="ColumnAliasStyle.AsKeyword">ColumnAliasStyle_AsKeyword</Option>
@@ -148,11 +156,16 @@
     </Setting>
   </SettingGroup>
   <SettingGroup name="INSERT">
-    <Setting name="MultilineInsertTargetsList" type="bool" default="true">
+    <Setting name="MultilineInsertTargetsList" type="bool" default="false">
       <Summary>Gets or sets a boolean indicating if the INSERT column targets list should be spread across multiple lines</Summary>
     </Setting>
     <Setting name="MultilineInsertSourcesList" type="bool" default="true">
       <Summary>Gets or sets a boolean indicating if the INSERT column sources list should be spread across multiple lines</Summary>
+    </Setting>
+  </SettingGroup>
+  <SettingGroup name="CREATE/ALTER PROCEDURE, FUNCTION">
+    <Setting name="MultilineProcedureParametersList" type="bool" default="false">
+      <Summary>Gets or sets a boolean indicating if procedure and function parameters should be listed on separate lines. When false (the default), all parameters are written on a single line, preserving the previous script-generation behavior. When true, each parameter is placed on its own line, indented one level from the procedure or function name. CommaPlacement applies to the parameter list. AlignColumnDefinitionFields does not apply to procedure or function parameters.</Summary>
     </Setting>
   </SettingGroup>
   <SettingGroup name="Parenthesis">

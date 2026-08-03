@@ -115,8 +115,16 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
             AddAlignmentPointForFragment(node.Source, clauseBody);
             if (node.Columns.Count > 0)
             {
-                GenerateSpace();
-                GenerateParenthesisedCommaSeparatedList(node.Columns);
+                if (_options.MultilineInsertTargetsList)
+                {
+                    ListGenerationOption option = ListGenerationOption.CreateOptionFromFormattingConfig(_options);
+                    GenerateFragmentList(node.Columns, option);
+                }
+                else
+                {
+                    GenerateSpace();
+                    GenerateParenthesisedCommaSeparatedList(node.Columns);
+                }
             }
 
             if (node.Source != null)
