@@ -32,7 +32,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
             public Boolean NewLineBeforeItems { get; set; }
             public int MultipleIndentItems { get; set; }
 
-            public static ListGenerationOption MultipleLineSelectElementOption = new ListGenerationOption()
+            public static readonly ListGenerationOption MultipleLineSelectElementOption = new ListGenerationOption()
             {
                 Parenthesised = false,
                 AlwaysGenerateParenthesis = false,
@@ -43,6 +43,23 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
                 NewLineBeforeFirstItem = false,
                 NewLineBeforeItems = true,
                 MultipleIndentItems = 0,
+            };
+
+            // Non-parenthesized, one-item-per-line list indented a single level. Used for
+            // CREATE/ALTER PROCEDURE parameters, which (unlike function parameters) are not wrapped
+            // in parentheses. The leading new line is produced by the option itself
+            // (NewLineBeforeFirstItem), so callers must not emit their own new line first.
+            public static readonly ListGenerationOption MultipleLineProcedureParameterOption = new ListGenerationOption()
+            {
+                Parenthesised = false,
+                AlwaysGenerateParenthesis = false,
+                IndentParentheses = false,
+                AlignParentheses = false,
+
+                Separator = SeparatorType.Comma,
+                NewLineBeforeFirstItem = true,
+                NewLineBeforeItems = true,
+                MultipleIndentItems = 1,
             };
 
             public static ListGenerationOption CreateOptionFromFormattingConfig(SqlScriptGeneratorOptions formatting)

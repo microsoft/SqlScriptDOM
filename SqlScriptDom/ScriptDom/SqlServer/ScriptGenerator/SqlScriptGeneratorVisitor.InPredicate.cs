@@ -22,8 +22,17 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
 
             if (node.Values.Count > 0)
             {
-                GenerateSpace();
-                GenerateParenthesisedCommaSeparatedList(node.Values);
+                if (_options.MultilineInValuesList)
+                {
+                    ListGenerationOption option = ListGenerationOption.CreateOptionFromFormattingConfig(_options);
+
+                    GenerateFragmentList(node.Values, option);
+                }
+                else
+                {
+                    GenerateSpace();
+                    GenerateParenthesisedCommaSeparatedList(node.Values);
+                }
             }
 
             GenerateSpaceAndFragmentIfNotNull(node.Subquery);

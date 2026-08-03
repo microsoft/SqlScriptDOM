@@ -2385,11 +2385,10 @@ INDEX IX_VETask_Status NONCLUSTERED (Status)
         [SqlStudioTestCategory(Category.UnitTest)]
         public void TestCommaPlacementLeadingInsertTargets()
         {
-            // The INSERT column target list is always emitted as a single-line parenthesized
-            // list (via GenerateParenthesisedCommaSeparatedList), and CommaPlacement only affects
-            // multi-line lists. MultilineInsertTargetsList is not consumed by the INSERT visitor,
-            // so the targets stay on one line and CommaPlacement = Leading has no visual effect:
-            // the output is identical to the trailing case below.
+            // With MultilineInsertTargetsList = true the INSERT column target list is emitted as a
+            // multi-line parenthesized list (like CREATE TABLE / VIEW columns): each column on its
+            // own line indented one level. CommaPlacement = Leading places each column's comma at
+            // the start of its line (indented two characters fewer than the column).
             var sql = "INSERT INTO t (a, b, c) VALUES (1, 2, 3);";
             var parser = new TSql170Parser(true);
             var fragment = parser.Parse(new StringReader(sql), out var errors);
@@ -2403,7 +2402,11 @@ INDEX IX_VETask_Status NONCLUSTERED (Status)
             generator.GenerateScript(fragment, out var generated);
 
             string expected =
-                "INSERT  INTO t (a, b, c)" + Environment.NewLine +
+                "INSERT  INTO t (" + Environment.NewLine +
+                "    a" + Environment.NewLine +
+                "  , b" + Environment.NewLine +
+                "  , c" + Environment.NewLine +
+                ")" + Environment.NewLine +
                 "VALUES        (1, 2, 3);" + Environment.NewLine + Environment.NewLine;
             Assert.AreEqual(expected, generated);
 
@@ -2417,10 +2420,9 @@ INDEX IX_VETask_Status NONCLUSTERED (Status)
         [SqlStudioTestCategory(Category.UnitTest)]
         public void TestCommaPlacementTrailingInsertTargets()
         {
-            // Same output as the leading case: because the INSERT target list renders on a
-            // single line (CommaPlacement only affects multi-line lists, and
-            // MultilineInsertTargetsList is not consumed here), leading and trailing placement
-            // produce identical text.
+            // With MultilineInsertTargetsList = true and CommaPlacement = Trailing (default) the
+            // INSERT column target list is emitted multi-line with each column on its own line and
+            // its comma trailing the column.
             var sql = "INSERT INTO t (a, b, c) VALUES (1, 2, 3);";
             var parser = new TSql170Parser(true);
             var fragment = parser.Parse(new StringReader(sql), out var errors);
@@ -2434,7 +2436,11 @@ INDEX IX_VETask_Status NONCLUSTERED (Status)
             generator.GenerateScript(fragment, out var generated);
 
             string expected =
-                "INSERT  INTO t (a, b, c)" + Environment.NewLine +
+                "INSERT  INTO t (" + Environment.NewLine +
+                "    a," + Environment.NewLine +
+                "    b," + Environment.NewLine +
+                "    c" + Environment.NewLine +
+                ")" + Environment.NewLine +
                 "VALUES        (1, 2, 3);" + Environment.NewLine + Environment.NewLine;
             Assert.AreEqual(expected, generated);
 
@@ -2451,7 +2457,9 @@ INDEX IX_VETask_Status NONCLUSTERED (Status)
             // The INSERT source (VALUES) row list is a multi-line comma-separated list, so
             // CommaPlacement = Leading places each continuation row's comma at the start of its
             // line. (The rows are not aligned under the first row: this list is emitted via the
-            // newline comma-list path, so continuation rows begin at column 0.)
+            // newline comma-list path, so continuation rows begin at column 0.) The target column
+            // list is emitted multi-line because MultilineInsertTargetsList is explicitly enabled
+            // (it is no longer the default).
             var sql = "INSERT INTO t (a, b, c) VALUES (1, 2, 3), (4, 5, 6), (7, 8, 9);";
             var parser = new TSql170Parser(true);
             var fragment = parser.Parse(new StringReader(sql), out var errors);
@@ -2460,12 +2468,17 @@ INDEX IX_VETask_Status NONCLUSTERED (Status)
             var generator = new Sql170ScriptGenerator(new SqlScriptGeneratorOptions
             {
                 CommaPlacement = CommaPlacement.Leading,
-                MultilineInsertSourcesList = true
+                MultilineInsertSourcesList = true,
+                MultilineInsertTargetsList = true
             });
             generator.GenerateScript(fragment, out var generated);
 
             string expected =
-                "INSERT  INTO t (a, b, c)" + Environment.NewLine +
+                "INSERT  INTO t (" + Environment.NewLine +
+                "    a" + Environment.NewLine +
+                "  , b" + Environment.NewLine +
+                "  , c" + Environment.NewLine +
+                ")" + Environment.NewLine +
                 "VALUES        (1, 2, 3)" + Environment.NewLine +
                 ", (4, 5, 6)" + Environment.NewLine +
                 ", (7, 8, 9);" + Environment.NewLine + Environment.NewLine;
@@ -2482,7 +2495,9 @@ INDEX IX_VETask_Status NONCLUSTERED (Status)
         public void TestCommaPlacementTrailingInsertSources()
         {
             // The INSERT source (VALUES) row list with CommaPlacement = Trailing (default):
-            // each row's comma follows it at the end of the line.
+            // each row's comma follows it at the end of the line. The target column list stays
+            // on a single line because MultilineInsertTargetsList is left at its default (false),
+            // exercising the common case of enabling only the source list.
             var sql = "INSERT INTO t (a, b, c) VALUES (1, 2, 3), (4, 5, 6), (7, 8, 9);";
             var parser = new TSql170Parser(true);
             var fragment = parser.Parse(new StringReader(sql), out var errors);
@@ -2891,7 +2906,8 @@ INDEX IX_VETask_Status NONCLUSTERED (Status)
             // The INSERT source (VALUES) row list is always emitted multi-line (the generator
             // does not gate it on MultilineInsertSourcesList), so setting that option to false
             // does NOT collapse it to one line: CommaPlacement = Leading still applies to the
-            // row separators.
+            // row separators. The target column list stays on a single line because
+            // MultilineInsertTargetsList is left at its default (false).
             var sql = "INSERT INTO t (a, b, c) VALUES (1, 2, 3), (4, 5, 6), (7, 8, 9);";
             var parser = new TSql170Parser(true);
             var fragment = parser.Parse(new StringReader(sql), out var errors);

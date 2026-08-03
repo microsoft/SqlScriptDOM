@@ -18,11 +18,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
             // name
             GenerateSpaceAndFragmentIfNotNull(node.ProcedureReference);
 
-            if (node.Parameters != null && node.Parameters.Count > 0)
-            {
-                NewLine();
-                GenerateCommaSeparatedList(node.Parameters);
-            }
+            GenerateProcedureOrFunctionParameters(node.Parameters, parenthesized: false);
 
             GenerateCommaSeparatedWithClause(node.Options, false, false);
 

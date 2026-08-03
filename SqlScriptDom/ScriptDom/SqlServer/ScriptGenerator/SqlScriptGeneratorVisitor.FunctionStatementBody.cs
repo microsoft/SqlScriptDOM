@@ -52,13 +52,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
             GenerateSpaceAndFragmentIfNotNull(node.Name);
 
             // parameters
-            NewLine();
-            GenerateParenthesisedCommaSeparatedList(node.Parameters);
-            if (node.Parameters == null || node.Parameters.Count == 0)
-            {
-                GenerateSymbol(TSqlTokenType.LeftParenthesis);
-                GenerateSpaceAndSymbol(TSqlTokenType.RightParenthesis);
-            }
+            GenerateProcedureOrFunctionParameters(node.Parameters, parenthesized: true);
 
             // RETURNS
             NewLine();

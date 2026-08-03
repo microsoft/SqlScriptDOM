@@ -315,11 +315,18 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
             }
         }
 
-        // mark an alignment point for clause body if it's configured so at a new line
+        // Mark the shared cross-clause "river" alignment point for a clause body, when the current
+        // options call for it.
+        //
+        // ClauseBodyAlignment.Indented never uses the river: a clause body either moves onto its own
+        // indented line (see GenerateClauseBodyStart) or stays on the keyword line separated by a
+        // single space. Marking in that mode would re-introduce the river padding the Indented layout
+        // deliberately drops, so the mode is part of the guard below instead of being repeated by
+        // every caller. Every other case - including the default (Aligned) - is unchanged.
         protected void MarkClauseBodyAlignmentWhenNecessary(Boolean newline, AlignmentPoint ap)
         {
-            // If we didn't put a newline in, don't align, even if AlignClauseBodies is on
-            if (newline && _options.AlignClauseBodies)
+            // If we didn't put a newline in, don't align, even if AlignClauseBodies is on.
+            if (newline && _options.AlignClauseBodies && _options.ClauseBodyAlignment != ClauseBodyAlignment.Indented)
             {
 #if !PIMODLANGUAGE
                 Debug.Assert(ap != null, "Alignment point should not be null");
@@ -329,6 +336,29 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
                     Mark(ap);
                 }
             }
+        }
+
+        // Handle the transition from a clause keyword to its body when the body would start on a new
+        // line (newline == true).
+        //
+        // Default (Aligned) mode: this is a pass-through - it marks the shared clause-body alignment
+        // point exactly as before (via MarkClauseBodyAlignmentWhenNecessary) and returns false, so the
+        // caller emits the usual separating space. The combination is identical to the original
+        // "MarkClauseBodyAlignmentWhenNecessary(...); GenerateSpace();" pair, so the default output
+        // does not change.
+        //
+        // Indented mode: the body is broken onto its own line, indented one level, and this returns
+        // true so the caller skips the separating space.
+        protected Boolean GenerateClauseBodyStart(Boolean newline, AlignmentPoint ap)
+        {
+            if (newline && _options.ClauseBodyAlignment == ClauseBodyAlignment.Indented)
+            {
+                NewLineAndIndent();
+                return true;
+            }
+
+            MarkClauseBodyAlignmentWhenNecessary(newline, ap);
+            return false;
         }
 
         protected void MarkInsertColumnsAlignmentPointWhenNecessary(AlignmentPoint ap)
@@ -398,6 +428,53 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
             PopAlignmentPoint();
 
             GenerateSymbol(TSqlTokenType.RightParenthesis);
+        }
+
+        // Emits the parameter list for a CREATE/ALTER PROCEDURE or FUNCTION statement.
+        //
+        // The default (MultilineProcedureParametersList == false) is intentionally the existing,
+        // unchanged behavior: all parameters are written on a single line - function parameters in
+        // parentheses, procedure parameters without. Multi-line output (one parameter per line,
+        // indented one level from the procedure/function name) is strictly opt-in via the option.
+        // CommaPlacement is honored by the underlying list generation when multi-line is enabled.
+        protected void GenerateProcedureOrFunctionParameters(IList<ProcedureParameter> parameters, bool parenthesized)
+        {
+            bool hasParameters = parameters != null && parameters.Count > 0;
+
+            // Default path: unchanged single-line behavior. Taken whenever the option is off (its
+            // default) or there is nothing to spread across multiple lines.
+            if (!_options.MultilineProcedureParametersList || !hasParameters)
+            {
+                if (parenthesized)
+                {
+                    NewLine();
+                    GenerateParenthesisedCommaSeparatedList(parameters);
+                    if (!hasParameters)
+                    {
+                        GenerateSymbol(TSqlTokenType.LeftParenthesis);
+                        GenerateSpaceAndSymbol(TSqlTokenType.RightParenthesis);
+                    }
+                }
+                else if (hasParameters)
+                {
+                    NewLine();
+                    GenerateCommaSeparatedList(parameters);
+                }
+
+                return;
+            }
+
+            // Opt-in path: one parameter per line, indented one level.
+            if (parenthesized)
+            {
+                ListGenerationOption option = ListGenerationOption.CreateOptionFromFormattingConfig(_options);
+                GenerateFragmentList(parameters, option);
+            }
+            else
+            {
+                // The option produces its own leading new line before the first parameter.
+                GenerateFragmentList(parameters, ListGenerationOption.MultipleLineProcedureParameterOption);
+            }
         }
 
         // True while rendering a SELECT projection list (QuerySpecification.SelectElements).
@@ -506,6 +583,36 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
             {
                 GenerateSymbol(TSqlTokenType.Semicolon);
             }
+        }
+
+        // Some statements must be preceded by a semicolon terminator to be valid in SQL Server:
+        // statements that begin with a WITH clause (common table expression / XMLNAMESPACES) and
+        // the THROW statement. When such a statement follows a statement that was not already
+        // terminated with a semicolon (for example an IF / BEGIN...END / WHILE / TRY...CATCH block,
+        // whose generated form ends with END and no terminator), the required separating semicolon
+        // is emitted so the generated script is valid for SQL Server, which enforces the terminator
+        // even though ScriptDom's own parser is lenient.
+        protected void GenerateSeparatingSemiColonWhenNecessary(TSqlStatement previous, TSqlStatement next)
+        {
+            if (previous != null &&
+                next != null &&
+                _generateSemiColon &&
+                StatementRequiresPrecedingSemiColon(next) &&
+                _writer.LastMeaningfulTokenIsSemicolon() == false)
+            {
+                GenerateSymbol(TSqlTokenType.Semicolon);
+            }
+        }
+
+        private static Boolean StatementRequiresPrecedingSemiColon(TSqlStatement statement)
+        {
+            if (statement is ThrowStatement)
+            {
+                return true;
+            }
+
+            StatementWithCtesAndXmlNamespaces statementWithCtes = statement as StatementWithCtesAndXmlNamespaces;
+            return statementWithCtes != null && statementWithCtes.WithCtesAndXmlNamespaces != null;
         }
 
         /// <summary>

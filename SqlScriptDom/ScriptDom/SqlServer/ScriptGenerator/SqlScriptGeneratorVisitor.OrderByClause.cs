@@ -18,9 +18,10 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
             GenerateSpaceAndKeyword(TSqlTokenType.By);
 
             AlignmentPoint clauseBody = GetAlignmentPointForFragment(node, ClauseBody);
-            MarkClauseBodyAlignmentWhenNecessary(_options.NewLineBeforeOrderByClause, clauseBody);
-
-            GenerateSpace();
+            if (!GenerateClauseBodyStart(_options.NewLineBeforeOrderByClause, clauseBody))
+            {
+                GenerateSpace();
+            }
             GenerateCommaSeparatedList(node.OrderByElements);
 
             PopAlignmentPoint();

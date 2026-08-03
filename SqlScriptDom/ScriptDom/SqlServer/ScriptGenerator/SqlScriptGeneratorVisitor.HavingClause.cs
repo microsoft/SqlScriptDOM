@@ -17,9 +17,14 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
             GenerateKeyword(TSqlTokenType.Having);
 
             AlignmentPoint clauseBody = GetAlignmentPointForFragment(node, ClauseBody);
-            MarkClauseBodyAlignmentWhenNecessary(_options.NewLineBeforeHavingClause, clauseBody);
-
-            GenerateSpaceAndFragmentIfNotNull(node.SearchCondition);
+            if (GenerateClauseBodyStart(_options.NewLineBeforeHavingClause, clauseBody))
+            {
+                GenerateFragmentIfNotNull(node.SearchCondition);
+            }
+            else
+            {
+                GenerateSpaceAndFragmentIfNotNull(node.SearchCondition);
+            }
 
             PopAlignmentPoint();
         }

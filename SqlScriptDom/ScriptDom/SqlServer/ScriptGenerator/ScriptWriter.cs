@@ -93,6 +93,44 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
             }
         }
 
+        // Returns true if the most recently added meaningful token is a semicolon, ignoring any
+        // trailing whitespace, newlines and alignment points. Used to avoid emitting a redundant
+        // separating semicolon when the previous statement already ended with one.
+        public Boolean LastMeaningfulTokenIsSemicolon()
+        {
+            for (Int32 index = _scriptWriterElements.Count - 1; index >= 0; --index)
+            {
+                ScriptWriterElement element = _scriptWriterElements[index];
+
+                if (element.ElementType == ScriptWriterElementType.NewLine ||
+                    element.ElementType == ScriptWriterElementType.AlignmentPoint)
+                {
+                    continue;
+                }
+
+                TokenWrapper tokenWrapper = element as TokenWrapper;
+                if (tokenWrapper != null)
+                {
+                    TSqlTokenType tokenType = tokenWrapper.Token.TokenType;
+
+                    // Skip trailing comments so a semicolon emitted before them is still detected;
+                    // otherwise the caller would append the separator into the comment text.
+                    if (tokenType == TSqlTokenType.WhiteSpace ||
+                        tokenType == TSqlTokenType.SingleLineComment ||
+                        tokenType == TSqlTokenType.MultilineComment)
+                    {
+                        continue;
+                    }
+
+                    return tokenType == TSqlTokenType.Semicolon;
+                }
+
+                return false;
+            }
+
+            return false;
+        }
+
         public void Indent(Int32 size)
         {
             AddSpace(size);

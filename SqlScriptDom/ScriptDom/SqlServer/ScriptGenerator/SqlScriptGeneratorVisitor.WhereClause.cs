@@ -18,15 +18,29 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
 
             AlignmentPoint clauseBody = GetAlignmentPointForFragment(node, ClauseBody);
 
-            MarkClauseBodyAlignmentWhenNecessary(_options.NewLineBeforeWhereClause, clauseBody);
+            bool indented = GenerateClauseBodyStart(_options.NewLineBeforeWhereClause, clauseBody);
 
             if (node.SearchCondition != null)
             {
-                GenerateSpaceAndFragmentIfNotNull(node.SearchCondition);
+                if (indented)
+                {
+                    GenerateFragmentIfNotNull(node.SearchCondition);
+                }
+                else
+                {
+                    GenerateSpaceAndFragmentIfNotNull(node.SearchCondition);
+                }
             }
             else
             {
-                GenerateSpaceAndKeyword(TSqlTokenType.Current);
+                if (indented)
+                {
+                    GenerateKeyword(TSqlTokenType.Current);
+                }
+                else
+                {
+                    GenerateSpaceAndKeyword(TSqlTokenType.Current);
+                }
                 GenerateSpaceAndKeyword(TSqlTokenType.Of);
                 GenerateSpaceAndFragmentIfNotNull(node.Cursor);
             }

@@ -15,6 +15,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
             if (node.Statements != null)
             {
                 Boolean first = true;
+                TSqlStatement previous = null;
                 foreach (TSqlStatement statement in node.Statements)
                 {
                     if (first)
@@ -23,6 +24,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
                     }
                     else
                     {
+                        GenerateSeparatingSemiColonWhenNecessary(previous, statement);
                         for (var i = 0; i < _options.NumNewlinesAfterStatement; i++)
                         {
                             NewLine();
@@ -30,6 +32,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
                     }
 
                     GenerateStatementWithSemiColon(statement);
+                    previous = statement;
                 }
             }
         }
