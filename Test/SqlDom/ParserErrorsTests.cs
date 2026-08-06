@@ -207,6 +207,21 @@ WITH
         }
 
         /// <summary>
+        /// Negative test for GitHub issue #216: MASKED WITH must not be specified twice on the
+        /// same column, even though SPARSE and MASKED WITH are now accepted in either order.
+        /// </summary>
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void SparseMaskedColumnNegativeTest()
+        {
+            string doubleMasked =
+                "CREATE TABLE t (c VARCHAR(100) MASKED WITH (FUNCTION = 'default()') SPARSE MASKED WITH (FUNCTION = 'email()') NULL)";
+            ParserTestUtils.ErrorTest140(doubleMasked,
+                new ParserErrorInfo(doubleMasked.IndexOf("SPARSE MASKED") + 7, "SQL46010", "MASKED"));
+        }
+
+        /// <summary>
         /// Negative tests for HIDDEN columns
         /// </summary>
         [TestMethod]

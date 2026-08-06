@@ -27715,6 +27715,10 @@ regularColumnBody [IndexAffectingStatement statementType, ColumnDefinition vPare
             )?
         )?
         (
+            {NextTokenMatches(CodeGenerationSupporter.Masked) && !vParent.IsMasked}?
+            maskedClause[vParent]
+        )?
+        (
             {NextTokenMatches(CodeGenerationSupporter.Hidden)}?
             tHidden:Identifier
             (
