@@ -41,5 +41,13 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         /// Take an action
         /// </summary>
         Action                      = 6,
+        /// <summary>
+        /// Grant CREATE ANY DATABASE
+        /// </summary>
+        GrantCreateAnyDatabase      = 7,
+        /// <summary>
+        /// Deny CREATE ANY DATABASE
+        /// </summary>
+        DenyCreateAnyDatabase       = 8,
     }
 }

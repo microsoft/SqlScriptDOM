@@ -133,6 +133,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         internal const string ApplicationLog = "APPLICATION_LOG";
         internal const string Apply = "APPLY";
         internal const string ApplyDelay = "APPLY_DELAY";
+        internal const string BackupPriority = "BACKUP_PRIORITY";
         internal const string Assembly = "ASSEMBLY";
         internal const string Asymmetric = "ASYMMETRIC";
         internal const string AsynchronousCommit = "ASYNCHRONOUS_COMMIT";

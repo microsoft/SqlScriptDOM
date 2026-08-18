@@ -9589,6 +9589,16 @@ alterAvailabilityGroupStatement returns [AlterAvailabilityGroupStatement vResult
         alterAvailabilityGroupRemoveReplica[vResult]
     |    alterAvailabilityGroupSetOption[vResult]
     |    alterAvailabilityGroupTakeAction[vResult]
+    |    tGrant:Grant Create Any tGrantDatabase:Database
+        {
+            vResult.AlterAvailabilityGroupStatementType = AlterAvailabilityGroupStatementType.GrantCreateAnyDatabase;
+            UpdateTokenInfo(vResult, tGrantDatabase);
+        }
+    |    tDeny:Deny Create Any tDenyDatabase:Database
+        {
+            vResult.AlterAvailabilityGroupStatementType = AlterAvailabilityGroupStatementType.DenyCreateAnyDatabase;
+            UpdateTokenInfo(vResult, tDenyDatabase);
+        }
      )
     ;
 
@@ -9953,6 +9963,10 @@ literalReplicaOption returns [LiteralReplicaOption vResult = FragmentFactory.Cre
                 if(TryMatch(tOption, CodeGenerationSupporter.SessionTimeout))
                 {
                     vResult.OptionKind=AvailabilityReplicaOptionKind.SessionTimeout;
+                }
+                else if(TryMatch(tOption, CodeGenerationSupporter.BackupPriority))
+                {
+                    vResult.OptionKind=AvailabilityReplicaOptionKind.BackupPriority;
                 }
                 else
                 {
