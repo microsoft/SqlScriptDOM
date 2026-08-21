@@ -10,8 +10,8 @@ jobs:
       matrix:
         os: [windows-latest, ubuntu-latest]
     steps:
-    - uses: actions/checkout@v2
-    - uses: actions/setup-dotnet@v2
+    - uses: actions/checkout@0717577d45739eb3c851188b29f50ed6c0b2194e # v2.8.0
+    - uses: actions/setup-dotnet@8e6bd2905eef86446227f003dda1deb3916c4aaf # v2.2.1
       with:
         global-json-file: global.json
     - name: Install dependencies
@@ -20,7 +20,7 @@ jobs:
       run: dotnet build dirs.proj
     - name: Archive antlr log for troubleshooting
       if: ${{ failure() && matrix.os == 'ubuntu-latest' }}
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
       with:
         name: antlr-log
         path: SqlScriptDom/NUL
@@ -31,8 +31,8 @@ jobs:
         os: [windows-latest, ubuntu-latest]
     needs: build
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-dotnet@v2
+      - uses: actions/checkout@0717577d45739eb3c851188b29f50ed6c0b2194e # v2.8.0
+      - uses: actions/setup-dotnet@8e6bd2905eef86446227f003dda1deb3916c4aaf # v2.2.1
         with:
           global-json-file: global.json
       - name: Disable strong name validation
