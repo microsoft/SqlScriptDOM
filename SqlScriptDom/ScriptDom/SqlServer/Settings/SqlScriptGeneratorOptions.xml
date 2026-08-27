@@ -57,7 +57,13 @@
       <Summary>Gets or sets a boolean indicating if a space should be included between parameters in a data type</Summary>
     </Setting>
     <Setting name="NumNewlinesAfterStatement" type="int" default="1" min="0">
-      <Summary>Gets or sets the number of newlines to include after each statement</Summary>
+      <Summary>Gets or sets the number of newlines to include after each statement of a nested statement list, such as the body of a BEGIN...END block, stored procedure, trigger, function, IF or WHILE. The newlines are written between consecutive statements only, not after the last one, so the default of 1 puts each nested statement on its own line with no blank line between them. Statements owned directly by a batch are not affected by this setting; use NumNewlinesAfterBatchStatement for those.</Summary>
+    </Setting>
+    <Setting name="NumNewlinesAfterBatchStatement" type="int" default="2" min="0">
+      <Summary>Gets or sets the number of newlines to include after each statement owned directly by a batch, that is, each top level statement of a script between GO separators. The newlines are written after every such statement, including the last one in the batch, except when the statement is a TSqlStatementSnippet (snippets are emitted as-is and do not receive additional trailing newlines from this option). The default of 2 leaves one blank line between consecutive top level statements and, together with the newline that always precedes GO, two blank lines before the GO that closes the batch. Statements nested inside another statement are not affected by this setting; use NumNewlinesAfterStatement for those.</Summary>
+    </Setting>
+    <Setting name="NumNewlinesAfterBatches" type="int" default="1" min="1">
+      <Summary>Gets or sets the number of newlines to include after the GO separator that is written between two batches. GO is always preceded by a newline of its own so that it starts a new line, and the blank lines before it are controlled by NumNewlinesAfterBatchStatement; this setting only controls what follows GO, so the default of 1 starts the next batch on the following line with no blank line in between.</Summary>
     </Setting>
     <Setting name="PreserveComments" type="bool" default="false">
       <Summary>Gets or sets a boolean indicating if comments from the original script should be preserved in the generated output</Summary>

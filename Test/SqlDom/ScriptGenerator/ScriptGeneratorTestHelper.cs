@@ -52,5 +52,12 @@ namespace SqlStudio.Tests.UTSqlScriptDom
         {
             Assert.AreEqual(Normalize(expected).Trim(), Normalize(Generate(sql, options)).Trim());
         }
+
+        // Exact comparison without Trim(), so leading and trailing newline counts are part of the
+        // assertion. Use this to lock down the newlines emitted after the final batch's last statement.
+        public static void AssertGeneratedExact(string sql, SqlScriptGeneratorOptions options, string expected)
+        {
+            Assert.AreEqual(Normalize(expected), Normalize(Generate(sql, options)));
+        }
     }
 }

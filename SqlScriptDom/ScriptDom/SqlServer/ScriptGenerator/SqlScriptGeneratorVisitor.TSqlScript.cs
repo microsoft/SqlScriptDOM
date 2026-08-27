@@ -27,9 +27,10 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
                 }
                 else
                 {
+                    // GO always starts a new line, whatever the batch statements left behind.
                     NewLine();
                     GenerateKeyword(TSqlTokenType.Go);
-                    NewLine();
+                    GenerateNewLinesAfterBatch();
                 }
 
                 GenerateFragmentIfNotNull(item);
@@ -37,6 +38,14 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
 
             // Emit any remaining comments at end of script (after the last statement)
             EmitRemainingComments();
+        }
+
+        private void GenerateNewLinesAfterBatch()
+        {
+            for (int i = 0; i < _options.NumNewlinesAfterBatches; i++)
+            {
+                NewLine();
+            }
         }
     }
 }
