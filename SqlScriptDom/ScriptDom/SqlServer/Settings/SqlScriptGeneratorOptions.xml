@@ -142,6 +142,18 @@
     <Setting name="MultilineWherePredicatesList" type="bool" default="true">
       <Summary>Gets or sets a boolean indicating if WHERE predicates (expressions separated by AND, and OR) should be written on multiple lines</Summary>
     </Setting>
+    <Setting name="MultilineGroupByElementsList" type="bool" default="false">
+      <Summary>Gets or sets a boolean indicating if GROUP BY elements should be listed as a multi-line list</Summary>
+    </Setting>
+    <Setting name="MultilineHavingPredicatesList" type="bool" default="true">
+      <Summary>Gets or sets a boolean indicating if HAVING predicates (expressions separated by AND or OR) should be written on multiple lines</Summary>
+    </Setting>
+    <Setting name="MultilineOrderByElementsList" type="bool" default="false">
+      <Summary>Gets or sets a boolean indicating if ORDER BY elements should be listed as a multi-line list</Summary>
+    </Setting>
+    <Setting name="MultilinePartitionByElementsList" type="bool" default="false">
+      <Summary>Gets or sets a boolean indicating if PARTITION BY elements in window specifications should be listed as a multi-line list</Summary>
+    </Setting>
     <Setting name="MultilineInValuesList" type="bool" default="false">
       <Summary>Gets or sets a boolean indicating if the values in an IN (values) predicate should be listed as a multi-line list. When false, the IN list is written on a single line.</Summary>
     </Setting>

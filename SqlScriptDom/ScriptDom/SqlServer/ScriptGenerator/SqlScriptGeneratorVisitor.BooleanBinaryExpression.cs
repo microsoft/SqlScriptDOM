@@ -10,6 +10,8 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
 {
     partial class SqlScriptGeneratorVisitor
     {
+        private Boolean? _multilinePredicates;
+
         public override void ExplicitVisit(BooleanBinaryExpression node)
         {
             AlignmentPoint start = new AlignmentPoint();
@@ -35,11 +37,26 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
             //  * A Newline was inserted before the WHERE clause, AND
             //  * The Binary Expression is an AND or an OR expression.
             Boolean insertNewline =
-                    _options.MultilineWherePredicatesList &&
-                    _options.NewLineBeforeWhereClause &&
+                    (_multilinePredicates ??
+                        (_options.MultilineWherePredicatesList && _options.NewLineBeforeWhereClause)) &&
                     (node.BinaryExpressionType == BooleanBinaryExpressionType.And || node.BinaryExpressionType == BooleanBinaryExpressionType.Or);
 
             return insertNewline;
+        }
+
+        private void GeneratePredicate(TSqlFragment predicate, Boolean multiline)
+        {
+            Boolean? previousMultilinePredicates = _multilinePredicates;
+            _multilinePredicates = multiline;
+
+            try
+            {
+                GenerateFragmentIfNotNull(predicate);
+            }
+            finally
+            {
+                _multilinePredicates = previousMultilinePredicates;
+            }
         }
 
     }

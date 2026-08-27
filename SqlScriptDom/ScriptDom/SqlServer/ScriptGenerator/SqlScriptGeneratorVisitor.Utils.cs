@@ -236,6 +236,41 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
             });
         }
 
+        // generate a multiline comma-separated list whose elements remain aligned when commas lead
+        protected void GenerateAlignedMultilineCommaSeparatedList<T>(IList<T> list) where T : TSqlFragment
+        {
+            if (list == null)
+            {
+                return;
+            }
+
+            Boolean first = true;
+            Boolean leadingComma = _options.CommaPlacement == CommaPlacement.Leading;
+            AlignmentPoint elements = new AlignmentPoint();
+
+            foreach (T fragment in list)
+            {
+                if (!first)
+                {
+                    if (leadingComma)
+                    {
+                        NewLine();
+                        GenerateRightAlignedCommaSeparator();
+                    }
+                    else
+                    {
+                        GenerateSymbol(TSqlTokenType.Comma);
+                        NewLine();
+                    }
+                }
+
+                MarkAndPushAlignmentPoint(elements);
+                GenerateFragmentIfNotNull(fragment);
+                PopAlignmentPoint();
+                first = false;
+            }
+        }
+
         // generate a comma-separated list
         protected void GenerateCommaSeparatedList<T>(IList<T> list, bool insertNewLine, bool indent, bool generateSpaces = true) where T : TSqlFragment
         {

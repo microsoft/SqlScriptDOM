@@ -33,7 +33,14 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
                     GenerateSpace();
                 }
 
-                GenerateCommaSeparatedList(node.GroupingSpecifications);
+                if (_options.MultilineGroupByElementsList)
+                {
+                    GenerateAlignedMultilineCommaSeparatedList(node.GroupingSpecifications);
+                }
+                else
+                {
+                    GenerateCommaSeparatedList(node.GroupingSpecifications);
+                }
             }
 
             if (node.GroupByOption != GroupByOption.None)

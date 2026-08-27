@@ -42,7 +42,14 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
                     GenerateSpace();
                 }
 
-                GenerateCommaSeparatedList(node.OrderByElements);
+                if (_options.MultilineOrderByElementsList)
+                {
+                    GenerateAlignedMultilineCommaSeparatedList(node.OrderByElements);
+                }
+                else
+                {
+                    GenerateCommaSeparatedList(node.OrderByElements);
+                }
             }
 
             PopAlignmentPoint();
