@@ -361,15 +361,27 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
             return false;
         }
 
+        // Marks the river that lines up an INSERT statement's VALUES row constructors under its
+        // column list (e.g. "INSERT INTO t (a, b)" / "VALUES       (1, 2)"). Only skipped for the
+        // Indented + !AlignClauseBodies combination, where ValuesInsertSource instead puts the row
+        // list on its own indented line (see ShouldMoveInsertValuesToNewLine); every other option
+        // combination keeps the existing river behavior so current baselines are unaffected.
         protected void MarkInsertColumnsAlignmentPointWhenNecessary(AlignmentPoint ap)
         {
 #if !PIMODLANGUAGE
             Debug.Assert(ap != null, "Alignment point should not be null");
 #endif
-            if (ap != null)
+            if (ap != null && !ShouldMoveInsertValuesToNewLine())
             {
                 Mark(ap);
             }
+        }
+
+        // True when an INSERT statement's VALUES row constructors should move to their own
+        // indented line instead of being padded (or single-spaced) onto the "VALUES" line.
+        protected Boolean ShouldMoveInsertValuesToNewLine()
+        {
+            return _options.ClauseBodyAlignment == ClauseBodyAlignment.Indented && !_options.AlignClauseBodies;
         }
 
         protected void GenerateSeparatorForOrderBy()

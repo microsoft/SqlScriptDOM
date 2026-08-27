@@ -334,9 +334,12 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
             }
         }
 
-        protected void GenerateFragmentList<T>(IList<T> list, ListGenerationOption option) where T : TSqlFragment
+        protected void GenerateFragmentList<T>(IList<T> list, ListGenerationOption option, AlignmentPoint openParenthesisAlignmentPoint = null) where T : TSqlFragment
         {
-            AlignmentPoint parentheses = new AlignmentPoint();
+            // When the caller supplies its own open-parenthesis alignment point, mark it at the "("
+            // so downstream content (e.g. an INSERT statement's VALUES row constructors) can line up
+            // under the list's opening parenthesis. Defaults to a private point for all other callers.
+            AlignmentPoint parentheses = openParenthesisAlignmentPoint ?? new AlignmentPoint();
             AlignmentPoint items = new AlignmentPoint();
 
             Boolean generateParentheses = (option.AlwaysGenerateParenthesis || (list.Count > 0 && option.Parenthesised));

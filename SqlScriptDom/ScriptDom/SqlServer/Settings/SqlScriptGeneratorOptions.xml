@@ -110,10 +110,10 @@
     <Setting name="ClauseBodyAlignment" type="ClauseBodyAlignment" default="ClauseBodyAlignment.Aligned">
       <Option value="ClauseBodyAlignment.Aligned">ClauseBodyAlignment_Aligned</Option>
       <Option value="ClauseBodyAlignment.Indented">ClauseBodyAlignment_Indented</Option>
-      <Summary>Gets or sets how a clause body (the part after FROM, WHERE, GROUP BY, etc.) is laid out. Aligned keeps the body on the keyword's line, lining all clause bodies up under a shared column past the widest keyword. Indented puts the body on its own new line, one indent level (IndentationSize) past the keyword, so nesting grows one step per level instead of drifting right. When Indented, AlignClauseBodies is ignored.</Summary>
+      <Summary>Gets or sets how a clause body (the part after FROM, WHERE, GROUP BY, etc.) is laid out. Aligned keeps the body on the keyword's line, lining all clause bodies up under a shared column past the widest keyword. Indented puts the body on its own new line, one indent level (IndentationSize) past the keyword, so nesting grows one step per level instead of drifting right. When Indented, AlignClauseBodies is ignored for clause bodies.</Summary>
     </Setting>
     <Setting name="AlignClauseBodies" type="bool" default="true">
-      <Summary>Gets or sets whether clause bodies are padded to line up under a shared column. Only applies when ClauseBodyAlignment is Aligned: true pads to the aligned column, false uses a single space after the keyword. Ignored when ClauseBodyAlignment is Indented.</Summary>
+      <Summary>Gets or sets whether clause bodies are padded to line up under a shared column. Only applies when ClauseBodyAlignment is Aligned: true pads to the aligned column, false uses a single space after the keyword. When ClauseBodyAlignment is Indented, this setting is generally ignored for clause bodies; however, it also affects an INSERT statement's VALUES row constructors: when ClauseBodyAlignment is Indented and this is false, the row constructors move to their own indented line instead of being padded to line up under the column list.</Summary>
     </Setting>
   </SettingGroup>
   <SettingGroup name="SELECT">

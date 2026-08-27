@@ -2407,7 +2407,7 @@ INDEX IX_VETask_Status NONCLUSTERED (Status)
                 "  , b" + Environment.NewLine +
                 "  , c" + Environment.NewLine +
                 ")" + Environment.NewLine +
-                "VALUES        (1, 2, 3);" + Environment.NewLine + Environment.NewLine;
+                "VALUES         (1, 2, 3);" + Environment.NewLine + Environment.NewLine;
             Assert.AreEqual(expected, generated);
 
             var reparser = new TSql170Parser(true);
@@ -2441,7 +2441,7 @@ INDEX IX_VETask_Status NONCLUSTERED (Status)
                 "    b," + Environment.NewLine +
                 "    c" + Environment.NewLine +
                 ")" + Environment.NewLine +
-                "VALUES        (1, 2, 3);" + Environment.NewLine + Environment.NewLine;
+                "VALUES         (1, 2, 3);" + Environment.NewLine + Environment.NewLine;
             Assert.AreEqual(expected, generated);
 
             var reparser = new TSql170Parser(true);
@@ -2456,10 +2456,9 @@ INDEX IX_VETask_Status NONCLUSTERED (Status)
         {
             // The INSERT source (VALUES) row list is a multi-line comma-separated list, so
             // CommaPlacement = Leading places each continuation row's comma at the start of its
-            // line. (The rows are not aligned under the first row: this list is emitted via the
-            // newline comma-list path, so continuation rows begin at column 0.) The target column
-            // list is emitted multi-line because MultilineInsertTargetsList is explicitly enabled
-            // (it is no longer the default).
+            // line, aligned under the first row's opening parenthesis. The target column list is
+            // emitted multi-line because MultilineInsertTargetsList is explicitly enabled (it is
+            // no longer the default).
             var sql = "INSERT INTO t (a, b, c) VALUES (1, 2, 3), (4, 5, 6), (7, 8, 9);";
             var parser = new TSql170Parser(true);
             var fragment = parser.Parse(new StringReader(sql), out var errors);
@@ -2479,9 +2478,9 @@ INDEX IX_VETask_Status NONCLUSTERED (Status)
                 "  , b" + Environment.NewLine +
                 "  , c" + Environment.NewLine +
                 ")" + Environment.NewLine +
-                "VALUES        (1, 2, 3)" + Environment.NewLine +
-                ", (4, 5, 6)" + Environment.NewLine +
-                ", (7, 8, 9);" + Environment.NewLine + Environment.NewLine;
+                "VALUES         (1, 2, 3)" + Environment.NewLine +
+                "             , (4, 5, 6)" + Environment.NewLine +
+                "             , (7, 8, 9);" + Environment.NewLine + Environment.NewLine;
             Assert.AreEqual(expected, generated);
 
             var reparser = new TSql170Parser(true);
@@ -2495,8 +2494,9 @@ INDEX IX_VETask_Status NONCLUSTERED (Status)
         public void TestCommaPlacementTrailingInsertSources()
         {
             // The INSERT source (VALUES) row list with CommaPlacement = Trailing (default):
-            // each row's comma follows it at the end of the line. The target column list stays
-            // on a single line because MultilineInsertTargetsList is left at its default (false),
+            // each row's comma follows it at the end of the line, and continuation rows align
+            // under the first row's opening parenthesis. The target column list stays on a
+            // single line because MultilineInsertTargetsList is left at its default (false),
             // exercising the common case of enabling only the source list.
             var sql = "INSERT INTO t (a, b, c) VALUES (1, 2, 3), (4, 5, 6), (7, 8, 9);";
             var parser = new TSql170Parser(true);
@@ -2512,9 +2512,9 @@ INDEX IX_VETask_Status NONCLUSTERED (Status)
 
             string expected =
                 "INSERT  INTO t (a, b, c)" + Environment.NewLine +
-                "VALUES        (1, 2, 3)," + Environment.NewLine +
-                "(4, 5, 6)," + Environment.NewLine +
-                "(7, 8, 9);" + Environment.NewLine + Environment.NewLine;
+                "VALUES         (1, 2, 3)," + Environment.NewLine +
+                "               (4, 5, 6)," + Environment.NewLine +
+                "               (7, 8, 9);" + Environment.NewLine + Environment.NewLine;
             Assert.AreEqual(expected, generated);
 
             var reparser = new TSql170Parser(true);
@@ -2890,7 +2890,7 @@ INDEX IX_VETask_Status NONCLUSTERED (Status)
 
             string expected =
                 "INSERT  INTO t (a, b, c)" + Environment.NewLine +
-                "VALUES        (1, 2, 3);" + Environment.NewLine + Environment.NewLine;
+                "VALUES         (1, 2, 3);" + Environment.NewLine + Environment.NewLine;
             Assert.AreEqual(expected, generated);
 
             var reparser = new TSql170Parser(true);
@@ -2906,7 +2906,8 @@ INDEX IX_VETask_Status NONCLUSTERED (Status)
             // The INSERT source (VALUES) row list is always emitted multi-line (the generator
             // does not gate it on MultilineInsertSourcesList), so setting that option to false
             // does NOT collapse it to one line: CommaPlacement = Leading still applies to the
-            // row separators. The target column list stays on a single line because
+            // row separators, and continuation rows align under the first row's opening
+            // parenthesis. The target column list stays on a single line because
             // MultilineInsertTargetsList is left at its default (false).
             var sql = "INSERT INTO t (a, b, c) VALUES (1, 2, 3), (4, 5, 6), (7, 8, 9);";
             var parser = new TSql170Parser(true);
@@ -2922,9 +2923,9 @@ INDEX IX_VETask_Status NONCLUSTERED (Status)
 
             string expected =
                 "INSERT  INTO t (a, b, c)" + Environment.NewLine +
-                "VALUES        (1, 2, 3)" + Environment.NewLine +
-                ", (4, 5, 6)" + Environment.NewLine +
-                ", (7, 8, 9);" + Environment.NewLine + Environment.NewLine;
+                "VALUES         (1, 2, 3)" + Environment.NewLine +
+                "             , (4, 5, 6)" + Environment.NewLine +
+                "             , (7, 8, 9);" + Environment.NewLine + Environment.NewLine;
             Assert.AreEqual(expected, generated);
 
             var reparser = new TSql170Parser(true);
