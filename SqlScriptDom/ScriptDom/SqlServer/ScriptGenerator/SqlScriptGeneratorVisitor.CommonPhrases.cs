@@ -587,11 +587,34 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
         // part of CREATE VIEW statement, and we don't want to generate semicolon for the included statements
         protected Boolean _generateSemiColon = true;
 
+        // Blocks that StatementsThatCannotHaveSemiColon suppresses by default but that
+        // TerminateBlockStatements opts back in. TryCatchStatement covers END CATCH; END TRY is
+        // internal to the block and never reaches this check.
+        private static readonly HashSet<Type> _blockStatementsTerminatedByOption = new HashSet<Type>
+        {
+            typeof(BeginEndBlockStatement),
+            typeof(TryCatchStatement),
+        };
+
+        // Membership is tested on the exact runtime type, so a derived block such as
+        // BeginEndAtomicBlockStatement is unaffected by either set.
+        private Boolean CanHaveSemiColon(TSqlStatement statement)
+        {
+            Type statementType = statement.GetType();
+
+            if (StatementsThatCannotHaveSemiColon.Contains(statementType) == false)
+            {
+                return true;
+            }
+
+            return _options.TerminateBlockStatements && _blockStatementsTerminatedByOption.Contains(statementType);
+        }
+
         protected void GenerateSemiColonWhenNecessary(TSqlStatement node)
         {
             if (node != null &&
                 _generateSemiColon &&
-                StatementsThatCannotHaveSemiColon.Contains(node.GetType()) == false)
+                CanHaveSemiColon(node))
             {
                 GenerateSymbol(TSqlTokenType.Semicolon);
             }
@@ -647,7 +670,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
             // Only suppress for fragments at the statement boundary (LastTokenIndex).
             bool previousSuppressState = _suppressTrailingComments;
             int previousSuppressIndex = _suppressTrailingCommentsAfterIndex;
-            if (_options.PreserveComments && _generateSemiColon && !StatementsThatCannotHaveSemiColon.Contains(statement.GetType()))
+            if (_options.PreserveComments && _generateSemiColon && CanHaveSemiColon(statement))
             {
                 _suppressTrailingComments = true;
                 _suppressTrailingCommentsAfterIndex = statement.LastTokenIndex;

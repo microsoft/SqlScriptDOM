@@ -44,6 +44,9 @@
       <Description>IncludeSemiColons_Description</Description>
       <Summary>Gets or sets a boolean indicating if a semi colon should be included after each statement</Summary>
     </Setting>
+    <Setting name="TerminateBlockStatements" type="bool" default="false">
+      <Summary>Gets or sets a boolean indicating if a semicolon terminator is written after a BEGIN...END block and after the END CATCH of a BEGIN TRY...END TRY BEGIN CATCH...END CATCH block. When false (the default), these blocks are written without a terminator, preserving the previous script-generation behavior. When true, a semicolon is appended, so a terminator supplied in the source script survives a parse and generate round-trip. END TRY is never terminated because it is internal to the TRY...CATCH block.</Summary>
+    </Setting>
     <Setting name="NewLineFormattedIndexDefinition" type="bool" default="false">
       <Summary>Gets or sets a boolean indicating if index definitions should have UNIQUE, INCLUDE and WHERE on their own line</Summary>
     </Setting>
