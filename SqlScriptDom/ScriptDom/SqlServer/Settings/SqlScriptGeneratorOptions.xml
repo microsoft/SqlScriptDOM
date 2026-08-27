@@ -84,6 +84,9 @@
     <Setting name="CommaPlacement" type="CommaPlacement" default="CommaPlacement.Trailing">
       <Summary>Gets or sets a value indicating whether commas in a multi-line comma-separated list are placed at the end of the line (trailing) or at the start of the next line (leading). When set to Leading, the IndentationMode setting is ignored and indentation always uses spaces.</Summary>
     </Setting>
+    <Setting name="LeadingCommaSpaceCount" type="int" default="1" min="0" max="1">
+      <Summary>Gets or sets the number of spaces written after a leading comma when CommaPlacement is Leading. Valid values are 0 and 1. The default is 1.</Summary>
+    </Setting>
   </SettingGroup>
   <SettingGroup name="CREATE TABLE">
     <Setting name="AlignColumnDefinitionFields" type="bool" default="true">

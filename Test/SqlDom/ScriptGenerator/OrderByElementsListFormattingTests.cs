@@ -175,18 +175,18 @@ ORDER BY a,
         [TestMethod]
         [Priority(0)]
         [SqlStudioTestCategory(Category.UnitTest)]
-        public void TestThreeMultilineOrderByElementsHonorLeadingCommaSpacing()
+        public void TestThreeMultilineOrderByElementsHonorZeroLeadingCommaSpacing()
         {
             const string input = "SELECT a, b, c FROM t ORDER BY a, b DESC, c;";
             SqlScriptGeneratorOptions options = MakeOptions(true);
             options.CommaPlacement = CommaPlacement.Leading;
-            options.LeadingCommaSpaceCount = 2;
+            options.LeadingCommaSpaceCount = 0;
             const string expected = @"
 SELECT a, b, c
 FROM t
 ORDER BY a
-      ,  b DESC
-      ,  c;";
+        ,b DESC
+        ,c;";
 
             AssertGenerated(input, options, expected);
         }
