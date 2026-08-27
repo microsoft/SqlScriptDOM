@@ -192,4 +192,9 @@
       <Summary>Gets or sets a boolean indicating if file paths can be used for external language content</Summary>
     </Setting>
   </SettingGroup>
+  <SettingGroup name="WITH clause options">
+    <Setting name="MultilineWithOptionsList" type="bool" default="false">
+      <Summary>Gets or sets a boolean indicating if the options in a WITH (or OPTION) clause should be listed on separate lines. This applies to CREATE/ALTER INDEX and other index options, table hints (WITH), query hints (OPTION), and BACKUP/RESTORE options (WITH). It does not apply to the WITH keyword of common table expressions or XMLNAMESPACES, nor to the option lists of CREATE XML INDEX (non-selective) or CREATE SPATIAL INDEX, which have their own generators. When false (default), the options are written on a single line. CommaPlacement applies within the options list. For parenthesized clauses, NewLineBeforeOpenParenthesisInMultilineList and NewLineBeforeCloseParenthesisInMultilineList control parenthesis placement. When the WITH keyword begins the option list, the options are indented one level from the statement.</Summary>
+    </Setting>
+  </SettingGroup>
 </Settings>

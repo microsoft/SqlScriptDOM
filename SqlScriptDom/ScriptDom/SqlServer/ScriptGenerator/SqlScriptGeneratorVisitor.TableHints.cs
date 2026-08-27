@@ -15,8 +15,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
             if (tableHints.Count > 0)
             {
                 GenerateSpaceAndKeyword(TSqlTokenType.With);
-                GenerateSpace();
-                GenerateParenthesisedCommaSeparatedList(tableHints);
+                GenerateWithOptionsList(tableHints, spaceBeforeSingleLineParenthesis: true);
             }
         }
 

@@ -65,12 +65,11 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
                 NewLineAndIndent();
                 GenerateKeyword(TSqlTokenType.With);
 
-                GenerateSpace();
                 // could be
                 //      MoveRestoreOption
                 //      SimpleRestoreOption
                 //      StopRestoreOption
-                GenerateCommaSeparatedList(node.Options);
+                GenerateWithOptionsListNonParenthesized(node.Options);
             }
         }
     }
