@@ -28,6 +28,9 @@ namespace SqlStudio.Tests.UTSqlScriptDom
             new ParserTestFabricDW("InvokeExternalApiTestsFabricDW.sql", nErrors80: 2, nErrors90: 1, nErrors100: 0, nErrors110: 0, nErrors120: 0, nErrors130: 0, nErrors140: 0, nErrors150: 0, nErrors160: 0, nErrors170: 0, nErrors180: 0),
             new ParserTestFabricDW("ExternalFunctionTestsFabricDW.sql", nErrors80: 12, nErrors90: 4, nErrors100: 4, nErrors110: 4, nErrors120: 4, nErrors130: 11, nErrors140: 11, nErrors150: 11, nErrors160: 11, nErrors170: 11, nErrors180: 0),
             new ParserTestFabricDW("CreateDatabaseCollateBeforeEditionTestsFabricDW.sql", nErrors80: 3, nErrors90: 3, nErrors100: 3, nErrors110: 3, nErrors120: 0, nErrors130: 0, nErrors140: 0, nErrors150: 0, nErrors160: 0, nErrors170: 0, nErrors180: 0),
+            new ParserTestFabricDW("ModernGroupByAllTestsFabricDW.sql", nErrors80: 9, nErrors90: 9, nErrors100: 9, nErrors110: 9, nErrors120: 9, nErrors130: 9, nErrors140: 9, nErrors150: 9, nErrors160: 9, nErrors170: 9, nErrors180: 9),
+            new ParserTestFabricDW("OrderByAllTestsFabricDW.sql", nErrors80: 13, nErrors90: 13, nErrors100: 13, nErrors110: 13, nErrors120: 13, nErrors130: 13, nErrors140: 13, nErrors150: 13, nErrors160: 13, nErrors170: 13, nErrors180: 13),
+                    
         };
 
         [TestMethod]

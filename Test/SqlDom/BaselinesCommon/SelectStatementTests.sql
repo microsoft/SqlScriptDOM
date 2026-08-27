@@ -95,6 +95,10 @@ GROUP BY ALL c1;
 
 SELECT *
 FROM t1
+GROUP BY ALL c1, c2, c3;
+
+SELECT *
+FROM t1
 GROUP BY c1, c2, c3;
 
 SELECT *

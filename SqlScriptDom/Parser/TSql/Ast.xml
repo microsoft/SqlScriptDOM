@@ -3550,6 +3550,8 @@
   </Class>
   <Class Name="OrderByClause" Summary="Represents the order by clause that can be used in statements like select.">
     <Member Name="OrderByElements" Type="ExpressionWithSortOrder" Collection="true" Summary="The items."/>
+    <Member Name="All" Type="bool" Summary="True if the ORDER BY ALL shorthand is used, which orders by every column in the select list. When true, OrderByElements is empty."/>
+    <Member Name="AllSortOrder" Type="SortOrder" GenerateUpdatePositionInfoCall="false" Summary="The sort order (ASC/DESC) applied to ORDER BY ALL. Only meaningful when All is true."/>
   </Class>
   <Class Name="JoinTableReference" Base="TableReference" Abstract="true" Summary="Base class for JOIN table references">
     <Member Name="FirstTableReference" Type="TableReference" Summary="The first table reference."/>

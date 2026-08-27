@@ -201,6 +201,113 @@ ORDER BY
             AssertGenerated(input, options, expected);
         }
 
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestIndentedLegacyGroupByAllColumnsStillIndent()
+        {
+            // Legacy GROUP BY ALL <columns> (accepted by the box parsers too): ALL stays on the
+            // GROUP BY line as a keyword modifier, but the explicit column list still drops to its
+            // own indented lines under Indented layout.
+            const string input = "SELECT a, COUNT(*) FROM t GROUP BY ALL a, b;";
+            var options = new SqlScriptGeneratorOptions { ClauseBodyAlignment = ClauseBodyAlignment.Indented };
+            const string expected =
+@"
+SELECT
+    a,
+    COUNT(*)
+FROM
+    t
+GROUP BY ALL
+    a, b;";
+
+            AssertGenerated(input, options, expected);
+        }
+
+        // --- GROUP BY ALL / ORDER BY ALL shorthands (Fabric DW first syntax) ----------------------
+        // GROUP BY ALL (no column list) and ORDER BY ALL are Fabric DW first, so these go through the
+        // Fabric DW pipeline (AssertGeneratedFabric). They confirm the ALL keyword is a clause-keyword
+        // modifier that stays on the GROUP BY / ORDER BY line under both Aligned and Indented layouts.
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestAlignedGroupByAll()
+        {
+            // Aligned: clause bodies line up under the widest keyword that has a body (here SELECT /
+            // FROM). The ALL shorthand has no body, so GROUP BY does not widen the alignment column;
+            // ALL simply stays on the GROUP BY line.
+            const string input = "SELECT City, COUNT(*) AS NumEmps FROM dbo.Employees GROUP BY ALL;";
+            var options = new SqlScriptGeneratorOptions { ClauseBodyAlignment = ClauseBodyAlignment.Aligned };
+            const string expected =
+@"
+SELECT City,
+       COUNT(*) AS NumEmps
+FROM   dbo.Employees
+GROUP BY ALL;";
+
+            AssertGeneratedFabric(input, options, expected);
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestIndentedGroupByAllKeepsAllInline()
+        {
+            // Indented: every clause body drops to its own indented line, but the ALL shorthand is a
+            // keyword modifier, so it stays on the GROUP BY line (no empty indented body line).
+            const string input = "SELECT City, COUNT(*) AS NumEmps FROM dbo.Employees GROUP BY ALL;";
+            var options = new SqlScriptGeneratorOptions { ClauseBodyAlignment = ClauseBodyAlignment.Indented };
+            const string expected =
+@"
+SELECT
+    City,
+    COUNT(*) AS NumEmps
+FROM
+    dbo.Employees
+GROUP BY ALL;";
+
+            AssertGeneratedFabric(input, options, expected);
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestAlignedOrderByAll()
+        {
+            const string input = "SELECT c1, c2 FROM t1 ORDER BY ALL;";
+            var options = new SqlScriptGeneratorOptions { ClauseBodyAlignment = ClauseBodyAlignment.Aligned };
+            const string expected =
+@"
+SELECT c1,
+       c2
+FROM   t1
+ORDER BY ALL;";
+
+            AssertGeneratedFabric(input, options, expected);
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestIndentedOrderByAllKeepsAllInline()
+        {
+            // Indented: the ALL shorthand (with its optional sort order) stays on the ORDER BY line
+            // rather than being pushed onto its own indented line.
+            const string input = "SELECT c1, c2 FROM t1 ORDER BY ALL DESC;";
+            var options = new SqlScriptGeneratorOptions { ClauseBodyAlignment = ClauseBodyAlignment.Indented };
+            const string expected =
+@"
+SELECT
+    c1,
+    c2
+FROM
+    t1
+ORDER BY ALL DESC;";
+
+            AssertGeneratedFabric(input, options, expected);
+        }
+
         // --- Nested derived table (the motivating case: linear growth vs. rightward drift) -------
 
         [TestMethod]

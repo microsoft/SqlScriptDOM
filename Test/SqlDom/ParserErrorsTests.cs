@@ -7285,6 +7285,80 @@ WHEN NOT MATCHED BY SOURCE THEN DELETE OUTPUT inserted.*, deleted.*;";
         }
 
         /// <summary>
+        /// Negative tests for the modern GROUP BY ALL (no explicit column list) syntax on Fabric DW.
+        /// The grammar accepts GROUP BY ALL with no columns, but WITH CUBE / WITH ROLLUP are rejected
+        /// at parse time (SQL46084), matching the source engine behavior.
+        /// </summary>
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void ModernGroupByAllNegativeTestsFabricDW()
+        {
+            // GROUP BY ALL (no columns) cannot be combined with WITH CUBE.
+            string withCube = "SELECT City, COUNT(*) AS NumEmps FROM dbo.Employees GROUP BY ALL WITH CUBE";
+            ParserTestUtils.ErrorTestFabricDW(withCube, new ParserErrorInfo(withCube.IndexOf("CUBE"), "SQL46084"));
+
+            // GROUP BY ALL (no columns) cannot be combined with WITH ROLLUP.
+            string withRollup = "SELECT City, COUNT(*) AS NumEmps FROM dbo.Employees GROUP BY ALL WITH ROLLUP";
+            ParserTestUtils.ErrorTestFabricDW(withRollup, new ParserErrorInfo(withRollup.IndexOf("ROLLUP"), "SQL46084"));
+
+            // GROUP BY ALL cannot be combined with a GROUPING SETS specification.
+            string groupingSets = "SELECT City, COUNT(*) AS NumEmps FROM dbo.Employees GROUP BY ALL GROUPING SETS ((City), ())";
+            ParserTestUtils.ErrorTestFabricDW(groupingSets, new ParserErrorInfo(groupingSets.IndexOf("GROUPING"), "SQL46084"));
+        }
+
+        /// <summary>
+        /// Negative tests for the ORDER BY ALL syntax on Fabric DW. ORDER BY ALL must stand alone
+        /// at the query / subquery level; mixing it with explicit items, or using it inside an
+        /// OVER() window clause or a WITHIN GROUP ordered-set aggregate, is rejected at parse time.
+        /// </summary>
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void OrderByAllNegativeTestsFabricDW()
+        {
+            // ALL followed by an explicit column is a syntax error.
+            string allThenColumn = "SELECT c1, c2 FROM t1 ORDER BY ALL, c1";
+            ParserTestUtils.ErrorTestFabricDW(allThenColumn, new ParserErrorInfo(allThenColumn.IndexOf(",", allThenColumn.IndexOf("ALL")), "SQL46010", ","));
+
+            // An explicit column followed by ALL is a syntax error.
+            string columnThenAll = "SELECT c1, c2 FROM t1 ORDER BY c1, ALL";
+            ParserTestUtils.ErrorTestFabricDW(columnThenAll, new ParserErrorInfo(columnThenAll.LastIndexOf("ALL"), "SQL46010", "ALL"));
+
+            // ORDER BY ALL is not allowed inside an OVER() window clause.
+            string inOver = "SELECT ROW_NUMBER() OVER (ORDER BY ALL) FROM t1";
+            ParserTestUtils.ErrorTestFabricDW(inOver, new ParserErrorInfo(inOver.IndexOf("ALL"), "SQL46010", "ALL"));
+
+            // ORDER BY ALL is not allowed inside a WITHIN GROUP ordered-set aggregate.
+            string inWithinGroup = "SELECT STRING_AGG(c2, ',') WITHIN GROUP (ORDER BY ALL) FROM t1";
+            ParserTestUtils.ErrorTestFabricDW(inWithinGroup, new ParserErrorInfo(inWithinGroup.LastIndexOf("ALL"), "SQL46010", "ALL"));
+
+            // ORDER BY ALL is not allowed inside an OVER() window clause with PARTITION BY.
+            string inOverPartition = "SELECT ROW_NUMBER() OVER (PARTITION BY c2 ORDER BY ALL) FROM t1";
+            ParserTestUtils.ErrorTestFabricDW(inOverPartition, new ParserErrorInfo(inOverPartition.LastIndexOf("ALL"), "SQL46010", "ALL"));
+
+            // ORDER BY ALL inside a derived table without TOP / OFFSET / FOR is invalid (SQL46047),
+            // exactly like any other ORDER BY in that position.
+            string subqueryNoTop = "SELECT * FROM (SELECT c1, c2 FROM t1 ORDER BY ALL) AS sub";
+            ParserTestUtils.ErrorTestFabricDW(subqueryNoTop, new ParserErrorInfo(subqueryNoTop.IndexOf("SELECT", 1), "SQL46047"));
+
+            // ORDER BY ALL is not allowed inside an OVER() window clause with a window frame (ROWS BETWEEN).
+            string inOverFrame = "SELECT SUM(c1) OVER (ORDER BY ALL ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) FROM t1";
+            ParserTestUtils.ErrorTestFabricDW(inOverFrame, new ParserErrorInfo(inOverFrame.IndexOf("ALL"), "SQL46010", "ALL"));
+
+            // ORDER BY ALL is not allowed inside a named WINDOW definition.
+            string inNamedWindow = "SELECT ROW_NUMBER() OVER w FROM t1 WINDOW w AS (ORDER BY ALL)";
+            ParserTestUtils.ErrorTestFabricDW(inNamedWindow, new ParserErrorInfo(inNamedWindow.LastIndexOf("ALL"), "SQL46010", "ALL"));
+
+            // ORDER BY ALL is not allowed inside a named WINDOW definition with PARTITION BY.
+            string inNamedWindowPartition = "SELECT ROW_NUMBER() OVER w FROM t1 WINDOW w AS (PARTITION BY c2 ORDER BY ALL)";
+            ParserTestUtils.ErrorTestFabricDW(inNamedWindowPartition, new ParserErrorInfo(inNamedWindowPartition.LastIndexOf("ALL"), "SQL46010", "ALL"));
+
+            string inJsonArrayAgg = "SELECT JSON_ARRAYAGG(c1 ORDER BY ALL) FROM t1";
+            ParserTestUtils.ErrorTestFabricDW(inJsonArrayAgg, new ParserErrorInfo(inJsonArrayAgg.IndexOf("ORDER"), "SQL46010", "ORDER"));
+        }
+
+        /// <summary>
         /// Negative tests for AI_GENERATE_CHUNKS syntax
         /// </summary>
         [TestMethod]
