@@ -2677,6 +2677,10 @@ createDatabase returns [CreateDatabaseStatement vResult = FragmentFactory.Create
             vResult.DatabaseName = vIdentifier;
             ThrowPartialAstIfPhaseOne(vResult);
         }
+      // NOTE: Unlike TSql120+, azureOptions and the collationOpt branch here are mutually-exclusive
+      // alternatives, so COLLATE and Azure edition options cannot coexist in either order. The
+      // COLLATE-before-options fix applied to TSql120-180/FabricDW is intentionally NOT ported here:
+      // it would require restructuring these alternatives into sequential optionals (a larger change).
       (
         {NextTokenMatches(CodeGenerationSupporter.MaxSize,2) || NextTokenMatches(CodeGenerationSupporter.Edition,2)}?
         azureOptions[vResult, vResult.Options]

@@ -2921,6 +2921,20 @@ ADD FILE
         [TestMethod]
         [Priority(0)]
         [SqlStudioTestCategory(Category.UnitTest)]
+        public void CreateDatabaseCollateWithAzureOptionsDownlevelErrorTest()
+        {
+            // TSql110 wires azureOptions and collationOpt as mutually-exclusive alternatives, so COLLATE
+            // and parenthesized Azure edition options cannot coexist in either order (see TSql110.g createDatabase).
+            ParserTestUtils.ErrorTest110("CREATE DATABASE [db1] COLLATE SQL_Latin1_General_CP1_CI_AS (EDITION = 'Standard')",
+                new ParserErrorInfo(60, "SQL46010", "EDITION"));
+            ParserTestUtils.ErrorTest110("CREATE DATABASE d1 (EDITION = 'business') COLLATE SQL_Latin1_General_CP1_CI_AS",
+                new ParserErrorInfo(42, "SQL46010", "COLLATE"));
+        }
+
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void SQL46063Test()
         {
             // Empty strings in file options are not allowed
