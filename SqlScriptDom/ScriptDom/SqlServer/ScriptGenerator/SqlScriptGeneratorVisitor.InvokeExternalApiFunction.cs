@@ -31,7 +31,10 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
                 throw new InvalidOperationException("InvokeExternalApiFunctionCall.FunctionName is required.");
             }
 
-            GenerateIdentifier(CodeGenerationSupporter.InvokeExternalApi);
+            if (!TryGenerateBuiltInFunctionName(CodeGenerationSupporter.InvokeExternalApi))
+            {
+                GenerateIdentifier(CodeGenerationSupporter.InvokeExternalApi);
+            }
             GenerateSymbol(TSqlTokenType.LeftParenthesis);
 
             GenerateFragmentIfNotNull(node.FunctionSetName);

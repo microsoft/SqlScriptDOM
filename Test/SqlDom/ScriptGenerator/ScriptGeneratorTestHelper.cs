@@ -84,6 +84,11 @@ namespace SqlStudio.Tests.UTSqlScriptDom
             new ScriptGenerationPipeline<TSqlFabricDWParser, SqlFabricDWScriptGenerator>(
                 () => new TSqlFabricDWParser(true), options => new SqlFabricDWScriptGenerator(options));
 
+        // SQL-100 pipeline, for syntax that later versions removed (for example the COMPUTE clause).
+        private static readonly ScriptGenerationPipeline<TSql100Parser, Sql100ScriptGenerator> Sql100 =
+            new ScriptGenerationPipeline<TSql100Parser, Sql100ScriptGenerator>(
+                () => new TSql100Parser(true), options => new Sql100ScriptGenerator(options));
+
         // SQL-170 pipeline.
         public static string Generate(string sql, SqlScriptGeneratorOptions options) => Sql170.Generate(sql, options);
         public static void AssertReparses(string sql) => Sql170.AssertReparses(sql);
@@ -93,6 +98,10 @@ namespace SqlStudio.Tests.UTSqlScriptDom
         public static string GenerateFabric(string sql, SqlScriptGeneratorOptions options) => FabricDW.Generate(sql, options);
         public static void AssertReparsesFabric(string sql) => FabricDW.AssertReparses(sql);
         public static void AssertGeneratedFabric(string sql, SqlScriptGeneratorOptions options, string expected) => FabricDW.AssertGenerated(sql, options, expected);
+
+        // SQL-100 pipeline.
+        public static string Generate100(string sql, SqlScriptGeneratorOptions options) => Sql100.Generate(sql, options);
+        public static void AssertGenerated100(string sql, SqlScriptGeneratorOptions options, string expected) => Sql100.AssertGenerated(sql, options, expected);
 
         // Normalizes line endings so verbatim expected constants compare equal regardless of the
         // source file's line-ending style.

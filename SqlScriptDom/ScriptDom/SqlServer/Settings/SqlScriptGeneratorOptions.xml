@@ -27,6 +27,13 @@
       <Option value="IdentifierBracketing.ExcludeBrackets">IdentifierBracketing_ExcludeBrackets</Option>
       <Summary>Gets or sets how square brackets are applied to object identifiers during script generation. IncludeBrackets wraps all identifiers in square brackets; ExcludeBrackets removes brackets from identifiers that do not require them (identifiers conflicting with reserved words for the configured SqlVersion or containing special characters retain their brackets).</Summary>
     </Setting>
+    <Setting name="BuiltInFunctionCasing" type="BuiltInFunctionCasing" default="BuiltInFunctionCasing.Preserve">
+      <Option value="BuiltInFunctionCasing.Preserve">BuiltInFunctionCasing_Preserve</Option>
+      <Option value="BuiltInFunctionCasing.Uppercase">BuiltInFunctionCasing_UpperCase</Option>
+      <Option value="BuiltInFunctionCasing.Lowercase">BuiltInFunctionCasing_LowerCase</Option>
+      <Option value="BuiltInFunctionCasing.PascalCase">BuiltInFunctionCasing_PascalCase</Option>
+      <Summary>Gets or sets the casing applied to built-in / system function names (such as GETDATE, ISNULL, COALESCE, CAST, COUNT) during script generation. The default (Preserve) has no effect on the formatted output. When set to any other value it takes precedence over KeywordCasing for function names; under Preserve, keyword-backed built-ins such as CAST and CONVERT continue to follow KeywordCasing. Data type names, keywords, string literals, and variables are never affected. Casing is applied to every unqualified, non-delimited function name, which is safe because T-SQL resolves a one-part scalar function name as a built-in function and never as a user-defined one (a scalar user-defined function must be called with at least a two-part name). Schema-qualified (for example dbo.MyFunc) and delimited (for example [MyFunc]) function names, and method calls on a variable or column (for example @g.STArea()), are always preserved. Keyword-form niladic functions (such as CURRENT_TIMESTAMP, SYSTEM_USER) and built-in table-valued functions (such as STRING_SPLIT, OPENJSON) are not affected.</Summary>
+    </Setting>
     <Setting name="SqlVersion" type="SqlVersion" default="SqlVersion.Sql90" browsable="false">
       <Summary>Gets or sets the Sql version to generate script for</Summary>
     </Setting>

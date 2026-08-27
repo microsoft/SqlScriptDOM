@@ -12,14 +12,20 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
     {
         public override void ExplicitVisit(LeftFunctionCall node)
         {
-            GenerateKeyword(TSqlTokenType.Left);
+            if (!TryGenerateBuiltInFunctionName(TSqlTokenType.Left))
+            {
+                GenerateKeyword(TSqlTokenType.Left);
+            }
             GenerateParenthesisedCommaSeparatedList(node.Parameters, true);
             GenerateSpaceAndCollation(node.Collation);
         }
 
         public override void ExplicitVisit(RightFunctionCall node)
         {
-            GenerateKeyword(TSqlTokenType.Right);
+            if (!TryGenerateBuiltInFunctionName(TSqlTokenType.Right))
+            {
+                GenerateKeyword(TSqlTokenType.Right);
+            }
             GenerateParenthesisedCommaSeparatedList(node.Parameters, true);
             GenerateSpaceAndCollation(node.Collation);
         }
@@ -28,10 +34,17 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
         {
             GenerateFragmentIfNotNull(node.CallTarget);
 
+            // Recognized, unqualified built-in function names follow the BuiltInFunctionCasing
+            // option. When that option is Preserve (the default) or the name is a user-defined
+            // function, fall back to emitting the name with its original casing.
+            //
             // Function names are not affected by the IdentifierCasing / IdentifierBracketing options
-            // (their casing is governed by a separate option), so emit the function name with
+            // (their casing is governed by BuiltInFunctionCasing), so emit the function name with
             // identifier formatting suppressed. This has no effect under default options.
-            GenerateWithoutIdentifierFormatting(() => GenerateFragmentIfNotNull(node.FunctionName));
+            if (!TryGenerateBuiltInFunctionName(node))
+            {
+                GenerateWithoutIdentifierFormatting(() => GenerateFragmentIfNotNull(node.FunctionName));
+            }
 
             GenerateSymbol(TSqlTokenType.LeftParenthesis);
 

@@ -19,7 +19,10 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
         /// <param name="node">Expression node to generate</param>
         public override void ExplicitVisit(AITranslateFunctionCall node)
         {
-            GenerateIdentifier(CodeGenerationSupporter.AITranslate);
+            if (!TryGenerateBuiltInFunctionName(CodeGenerationSupporter.AITranslate))
+            {
+                GenerateIdentifier(CodeGenerationSupporter.AITranslate);
+            }
             GenerateSymbol(TSqlTokenType.LeftParenthesis);
             GenerateFragmentIfNotNull(node.Input);
             GenerateSymbol(TSqlTokenType.Comma);

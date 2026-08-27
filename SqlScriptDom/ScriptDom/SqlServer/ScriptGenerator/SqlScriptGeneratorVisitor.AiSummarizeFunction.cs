@@ -17,7 +17,10 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
         /// <param name="node">Expression node to generate</param>
         public override void ExplicitVisit(AISummarizeFunctionCall node)
         {
-            GenerateIdentifier(CodeGenerationSupporter.AISummarize);
+            if (!TryGenerateBuiltInFunctionName(CodeGenerationSupporter.AISummarize))
+            {
+                GenerateIdentifier(CodeGenerationSupporter.AISummarize);
+            }
             GenerateSymbol(TSqlTokenType.LeftParenthesis);
             GenerateFragmentIfNotNull(node.Input);
             GenerateSymbol(TSqlTokenType.RightParenthesis);
