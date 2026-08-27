@@ -952,7 +952,12 @@ GO
             // AssertGenerated also verifies the generated script (comments included) reparses cleanly.
             ScriptGeneratorTestHelper.AssertGenerated(
                 sql,
-                new SqlScriptGeneratorOptions { AlignColumnDefinitionFields = true, PreserveComments = true },
+                new SqlScriptGeneratorOptions
+                {
+                    AlignColumnDefinitionFields = true,
+                    NewLineBeforeCloseParenthesisInMultilineList = false,
+                    PreserveComments = true,
+                },
                 expected);
         }
 

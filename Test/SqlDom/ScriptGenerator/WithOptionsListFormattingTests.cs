@@ -147,6 +147,28 @@ CREATE INDEX i1
             AssertGenerated(input, options, expected);
         }
 
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestMultilineCreateIndexCommentBeforeCloseParenthesisForcesNewLine()
+        {
+            const string input =
+@"CREATE INDEX i1 ON t1 (c1) WITH (PAD_INDEX = ON, FILLFACTOR = 50 -- last option
+);";
+            var options = MakeOptions(true);
+            options.NewLineBeforeCloseParenthesisInMultilineList = false;
+            options.PreserveComments = true;
+            const string expected =
+@"
+CREATE INDEX i1
+    ON t1(c1) WITH (
+    PAD_INDEX = ON,
+    FILLFACTOR = 50 -- last option
+);";
+
+            AssertGenerated(input, options, expected);
+        }
+
         // -----------------------------------------------------------------------------------------
         // ALTER INDEX ... REBUILD (index options WITHOUT a space before the parenthesis by default)
         // -----------------------------------------------------------------------------------------

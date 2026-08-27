@@ -224,7 +224,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
                 else
                 {
                     GenerateSymbol(TSqlTokenType.Comma);
-                    if (insertNewLine)
+                    if (insertNewLine || HasDeferredTrailingSingleLineComments)
                     {
                         NewLine();
                     }
@@ -487,7 +487,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
                     // Only push alignment point for NewLine() restoration when comment preservation is enabled.
                     // This ensures NewLine() calls within items (e.g., from EmitCommentToken) can restore
                     // to the correct indented position, without affecting general formatting.
-                    if (_options.PreserveComments)
+                    if (_options.PreserveComments || option.AlignItemsForNewLines)
                     {
                         AlignmentPoint itemScope = new AlignmentPoint();
                         // Keep the current named-alignment-point scope so field alignment points
@@ -521,7 +521,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
             // generate close parenthesis
             if (generateParentheses)
             {
-                if (option.NewLineBeforeCloseParenthesis)
+                if (option.NewLineBeforeCloseParenthesis || HasDeferredTrailingSingleLineComments)
                 {
                     NewLine();
                     if (option.AlignParentheses)

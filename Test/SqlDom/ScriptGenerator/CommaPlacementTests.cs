@@ -316,6 +316,26 @@ FROM   t;";
         [TestMethod]
         [Priority(0)]
         [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestCommaPlacementTrailingWithCommentBeforeCommaForcesNewLine()
+        {
+            const string input = @"SELECT col1 -- first column
+, col2
+FROM t;";
+            var options = new SqlScriptGeneratorOptions
+            {
+                CommaPlacement = CommaPlacement.Trailing,
+                PreserveComments = true,
+            };
+            const string expected = @"
+SELECT col1, -- first column
+       col2
+FROM   t;";
+            AssertGenerated(input, options, expected);
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void TestCommaPlacementLeadingSelectListMultilineFalse()
         {
             const string input = "SELECT a, b, c FROM t;";

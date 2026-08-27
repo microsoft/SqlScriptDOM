@@ -210,6 +210,11 @@
       <Summary>Gets or sets a boolean indicating if a newline should be placed before an close parenthesis when writing a multi-line list in parenthesis</Summary>
     </Setting>
   </SettingGroup>
+  <SettingGroup name="Function calls">
+    <Setting name="MultilineNestedFunctionCalls" type="bool" default="false">
+      <Summary>Gets or sets a boolean indicating if parameters in a nested function call tree should be written on separate lines and indented one level per call. Isolated function calls remain on one line. When false (the default), all function calls retain the existing compact layout.</Summary>
+    </Setting>
+  </SettingGroup>
   <SettingGroup name="External Libraries">
     <Setting name="AllowExternalLibraryPaths" type="bool" default="true">
       <Summary>Gets or sets a boolean indicating if file paths can be used for external library content</Summary>
