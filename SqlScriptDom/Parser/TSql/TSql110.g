@@ -133,13 +133,17 @@ script returns [TSqlScript vResult = this.FragmentFactory.CreateFragment<TSqlScr
         ( 
             Go
             {
+                vResult.TrailingGoCount++;
                 ResetQuotedIdentifiersSettingToInitial();
                 ThrowPartialAstIfPhaseOne(null);
             }
             vCurrentBatch = batch
             {
                 if (vCurrentBatch != null)
+                {
                     AddAndUpdateTokenInfo(vResult, vResult.Batches, vCurrentBatch);
+                    vResult.TrailingGoCount = 0;
+                }
             }
 
         )* 

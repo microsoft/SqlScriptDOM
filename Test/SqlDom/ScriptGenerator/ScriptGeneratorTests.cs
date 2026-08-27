@@ -432,6 +432,270 @@ namespace SqlStudio.Tests.UTSqlScriptDom
         [TestMethod]
         [Priority(0)]
         [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestTrailingGo_IsPreservedOnRoundTrip()
+        {
+            // With PersistTrailingGo enabled, a trailing GO present on input is regenerated.
+            var sql = @"DECLARE @v1 AS VARCHAR (100) = '';
+SELECT id, name FROM sys.databases;
+GO
+";
+            var expected = @"DECLARE @v1 AS VARCHAR (100) = '';
+
+SELECT id,
+       name
+FROM   sys.databases;
+
+
+GO
+";
+            ScriptGeneratorTestHelper.AssertGeneratedExact(
+                sql,
+                new SqlScriptGeneratorOptions { PersistTrailingGo = true },
+                expected);
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestTrailingGo_NotEmittedByDefault()
+        {
+            // PersistTrailingGo defaults to false, so the trailing GO is not regenerated.
+            var sql = @"DECLARE @v1 AS VARCHAR (100) = '';
+SELECT id, name FROM sys.databases;
+GO
+";
+            var expected = @"DECLARE @v1 AS VARCHAR (100) = '';
+
+SELECT id,
+       name
+FROM   sys.databases;
+
+";
+            ScriptGeneratorTestHelper.AssertGeneratedExact(
+                sql,
+                new SqlScriptGeneratorOptions(),
+                expected);
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestNoTrailingGo_IsNotAdded()
+        {
+            // The trailing GO is optional on input; when absent it must not be generated even when enabled.
+            var sql = @"DECLARE @v1 AS VARCHAR (100) = '';
+SELECT id, name FROM sys.databases;
+";
+            var expected = @"DECLARE @v1 AS VARCHAR (100) = '';
+
+SELECT id,
+       name
+FROM   sys.databases;
+
+";
+            ScriptGeneratorTestHelper.AssertGeneratedExact(
+                sql,
+                new SqlScriptGeneratorOptions { PersistTrailingGo = true },
+                expected);
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestTrailingGo_ExtraNewLinesAroundGoAreNormalized()
+        {
+            // Several blank lines before and after the GO must not affect the generated output.
+            var sql = @"DECLARE @v1 AS VARCHAR (100) = '';
+SELECT id, name FROM sys.databases;
+
+
+
+GO
+
+
+
+";
+            var expected = @"DECLARE @v1 AS VARCHAR (100) = '';
+
+SELECT id,
+       name
+FROM   sys.databases;
+
+
+GO
+";
+            ScriptGeneratorTestHelper.AssertGeneratedExact(
+                sql,
+                new SqlScriptGeneratorOptions { PersistTrailingGo = true },
+                expected);
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestTrailingGo_CommentBeforeGoStaysAboveSeparator()
+        {
+            // With PreserveComments + PersistTrailingGo, a comment between the last statement
+            // and the trailing GO must stay above the GO, not cross the batch separator.
+            var sql = @"SELECT 1;
+-- trailing note
+GO
+";
+            var expected = @"SELECT 1;
+
+ -- trailing note
+GO
+";
+            ScriptGeneratorTestHelper.AssertGeneratedExact(
+                sql,
+                new SqlScriptGeneratorOptions { PersistTrailingGo = true, PreserveComments = true },
+                expected);
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestTrailingGo_BlockCommentBeforeAndCommentAfterGo()
+        {
+            // With PreserveComments + PersistTrailingGo, a block comment before the trailing GO
+            // must stay above it and a comment after the GO must stay below it — neither crosses
+            // the batch separator.
+            var sql = @"SELECT 1;
+/* before */
+GO
+-- after
+";
+            var expected = @"SELECT 1;
+
+
+/* before */
+GO
+
+-- after";
+            ScriptGeneratorTestHelper.AssertGeneratedExact(
+                sql,
+                new SqlScriptGeneratorOptions { PersistTrailingGo = true, PreserveComments = true },
+                expected);
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestTrailingGo_MultiBatchWithoutTrailingGoAddsNone()
+        {
+            // A GO between batches with no trailing GO must reset TrailingGoCount to 0, so even with
+            // PersistTrailingGo enabled the between-batch GO is preserved but no extra GO is appended.
+            var sql = @"SELECT 1;
+GO
+SELECT 2;
+";
+            var expected = @"SELECT 1;
+
+
+GO
+SELECT 2;
+
+";
+            ScriptGeneratorTestHelper.AssertGeneratedExact(
+                sql,
+                new SqlScriptGeneratorOptions { PersistTrailingGo = true },
+                expected);
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestTrailingGo_MultiBatchWithTrailingGoPreserved()
+        {
+            // A multi-batch script that also ends with a trailing GO keeps both the between-batch
+            // GO and the trailing GO when PersistTrailingGo is enabled.
+            var sql = @"SELECT 1;
+GO
+SELECT 2;
+GO
+";
+            var expected = @"SELECT 1;
+
+
+GO
+SELECT 2;
+
+
+GO
+";
+            ScriptGeneratorTestHelper.AssertGeneratedExact(
+                sql,
+                new SqlScriptGeneratorOptions { PersistTrailingGo = true },
+                expected);
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestTrailingGo_ConsecutiveTrailingGosArePreserved()
+        {
+            // Consecutive trailing GO separators must be counted and re-emitted one-for-one so a
+            // parse -> generate -> reparse round-trip preserves the exact number of trailing GOs.
+            var sql = @"SELECT 1;
+GO
+GO
+";
+            var expected = @"SELECT 1;
+
+
+GO
+
+GO
+";
+            ScriptGeneratorTestHelper.AssertGeneratedExact(
+                sql,
+                new SqlScriptGeneratorOptions { PersistTrailingGo = true },
+                expected);
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestTrailingGo_MultiBatchVaryingGoCountsBetweenBatches()
+        {
+            // Between-batch GO runs (any count) collapse to a single batch separator, while only the
+            // consecutive trailing GO run is counted and re-emitted one-for-one.
+            var sql = @"SELECT 1;
+GO
+GO
+SELECT 2;
+GO
+SELECT 3;
+GO
+GO
+GO
+";
+            var expected = @"SELECT 1;
+
+
+GO
+SELECT 2;
+
+
+GO
+SELECT 3;
+
+
+GO
+
+GO
+
+GO
+";
+            ScriptGeneratorTestHelper.AssertGeneratedExact(
+                sql,
+                new SqlScriptGeneratorOptions { PersistTrailingGo = true },
+                expected);
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void TestWindowDefinition_RefWindowFollowedByPartitionByEmitsSpace()
         {
             // Verbatim sample from docs/t-sql/queries/select-window-transact-sql.md

@@ -68,6 +68,9 @@
     <Setting name="NumNewlinesAfterBatches" type="int" default="1" min="1">
       <Summary>Gets or sets the number of newlines to include after the GO separator that is written between two batches. GO is always preceded by a newline of its own so that it starts a new line, and the blank lines before it are controlled by NumNewlinesAfterBatchStatement; this setting only controls what follows GO, so the default of 1 starts the next batch on the following line with no blank line in between.</Summary>
     </Setting>
+    <Setting name="PersistTrailingGo" type="bool" default="false">
+      <Summary>Gets or sets a boolean indicating whether the trailing GO batch separators are generated when the parsed script ended with them (see TSqlScript.TrailingGoCount). Defaults to false, so a trailing GO is not emitted and generation behavior is unchanged.</Summary>
+    </Setting>
     <Setting name="PreserveComments" type="bool" default="false">
       <Summary>Gets or sets a boolean indicating if comments from the original script should be preserved in the generated output</Summary>
     </Setting>

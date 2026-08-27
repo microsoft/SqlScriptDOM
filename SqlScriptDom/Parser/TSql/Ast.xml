@@ -4048,6 +4048,7 @@
   </Class>
   <Class Name="TSqlScript" Summary="Represents a TSql sript.">
     <Member Name="Batches" Type="TSqlBatch" Collection ="true" Summary="Batches in the script."/>
+    <Member Name="TrailingGoCount" Type="int" Summary="The number of consecutive trailing GO batch separators at the end of the script (0 if none)."/>
   </Class>
   <Class Name="TSqlBatch" Summary="Represents a batch in T-SQL script." >
     <Member Name="Statements" Type="TSqlStatement" Collection="true" Summary="A list of statements, possibly empty."/>

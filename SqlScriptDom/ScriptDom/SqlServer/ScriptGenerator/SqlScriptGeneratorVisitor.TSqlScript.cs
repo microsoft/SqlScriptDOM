@@ -36,6 +36,19 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
                 GenerateFragmentIfNotNull(item);
             }
 
+            // Preserve the trailing GO separators when the parsed script ended with them and the option is enabled.
+            if (_options.PersistTrailingGo && node.TrailingGoCount > 0)
+            {
+                // Emit comments that precede the trailing GO(s) so they stay above the batch separator.
+                EmitCommentsUntilNextNonTriviaToken();
+                for (int i = 0; i < node.TrailingGoCount; i++)
+                {
+                    NewLine();
+                    GenerateKeyword(TSqlTokenType.Go);
+                    GenerateNewLinesAfterBatch();
+                }
+            }
+
             // Emit any remaining comments at end of script (after the last statement)
             EmitRemainingComments();
         }
