@@ -29145,6 +29145,11 @@ regularColumnBody [IndexAffectingStatement statementType, ColumnDefinition vPare
                     vParent.StorageOptions = vStorageOptions;
                 }
             )?
+            // MASKED WITH may follow the storage options (documented SPARSE-before-MASKED order)
+            (
+                {NextTokenMatches(CodeGenerationSupporter.Masked)}?
+                maskedClause[vParent]
+            )?
         )?
         (
             {NextTokenMatches(CodeGenerationSupporter.Hidden)}?
