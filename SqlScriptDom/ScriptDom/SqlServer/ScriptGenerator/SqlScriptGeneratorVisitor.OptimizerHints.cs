@@ -17,8 +17,11 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
                 AlignmentPoint start = new AlignmentPoint();
                 MarkAndPushAlignmentPoint(start);
 
-                GenerateKeywordAndSpace(TSqlTokenType.Option);
-                GenerateParenthesisedCommaSeparatedList(hints);
+                // GenerateKeyword (not GenerateKeywordAndSpace): the separating space before the
+                // open parenthesis is emitted by GenerateWithOptionsList so the single-line output
+                // (OPTION (...)) is unchanged while multiline output is handled uniformly.
+                GenerateKeyword(TSqlTokenType.Option);
+                GenerateWithOptionsList(hints, spaceBeforeSingleLineParenthesis: true);
 
                 PopAlignmentPoint();
             }

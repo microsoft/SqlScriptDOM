@@ -361,15 +361,27 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
             return false;
         }
 
+        // Marks the river that lines up an INSERT statement's VALUES row constructors under its
+        // column list (e.g. "INSERT INTO t (a, b)" / "VALUES       (1, 2)"). Only skipped for the
+        // Indented + !AlignClauseBodies combination, where ValuesInsertSource instead puts the row
+        // list on its own indented line (see ShouldMoveInsertValuesToNewLine); every other option
+        // combination keeps the existing river behavior so current baselines are unaffected.
         protected void MarkInsertColumnsAlignmentPointWhenNecessary(AlignmentPoint ap)
         {
 #if !PIMODLANGUAGE
             Debug.Assert(ap != null, "Alignment point should not be null");
 #endif
-            if (ap != null)
+            if (ap != null && !ShouldMoveInsertValuesToNewLine())
             {
                 Mark(ap);
             }
+        }
+
+        // True when an INSERT statement's VALUES row constructors should move to their own
+        // indented line instead of being padded (or single-spaced) onto the "VALUES" line.
+        protected Boolean ShouldMoveInsertValuesToNewLine()
+        {
+            return _options.ClauseBodyAlignment == ClauseBodyAlignment.Indented && !_options.AlignClauseBodies;
         }
 
         protected void GenerateSeparatorForOrderBy()
@@ -575,11 +587,34 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
         // part of CREATE VIEW statement, and we don't want to generate semicolon for the included statements
         protected Boolean _generateSemiColon = true;
 
+        // Blocks that StatementsThatCannotHaveSemiColon suppresses by default but that
+        // TerminateBlockStatements opts back in. TryCatchStatement covers END CATCH; END TRY is
+        // internal to the block and never reaches this check.
+        private static readonly HashSet<Type> _blockStatementsTerminatedByOption = new HashSet<Type>
+        {
+            typeof(BeginEndBlockStatement),
+            typeof(TryCatchStatement),
+        };
+
+        // Membership is tested on the exact runtime type, so a derived block such as
+        // BeginEndAtomicBlockStatement is unaffected by either set.
+        private Boolean CanHaveSemiColon(TSqlStatement statement)
+        {
+            Type statementType = statement.GetType();
+
+            if (StatementsThatCannotHaveSemiColon.Contains(statementType) == false)
+            {
+                return true;
+            }
+
+            return _options.TerminateBlockStatements && _blockStatementsTerminatedByOption.Contains(statementType);
+        }
+
         protected void GenerateSemiColonWhenNecessary(TSqlStatement node)
         {
             if (node != null &&
                 _generateSemiColon &&
-                StatementsThatCannotHaveSemiColon.Contains(node.GetType()) == false)
+                CanHaveSemiColon(node))
             {
                 GenerateSymbol(TSqlTokenType.Semicolon);
             }
@@ -635,7 +670,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
             // Only suppress for fragments at the statement boundary (LastTokenIndex).
             bool previousSuppressState = _suppressTrailingComments;
             int previousSuppressIndex = _suppressTrailingCommentsAfterIndex;
-            if (_options.PreserveComments && _generateSemiColon && !StatementsThatCannotHaveSemiColon.Contains(statement.GetType()))
+            if (_options.PreserveComments && _generateSemiColon && CanHaveSemiColon(statement))
             {
                 _suppressTrailingComments = true;
                 _suppressTrailingCommentsAfterIndex = statement.LastTokenIndex;

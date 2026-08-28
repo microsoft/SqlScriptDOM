@@ -133,13 +133,17 @@ script returns [TSqlScript vResult = this.FragmentFactory.CreateFragment<TSqlScr
         ( 
             Go
             {
+                vResult.TrailingGoCount++;
                 ResetQuotedIdentifiersSettingToInitial();
                 ThrowPartialAstIfPhaseOne(null);
             }
             vCurrentBatch = batch
             {
                 if (vCurrentBatch != null)
+                {
                     AddAndUpdateTokenInfo(vResult, vResult.Batches, vCurrentBatch);
+                    vResult.TrailingGoCount = 0;
+                }
             }
 
         )* 
@@ -2771,6 +2775,13 @@ createDatabase returns [CreateDatabaseStatement vResult = FragmentFactory.Create
           )?
         recoveryUnitList[vResult] 
         collationOpt[vResult]
+        (
+            // Azure SQL: parenthesized edition options may follow COLLATE.
+            // Limitation: each azureOptions invocation checks SQL46049 duplicates only within its own
+            // group, so an option repeated across the pre- and post-COLLATE groups is not flagged.
+            {NextTokenMatches(CodeGenerationSupporter.MaxSize,2) || NextTokenMatches(CodeGenerationSupporter.Edition,2) || NextTokenMatches(CodeGenerationSupporter.ServiceObjective,2)}?
+            azureOptions[vResult, vResult.Options]
+        )?
         (
             dbAddendums[vResult]
         )? 

@@ -27,6 +27,13 @@
       <Option value="IdentifierBracketing.ExcludeBrackets">IdentifierBracketing_ExcludeBrackets</Option>
       <Summary>Gets or sets how square brackets are applied to object identifiers during script generation. IncludeBrackets wraps all identifiers in square brackets; ExcludeBrackets removes brackets from identifiers that do not require them (identifiers conflicting with reserved words for the configured SqlVersion or containing special characters retain their brackets).</Summary>
     </Setting>
+    <Setting name="BuiltInFunctionCasing" type="BuiltInFunctionCasing" default="BuiltInFunctionCasing.Preserve">
+      <Option value="BuiltInFunctionCasing.Preserve">BuiltInFunctionCasing_Preserve</Option>
+      <Option value="BuiltInFunctionCasing.Uppercase">BuiltInFunctionCasing_UpperCase</Option>
+      <Option value="BuiltInFunctionCasing.Lowercase">BuiltInFunctionCasing_LowerCase</Option>
+      <Option value="BuiltInFunctionCasing.PascalCase">BuiltInFunctionCasing_PascalCase</Option>
+      <Summary>Gets or sets the casing applied to built-in / system function names (such as GETDATE, ISNULL, COALESCE, CAST, COUNT) during script generation. The default (Preserve) has no effect on the formatted output. When set to any other value it takes precedence over KeywordCasing for function names; under Preserve, keyword-backed built-ins such as CAST and CONVERT continue to follow KeywordCasing. Data type names, keywords, string literals, and variables are never affected. Casing is applied to every unqualified, non-delimited function name, which is safe because T-SQL resolves a one-part scalar function name as a built-in function and never as a user-defined one (a scalar user-defined function must be called with at least a two-part name). Schema-qualified (for example dbo.MyFunc) and delimited (for example [MyFunc]) function names, and method calls on a variable or column (for example @g.STArea()), are always preserved. Keyword-form niladic functions (such as CURRENT_TIMESTAMP, SYSTEM_USER) and built-in table-valued functions (such as STRING_SPLIT, OPENJSON) are not affected.</Summary>
+    </Setting>
     <Setting name="SqlVersion" type="SqlVersion" default="SqlVersion.Sql90" browsable="false">
       <Summary>Gets or sets the Sql version to generate script for</Summary>
     </Setting>
@@ -44,6 +51,9 @@
       <Description>IncludeSemiColons_Description</Description>
       <Summary>Gets or sets a boolean indicating if a semi colon should be included after each statement</Summary>
     </Setting>
+    <Setting name="TerminateBlockStatements" type="bool" default="false">
+      <Summary>Gets or sets a boolean indicating if a semicolon terminator is written after a BEGIN...END block and after the END CATCH of a BEGIN TRY...END TRY BEGIN CATCH...END CATCH block. When false (the default), these blocks are written without a terminator, preserving the previous script-generation behavior. When true, a semicolon is appended, so a terminator supplied in the source script survives a parse and generate round-trip. END TRY is never terminated because it is internal to the TRY...CATCH block.</Summary>
+    </Setting>
     <Setting name="NewLineFormattedIndexDefinition" type="bool" default="false">
       <Summary>Gets or sets a boolean indicating if index definitions should have UNIQUE, INCLUDE and WHERE on their own line</Summary>
     </Setting>
@@ -57,13 +67,25 @@
       <Summary>Gets or sets a boolean indicating if a space should be included between parameters in a data type</Summary>
     </Setting>
     <Setting name="NumNewlinesAfterStatement" type="int" default="1" min="0">
-      <Summary>Gets or sets the number of newlines to include after each statement</Summary>
+      <Summary>Gets or sets the number of newlines to include after each statement of a nested statement list, such as the body of a BEGIN...END block, stored procedure, trigger, function, IF or WHILE. The newlines are written between consecutive statements only, not after the last one, so the default of 1 puts each nested statement on its own line with no blank line between them. Statements owned directly by a batch are not affected by this setting; use NumNewlinesAfterBatchStatement for those.</Summary>
+    </Setting>
+    <Setting name="NumNewlinesAfterBatchStatement" type="int" default="2" min="0">
+      <Summary>Gets or sets the number of newlines to include after each statement owned directly by a batch, that is, each top level statement of a script between GO separators. The newlines are written after every such statement, including the last one in the batch, except when the statement is a TSqlStatementSnippet (snippets are emitted as-is and do not receive additional trailing newlines from this option). The default of 2 leaves one blank line between consecutive top level statements and, together with the newline that always precedes GO, two blank lines before the GO that closes the batch. Statements nested inside another statement are not affected by this setting; use NumNewlinesAfterStatement for those.</Summary>
+    </Setting>
+    <Setting name="NumNewlinesAfterBatches" type="int" default="1" min="1">
+      <Summary>Gets or sets the number of newlines to include after the GO separator that is written between two batches. GO is always preceded by a newline of its own so that it starts a new line, and the blank lines before it are controlled by NumNewlinesAfterBatchStatement; this setting only controls what follows GO, so the default of 1 starts the next batch on the following line with no blank line in between.</Summary>
+    </Setting>
+    <Setting name="PersistTrailingGo" type="bool" default="false">
+      <Summary>Gets or sets a boolean indicating whether the trailing GO batch separators are generated when the parsed script ended with them (see TSqlScript.TrailingGoCount). Defaults to false, so a trailing GO is not emitted and generation behavior is unchanged.</Summary>
     </Setting>
     <Setting name="PreserveComments" type="bool" default="false">
       <Summary>Gets or sets a boolean indicating if comments from the original script should be preserved in the generated output</Summary>
     </Setting>
     <Setting name="CommaPlacement" type="CommaPlacement" default="CommaPlacement.Trailing">
       <Summary>Gets or sets a value indicating whether commas in a multi-line comma-separated list are placed at the end of the line (trailing) or at the start of the next line (leading). When set to Leading, the IndentationMode setting is ignored and indentation always uses spaces.</Summary>
+    </Setting>
+    <Setting name="LeadingCommaSpaceCount" type="int" default="1" min="0" max="1">
+      <Summary>Gets or sets the number of spaces written after a leading comma when CommaPlacement is Leading. Valid values are 0 and 1. The default is 1.</Summary>
     </Setting>
   </SettingGroup>
   <SettingGroup name="CREATE TABLE">
@@ -110,10 +132,10 @@
     <Setting name="ClauseBodyAlignment" type="ClauseBodyAlignment" default="ClauseBodyAlignment.Aligned">
       <Option value="ClauseBodyAlignment.Aligned">ClauseBodyAlignment_Aligned</Option>
       <Option value="ClauseBodyAlignment.Indented">ClauseBodyAlignment_Indented</Option>
-      <Summary>Gets or sets how a clause body (the part after FROM, WHERE, GROUP BY, etc.) is laid out. Aligned keeps the body on the keyword's line, lining all clause bodies up under a shared column past the widest keyword. Indented puts the body on its own new line, one indent level (IndentationSize) past the keyword, so nesting grows one step per level instead of drifting right. When Indented, AlignClauseBodies is ignored.</Summary>
+      <Summary>Gets or sets how a clause body (the part after FROM, WHERE, GROUP BY, etc.) is laid out. Aligned keeps the body on the keyword's line, lining all clause bodies up under a shared column past the widest keyword. Indented puts the body on its own new line, one indent level (IndentationSize) past the keyword, so nesting grows one step per level instead of drifting right. When Indented, AlignClauseBodies is ignored for clause bodies.</Summary>
     </Setting>
     <Setting name="AlignClauseBodies" type="bool" default="true">
-      <Summary>Gets or sets whether clause bodies are padded to line up under a shared column. Only applies when ClauseBodyAlignment is Aligned: true pads to the aligned column, false uses a single space after the keyword. Ignored when ClauseBodyAlignment is Indented.</Summary>
+      <Summary>Gets or sets whether clause bodies are padded to line up under a shared column. Only applies when ClauseBodyAlignment is Aligned: true pads to the aligned column, false uses a single space after the keyword. When ClauseBodyAlignment is Indented, this setting is generally ignored for clause bodies; however, it also affects an INSERT statement's VALUES row constructors: when ClauseBodyAlignment is Indented and this is false, the row constructors move to their own indented line instead of being padded to line up under the column list.</Summary>
     </Setting>
   </SettingGroup>
   <SettingGroup name="SELECT">
@@ -122,6 +144,18 @@
     </Setting>
     <Setting name="MultilineWherePredicatesList" type="bool" default="true">
       <Summary>Gets or sets a boolean indicating if WHERE predicates (expressions separated by AND, and OR) should be written on multiple lines</Summary>
+    </Setting>
+    <Setting name="MultilineGroupByElementsList" type="bool" default="false">
+      <Summary>Gets or sets a boolean indicating if GROUP BY elements should be listed as a multi-line list</Summary>
+    </Setting>
+    <Setting name="MultilineHavingPredicatesList" type="bool" default="true">
+      <Summary>Gets or sets a boolean indicating if HAVING predicates (expressions separated by AND or OR) should be written on multiple lines</Summary>
+    </Setting>
+    <Setting name="MultilineOrderByElementsList" type="bool" default="false">
+      <Summary>Gets or sets a boolean indicating if ORDER BY elements should be listed as a multi-line list</Summary>
+    </Setting>
+    <Setting name="MultilinePartitionByElementsList" type="bool" default="false">
+      <Summary>Gets or sets a boolean indicating if PARTITION BY elements in window specifications should be listed as a multi-line list</Summary>
     </Setting>
     <Setting name="MultilineInValuesList" type="bool" default="false">
       <Summary>Gets or sets a boolean indicating if the values in an IN (values) predicate should be listed as a multi-line list. When false, the IN list is written on a single line.</Summary>
@@ -176,6 +210,11 @@
       <Summary>Gets or sets a boolean indicating if a newline should be placed before an close parenthesis when writing a multi-line list in parenthesis</Summary>
     </Setting>
   </SettingGroup>
+  <SettingGroup name="Function calls">
+    <Setting name="MultilineNestedFunctionCalls" type="bool" default="false">
+      <Summary>Gets or sets a boolean indicating if parameters in a nested function call tree should be written on separate lines and indented one level per call. Isolated function calls remain on one line. When false (the default), all function calls retain the existing compact layout.</Summary>
+    </Setting>
+  </SettingGroup>
   <SettingGroup name="External Libraries">
     <Setting name="AllowExternalLibraryPaths" type="bool" default="true">
       <Summary>Gets or sets a boolean indicating if file paths can be used for external library content</Summary>
@@ -184,6 +223,11 @@
   <SettingGroup name="External Languages">
     <Setting name="AllowExternalLanguagePaths" type="bool" default="true">
       <Summary>Gets or sets a boolean indicating if file paths can be used for external language content</Summary>
+    </Setting>
+  </SettingGroup>
+  <SettingGroup name="WITH clause options">
+    <Setting name="MultilineWithOptionsList" type="bool" default="false">
+      <Summary>Gets or sets a boolean indicating if the options in a WITH (or OPTION) clause should be listed on separate lines. This applies to CREATE/ALTER INDEX and other index options, table hints (WITH), query hints (OPTION), and BACKUP/RESTORE options (WITH). It does not apply to the WITH keyword of common table expressions or XMLNAMESPACES, nor to the option lists of CREATE XML INDEX (non-selective) or CREATE SPATIAL INDEX, which have their own generators. When false (default), the options are written on a single line. CommaPlacement applies within the options list. For parenthesized clauses, NewLineBeforeOpenParenthesisInMultilineList and NewLineBeforeCloseParenthesisInMultilineList control parenthesis placement. When the WITH keyword begins the option list, the options are indented one level from the statement.</Summary>
     </Setting>
   </SettingGroup>
 </Settings>

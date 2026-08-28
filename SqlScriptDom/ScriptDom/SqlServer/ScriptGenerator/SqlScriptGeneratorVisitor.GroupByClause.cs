@@ -22,11 +22,26 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
             }
 
             AlignmentPoint clauseBody = GetAlignmentPointForFragment(node, ClauseBody);
-            if (!GenerateClauseBodyStart(_options.NewLineBeforeGroupByClause, clauseBody))
+
+            // Modern GROUP BY ALL (no explicit column list) has no grouping specifications;
+            // the grouping columns are inferred from the SELECT list. Only emit the body
+            // (and its leading space/newline) when a column list is actually present.
+            if (!node.All || node.GroupingSpecifications.Count > 0)
             {
-                GenerateSpace();
+                if (!GenerateClauseBodyStart(_options.NewLineBeforeGroupByClause, clauseBody))
+                {
+                    GenerateSpace();
+                }
+
+                if (_options.MultilineGroupByElementsList)
+                {
+                    GenerateAlignedMultilineCommaSeparatedList(node.GroupingSpecifications);
+                }
+                else
+                {
+                    GenerateCommaSeparatedList(node.GroupingSpecifications);
+                }
             }
-            GenerateCommaSeparatedList(node.GroupingSpecifications);
 
             if (node.GroupByOption != GroupByOption.None)
             {

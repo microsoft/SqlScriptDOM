@@ -40,7 +40,14 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
                     GenerateSpaceAndKeyword(TSqlTokenType.By);
 
                     GenerateSpace();
-                    GenerateCommaSeparatedList(node.Partitions);
+                    if (_options.MultilinePartitionByElementsList)
+                    {
+                        GenerateAlignedMultilineCommaSeparatedList(node.Partitions);
+                    }
+                    else
+                    {
+                        GenerateCommaSeparatedList(node.Partitions);
+                    }
                 }
 
                 if (node.OrderByClause != null)

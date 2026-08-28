@@ -26,7 +26,7 @@ namespace SqlStudio.Tests.UTSqlScriptDom
             new ParserTest130("AlterTableDropTableElementStatementTests130.sql", 1, 1, 1, 1, 1),
             new ParserTest130("ColumnStoreInlineIndex130.sql", 10, 10, 10, 10, 10),
             new ParserTest130("CreateIndexStatementTests130.sql", 6, 6, 6, 6, 6),
-            new ParserTest130("CreateTableTests130.sql", 62, 62, 62, 62, 62),
+            new ParserTest130("CreateTableTests130.sql", 63, 63, 63, 63, 63),
             new ParserTest130("CreateAlterSecurityPolicyStatementTests130.sql", 2, 33, 33, 33, 33),
             new ParserTest130("JsonForClauseTests130.sql", 14, 14, 14, 14, 14),
             new ParserTest130("DropStatementsTests130.sql", 10, 10, 9, 9, 9),

@@ -16,7 +16,10 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
         /// <param name="node">Expression node to generate</param>
         public override void ExplicitVisit(AIFixGrammarFunctionCall node)
         {
-            GenerateIdentifier(CodeGenerationSupporter.AIFixGrammar);
+            if (!TryGenerateBuiltInFunctionName(CodeGenerationSupporter.AIFixGrammar))
+            {
+                GenerateIdentifier(CodeGenerationSupporter.AIFixGrammar);
+            }
             GenerateSymbol(TSqlTokenType.LeftParenthesis);
             GenerateFragmentIfNotNull(node.Input);
             GenerateSymbol(TSqlTokenType.RightParenthesis);

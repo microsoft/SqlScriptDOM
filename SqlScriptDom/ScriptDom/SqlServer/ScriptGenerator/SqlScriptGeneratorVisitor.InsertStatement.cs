@@ -65,15 +65,30 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
 
                 if (node.Columns.Count > 0)
                 {
-                    MarkInsertColumnsAlignmentPointWhenNecessary(insertColumns);
                     if (_options.MultilineInsertTargetsList)
                     {
                         ListGenerationOption option = ListGenerationOption.CreateOptionFromFormattingConfig(_options);
-                        GenerateFragmentList(node.Columns, option);
+                        if (option.NewLineBeforeOpenParenthesis || ShouldMoveInsertValuesToNewLine())
+                        {
+                            // No inline "(" to align under (it moves to its own line), or the VALUES
+                            // rows move to their own indented line: keep the pre-existing mark position.
+                            MarkInsertColumnsAlignmentPointWhenNecessary(insertColumns);
+                            GenerateFragmentList(node.Columns, option);
+                        }
+                        else
+                        {
+                            // Inline "(": mark insertColumns at the list's "(" (the same column the
+                            // non-multiline branch marks) so the VALUES row constructors line up under
+                            // the target list's opening parenthesis.
+                            GenerateFragmentList(node.Columns, option, insertColumns);
+                        }
                     }
                     else
                     {
+                        // Mark insertColumns right at "(" (after the separating space), matching where
+                        // ValuesInsertSource marks it for its own row list, so both parentheses line up.
                         GenerateSpace();
+                        MarkInsertColumnsAlignmentPointWhenNecessary(insertColumns);
                         GenerateParenthesisedCommaSeparatedList(node.Columns);
                     }
                 }

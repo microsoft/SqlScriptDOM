@@ -48,7 +48,7 @@ namespace SqlStudio.Tests.UTSqlScriptDom
             const string expected =
 @"
 INSERT  INTO t (a, b, c)
-VALUES        (1, 2, 3);";
+VALUES         (1, 2, 3);";
 
             AssertGenerated(input, options, expected);
         }
@@ -69,7 +69,7 @@ INSERT  INTO t (
     b,
     c
 )
-VALUES        (1, 2, 3);";
+VALUES         (1, 2, 3);";
 
             AssertGenerated(input, options, expected);
         }
@@ -85,7 +85,7 @@ VALUES        (1, 2, 3);";
             const string expected =
 @"
 INSERT  INTO t (a, b, c)
-VALUES        (1, 2, 3);";
+VALUES         (1, 2, 3);";
 
             AssertGenerated(input, options, expected);
         }
@@ -103,7 +103,7 @@ VALUES        (1, 2, 3);";
 INSERT  INTO t (
     a
 )
-VALUES        (1);";
+VALUES         (1);";
 
             AssertGenerated(input, options, expected);
         }
@@ -199,7 +199,7 @@ INSERT  INTO t (
   , b
   , c
 )
-VALUES        (1, 2, 3);";
+VALUES         (1, 2, 3);";
 
             AssertGenerated(input, options, expected);
         }
@@ -219,7 +219,36 @@ INSERT  INTO t (
     b,
     c
 )
-VALUES        (1, 2, 3);";
+VALUES         (1, 2, 3);";
+
+            AssertGenerated(input, options, expected);
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestMultilineTargetsWithValuesMovedToNewLine()
+        {
+            // Multi-line target list combined with the Indented + AlignClauseBodies = false mode that
+            // moves the VALUES row constructors to their own indented line: the target list is still
+            // multi-line and the rows are not aligned under the target parenthesis.
+            const string input = "INSERT INTO t (a, b, c) VALUES (1, 2, 3), (4, 5, 6);";
+            var options = new SqlScriptGeneratorOptions
+            {
+                MultilineInsertTargetsList = true,
+                ClauseBodyAlignment = ClauseBodyAlignment.Indented,
+                AlignClauseBodies = false,
+            };
+            const string expected =
+@"
+INSERT INTO t (
+    a,
+    b,
+    c
+)
+VALUES
+    (1, 2, 3),
+    (4, 5, 6);";
 
             AssertGenerated(input, options, expected);
         }
@@ -273,7 +302,7 @@ INSERT  INTO t (
     a,
     b,
     c)
-VALUES        (1, 2, 3);";
+VALUES         (1, 2, 3);";
 
             AssertGenerated(input, options, expected);
         }
@@ -297,7 +326,7 @@ INSERT  INTO t (
     b
 )
 OUTPUT  inserted.a, inserted.b
-VALUES        (1, 2);";
+VALUES         (1, 2);";
 
             AssertGenerated(input, options, expected);
         }
@@ -317,7 +346,7 @@ INSERT  INTO t (
     b
 )
 OUTPUT  inserted.a INTO @log
-VALUES        (1, 2);";
+VALUES         (1, 2);";
 
             AssertGenerated(input, options, expected);
         }
@@ -391,7 +420,8 @@ FROM   c;";
         [SqlStudioTestCategory(Category.UnitTest)]
         public void TestMultilineTargetsWithMultiRowValues()
         {
-            // Only the target list is affected; a multi-row VALUES source is left as-is.
+            // Only the target list is affected; a multi-row VALUES source keeps aligning its
+            // continuation rows under the first row.
             const string input = "INSERT INTO t (a, b) VALUES (1, 2), (3, 4);";
             var options = new SqlScriptGeneratorOptions { MultilineInsertTargetsList = true };
             const string expected =
@@ -400,8 +430,8 @@ INSERT  INTO t (
     a,
     b
 )
-VALUES        (1, 2),
-(3, 4);";
+VALUES         (1, 2),
+               (3, 4);";
 
             AssertGenerated(input, options, expected);
         }

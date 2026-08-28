@@ -44,9 +44,9 @@ CREATE TABLE t2 (
 GO
 
 INSERT INTO t2 (Text)
-VALUES        (N'This is the first text.'),
-(N'Second sample text.'),
-(N'Third example text.');
+VALUES         (N'This is the first text.'),
+               (N'Second sample text.'),
+               (N'Third example text.');
 GO
 
 CREATE VIEW v_GeneratedChunksFromTable

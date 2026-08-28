@@ -3550,6 +3550,8 @@
   </Class>
   <Class Name="OrderByClause" Summary="Represents the order by clause that can be used in statements like select.">
     <Member Name="OrderByElements" Type="ExpressionWithSortOrder" Collection="true" Summary="The items."/>
+    <Member Name="All" Type="bool" Summary="True if the ORDER BY ALL shorthand is used, which orders by every column in the select list. When true, OrderByElements is empty."/>
+    <Member Name="AllSortOrder" Type="SortOrder" GenerateUpdatePositionInfoCall="false" Summary="The sort order (ASC/DESC) applied to ORDER BY ALL. Only meaningful when All is true."/>
   </Class>
   <Class Name="JoinTableReference" Base="TableReference" Abstract="true" Summary="Base class for JOIN table references">
     <Member Name="FirstTableReference" Type="TableReference" Summary="The first table reference."/>
@@ -4046,6 +4048,7 @@
   </Class>
   <Class Name="TSqlScript" Summary="Represents a TSql sript.">
     <Member Name="Batches" Type="TSqlBatch" Collection ="true" Summary="Batches in the script."/>
+    <Member Name="TrailingGoCount" Type="int" Summary="The number of consecutive trailing GO batch separators at the end of the script (0 if none)."/>
   </Class>
   <Class Name="TSqlBatch" Summary="Represents a batch in T-SQL script." >
     <Member Name="Statements" Type="TSqlStatement" Collection="true" Summary="A list of statements, possibly empty."/>

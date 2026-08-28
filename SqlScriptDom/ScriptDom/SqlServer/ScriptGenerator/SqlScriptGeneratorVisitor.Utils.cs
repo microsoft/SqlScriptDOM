@@ -224,7 +224,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
                 else
                 {
                     GenerateSymbol(TSqlTokenType.Comma);
-                    if (insertNewLine)
+                    if (insertNewLine || HasDeferredTrailingSingleLineComments)
                     {
                         NewLine();
                     }
@@ -234,6 +234,41 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
                     }
                 }
             });
+        }
+
+        // generate a multiline comma-separated list whose elements remain aligned when commas lead
+        protected void GenerateAlignedMultilineCommaSeparatedList<T>(IList<T> list) where T : TSqlFragment
+        {
+            if (list == null)
+            {
+                return;
+            }
+
+            Boolean first = true;
+            Boolean leadingComma = _options.CommaPlacement == CommaPlacement.Leading;
+            AlignmentPoint elements = new AlignmentPoint();
+
+            foreach (T fragment in list)
+            {
+                if (!first)
+                {
+                    if (leadingComma)
+                    {
+                        NewLine();
+                        GenerateRightAlignedCommaSeparator();
+                    }
+                    else
+                    {
+                        GenerateSymbol(TSqlTokenType.Comma);
+                        NewLine();
+                    }
+                }
+
+                MarkAndPushAlignmentPoint(elements);
+                GenerateFragmentIfNotNull(fragment);
+                PopAlignmentPoint();
+                first = false;
+            }
         }
 
         // generate a comma-separated list
@@ -334,9 +369,12 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
             }
         }
 
-        protected void GenerateFragmentList<T>(IList<T> list, ListGenerationOption option) where T : TSqlFragment
+        protected void GenerateFragmentList<T>(IList<T> list, ListGenerationOption option, AlignmentPoint openParenthesisAlignmentPoint = null) where T : TSqlFragment
         {
-            AlignmentPoint parentheses = new AlignmentPoint();
+            // When the caller supplies its own open-parenthesis alignment point, mark it at the "("
+            // so downstream content (e.g. an INSERT statement's VALUES row constructors) can line up
+            // under the list's opening parenthesis. Defaults to a private point for all other callers.
+            AlignmentPoint parentheses = openParenthesisAlignmentPoint ?? new AlignmentPoint();
             AlignmentPoint items = new AlignmentPoint();
 
             Boolean generateParentheses = (option.AlwaysGenerateParenthesis || (list.Count > 0 && option.Parenthesised));
@@ -449,7 +487,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
                     // Only push alignment point for NewLine() restoration when comment preservation is enabled.
                     // This ensures NewLine() calls within items (e.g., from EmitCommentToken) can restore
                     // to the correct indented position, without affecting general formatting.
-                    if (_options.PreserveComments)
+                    if (_options.PreserveComments || option.AlignItemsForNewLines)
                     {
                         AlignmentPoint itemScope = new AlignmentPoint();
                         // Keep the current named-alignment-point scope so field alignment points
@@ -483,7 +521,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
             // generate close parenthesis
             if (generateParentheses)
             {
-                if (option.NewLineBeforeCloseParenthesis)
+                if (option.NewLineBeforeCloseParenthesis || HasDeferredTrailingSingleLineComments)
                 {
                     NewLine();
                     if (option.AlignParentheses)

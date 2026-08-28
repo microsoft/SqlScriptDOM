@@ -428,6 +428,18 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
         }
 
         /// <summary>
+        /// Indicates that a trailing <c>--</c> comment is waiting for the next newline. This allows
+        /// callers that are about to emit closing punctuation, such as a function's right
+        /// parenthesis, to start a new line first so the punctuation is not consumed by the comment.
+        /// </summary>
+        /// <example>
+        /// For <c>TRANSLATE(city, 'a', 'b' -- replacement characters</c>, the closing parenthesis
+        /// must be emitted on the following line; otherwise it becomes part of the comment.
+        /// </example>
+        protected bool HasDeferredTrailingSingleLineComments =>
+            _deferredTrailingSingleLineComments.Count > 0;
+
+        /// <summary>
         /// Updates tracking after generating a fragment.
         /// </summary>
         /// <param name="fragment">The fragment that was just generated.</param>

@@ -27,16 +27,38 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
                 }
                 else
                 {
+                    // GO always starts a new line, whatever the batch statements left behind.
                     NewLine();
                     GenerateKeyword(TSqlTokenType.Go);
-                    NewLine();
+                    GenerateNewLinesAfterBatch();
                 }
 
                 GenerateFragmentIfNotNull(item);
             }
 
+            // Preserve the trailing GO separators when the parsed script ended with them and the option is enabled.
+            if (_options.PersistTrailingGo && node.TrailingGoCount > 0)
+            {
+                // Emit comments that precede the trailing GO(s) so they stay above the batch separator.
+                EmitCommentsUntilNextNonTriviaToken();
+                for (int i = 0; i < node.TrailingGoCount; i++)
+                {
+                    NewLine();
+                    GenerateKeyword(TSqlTokenType.Go);
+                    GenerateNewLinesAfterBatch();
+                }
+            }
+
             // Emit any remaining comments at end of script (after the last statement)
             EmitRemainingComments();
+        }
+
+        private void GenerateNewLinesAfterBatch()
+        {
+            for (int i = 0; i < _options.NumNewlinesAfterBatches; i++)
+            {
+                NewLine();
+            }
         }
     }
 }

@@ -67,6 +67,11 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
             {
                 get { return _optionValue; }
             }
+
+            public string Identifier
+            {
+                get { return _identifier; }
+            }
         }
 
         private Dictionary<OptionType, OptionInfo> _optionToOptionInfo = new Dictionary<OptionType, OptionInfo>();
@@ -205,6 +210,21 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
                 optionInfo.GenerateSource(writer);
                 return true;
             }
+            return false;
+        }
+
+        // Exposes the literal source text of identifier-backed options so callers can apply their own
+        // casing; returns false for token-backed options, whose text comes from the token table.
+        internal bool TryGetOptionIdentifier(OptionType option, out string identifier)
+        {
+            OptionInfo optionInfo;
+            if (_optionToOptionInfo.TryGetValue(option, out optionInfo) && optionInfo.Identifier != null)
+            {
+                identifier = optionInfo.Identifier;
+                return true;
+            }
+
+            identifier = null;
             return false;
         }
 

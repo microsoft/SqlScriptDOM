@@ -133,13 +133,17 @@ script returns [TSqlScript vResult = this.FragmentFactory.CreateFragment<TSqlScr
         (
             Go
             {
+                vResult.TrailingGoCount++;
                 ResetQuotedIdentifiersSettingToInitial();
                 ThrowPartialAstIfPhaseOne(null);
             }
             vCurrentBatch = batch
             {
                 if (vCurrentBatch != null)
+                {
                     AddAndUpdateTokenInfo(vResult, vResult.Batches, vCurrentBatch);
+                    vResult.TrailingGoCount = 0;
+                }
             }
 
         )*
@@ -4476,6 +4480,13 @@ createDatabase returns [CreateDatabaseStatement vResult = FragmentFactory.Create
           )?
         recoveryUnitList[vResult]
         collationOpt[vResult]
+        (
+            // Azure SQL: parenthesized edition options may follow COLLATE.
+            // Limitation: each azureOptions invocation checks SQL46049 duplicates only within its own
+            // group, so an option repeated across the pre- and post-COLLATE groups is not flagged.
+            {NextTokenMatches(CodeGenerationSupporter.MaxSize,2) || NextTokenMatches(CodeGenerationSupporter.Edition,2) || NextTokenMatches(CodeGenerationSupporter.ServiceObjective,2)}?
+            azureOptions[vResult, vResult.Options]
+        )?
         (
             dbAddendums[vResult]
         )?
@@ -17976,7 +17987,7 @@ select [SubDmlFlags subDmlFlags] returns [SelectStatement vResult = this.Fragmen
 }
     :   vQueryExpression=queryExpression[subDmlFlags, vResult]
         (
-            vOrderByClause=orderByClause
+            vOrderByClause=orderByClause[true]
             {
                 vQueryExpression.OrderByClause = vOrderByClause;
             }
@@ -18250,7 +18261,7 @@ subquerySpecification [SubDmlFlags subDmlFlags] returns [QuerySpecification vRes
             }
         )?
         (
-            vOrderByClause=orderByClause
+            vOrderByClause=orderByClause[true]
             {
                 vResult.OrderByClause = vOrderByClause;
             }
@@ -20146,7 +20157,7 @@ selectInsertSource [SubDmlFlags subDmlFlags] returns [SelectInsertSource vResult
     :
         vQueryExpression = queryExpression[subDmlFlags, null]
         (
-            vOrderByClause=orderByClause
+            vOrderByClause=orderByClause[true]
             {
                 vQueryExpression.OrderByClause = vOrderByClause;
             }
@@ -21410,16 +21421,32 @@ groupByClause returns [GroupByClause vResult = FragmentFactory.CreateFragment<Gr
             {
                 vResult.All = true;
             }
-        )?
-        vGroupingItem = groupByItem[vResult.All, ref encounteredCubeRollupGroupingSets, ref alreadyEncounteredDistributedAggHint]
-        {
-            AddAndUpdateTokenInfo(vResult, vResult.GroupingSpecifications, vGroupingItem);
-        }
-        (Comma vGroupingItem = groupByItem[vResult.All, ref encounteredCubeRollupGroupingSets, ref alreadyEncounteredDistributedAggHint]
+            (
+                // Greedy: a grouping-item start token always belongs to the optional
+                // list; non-item tokens (WITH, end of clause) exit. This is the intended
+                // resolution, so mark it greedy to avoid a spurious nondeterminism warning.
+                options {greedy = true; } :
+                vGroupingItem = groupByItem[vResult.All, ref encounteredCubeRollupGroupingSets, ref alreadyEncounteredDistributedAggHint]
+                {
+                    AddAndUpdateTokenInfo(vResult, vResult.GroupingSpecifications, vGroupingItem);
+                }
+                (Comma vGroupingItem = groupByItem[vResult.All, ref encounteredCubeRollupGroupingSets, ref alreadyEncounteredDistributedAggHint]
+                    {
+                        AddAndUpdateTokenInfo(vResult, vResult.GroupingSpecifications, vGroupingItem);
+                    }
+                )*
+            )?
+        |
+            vGroupingItem = groupByItem[vResult.All, ref encounteredCubeRollupGroupingSets, ref alreadyEncounteredDistributedAggHint]
             {
                 AddAndUpdateTokenInfo(vResult, vResult.GroupingSpecifications, vGroupingItem);
             }
-        )*
+            (Comma vGroupingItem = groupByItem[vResult.All, ref encounteredCubeRollupGroupingSets, ref alreadyEncounteredDistributedAggHint]
+                {
+                    AddAndUpdateTokenInfo(vResult, vResult.GroupingSpecifications, vGroupingItem);
+                }
+            )*
+        )
         (
             // Greedy due to conflict with withCommonTableExpressionsAndXmlNamespaces
             options {greedy = true; } :
@@ -21653,25 +21680,44 @@ havingClause returns [HavingClause vResult = this.FragmentFactory.CreateFragment
         }
     ;
 
-orderByClause returns [OrderByClause vResult = this.FragmentFactory.CreateFragment<OrderByClause>()]
+orderByClause [bool allowAll] returns [OrderByClause vResult = this.FragmentFactory.CreateFragment<OrderByClause>()]
 {
     ExpressionWithSortOrder vExpressionWithSortOrder;
+    SortOrder vAllSortOrder;
 }
     :
         tOrder:Order By
         {
             UpdateTokenInfo(vResult,tOrder);
         }
-        vExpressionWithSortOrder=expressionWithSortOrder
-        {
-            AddAndUpdateTokenInfo(vResult, vResult.OrderByElements, vExpressionWithSortOrder);
-        }
         (
-            Comma vExpressionWithSortOrder=expressionWithSortOrder
+            tAll:All
+            {
+                // ORDER BY ALL (Fabric DW) is only allowed at the query / subquery level.
+                // It is not permitted inside OVER(), WINDOW definitions or WITHIN GROUP.
+                if (!allowAll)
+                    ThrowIncorrectSyntaxErrorException(tAll);
+
+                vResult.All = true;
+                UpdateTokenInfo(vResult, tAll);
+            }
+            (vAllSortOrder = orderByOption[vResult]
+                {
+                    vResult.AllSortOrder = vAllSortOrder;
+                }
+            )?
+        |
+            vExpressionWithSortOrder=expressionWithSortOrder
             {
                 AddAndUpdateTokenInfo(vResult, vResult.OrderByElements, vExpressionWithSortOrder);
             }
-        )*
+            (
+                Comma vExpressionWithSortOrder=expressionWithSortOrder
+                {
+                    AddAndUpdateTokenInfo(vResult, vResult.OrderByElements, vExpressionWithSortOrder);
+                }
+            )*
+        )
     ;
 
 expressionWithSortOrder returns [ExpressionWithSortOrder vResult = this.FragmentFactory.CreateFragment<ExpressionWithSortOrder>()]
@@ -29103,6 +29149,11 @@ regularColumnBody [IndexAffectingStatement statementType, ColumnDefinition vPare
                     vParent.StorageOptions = vStorageOptions;
                 }
             )?
+            // MASKED WITH may follow the storage options (documented SPARSE-before-MASKED order)
+            (
+                {NextTokenMatches(CodeGenerationSupporter.Masked)}?
+                maskedClause[vParent]
+            )?
         )?
         (
             {NextTokenMatches(CodeGenerationSupporter.Hidden)}?
@@ -32001,7 +32052,7 @@ windowDefinition returns [WindowDefinition vResult = FragmentFactory.CreateFragm
             By expressionList[vResult, vResult.Partitions]
         )?
         (
-            vOrderByClause=orderByClause
+            vOrderByClause=orderByClause[false]
             {
                 vResult.OrderByClause = vOrderByClause;
             }
@@ -32026,7 +32077,7 @@ overClause returns [OverClause vResult]
 }
     :   vResult = overClauseBeginning
         (
-            vOrderByClause=orderByClause
+            vOrderByClause=orderByClause[false]
             {
                 vResult.OrderByClause = vOrderByClause;
             }
@@ -32200,7 +32251,7 @@ withinGroupClause returns [WithinGroupClause vResult = FragmentFactory.CreateFra
                 graphPathClause[vResult]
             )
         |
-            vOrderByClause=orderByClause
+            vOrderByClause=orderByClause[false]
             {
                 vResult.OrderByClause = vOrderByClause;
                 UpdateTokenInfo(vResult,tLParen);
