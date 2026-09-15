@@ -22161,6 +22161,7 @@ hint returns [OptimizerHint vResult]
     | vResult = optimizeForOptimizerHint
     | vResult = tableHintsOptimizerHint
     | vResult = useHintClause
+    | vResult = forTimestampAsOfOptimizerHint
     ;
 
 tableHintsOptimizerHint returns [TableHintsOptimizerHint vResult = FragmentFactory.CreateFragment<TableHintsOptimizerHint>()]
@@ -22202,12 +22203,31 @@ simpleOptimizerHint returns [OptimizerHint vResult = FragmentFactory.CreateFragm
             vResult.HintKind = OptimizerHintKind.MergeUnion;
             UpdateTokenInfo(vResult, tMergeUnion); 
         }
-    | tForce:Identifier Order
-        {
-            Match(tForce, CodeGenerationSupporter.Force);
-            vResult.HintKind = OptimizerHintKind.ForceOrder;
-            UpdateTokenInfo(vResult, tForce); 
-        }
+    | {NextTokenMatches(CodeGenerationSupporter.Force)}?
+      tForce:Identifier (
+          Order
+          {
+              Match(tForce, CodeGenerationSupporter.Force);
+              vResult.HintKind = OptimizerHintKind.ForceOrder;
+              UpdateTokenInfo(vResult, tForce); 
+          }
+          |
+          Distributed tPlan1:Plan
+          {
+              Match(tForce, CodeGenerationSupporter.Force);
+              vResult.HintKind = OptimizerHintKind.ForceDistributedPlan;
+              UpdateTokenInfo(vResult, tForce); 
+          }
+          |
+          tSingle:Identifier tNode:Identifier tPlan2:Plan
+          {
+              Match(tForce, CodeGenerationSupporter.Force);
+              Match(tSingle, CodeGenerationSupporter.Single);
+              Match(tNode, CodeGenerationSupporter.GraphNode); // NODE
+              vResult.HintKind = OptimizerHintKind.ForceSingleNodePlan;
+              UpdateTokenInfo(vResult, tForce); 
+          }
+      )
     | tHash:Identifier Group
         {
             Match(tHash, CodeGenerationSupporter.Hash);
@@ -22382,6 +22402,19 @@ useHintClause returns [UseHintList vResult = FragmentFactory.CreateFragment<UseH
             UpdateTokenInfo(vResult, tRParen);
         }
 
+    ;
+
+forTimestampAsOfOptimizerHint returns [LiteralOptimizerHint vResult = FragmentFactory.CreateFragment<LiteralOptimizerHint>()]
+{
+    Literal vValue;
+}
+    : tFor:For tTimestamp:Identifier tAs:As tOf:Of vValue = stringLiteral
+        {
+            Match(tTimestamp, CodeGenerationSupporter.TimeStamp);
+            vResult.HintKind = OptimizerHintKind.ForTimestampAsOf;
+            vResult.Value = vValue;
+            UpdateTokenInfo(vResult, tFor);
+        }
     ;
 
 createRuleStatement returns [CreateRuleStatement vResult = this.FragmentFactory.CreateFragment<CreateRuleStatement>()]
