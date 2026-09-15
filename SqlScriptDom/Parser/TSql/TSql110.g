@@ -7858,6 +7858,10 @@ literalReplicaOption returns [LiteralReplicaOption vResult = FragmentFactory.Cre
                 {
                     vResult.OptionKind=AvailabilityReplicaOptionKind.SessionTimeout;
                 }
+                else if(TryMatch(tOption, CodeGenerationSupporter.BackupPriority))
+                {
+                    vResult.OptionKind=AvailabilityReplicaOptionKind.BackupPriority;
+                }
                 else
                 {
                     Match(tOption, CodeGenerationSupporter.ApplyDelay);

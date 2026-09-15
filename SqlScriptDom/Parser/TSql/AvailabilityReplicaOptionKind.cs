@@ -41,6 +41,10 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         /// Primary role
         /// </summary>
         PrimaryRole         = 6,
+        /// <summary>
+        /// Backup priority
+        /// </summary>
+        BackupPriority      = 7,
 
     }
 }
