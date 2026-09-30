@@ -17,6 +17,19 @@ namespace SqlStudio.Tests.UTSqlScriptDom
     public partial class SqlDomTests
     {
         /// <summary>
+        /// Negative test for GitHub issue #222: ALTER AVAILABILITY GROUP ... GRANT/DENY only
+        /// accepts CREATE ANY DATABASE; any other permission phrase must be rejected.
+        /// </summary>
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void AlterAvailabilityGroupCreateAnyDatabaseNegativeTest()
+        {
+            ParserTestUtils.ErrorTest130("ALTER AVAILABILITY GROUP [ag] GRANT CREATE ANY TABLE",
+                new ParserErrorInfo(47, "SQL46010", "TABLE"));
+        }
+
+        /// <summary>
         /// Negative tests for create table with generated always
         /// as user id/name start/end columns
         /// </summary>

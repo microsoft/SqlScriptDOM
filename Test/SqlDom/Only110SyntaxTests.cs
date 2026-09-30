@@ -15,6 +15,7 @@ namespace SqlStudio.Tests.UTSqlScriptDom
         // Note: These filenames are case sensitive, make sure they match the checked-in file exactly
         private static readonly ParserTest[] Only110TestInfos = {
             new ParserTest110("AlterAvailabilityGroupStatementTests.sql", 24, 12, 12),
+            new ParserTest110("AlterAvailabilityGroupBackupPriorityTests.sql", 6, 3, 3),
             new ParserTest110("AlterSearchPropertyListStatementTests.sql", 4, 4, 4),
             new ParserTest110("AlterSelectiveXmlIndexStatementTests.sql", 2, 6, 6),
             new ParserTest110("AlterSequenceStatementTests.sql", 2, 6, 6),

@@ -14,6 +14,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         private AvailabilityReplicaOptionsHelper()
         {
             AddOptionMapping(AvailabilityReplicaOptionKind.ApplyDelay, CodeGenerationSupporter.ApplyDelay);
+            AddOptionMapping(AvailabilityReplicaOptionKind.BackupPriority, CodeGenerationSupporter.BackupPriority);
             AddOptionMapping(AvailabilityReplicaOptionKind.AvailabilityMode, CodeGenerationSupporter.AvailabilityMode);
             AddOptionMapping(AvailabilityReplicaOptionKind.EndpointUrl, CodeGenerationSupporter.EndpointUrl);
             AddOptionMapping(AvailabilityReplicaOptionKind.SecondaryRole, CodeGenerationSupporter.SecondaryRole);
