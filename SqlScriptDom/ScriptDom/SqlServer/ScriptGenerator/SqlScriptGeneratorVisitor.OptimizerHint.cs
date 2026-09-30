@@ -105,7 +105,16 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
                     new IdentifierGenerator(CodeGenerationSupporter.NoPerformanceSpool), }},
                { OptimizerHintKind.Label, new List<TokenGenerator>() {
                     new IdentifierGenerator(CodeGenerationSupporter.Label, true),
-                    new KeywordGenerator(TSqlTokenType.EqualsSign) }}
+                    new KeywordGenerator(TSqlTokenType.EqualsSign) }},
+               { OptimizerHintKind.ForceSingleNodePlan, new List<TokenGenerator>( ) {
+                    new IdentifierGenerator(CodeGenerationSupporter.Force, true),
+                    new IdentifierGenerator(CodeGenerationSupporter.Single, true),
+                    new IdentifierGenerator(CodeGenerationSupporter.GraphNode, true),
+                    new KeywordGenerator(TSqlTokenType.Plan) }},
+               { OptimizerHintKind.ForceDistributedPlan, new List<TokenGenerator>( ) {
+                    new IdentifierGenerator(CodeGenerationSupporter.Force, true),
+                    new KeywordGenerator(TSqlTokenType.Distributed, true),
+                    new KeywordGenerator(TSqlTokenType.Plan) }}
        };
 
         public override void ExplicitVisit(LiteralOptimizerHint node)
@@ -121,6 +130,13 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
                     GenerateKeyword(TSqlTokenType.Use);
                     GenerateSpaceAndKeyword(TSqlTokenType.Plan);
                 }
+            }
+            else if (node.HintKind == OptimizerHintKind.ForTimestampAsOf)
+            {
+                GenerateKeyword(TSqlTokenType.For);
+                GenerateSpaceAndIdentifier(CodeGenerationSupporter.TimeStamp);
+                GenerateSpaceAndKeyword(TSqlTokenType.As);
+                GenerateSpaceAndKeyword(TSqlTokenType.Of);
             }
             else
             {

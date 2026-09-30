@@ -59,6 +59,9 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
 
         NoPerformanceSpool          = 34,
         Label = 35,
+        ForceSingleNodePlan         = 36,
+        ForceDistributedPlan        = 37,
+        ForTimestampAsOf            = 38,
     }
 
 #pragma warning restore 1591
