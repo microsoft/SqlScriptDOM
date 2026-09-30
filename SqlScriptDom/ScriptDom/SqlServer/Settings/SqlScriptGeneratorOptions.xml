@@ -215,6 +215,11 @@
       <Summary>Gets or sets a boolean indicating if parameters in a nested function call tree should be written on separate lines and indented one level per call. Isolated function calls remain on one line. When false (the default), all function calls retain the existing compact layout.</Summary>
     </Setting>
   </SettingGroup>
+  <SettingGroup name="CASE expressions">
+    <Setting name="MultilineCaseExpression" type="bool" default="false">
+      <Summary>Gets or sets a boolean indicating if each WHEN clause and the ELSE of a CASE expression should be written on its own line, indented one level from the CASE keyword, with END on its own line aligned with CASE. This applies to simple and searched CASE expressions wherever they appear. When false (the default), a CASE expression is written on a single line.</Summary>
+    </Setting>
+  </SettingGroup>
   <SettingGroup name="External Libraries">
     <Setting name="AllowExternalLibraryPaths" type="bool" default="true">
       <Summary>Gets or sets a boolean indicating if file paths can be used for external library content</Summary>
