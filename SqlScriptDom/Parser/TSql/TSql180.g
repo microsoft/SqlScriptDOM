@@ -2874,6 +2874,11 @@ alterDatabaseScopedGenericOption[bool forSecondary] returns [GenericConfiguratio
                 vResult.GenericOptionState = vValue;
             }
         |
+            tRollback:Rollback
+            {
+                vResult.GenericOptionState = CreateIdentifierOrScalarExpressionFromIdentifier(CreateIdentifierFromToken(tRollback));
+            }
+        |
             vValue = stringOrSignedIntegerOrIdentifier
             {
                 vResult.GenericOptionState = vValue;
