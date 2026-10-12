@@ -21417,9 +21417,10 @@ groupByClause returns [GroupByClause vResult = FragmentFactory.CreateFragment<Gr
             UpdateTokenInfo(vResult,tGroup);
         }
         (
-            All
+            tAll:All
             {
                 vResult.All = true;
+                UpdateTokenInfo(vResult, tAll);
             }
             (
                 // Greedy: a grouping-item start token always belongs to the optional

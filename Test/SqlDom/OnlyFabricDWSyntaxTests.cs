@@ -1,4 +1,5 @@
-﻿using Microsoft.SqlServer.TransactSql.ScriptDom;
+﻿using System.IO;
+using Microsoft.SqlServer.TransactSql.ScriptDom;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SqlStudio.Tests.AssemblyTools.TestCategory;
 
@@ -32,6 +33,38 @@ namespace SqlStudio.Tests.UTSqlScriptDom
             new ParserTestFabricDW("OrderByAllTestsFabricDW.sql", nErrors80: 13, nErrors90: 13, nErrors100: 13, nErrors110: 13, nErrors120: 13, nErrors130: 13, nErrors140: 13, nErrors150: 13, nErrors160: 13, nErrors170: 13, nErrors180: 13),
                     
         };
+
+        [DataTestMethod]
+        [DataRow("GROUP BY ALL")]
+        [DataRow("GROUP BY ALL City")]
+        [DataRow("GROUP BY City")]
+        [DataRow("ORDER BY ALL")]
+        [DataRow("ORDER BY ALL ASC")]
+        [DataRow("ORDER BY ALL DESC")]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void FabricDWGroupingAndOrderingTokenRanges(string clauseText)
+        {
+            string selectText = "SELECT TOP 100 City, COUNT(*) AS Cnt FROM dbo.Employees " + clauseText;
+            string sql = "CREATE VIEW dbo.TestView AS " + selectText + ";";
+            var parser = new TSqlFabricDWParser(true);
+            using (var reader = new StringReader(sql))
+            {
+                var script = (TSqlScript)parser.Parse(reader, out var errors);
+                Assert.AreEqual(0, errors.Count);
+                var view = (CreateViewStatement)script.Batches[0].Statements[0];
+                var query = (QuerySpecification)view.SelectStatement.QueryExpression;
+                TSqlFragment clause = query.GroupByClause != null
+                    ? (TSqlFragment)query.GroupByClause
+                    : query.OrderByClause;
+
+                Assert.AreEqual(clauseText, sql.Substring(clause.StartOffset, clause.FragmentLength));
+                Assert.AreEqual(selectText, sql.Substring(query.StartOffset, query.FragmentLength));
+                Assert.AreEqual(selectText, sql.Substring(view.SelectStatement.StartOffset, view.SelectStatement.FragmentLength));
+                Assert.AreEqual(clause.LastTokenIndex, query.LastTokenIndex);
+                Assert.AreEqual(clause.LastTokenIndex, view.SelectStatement.LastTokenIndex);
+            }
+        }
 
         [TestMethod]
         [Priority(0)]
