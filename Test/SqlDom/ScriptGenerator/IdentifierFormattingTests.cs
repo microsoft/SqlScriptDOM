@@ -1016,6 +1016,7 @@ WITH (FILETABLE_COLLATE_FILENAME = Latin1_General_bin, FILETABLE_DIRECTORY = NUL
         {
             const string input = "SELECT SOURCE FROM userTable CROSS APPLY dbo.[AI_GENERATE_CHUNKS](SOURCE);";
             var options = MakeOptions(IdentifierCasing.Preserve, IdentifierBracketing.ExcludeBrackets);
+            options.NewLineBeforeJoinClause = false;
             const string expected = @"SELECT SOURCE FROM userTable CROSS APPLY dbo.AI_GENERATE_CHUNKS(SOURCE);";
 
             AssertGeneratedWith(new TSql170Parser(true), new Sql170ScriptGenerator(options), input, expected);

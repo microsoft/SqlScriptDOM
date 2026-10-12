@@ -41,10 +41,11 @@ ORDER BY a
 OFFSET (sum(5)) ROWS FETCH NEXT 6 ROWS ONLY;
 
 SELECT *
-FROM t1 CROSS APPLY (SELECT *
-                     FROM sys.objects
-                     ORDER BY 1
-                     OFFSET offset ROWS FETCH NEXT first ROWS ONLY) AS t1;
+FROM t1
+     CROSS APPLY (SELECT *
+                  FROM sys.objects
+                  ORDER BY 1
+                  OFFSET offset ROWS FETCH NEXT first ROWS ONLY) AS t1;
 
 INSERT INTO t
 SELECT *

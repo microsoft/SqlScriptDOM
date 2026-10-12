@@ -195,15 +195,135 @@ FROM   a
         [TestMethod]
         [Priority(0)]
         [SqlStudioTestCategory(Category.UnitTest)]
-        public void TestCrossJoinUnaffectedByNewOptions()
+        public void TestCrossJoinUnaffectedByOnClauseOptions()
         {
-            // CROSS JOIN has no ON clause (it is an UnqualifiedJoin), so the new options do not
-            // change its formatting.
+            // CROSS JOIN has no ON clause (it is an UnqualifiedJoin), so the ON-related options
+            // (NewLineAfterJoinKeyword, NewLineBeforeOnClause) do not change its formatting. The
+            // leading newline comes from NewLineBeforeJoinClause, which defaults to true.
             const string input = "SELECT * FROM a CROSS JOIN b;";
             var options = new SqlScriptGeneratorOptions
             {
                 NewLineAfterJoinKeyword = false,
                 NewLineBeforeOnClause = true
+            };
+            const string expected =
+@"
+SELECT *
+FROM   a
+       CROSS JOIN b;";
+
+            AssertGenerated(input, options, expected);
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestCrossApplyUnaffectedByOnClauseOptions()
+        {
+            // CROSS APPLY has no ON clause either, so the ON-related options leave it unchanged. The
+            // leading newline comes from NewLineBeforeJoinClause, which defaults to true.
+            const string input = "SELECT * FROM a CROSS APPLY dbo.f(a.id) AS b;";
+            var options = new SqlScriptGeneratorOptions
+            {
+                NewLineAfterJoinKeyword = false,
+                NewLineBeforeOnClause = true
+            };
+            const string expected =
+@"
+SELECT *
+FROM   a
+       CROSS APPLY dbo.f(a.id) AS b;";
+
+            AssertGenerated(input, options, expected);
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestCrossApplyNewLineBeforeJoinClauseDefaultTrue()
+        {
+            // NewLineBeforeJoinClause (default true) applies to CROSS APPLY just like a qualified
+            // JOIN: the operator goes on its own line under the first table source.
+            const string input = "SELECT * FROM a CROSS APPLY dbo.f(a.id) AS b;";
+            var options = new SqlScriptGeneratorOptions();
+            const string expected =
+@"
+SELECT *
+FROM   a
+       CROSS APPLY dbo.f(a.id) AS b;";
+
+            AssertGenerated(input, options, expected);
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestCrossApplyInlineWhenNewLineBeforeJoinClauseFalse()
+        {
+            // When NewLineBeforeJoinClause is false, CROSS APPLY stays on the same line as the first
+            // table source.
+            const string input = "SELECT * FROM a CROSS APPLY dbo.f(a.id) AS b;";
+            var options = new SqlScriptGeneratorOptions
+            {
+                NewLineBeforeJoinClause = false
+            };
+            const string expected =
+@"
+SELECT *
+FROM   a CROSS APPLY dbo.f(a.id) AS b;";
+
+            AssertGenerated(input, options, expected);
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestOuterApplyInlineWhenNewLineBeforeJoinClauseFalse()
+        {
+            // When NewLineBeforeJoinClause is false, OUTER APPLY stays on the same line as the first
+            // table source.
+            const string input = "SELECT * FROM a OUTER APPLY dbo.f(a.id) AS b;";
+            var options = new SqlScriptGeneratorOptions
+            {
+                NewLineBeforeJoinClause = false
+            };
+            const string expected =
+@"
+SELECT *
+FROM   a OUTER APPLY dbo.f(a.id) AS b;";
+
+            AssertGenerated(input, options, expected);
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestOuterApplyNewLineBeforeJoinClauseDefaultTrue()
+        {
+            // NewLineBeforeJoinClause (default true) applies to OUTER APPLY just like a qualified
+            // JOIN: the operator goes on its own line under the first table source.
+            const string input = "SELECT * FROM a OUTER APPLY dbo.f(a.id) AS b;";
+            var options = new SqlScriptGeneratorOptions();
+            const string expected =
+@"
+SELECT *
+FROM   a
+       OUTER APPLY dbo.f(a.id) AS b;";
+
+            AssertGenerated(input, options, expected);
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestCrossJoinInlineWhenNewLineBeforeJoinClauseFalse()
+        {
+            // When NewLineBeforeJoinClause is false, CROSS JOIN stays on the same line as the first
+            // table source.
+            const string input = "SELECT * FROM a CROSS JOIN b;";
+            var options = new SqlScriptGeneratorOptions
+            {
+                NewLineBeforeJoinClause = false
             };
             const string expected =
 @"
@@ -216,19 +336,17 @@ FROM   a CROSS JOIN b;";
         [TestMethod]
         [Priority(0)]
         [SqlStudioTestCategory(Category.UnitTest)]
-        public void TestCrossApplyUnaffectedByNewOptions()
+        public void TestCrossJoinNewLineBeforeJoinClauseDefaultTrue()
         {
-            // CROSS APPLY has no ON clause either, so the new options leave it unchanged.
-            const string input = "SELECT * FROM a CROSS APPLY dbo.f(a.id) AS b;";
-            var options = new SqlScriptGeneratorOptions
-            {
-                NewLineAfterJoinKeyword = false,
-                NewLineBeforeOnClause = true
-            };
+            // NewLineBeforeJoinClause (default true) applies to CROSS JOIN just like a qualified
+            // JOIN: the operator goes on its own line under the first table source.
+            const string input = "SELECT * FROM a CROSS JOIN b;";
+            var options = new SqlScriptGeneratorOptions();
             const string expected =
 @"
 SELECT *
-FROM   a CROSS APPLY dbo.f(a.id) AS b;";
+FROM   a
+       CROSS JOIN b;";
 
             AssertGenerated(input, options, expected);
         }
