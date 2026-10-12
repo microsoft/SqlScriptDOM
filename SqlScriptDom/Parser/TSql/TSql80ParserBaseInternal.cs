@@ -2365,12 +2365,15 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
             antlr.NoViableAltForCharException notViableAltForCharException = exception.recog as antlr.NoViableAltForCharException;
             if (notViableAltForCharException != null)
             {
+                string foundChar = notViableAltForCharException.foundChar == antlr.CharScanner.EOF_CHAR
+                    ? "<EOF>"
+                    : Convert.ToChar(notViableAltForCharException.foundChar).ToString();
                 return TSql80ParserBaseInternal.CreateParseError("SQL46010",
                     lastOffset,
                     notViableAltForCharException.getLine(),
                     notViableAltForCharException.getColumn(),
                     TSqlParserResource.SQL46010Message,
-                    notViableAltForCharException.foundChar.ToString());
+                    foundChar);
             }
 
             // TODO, sacaglar: This is translated into an internal error.  Is there a runtime log for this?

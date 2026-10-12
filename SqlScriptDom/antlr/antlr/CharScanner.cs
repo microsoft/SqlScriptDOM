@@ -28,7 +28,11 @@ namespace antlr
 	internal abstract class CharScanner : TokenStream
 	{
 		internal const char NO_CHAR = (char) (0);
-		public static readonly char EOF_CHAR = Char.MaxValue;
+		// EOF is represented by a value OUTSIDE the 16-bit char range so that a real
+		// character equal to U+FFFF (char.MaxValue) in the input is not mistaken for
+		// end-of-input. Real EOF is produced only by the input buffer once the
+		// underlying reader is exhausted (detected by stream position, not by value).
+		public const int EOF_CHAR = Char.MaxValue + 1;
 
         // NOTE, olegr: Appears to be not used...
 		//// Used to store event delegates
@@ -64,10 +68,12 @@ namespace antlr
 		/// <summary>Used for creating Token instances.</summary>
 		protected TokenCreator	tokenCreator;
 
-		/// <summary>Used for caching lookahead characters.</summary>
-		protected char			cached_LA1;
-		protected char			cached_LA2;
-		protected char			cached_LA3;
+		/// <summary>Used for caching lookahead characters. Typed as int so the
+		/// out-of-char-range EOF_CHAR sentinel can be represented distinctly from a
+		/// real U+FFFF character.</summary>
+		protected int			cached_LA1;
+		protected int			cached_LA2;
+		protected int			cached_LA3;
 
 		protected bool caseSensitive = true;
 		protected bool caseSensitiveLiterals = true;
@@ -149,13 +155,13 @@ namespace antlr
 			{
 				if (caseSensitive)
 				{
-					append(cached_LA1);
+					append((char) cached_LA1);
 				}
 				else
 				{
 					// use input.LA(), not LA(), to get original case
 					// CharScanner.LA() would toLower it.
-					append(inputState.input.LA(1));
+					append((char) inputState.input.LA(1));
 				}
 				if (cached_LA1 == '\t')
 				{
@@ -259,7 +265,7 @@ namespace antlr
 			return returnToken_;
 		}
 		
-		public virtual char LA(int i)
+		public virtual int LA(int i)
 		{
 			if (i == 1)
 			{
@@ -328,6 +334,10 @@ namespace antlr
 		{
 			if (cached_LA1 != c)
 			{
+				if (cached_LA1 == EOF_CHAR)
+				{
+					handlePrematureEof();
+				}
 				throw new MismatchedCharException(cached_LA1, Convert.ToChar(c), false, this);
 			}
 			consume();
@@ -337,6 +347,10 @@ namespace antlr
 		{
 			if (!b.member(cached_LA1))
 			{
+				if (cached_LA1 == EOF_CHAR)
+				{
+					handlePrematureEof();
+				}
 				throw new MismatchedCharException(cached_LA1, b, false, this);
 			}
 			consume();
@@ -349,6 +363,10 @@ namespace antlr
 			{
 				if (cached_LA1 != s[i])
 				{
+					if (cached_LA1 == EOF_CHAR)
+					{
+						handlePrematureEof();
+					}
 					throw new MismatchedCharException(cached_LA1, s[i], false, this);
 				}
 				consume();
@@ -381,6 +399,15 @@ namespace antlr
 		public virtual void  matchRange(char c1, char c2)
 		{
 			matchRange((int) c1, (int) c2);
+		}
+		
+		/// <summary>
+		/// Hook invoked when a character match fails because the next lookahead is the
+		/// EOF sentinel. Subclasses can override to raise a context-specific error
+		/// (e.g. an unterminated string literal, delimited identifier, or comment).
+		/// </summary>
+		protected virtual void handlePrematureEof()
+		{
 		}
 		
 		public virtual void  newline()
@@ -594,8 +621,13 @@ namespace antlr
 		}
 		
 		// Override this method to get more specific case handling
-		public virtual char toLower(int c)
+		public virtual int toLower(int c)
 		{
+			// Keep any out-of-range sentinel unchanged before converting to char.
+			// EOF_CHAR is above the range; the lower-bound check also prevents a
+			// negative sentinel from being narrowed.
+			if (c < 0 || c > Char.MaxValue)
+				return c;
 			return Char.ToLower(Convert.ToChar(c), System.Globalization.CultureInfo.InvariantCulture);
 		}
 		
