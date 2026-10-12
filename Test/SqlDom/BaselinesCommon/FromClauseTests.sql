@@ -47,7 +47,8 @@ SELECT c1
 FROM t1 WITH (HOLDLOCK, READPAST, INDEX (0));
 
 SELECT *
-FROM t1 WITH (NOLOCK) CROSS APPLY dbo.tvf WITH (NOLOCK);
+FROM t1 WITH (NOLOCK)
+     CROSS APPLY dbo.tvf WITH (NOLOCK);
 
 SELECT c1
 FROM t1 AS table1 WITH (INDEX (0, 1, ind2), HOLDLOCK, NOLOCK, PAGLOCK, READCOMMITTED, READPAST, READUNCOMMITTED, REPEATABLEREAD, ROWLOCK, SERIALIZABLE, TABLOCK, TABLOCKX, UPDLOCK, XLOCK, NOWAIT), t2 WITH (NOWAIT);
@@ -68,25 +69,38 @@ FROM @var1, @var2 AS [table 1], @var3 AS table2;
 
 GO
 SELECT *
-FROM t1 CROSS JOIN t10;
+FROM t1
+     CROSS JOIN t10;
 
 SELECT *
-FROM t1 CROSS JOIN (t10 CROSS JOIN t11);
+FROM t1
+     CROSS JOIN (t10
+                 CROSS JOIN t11);
 
 SELECT *
-FROM (((t1 CROSS JOIN ((t10 CROSS JOIN t11)))));
+FROM (((t1
+        CROSS JOIN ((t10
+                     CROSS JOIN t11)))));
 
 SELECT *
-FROM t1 CROSS APPLY (t10 CROSS APPLY t11);
+FROM t1
+     CROSS APPLY (t10
+                  CROSS APPLY t11);
 
 SELECT *
-FROM (((t1 CROSS APPLY ((t10 CROSS APPLY t11)))));
+FROM (((t1
+        CROSS APPLY ((t10
+                      CROSS APPLY t11)))));
 
 SELECT *
-FROM t1 OUTER APPLY (t10 OUTER APPLY t11);
+FROM t1
+     OUTER APPLY (t10
+                  OUTER APPLY t11);
 
 SELECT *
-FROM (((t1 OUTER APPLY ((t10 OUTER APPLY t11)))));
+FROM (((t1
+        OUTER APPLY ((t10
+                      OUTER APPLY t11)))));
 
 SELECT *
 FROM t1
@@ -240,7 +254,8 @@ FROM (SELECT c1 AS a,
 
 SELECT *
 FROM (SELECT *
-      FROM t1) AS t10(c1, c2) CROSS JOIN t2;
+      FROM t1) AS t10(c1, c2)
+     CROSS JOIN t2;
 
 SELECT *
 FROM ((SELECT *
@@ -265,13 +280,15 @@ FROM { OJ t1
      ON c1 < 10 };
 
 SELECT *
-FROM { OJ t1 CROSS JOIN t2
+FROM { OJ t1
+     CROSS JOIN t2
      INNER JOIN
      t2
      ON c1 < 10 };
 
 SELECT *
-FROM { OJ (t1 CROSS JOIN t2)
+FROM { OJ (t1
+           CROSS JOIN t2)
      INNER JOIN
      t2
      ON c1 < 10 };
@@ -279,18 +296,22 @@ FROM { OJ (t1 CROSS JOIN t2)
 SELECT *
 FROM t1
      INNER JOIN
-     { OJ t1 CROSS JOIN t2
+     { OJ t1
+     CROSS JOIN t2
      INNER JOIN
      t2
      ON c1 < 10 }
-     ON c1 < 10 CROSS JOIN t3;
+     ON c1 < 10
+     CROSS JOIN t3;
 
 SELECT jc.[JobCandidateID]
-FROM [HumanResources].[JobCandidate] AS jc CROSS APPLY jc.[Resume].nodes(N'declare default element namespace "http://schemas.microsoft.com/sqlserver/2004/07/adventure-works/Resume"; 
+FROM [HumanResources].[JobCandidate] AS jc
+     CROSS APPLY jc.[Resume].nodes(N'declare default element namespace "http://schemas.microsoft.com/sqlserver/2004/07/adventure-works/Resume"; 
     /Resume/Employment') AS Employment(ref);
 
 SELECT ecp.*
-FROM sys.dm_exec_cached_plans AS ecp OUTER APPLY sys.dm_exec_plan_attributes(ecp.plan_handle) AS epa;
+FROM sys.dm_exec_cached_plans AS ecp
+     OUTER APPLY sys.dm_exec_plan_attributes(ecp.plan_handle) AS epa;
 
 SELECT au_id
 FROM [dbo].[Authors] AS auth WITH (NOLOCK)
@@ -303,7 +324,8 @@ SELECT *
 FROM t AS s WITH (NOLOCK);
 
 SELECT *
-FROM t1 WITH (NOLOCK) CROSS APPLY dbo.tvf WITH (NOLOCK);
+FROM t1 WITH (NOLOCK)
+     CROSS APPLY dbo.tvf WITH (NOLOCK);
 
 SELECT *
 FROM t AS s WITH (NOLOCK);
@@ -313,4 +335,3 @@ FROM t WITH (NOLOCK);
 
 SELECT *
 FROM t AS s WITH (NOLOCK);
-

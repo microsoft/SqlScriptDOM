@@ -274,7 +274,8 @@ FROM   t;";
         public void TestCommaPlacementLeadingWithPreserveCommentsDoesNotAbsorbComma()
         {
             // A line comment after an element must not absorb the following leading comma.
-            const string input = @"SELECT col1, -- first column
+            const string input = @"
+SELECT col1, -- first column
        col2, -- second column
        col3
 FROM t;";
@@ -296,7 +297,8 @@ FROM   t;";
         [SqlStudioTestCategory(Category.UnitTest)]
         public void TestCommaPlacementTrailingWithPreserveCommentsKeepsCommentsAfterComma()
         {
-            const string input = @"SELECT col1, -- first column
+            const string input = @"
+SELECT col1, -- first column
        col2, -- second column
        col3
 FROM t;";
@@ -330,6 +332,126 @@ FROM t;";
 SELECT col1, -- first column
        col2
 FROM   t;";
+            AssertGenerated(input, options, expected);
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestCommaPlacementLeadingPreservesCommentBeforeFromClause()
+        {
+            const string input = @"
+SELECT a
+, b
+-- comment
+FROM t;";
+            var options = new SqlScriptGeneratorOptions
+            {
+                AlignClauseBodies = false,
+                CommaPlacement = CommaPlacement.Leading,
+                LeadingCommaSpaceCount = 0,
+                NewLineBeforeFromClause = false,
+                PreserveComments = true,
+            };
+            const string expected = @"
+SELECT a
+      ,b
+-- comment
+FROM t;";
+            AssertGenerated(input, options, expected);
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestCommaPlacementTrailingPreservesCommentBeforeFromClause()
+        {
+            const string input = @"
+SELECT a,
+b
+-- comment
+FROM t;";
+            var options = new SqlScriptGeneratorOptions
+            {
+                AlignClauseBodies = false,
+                CommaPlacement = CommaPlacement.Trailing,
+                NewLineBeforeFromClause = false,
+                PreserveComments = true,
+            };
+            const string expected = @"
+SELECT a,
+       b
+-- comment
+FROM t;";
+            AssertGenerated(input, options, expected);
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestCommaPlacementLeadingPreservesCommentsAroundSelectElements()
+        {
+            const string input = @"
+-- before select
+SELECT
+-- before first column
+a -- after first column
+-- between first and second column
+,b -- after second column
+,c -- after third column
+-- before from
+FROM t;";
+            var options = new SqlScriptGeneratorOptions
+            {
+                AlignClauseBodies = false,
+                CommaPlacement = CommaPlacement.Leading,
+                LeadingCommaSpaceCount = 0,
+                NewLineBeforeFromClause = true,
+                PreserveComments = true,
+            };
+            const string expected = @"
+-- before select
+SELECT -- before first column
+       a -- after first column
+       -- between first and second column
+      ,b -- after second column
+      ,c -- after third column
+-- before from
+FROM t;";
+            AssertGenerated(input, options, expected);
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestCommaPlacementTrailingPreservesCommentsAroundSelectElements()
+        {
+            const string input = @"
+-- before select
+SELECT
+-- before first column
+a, -- after first column
+-- between first and second column
+b, -- after second column
+c -- after third column
+-- before from
+FROM t;";
+            var options = new SqlScriptGeneratorOptions
+            {
+                AlignClauseBodies = false,
+                CommaPlacement = CommaPlacement.Trailing,
+                NewLineBeforeFromClause = true,
+                PreserveComments = true,
+            };
+            const string expected = @"
+-- before select
+SELECT -- before first column
+       a, -- after first column
+       -- between first and second column
+       b, -- after second column
+       c -- after third column
+-- before from
+FROM t;";
             AssertGenerated(input, options, expected);
         }
 
@@ -497,6 +619,111 @@ CREATE TABLE t (
   , b INT -- second
   , c INT
 );";
+            AssertGenerated(input, options, expected);
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestCommaPlacementLeadingProcedureParametersPreservesCommentBeforeParameter()
+        {
+            const string input = @"CREATE PROCEDURE p @a INT,
+-- before second parameter
+@b INT AS SELECT 1;";
+            var options = new SqlScriptGeneratorOptions
+            {
+                CommaPlacement = CommaPlacement.Leading,
+                MultilineProcedureParametersList = true,
+                PreserveComments = true,
+            };
+            const string expected = @"
+CREATE PROCEDURE p
+    @a INT
+    -- before second parameter
+  , @b INT
+AS
+SELECT 1;";
+            AssertGenerated(input, options, expected);
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestCommaPlacementLeadingProcedureParametersPreservesCommentsAroundParameters()
+        {
+            const string input = @"CREATE PROCEDURE p
+-- before first parameter
+@a INT, -- after first parameter
+-- before second parameter
+@b INT -- after second parameter
+AS SELECT 1;";
+            var options = new SqlScriptGeneratorOptions
+            {
+                CommaPlacement = CommaPlacement.Leading,
+                MultilineProcedureParametersList = true,
+                PreserveComments = true,
+            };
+            const string expected = @"
+CREATE PROCEDURE p
+    -- before first parameter
+    @a INT -- after first parameter
+    -- before second parameter
+  , @b INT -- after second parameter
+AS
+SELECT 1;";
+            AssertGenerated(input, options, expected);
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestCommaPlacementLeadingProcedureParametersWithSmallIndentation()
+        {
+            const string input = @"CREATE PROCEDURE p @a INT,
+-- before second parameter
+@b INT AS SELECT 1;";
+            var options = new SqlScriptGeneratorOptions
+            {
+                CommaPlacement = CommaPlacement.Leading,
+                IndentationSize = 1,
+                MultilineProcedureParametersList = true,
+                PreserveComments = true,
+            };
+            const string expected = @"
+CREATE PROCEDURE p
+ @a INT
+ -- before second parameter
+, @b INT
+AS
+SELECT 1;";
+            AssertGenerated(input, options, expected);
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestCommaPlacementTrailingProcedureParametersPreservesCommentsAroundParameters()
+        {
+            const string input = @"CREATE PROCEDURE p
+-- before first parameter
+@a INT, -- after first parameter
+-- before second parameter
+@b INT -- after second parameter
+AS SELECT 1;";
+            var options = new SqlScriptGeneratorOptions
+            {
+                CommaPlacement = CommaPlacement.Trailing,
+                MultilineProcedureParametersList = true,
+                PreserveComments = true,
+            };
+            const string expected = @"
+CREATE PROCEDURE p
+    -- before first parameter
+    @a INT, -- after first parameter
+    -- before second parameter
+    @b INT -- after second parameter
+AS
+SELECT 1;";
             AssertGenerated(input, options, expected);
         }
 

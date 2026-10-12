@@ -23,6 +23,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
             }
             GenerateSymbol(TSqlTokenType.LeftParenthesis);
             GenerateFragmentIfNotNull(node.Input);
+            GenerateSpaceAndFragmentIfNotNull(node.OnErrorClause);
             GenerateSymbol(TSqlTokenType.RightParenthesis);
         }
     }

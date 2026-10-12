@@ -152,6 +152,36 @@ namespace antlr
 			scanner = scanner_;
 		}		
 
+		// int overloads so the lexer can pass a lookahead that may be the
+		// out-of-char-range EOF sentinel without a cast/overflow at the call site.
+		public MismatchedCharException(int c, char lower, char upper_, bool matchNot, CharScanner scanner_) :
+					base("Mismatched char", scanner_.getFilename(), scanner_.getLine(), scanner_.getColumn())
+		{
+			mismatchType = matchNot ? CharTypeEnum.NotRangeType : CharTypeEnum.RangeType;
+			foundChar = c;
+			expecting = lower;
+			upper = upper_;
+			scanner = scanner_;
+		}
+
+		public MismatchedCharException(int c, char expecting_, bool matchNot, CharScanner scanner_) :
+					base("Mismatched char", scanner_.getFilename(), scanner_.getLine(), scanner_.getColumn())
+		{
+			mismatchType = matchNot ? CharTypeEnum.NotCharType : CharTypeEnum.CharType;
+			foundChar = c;
+			expecting = expecting_;
+			scanner = scanner_;
+		}
+
+		public MismatchedCharException(int c, BitSet set_, bool matchNot, CharScanner scanner_) :
+					base("Mismatched char", scanner_.getFilename(), scanner_.getLine(), scanner_.getColumn())
+		{
+			mismatchType = matchNot ? CharTypeEnum.NotSetType : CharTypeEnum.SetType;
+			foundChar = c;
+			bset = set_;
+			scanner = scanner_;
+		}
+
         protected MismatchedCharException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         { }
@@ -165,8 +195,7 @@ namespace antlr
 		{
 			switch (c) 
 			{
-				case 65535 :
-					// 65535 = (char) -1 = EOF
+				case CharScanner.EOF_CHAR :
 					sb.Append("'<EOF>'");
 					break;
 				case '\n' :

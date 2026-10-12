@@ -535,9 +535,6 @@ ctasCreateTableStatement [CreateTableStatement vParent]
         {
             vParent.SelectStatement = vSelectStatement;
         }
-        {
-           CheckCtasStatementHasDistributionOption(vParent);
-        }
     ;
 
 /////////////////////////////////////////////////
@@ -19536,28 +19533,37 @@ qualifiedJoin[SubDmlFlags subDmlFlags, ref TableReference vResult]
     ;
 
 joinHint[QualifiedJoin vParent]
+{
+    IntegerLiteral vColumnsCount;
+}
     :    (
             tId1:Identifier
             (
-                tId2:Identifier
+                LeftParenthesis vColumnsCount = integer RightParenthesis
                 {
-                    Match(tId1,CodeGenerationSupporter.Local);
-                    vParent.JoinHint = JoinHintHelper.Instance.ParseOption(tId2);
-                    if (vParent.JoinHint == JoinHint.Remote)
-                    {
-                        ThrowIncorrectSyntaxErrorException(tId2);
-                    }
-                }
-            |
-                tMerge:Merge
-                {
-                    Match(tId1,CodeGenerationSupporter.Local);
-                    vParent.JoinHint = JoinHint.Merge;
+                    Match(tId1,CodeGenerationSupporter.Redistribute);
+                    vParent.JoinHint = JoinHint.Redistribute;
+                    vParent.JoinHintColumnsCount = vColumnsCount;
                 }
             |
                 /* empty */
                 {
-                    vParent.JoinHint = JoinHintHelper.Instance.ParseOption(tId1);
+                    if (TryMatch(tId1, CodeGenerationSupporter.Replicate))
+                    {
+                        vParent.JoinHint = JoinHint.Replicate;
+                    }
+                    else if (TryMatch(tId1, CodeGenerationSupporter.Redistribute))
+                    {
+                        vParent.JoinHint = JoinHint.Redistribute;
+                    }
+                    else
+                    {
+                        vParent.JoinHint = JoinHintHelper.Instance.ParseOption(tId1);
+                        if (vParent.JoinHint == JoinHint.Remote)
+                        {
+                            ThrowIncorrectSyntaxErrorException(tId1);
+                        }
+                    }
                 }
             )
         )
@@ -21417,9 +21423,10 @@ groupByClause returns [GroupByClause vResult = FragmentFactory.CreateFragment<Gr
             UpdateTokenInfo(vResult,tGroup);
         }
         (
-            All
+            tAll:All
             {
                 vResult.All = true;
+                UpdateTokenInfo(vResult, tAll);
             }
             (
                 // Greedy: a grouping-item start token always belongs to the optional
@@ -21959,6 +21966,19 @@ hint returns [OptimizerHint vResult]
     | vResult = forTimestampAsOfOptimizerHint
     ;
 
+forTimestampAsOfOptimizerHint returns [LiteralOptimizerHint vResult = FragmentFactory.CreateFragment<LiteralOptimizerHint>()]
+{
+    Literal vValue;
+}
+    :   tFor:For tTimestamp:Identifier As Of vValue = stringLiteral
+        {
+            Match(tTimestamp, CodeGenerationSupporter.TimeStamp);
+            vResult.HintKind = OptimizerHintKind.ForTimestampAsOf;
+            UpdateTokenInfo(vResult, tFor);
+            vResult.Value = vValue;
+        }
+    ;
+
 tableHintsOptimizerHint returns [TableHintsOptimizerHint vResult = FragmentFactory.CreateFragment<TableHintsOptimizerHint>()]
 {
     SchemaObjectName vSchemaObjectName;
@@ -22004,14 +22024,14 @@ simpleOptimizerHint returns [OptimizerHint vResult = FragmentFactory.CreateFragm
           {
               Match(tForce, CodeGenerationSupporter.Force);
               vResult.HintKind = OptimizerHintKind.ForceOrder;
-              UpdateTokenInfo(vResult, tForce); 
+              UpdateTokenInfo(vResult, tForce);
           }
           |
           Distributed tPlan1:Plan
           {
               Match(tForce, CodeGenerationSupporter.Force);
               vResult.HintKind = OptimizerHintKind.ForceDistributedPlan;
-              UpdateTokenInfo(vResult, tForce); 
+              UpdateTokenInfo(vResult, tForce);
           }
           |
           tSingle:Identifier tNode:Identifier tPlan2:Plan
@@ -22020,7 +22040,7 @@ simpleOptimizerHint returns [OptimizerHint vResult = FragmentFactory.CreateFragm
               Match(tSingle, CodeGenerationSupporter.Single);
               Match(tNode, CodeGenerationSupporter.GraphNode); // NODE
               vResult.HintKind = OptimizerHintKind.ForceSingleNodePlan;
-              UpdateTokenInfo(vResult, tForce); 
+              UpdateTokenInfo(vResult, tForce);
           }
       )
     | tHash:Identifier Group
@@ -22071,7 +22091,16 @@ simpleOptimizerHint returns [OptimizerHint vResult = FragmentFactory.CreateFragm
                 Match(tFirstWord, CodeGenerationSupporter.Optimize);
                 Match(tSecondWord, CodeGenerationSupporter.Correlated);
                 vResult.HintKind = OptimizerHintKind.OptimizeCorrelatedUnionAll;
-                UpdateTokenInfo(vResult, tUnion2); 
+                UpdateTokenInfo(vResult, tUnion2);
+            }
+        | tNodeWord:Identifier tPlanSingleNode:Plan
+            {
+                Match(tFirstWord, CodeGenerationSupporter.Force);
+                Match(tSecondWord, CodeGenerationSupporter.Single);
+                Match(tNodeWord, CodeGenerationSupporter.GraphNode);
+                vResult.HintKind = OptimizerHintKind.ForceSingleNodePlan;
+                UpdateTokenInfo(vResult, tFirstWord);
+                UpdateTokenInfo(vResult, tPlanSingleNode);
             }
         )
     | tMonoHint:Identifier
@@ -22197,19 +22226,6 @@ useHintClause returns [UseHintList vResult = FragmentFactory.CreateFragment<UseH
             UpdateTokenInfo(vResult, tRParen);
         }
 
-    ;
-
-forTimestampAsOfOptimizerHint returns [LiteralOptimizerHint vResult = FragmentFactory.CreateFragment<LiteralOptimizerHint>()]
-{
-    Literal vValue;
-}
-    : tFor:For tTimestamp:Identifier tAs:As tOf:Of vValue = stringLiteral
-        {
-            Match(tTimestamp, CodeGenerationSupporter.TimeStamp);
-            vResult.HintKind = OptimizerHintKind.ForTimestampAsOf;
-            vResult.Value = vValue;
-            UpdateTokenInfo(vResult, tFor);
-        }
     ;
 
 createRuleStatement returns [CreateRuleStatement vResult = this.FragmentFactory.CreateFragment<CreateRuleStatement>()]
@@ -28027,6 +28043,8 @@ alterTableStatement returns [AlterTableStatement vResult = null]
         |   vResult=alterTableDropTableElementStatement
         |   {NextTokenMatches(CodeGenerationSupporter.Switch)}?
             vResult=alterTableSwitchStatement
+        |   {NextTokenMatches(CodeGenerationSupporter.Cluster, 3)}?
+            vResult=alterTableAddClusterByStatement
         |   (
                 (With vExistingRowsCheck = constraintEnforcement)?
                 (
@@ -28047,7 +28065,6 @@ alterTableStatement returns [AlterTableStatement vResult = null]
             {NextTokenMatches(CodeGenerationSupporter.FileTableNamespace, 2)}?
             vResult=alterTableFileTableNamespaceStatement
         |   vResult=alterTableSetStatement
-        |   vResult=alterTableAddClusterByStatement
         )
         {
             // Update position later, because instantiation is lazy
@@ -28194,10 +28211,10 @@ alterTableAddClusterByStatement returns [AlterTableAddClusterByStatement vResult
 {
     ClusterByTableOption vClusterByOption;
 }
-    : tAdd:Add LeftParenthesis vClusterByOption = clusterByTableOption
+    : tWith:With LeftParenthesis vClusterByOption = clusterByTableOption
         {
             vResult.ClusterByOption = vClusterByOption;
-            UpdateTokenInfo(vResult, tAdd);
+            UpdateTokenInfo(vResult, tWith);
         }
         tRParen:RightParenthesis
         {
@@ -32296,10 +32313,11 @@ withinGroupClause returns [WithinGroupClause vResult = FragmentFactory.CreateFra
         }
     ;
 
-// AI_ANALYZE_SENTIMENT(<input>)
+// AI_ANALYZE_SENTIMENT(<input> [(ERROR | NULL | DEFAULT <literal>) ON ERROR])
 aiAnalyzeSentimentFunctionCall returns [AIAnalyzeSentimentFunctionCall vResult = this.FragmentFactory.CreateFragment<AIAnalyzeSentimentFunctionCall>()]
 {
     ScalarExpression vInput;
+    AIOnErrorClause vOnErrorClause;
 }
     : tFunc:Identifier LeftParenthesis
         {
@@ -32310,15 +32328,25 @@ aiAnalyzeSentimentFunctionCall returns [AIAnalyzeSentimentFunctionCall vResult =
         {
             vResult.Input = vInput;
         }
-        RightParenthesis
+        (
+            vOnErrorClause = aiOnErrorClause
+            {
+                vResult.OnErrorClause = vOnErrorClause;
+            }
+        )?
+        tRParen:RightParenthesis
+        {
+            UpdateTokenInfo(vResult, tRParen);
+        }
     ;
 
-// AI_CLASSIFY(<input>, <class1>[, <class2> ... up to 21])
+// AI_CLASSIFY(<input>, <class1>[, <class2> ... up to 20] [(ERROR | NULL | DEFAULT <literal>) ON ERROR])
 // Input and labels accept any expression; type constraints are deferred to semantic/type phase.
 aiClassifyFunctionCall returns [AIClassifyFunctionCall vResult = this.FragmentFactory.CreateFragment<AIClassifyFunctionCall>()]
 {
     ScalarExpression vExpr;
     int labelsCount = 0;
+    AIOnErrorClause vOnErrorClause;
 }
     : tFunc:Identifier LeftParenthesis
       {
@@ -32336,29 +32364,36 @@ aiClassifyFunctionCall returns [AIClassifyFunctionCall vResult = this.FragmentFa
           AddAndUpdateTokenInfo(vResult, vResult.Labels, vExpr);
           labelsCount = 1;
       }
-      // additional labels up to 21 total
+      // additional labels up to 20 total
       (
           Comma vExpr = expression
           {
               ++labelsCount;
-              if (labelsCount > 21)
+              if (labelsCount > 20)
               {ThrowParseErrorException("SQL46010", vExpr, TSqlParserResource.SQL46010Message, CodeGenerationSupporter.AIClassify);
               }
               AddAndUpdateTokenInfo(vResult, vResult.Labels, vExpr);
           }
       )*
+      (
+          vOnErrorClause = aiOnErrorClause
+          {
+              vResult.OnErrorClause = vOnErrorClause;
+          }
+      )?
       tRParen:RightParenthesis
       {
           UpdateTokenInfo(vResult, tRParen);
       }
     ;
 
-// AI_EXTRACT(<input>, <class1>[, <class2> ... up to 21])
+// AI_EXTRACT(<input>, <class1>[, <class2> ... up to 20] [(ERROR | NULL | DEFAULT <literal>) ON ERROR])
 // Input and labels accept any expression; type constraints are deferred to semantic/type phase.
 aiExtractFunctionCall returns [AIExtractFunctionCall vResult = this.FragmentFactory.CreateFragment<AIExtractFunctionCall>()]
 {
     ScalarExpression vExpr;
     int labelsCount = 0;
+    AIOnErrorClause vOnErrorClause;
 }
     : tFunc:Identifier LeftParenthesis
       {
@@ -32376,27 +32411,34 @@ aiExtractFunctionCall returns [AIExtractFunctionCall vResult = this.FragmentFact
           AddAndUpdateTokenInfo(vResult, vResult.Labels, vExpr);
           labelsCount = 1;
       }
-      // additional labels up to 21 total
+      // additional labels up to 20 total
       (
           Comma vExpr = expression
           {
               ++labelsCount;
-              if (labelsCount > 21)
+              if (labelsCount > 20)
               {ThrowParseErrorException("SQL46010", vExpr, TSqlParserResource.SQL46010Message, CodeGenerationSupporter.AIExtract);
               }
               AddAndUpdateTokenInfo(vResult, vResult.Labels, vExpr);
           }
       )*
+      (
+          vOnErrorClause = aiOnErrorClause
+          {
+              vResult.OnErrorClause = vOnErrorClause;
+          }
+      )?
       tRParen:RightParenthesis
       {
           UpdateTokenInfo(vResult, tRParen);
       }
     ;
 
-// AI_FIX_GRAMMAR(<input>)
+// AI_FIX_GRAMMAR(<input> [(ERROR | NULL | DEFAULT <literal>) ON ERROR])
 aiFixGrammarFunctionCall returns [AIFixGrammarFunctionCall vResult = this.FragmentFactory.CreateFragment<AIFixGrammarFunctionCall>()]
 {
     ScalarExpression vInput;
+    AIOnErrorClause vOnErrorClause;
 }
     : tFunc:Identifier LeftParenthesis
         {
@@ -32407,14 +32449,24 @@ aiFixGrammarFunctionCall returns [AIFixGrammarFunctionCall vResult = this.Fragme
         {
             vResult.Input = vInput;
         }
-        RightParenthesis
+        (
+            vOnErrorClause = aiOnErrorClause
+            {
+                vResult.OnErrorClause = vOnErrorClause;
+            }
+        )?
+        tRParen:RightParenthesis
+        {
+            UpdateTokenInfo(vResult, tRParen);
+        }
     ;
 
-// AI_GENERATE_RESPONSE(<promptPart1>[, <promptPart2>])
+// AI_GENERATE_RESPONSE(<promptPart1>[, <promptPart2>] [(ERROR | NULL | DEFAULT <literal>) ON ERROR])
 aiGenerateResponseFunctionCall returns [AIGenerateResponseFunctionCall vResult = this.FragmentFactory.CreateFragment<AIGenerateResponseFunctionCall>()]
 {
     ScalarExpression vPart1;
     ScalarExpression vPart2;
+    AIOnErrorClause vOnErrorClause;
 }
     :   tFunc:Identifier LeftParenthesis
         {
@@ -32431,13 +32483,23 @@ aiGenerateResponseFunctionCall returns [AIGenerateResponseFunctionCall vResult =
                 vResult.PromptPart2 = vPart2;
             }
         )?
-        RightParenthesis
+        (
+            vOnErrorClause = aiOnErrorClause
+            {
+                vResult.OnErrorClause = vOnErrorClause;
+            }
+        )?
+        tRParen:RightParenthesis
+        {
+            UpdateTokenInfo(vResult, tRParen);
+        }
     ;
 
-// AI_SUMMARIZE(<input>)
+// AI_SUMMARIZE(<input> [(ERROR | NULL | DEFAULT <literal>) ON ERROR])
 aiSummarizeFunctionCall returns [AISummarizeFunctionCall vResult = this.FragmentFactory.CreateFragment<AISummarizeFunctionCall>()]
 {
     ScalarExpression vInput;
+    AIOnErrorClause vOnErrorClause;
 }
     : tFunc:Identifier LeftParenthesis
         {
@@ -32448,14 +32510,24 @@ aiSummarizeFunctionCall returns [AISummarizeFunctionCall vResult = this.Fragment
         {
             vResult.Input = vInput;
         }
-        RightParenthesis
+        (
+            vOnErrorClause = aiOnErrorClause
+            {
+                vResult.OnErrorClause = vOnErrorClause;
+            }
+        )?
+        tRParen:RightParenthesis
+        {
+            UpdateTokenInfo(vResult, tRParen);
+        }
     ;
 
-// AI_TRANSLATE(<input>, <lang>)
+// AI_TRANSLATE(<input>, <lang> [(ERROR | NULL | DEFAULT <literal>) ON ERROR])
 aiTranslateFunctionCall returns [AITranslateFunctionCall vResult = this.FragmentFactory.CreateFragment<AITranslateFunctionCall>()]
 {
     ScalarExpression vInput;
     ScalarExpression vLang;
+    AIOnErrorClause vOnErrorClause;
 }
     :   tFunc:Identifier LeftParenthesis
         {
@@ -32470,7 +32542,50 @@ aiTranslateFunctionCall returns [AITranslateFunctionCall vResult = this.Fragment
         {
             vResult.Language = vLang;
         }
-        RightParenthesis
+        (
+            vOnErrorClause = aiOnErrorClause
+            {
+                vResult.OnErrorClause = vOnErrorClause;
+            }
+        )?
+        tRParen:RightParenthesis
+        {
+            UpdateTokenInfo(vResult, tRParen);
+        }
+    ;
+
+aiOnErrorClause returns [AIOnErrorClause vResult = null]
+{
+    StringLiteral vDefaultValue;
+}
+    :
+        (
+            tErrorAction:Identifier
+            {
+                Match(tErrorAction, CodeGenerationSupporter.Error);
+                vResult = this.FragmentFactory.CreateFragment<AIErrorOnErrorClause>();
+                UpdateTokenInfo(vResult, tErrorAction);
+            }
+        |
+            tNull:Null
+            {
+                vResult = this.FragmentFactory.CreateFragment<AINullOnErrorClause>();
+                UpdateTokenInfo(vResult, tNull);
+            }
+        |
+            tDefault:Default vDefaultValue=stringLiteral
+            {
+                AIDefaultOnErrorClause vDefaultClause = this.FragmentFactory.CreateFragment<AIDefaultOnErrorClause>();
+                vDefaultClause.Value = vDefaultValue;
+                vResult = vDefaultClause;
+                UpdateTokenInfo(vResult, tDefault);
+            }
+        )
+        On tError:Identifier
+        {
+            Match(tError, CodeGenerationSupporter.Error);
+            UpdateTokenInfo(vResult, tError);
+        }
     ;
 
 // INVOKE_EXTERNAL_API('<functionSetName>', '<functionName>' [, <arg1> [, <arg2> ... ]])
@@ -32604,7 +32719,7 @@ regularBuiltInFunctionCall [FunctionCall vParent]
             UpdateTokenInfo(vParent,tRParen);
         }
         (
-            {(LA(1)==Over && (LA(2)==LeftParenthesis || LA(2)==Identifier)) ||
+            {(LA(1)==Over && (LA(2)==LeftParenthesis || LA(2)==Identifier || LA(2)==QuotedIdentifier)) ||
              (NextTokenMatches(CodeGenerationSupporter.Within) && LA(2)==Group && LA(3)==LeftParenthesis) }?
             withinGroupOrOverClause [vParent]
         )?
@@ -32635,7 +32750,7 @@ ignoreRespectNullsRegularBuiltInFunctionCall [FunctionCall vParent]
             ignoreRespectNulls [vParent]
         )?
         (
-            {(LA(1)==Over && (LA(2)==LeftParenthesis || LA(2)==Identifier)) ||
+            {(LA(1)==Over && (LA(2)==LeftParenthesis || LA(2)==Identifier || LA(2)==QuotedIdentifier)) ||
              (NextTokenMatches(CodeGenerationSupporter.Within) && LA(2)==Group && LA(3)==LeftParenthesis) }?
             withinGroupOrOverClause [vParent]
         )?

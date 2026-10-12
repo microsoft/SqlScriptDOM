@@ -25,14 +25,21 @@ WITH (CLUSTER BY (ProductID));
 
 GO
 ALTER TABLE Customers
-    ADD (CLUSTER BY (CustomerID));
+    WITH (CLUSTER BY (CustomerID));
 
 
 GO
 ALTER TABLE sales.Orders
-    ADD (CLUSTER BY (CustomerID, OrderDate));
+    WITH (CLUSTER BY (CustomerID, OrderDate));
 
 
 GO
 ALTER TABLE Inventory
-    ADD (CLUSTER BY (ProductID));
+    WITH (CLUSTER BY (ProductID));
+
+
+GO
+CREATE TABLE CustomersClustered
+WITH (CLUSTER BY (CustomerID)) AS
+SELECT *
+FROM Customers;

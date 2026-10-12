@@ -485,7 +485,54 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
             else
             {
                 // The option produces its own leading new line before the first parameter.
-                GenerateFragmentList(parameters, ListGenerationOption.MultipleLineProcedureParameterOption);
+                if (_options.PreserveComments && _options.CommaPlacement == CommaPlacement.Leading)
+                {
+                    GenerateMultilineProcedureParametersWithLeadingCommas(parameters);
+                }
+                else
+                {
+                    GenerateFragmentList(parameters, ListGenerationOption.MultipleLineProcedureParameterOption);
+                }
+            }
+        }
+
+        private void GenerateMultilineProcedureParametersWithLeadingCommas(
+            IList<ProcedureParameter> parameters)
+        {
+            PushNamedAlignmentScope();
+            try
+            {
+                AlignmentPoint items = new AlignmentPoint();
+
+                for (int index = 0; index < parameters.Count; index++)
+                {
+                    ProcedureParameter parameter = parameters[index];
+                    NewLine();
+
+                    if (index == 0)
+                    {
+                        Indent();
+                        if (HandleCommentsBeforeListItem(parameter, items))
+                        {
+                            Indent();
+                        }
+                        Mark(items);
+                    }
+                    else
+                    {
+                        HandleCommentsBeforeListItem(parameter, items);
+                        int indentColumns = _options.IndentationSize;
+                        Indent(indentColumns >= LeadingCommaWidth ? indentColumns - LeadingCommaWidth : 0);
+                        GenerateSymbol(TSqlTokenType.Comma);
+                        GenerateLeadingCommaSpace();
+                    }
+
+                    GenerateFragmentIfNotNull(parameter);
+                }
+            }
+            finally
+            {
+                PopNamedAlignmentScope();
             }
         }
 

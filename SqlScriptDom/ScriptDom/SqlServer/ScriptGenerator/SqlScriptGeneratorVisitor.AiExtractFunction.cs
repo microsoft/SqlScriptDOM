@@ -39,6 +39,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
                 }
             }
 
+            GenerateSpaceAndFragmentIfNotNull(node.OnErrorClause);
             GenerateSymbol(TSqlTokenType.RightParenthesis);
         }
     }

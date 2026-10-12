@@ -3562,6 +3562,7 @@
     <Member Name="SearchCondition" Type="BooleanExpression" Summary="The search condition."/>
     <Member Name="QualifiedJoinType" Type="QualifiedJoinType" GenerateUpdatePositionInfoCall="false" Summary="The join type."/>
     <Member Name="JoinHint" Type="JoinHint" GenerateUpdatePositionInfoCall="false" Summary="The join hint."/>
+    <Member Name="JoinHintColumnsCount" Type="IntegerLiteral" Summary="The optional columns count argument of the REDISTRIBUTE join hint."/>
   </Class>
   <Class Name="OdbcQualifiedJoinTableReference" Base="TableReference" Summary="Represents the odbc qualified join in a from clause.">
     <Member Name="TableReference" Type="TableReference" Summary="The table reference."/>
@@ -4827,34 +4828,52 @@
   <Class Name="AIAnalyzeSentimentFunctionCall" Base="PrimaryExpression" Summary="Represents the ai_analyze_sentiment built-in.">
     <InheritedClass Name="PrimaryExpression" />
     <Member Name="Input" Type="ScalarExpression" Summary="Input text to analyze sentiment for." />
+    <Member Name="OnErrorClause" Type="AIOnErrorClause" Summary="Optional behavior when sentiment analysis fails." />
   </Class>
   <Class Name="AIFixGrammarFunctionCall" Base="PrimaryExpression" Summary="Represents the ai_fix_grammar built-in.">
     <InheritedClass Name="PrimaryExpression" />
     <Member Name="Input" Type="ScalarExpression" Summary="Input text to fix grammar for." />
+    <Member Name="OnErrorClause" Type="AIOnErrorClause" Summary="Optional behavior when grammar correction fails." />
   </Class>
   <Class Name="AIClassifyFunctionCall" Base="PrimaryExpression" Summary="Represents AI_CLASSIFY(...) function call.">
     <InheritedClass Name="PrimaryExpression" />
     <Member Name="Input" Type="ScalarExpression" Summary="Variable or column identifier providing the text to classify." />
-    <Member Name="Labels" Type="ScalarExpression" Collection="true" Summary="One or more label expressions (at least two)." />
+    <Member Name="Labels" Type="ScalarExpression" Collection="true" Summary="One or more label expressions." />
+    <Member Name="OnErrorClause" Type="AIOnErrorClause" Summary="Optional behavior when classification fails." />
   </Class>
   <Class Name="AIExtractFunctionCall" Base="PrimaryExpression" Summary="Represents the ai_extract built-in.">
     <InheritedClass Name="PrimaryExpression" />
     <Member Name="Input" Type="ScalarExpression" Summary="Input text to extract from." />
     <Member Name="Labels" Type="ScalarExpression" Collection="true" Summary="One or more label expressions." />
+    <Member Name="OnErrorClause" Type="AIOnErrorClause" Summary="Optional behavior when extraction fails." />
   </Class>
   <Class Name="AIGenerateResponseFunctionCall" Base="PrimaryExpression" Summary="Represents AI_GENERATE_RESPONSE(...) function call.">
     <InheritedClass Name="PrimaryExpression" />
     <Member Name="PromptPart1" Type="ScalarExpression" Summary="First prompt part (required)." />
     <Member Name="PromptPart2" Type="ScalarExpression" Summary="Second prompt part (optional)." />
+    <Member Name="OnErrorClause" Type="AIOnErrorClause" Summary="Optional behavior when response generation fails." />
   </Class>
   <Class Name="AISummarizeFunctionCall" Base="PrimaryExpression" Summary="Represents AI_SUMMARIZE(...) function call.">
     <InheritedClass Name="PrimaryExpression" />
     <Member Name="Input" Type="ScalarExpression" Summary="Variable or column identifier providing the text to summarize." />
+    <Member Name="OnErrorClause" Type="AIOnErrorClause" Summary="Optional behavior when summarization fails." />
   </Class>
   <Class Name="AITranslateFunctionCall" Base="PrimaryExpression" Summary="Represents AI_TRANSLATE(...) function call.">
     <InheritedClass Name="PrimaryExpression" />
     <Member Name="Input" Type="ScalarExpression" Summary="Text to translate; variable or column reference." />
     <Member Name="Language" Type="ScalarExpression" Summary="Target language; typically string literal or identifier." />
+    <Member Name="OnErrorClause" Type="AIOnErrorClause" Summary="Optional behavior when translation fails." />
+  </Class>
+  <Class Name="AIOnErrorClause" Abstract="true" Summary="Represents the ON ERROR clause of an AI function call." />
+  <Class Name="AIErrorOnErrorClause" Base="AIOnErrorClause" Summary="Represents ERROR ON ERROR behavior for AI functions.">
+    <InheritedClass Name="AIOnErrorClause" />
+  </Class>
+  <Class Name="AINullOnErrorClause" Base="AIOnErrorClause" Summary="Represents NULL ON ERROR behavior for AI functions.">
+    <InheritedClass Name="AIOnErrorClause" />
+  </Class>
+  <Class Name="AIDefaultOnErrorClause" Base="AIOnErrorClause" Summary="Represents DEFAULT 'literal' ON ERROR behavior for AI functions.">
+    <InheritedClass Name="AIOnErrorClause" />
+    <Member Name="Value" Type="StringLiteral" Summary="The literal returned when the AI function fails." />
   </Class>
   <Class Name="InvokeExternalApiFunctionCall" Base="PrimaryExpression" Summary="Represents INVOKE_EXTERNAL_API(...) function call.">
     <InheritedClass Name="PrimaryExpression" />

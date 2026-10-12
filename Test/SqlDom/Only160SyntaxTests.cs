@@ -21,6 +21,7 @@ namespace SqlStudio.Tests.UTSqlScriptDom
             new ParserTest160("CreateUserFromExternalProvider160.sql", nErrors80: 2, nErrors90: 1, nErrors100: 1, nErrors110: 1, nErrors120: 1, nErrors130: 1, nErrors140: 1, nErrors150: 1),
             new ParserTest160("CreateExternalTableStatementTests160.sql", nErrors80: 2, nErrors90: 2, nErrors100: 2, nErrors110: 2, nErrors120: 2, nErrors130: 2, nErrors140: 2, nErrors150: 2),
             new ParserTest160("WindowClauseTests160.sql", nErrors80: 16, nErrors90: 15, nErrors100: 15, nErrors110: 15, nErrors120: 15, nErrors130: 15, nErrors140: 15, nErrors150: 15),
+            new ParserTest160("WindowClauseQuotedNameTests160.sql", nErrors80: 7, nErrors90: 7, nErrors100: 7, nErrors110: 7, nErrors120: 7, nErrors130: 7, nErrors140: 7, nErrors150: 7),
             new ParserTest160("CreateExternalDataSourceStatementTests160.sql", nErrors80: 2, nErrors90: 2, nErrors100: 2, nErrors110: 2, nErrors120: 2, nErrors130: 0, nErrors140: 0, nErrors150: 0),
             new ParserTest160("CreateDatabaseTests160.sql", nErrors80: 4, nErrors90: 4, nErrors100: 4, nErrors110: 4, nErrors120: 4, nErrors130: 4, nErrors140: 4, nErrors150: 4),
             new ParserTest160("CreateLedgerTableTests160.sql", nErrors80: 14, nErrors90: 14, nErrors100: 14, nErrors110: 14, nErrors120: 14, nErrors130: 14, nErrors140: 14, nErrors150: 14),
