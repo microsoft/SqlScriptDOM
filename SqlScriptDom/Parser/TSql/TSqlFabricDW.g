@@ -32301,10 +32301,11 @@ withinGroupClause returns [WithinGroupClause vResult = FragmentFactory.CreateFra
         }
     ;
 
-// AI_ANALYZE_SENTIMENT(<input>)
+// AI_ANALYZE_SENTIMENT(<input> [(ERROR | NULL | DEFAULT <literal>) ON ERROR])
 aiAnalyzeSentimentFunctionCall returns [AIAnalyzeSentimentFunctionCall vResult = this.FragmentFactory.CreateFragment<AIAnalyzeSentimentFunctionCall>()]
 {
     ScalarExpression vInput;
+    AIOnErrorClause vOnErrorClause;
 }
     : tFunc:Identifier LeftParenthesis
         {
@@ -32315,15 +32316,25 @@ aiAnalyzeSentimentFunctionCall returns [AIAnalyzeSentimentFunctionCall vResult =
         {
             vResult.Input = vInput;
         }
-        RightParenthesis
+        (
+            vOnErrorClause = aiOnErrorClause
+            {
+                vResult.OnErrorClause = vOnErrorClause;
+            }
+        )?
+        tRParen:RightParenthesis
+        {
+            UpdateTokenInfo(vResult, tRParen);
+        }
     ;
 
-// AI_CLASSIFY(<input>, <class1>[, <class2> ... up to 21])
+// AI_CLASSIFY(<input>, <class1>[, <class2> ... up to 20] [(ERROR | NULL | DEFAULT <literal>) ON ERROR])
 // Input and labels accept any expression; type constraints are deferred to semantic/type phase.
 aiClassifyFunctionCall returns [AIClassifyFunctionCall vResult = this.FragmentFactory.CreateFragment<AIClassifyFunctionCall>()]
 {
     ScalarExpression vExpr;
     int labelsCount = 0;
+    AIOnErrorClause vOnErrorClause;
 }
     : tFunc:Identifier LeftParenthesis
       {
@@ -32341,29 +32352,36 @@ aiClassifyFunctionCall returns [AIClassifyFunctionCall vResult = this.FragmentFa
           AddAndUpdateTokenInfo(vResult, vResult.Labels, vExpr);
           labelsCount = 1;
       }
-      // additional labels up to 21 total
+      // additional labels up to 20 total
       (
           Comma vExpr = expression
           {
               ++labelsCount;
-              if (labelsCount > 21)
+              if (labelsCount > 20)
               {ThrowParseErrorException("SQL46010", vExpr, TSqlParserResource.SQL46010Message, CodeGenerationSupporter.AIClassify);
               }
               AddAndUpdateTokenInfo(vResult, vResult.Labels, vExpr);
           }
       )*
+      (
+          vOnErrorClause = aiOnErrorClause
+          {
+              vResult.OnErrorClause = vOnErrorClause;
+          }
+      )?
       tRParen:RightParenthesis
       {
           UpdateTokenInfo(vResult, tRParen);
       }
     ;
 
-// AI_EXTRACT(<input>, <class1>[, <class2> ... up to 21])
+// AI_EXTRACT(<input>, <class1>[, <class2> ... up to 20] [(ERROR | NULL | DEFAULT <literal>) ON ERROR])
 // Input and labels accept any expression; type constraints are deferred to semantic/type phase.
 aiExtractFunctionCall returns [AIExtractFunctionCall vResult = this.FragmentFactory.CreateFragment<AIExtractFunctionCall>()]
 {
     ScalarExpression vExpr;
     int labelsCount = 0;
+    AIOnErrorClause vOnErrorClause;
 }
     : tFunc:Identifier LeftParenthesis
       {
@@ -32381,27 +32399,34 @@ aiExtractFunctionCall returns [AIExtractFunctionCall vResult = this.FragmentFact
           AddAndUpdateTokenInfo(vResult, vResult.Labels, vExpr);
           labelsCount = 1;
       }
-      // additional labels up to 21 total
+      // additional labels up to 20 total
       (
           Comma vExpr = expression
           {
               ++labelsCount;
-              if (labelsCount > 21)
+              if (labelsCount > 20)
               {ThrowParseErrorException("SQL46010", vExpr, TSqlParserResource.SQL46010Message, CodeGenerationSupporter.AIExtract);
               }
               AddAndUpdateTokenInfo(vResult, vResult.Labels, vExpr);
           }
       )*
+      (
+          vOnErrorClause = aiOnErrorClause
+          {
+              vResult.OnErrorClause = vOnErrorClause;
+          }
+      )?
       tRParen:RightParenthesis
       {
           UpdateTokenInfo(vResult, tRParen);
       }
     ;
 
-// AI_FIX_GRAMMAR(<input>)
+// AI_FIX_GRAMMAR(<input> [(ERROR | NULL | DEFAULT <literal>) ON ERROR])
 aiFixGrammarFunctionCall returns [AIFixGrammarFunctionCall vResult = this.FragmentFactory.CreateFragment<AIFixGrammarFunctionCall>()]
 {
     ScalarExpression vInput;
+    AIOnErrorClause vOnErrorClause;
 }
     : tFunc:Identifier LeftParenthesis
         {
@@ -32412,14 +32437,24 @@ aiFixGrammarFunctionCall returns [AIFixGrammarFunctionCall vResult = this.Fragme
         {
             vResult.Input = vInput;
         }
-        RightParenthesis
+        (
+            vOnErrorClause = aiOnErrorClause
+            {
+                vResult.OnErrorClause = vOnErrorClause;
+            }
+        )?
+        tRParen:RightParenthesis
+        {
+            UpdateTokenInfo(vResult, tRParen);
+        }
     ;
 
-// AI_GENERATE_RESPONSE(<promptPart1>[, <promptPart2>])
+// AI_GENERATE_RESPONSE(<promptPart1>[, <promptPart2>] [(ERROR | NULL | DEFAULT <literal>) ON ERROR])
 aiGenerateResponseFunctionCall returns [AIGenerateResponseFunctionCall vResult = this.FragmentFactory.CreateFragment<AIGenerateResponseFunctionCall>()]
 {
     ScalarExpression vPart1;
     ScalarExpression vPart2;
+    AIOnErrorClause vOnErrorClause;
 }
     :   tFunc:Identifier LeftParenthesis
         {
@@ -32436,13 +32471,23 @@ aiGenerateResponseFunctionCall returns [AIGenerateResponseFunctionCall vResult =
                 vResult.PromptPart2 = vPart2;
             }
         )?
-        RightParenthesis
+        (
+            vOnErrorClause = aiOnErrorClause
+            {
+                vResult.OnErrorClause = vOnErrorClause;
+            }
+        )?
+        tRParen:RightParenthesis
+        {
+            UpdateTokenInfo(vResult, tRParen);
+        }
     ;
 
-// AI_SUMMARIZE(<input>)
+// AI_SUMMARIZE(<input> [(ERROR | NULL | DEFAULT <literal>) ON ERROR])
 aiSummarizeFunctionCall returns [AISummarizeFunctionCall vResult = this.FragmentFactory.CreateFragment<AISummarizeFunctionCall>()]
 {
     ScalarExpression vInput;
+    AIOnErrorClause vOnErrorClause;
 }
     : tFunc:Identifier LeftParenthesis
         {
@@ -32453,14 +32498,24 @@ aiSummarizeFunctionCall returns [AISummarizeFunctionCall vResult = this.Fragment
         {
             vResult.Input = vInput;
         }
-        RightParenthesis
+        (
+            vOnErrorClause = aiOnErrorClause
+            {
+                vResult.OnErrorClause = vOnErrorClause;
+            }
+        )?
+        tRParen:RightParenthesis
+        {
+            UpdateTokenInfo(vResult, tRParen);
+        }
     ;
 
-// AI_TRANSLATE(<input>, <lang>)
+// AI_TRANSLATE(<input>, <lang> [(ERROR | NULL | DEFAULT <literal>) ON ERROR])
 aiTranslateFunctionCall returns [AITranslateFunctionCall vResult = this.FragmentFactory.CreateFragment<AITranslateFunctionCall>()]
 {
     ScalarExpression vInput;
     ScalarExpression vLang;
+    AIOnErrorClause vOnErrorClause;
 }
     :   tFunc:Identifier LeftParenthesis
         {
@@ -32475,7 +32530,50 @@ aiTranslateFunctionCall returns [AITranslateFunctionCall vResult = this.Fragment
         {
             vResult.Language = vLang;
         }
-        RightParenthesis
+        (
+            vOnErrorClause = aiOnErrorClause
+            {
+                vResult.OnErrorClause = vOnErrorClause;
+            }
+        )?
+        tRParen:RightParenthesis
+        {
+            UpdateTokenInfo(vResult, tRParen);
+        }
+    ;
+
+aiOnErrorClause returns [AIOnErrorClause vResult = null]
+{
+    StringLiteral vDefaultValue;
+}
+    :
+        (
+            tErrorAction:Identifier
+            {
+                Match(tErrorAction, CodeGenerationSupporter.Error);
+                vResult = this.FragmentFactory.CreateFragment<AIErrorOnErrorClause>();
+                UpdateTokenInfo(vResult, tErrorAction);
+            }
+        |
+            tNull:Null
+            {
+                vResult = this.FragmentFactory.CreateFragment<AINullOnErrorClause>();
+                UpdateTokenInfo(vResult, tNull);
+            }
+        |
+            tDefault:Default vDefaultValue=stringLiteral
+            {
+                AIDefaultOnErrorClause vDefaultClause = this.FragmentFactory.CreateFragment<AIDefaultOnErrorClause>();
+                vDefaultClause.Value = vDefaultValue;
+                vResult = vDefaultClause;
+                UpdateTokenInfo(vResult, tDefault);
+            }
+        )
+        On tError:Identifier
+        {
+            Match(tError, CodeGenerationSupporter.Error);
+            UpdateTokenInfo(vResult, tError);
+        }
     ;
 
 // INVOKE_EXTERNAL_API('<functionSetName>', '<functionName>' [, <arg1> [, <arg2> ... ]])

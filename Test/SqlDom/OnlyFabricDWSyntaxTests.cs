@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using Microsoft.SqlServer.TransactSql.ScriptDom;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SqlStudio.Tests.AssemblyTools.TestCategory;
@@ -19,13 +20,13 @@ namespace SqlStudio.Tests.UTSqlScriptDom
             new ParserTestFabricDW("NestedCTETestsFabricDW.sql", nErrors80: 1, nErrors90: 2, nErrors100: 2, nErrors110: 2, nErrors120: 2, nErrors130: 2, nErrors140: 2, nErrors150: 2, nErrors160: 2, nErrors170: 2, nErrors180: 2),
             new ParserTestFabricDW("ScalarFunctionTestsFabricDW.sql", nErrors80: 3, nErrors90: 2, nErrors100: 2, nErrors110: 2, nErrors120: 2, nErrors130: 0, nErrors140: 0, nErrors150: 0, nErrors160: 0, nErrors170: 0, nErrors180: 0),
             new ParserTestFabricDW("CreateEventSessionNotLikePredicate.sql", nErrors80: 2, nErrors90: 1,  nErrors100: 1, nErrors110: 1, nErrors120: 1, nErrors130: 0, nErrors140: 0, nErrors150: 0, nErrors160: 0, nErrors170: 0, nErrors180: 0),
-            new ParserTestFabricDW("AiAnalyzeSentimentTestsFabricDW.sql", nErrors80: 2, nErrors90: 1, nErrors100: 2, nErrors110: 2, nErrors120: 2, nErrors130: 0, nErrors140: 0, nErrors150: 0, nErrors160: 0, nErrors170: 0, nErrors180: 0),
-            new ParserTestFabricDW("AiClassifyTestsFabricDW.sql", nErrors80: 2, nErrors90: 1, nErrors100: 2, nErrors110: 2, nErrors120: 2, nErrors130: 0, nErrors140: 0, nErrors150: 0, nErrors160: 0, nErrors170: 0, nErrors180: 0),
-            new ParserTestFabricDW("AiExtractTestsFabricDW.sql", nErrors80: 2, nErrors90: 1, nErrors100: 2, nErrors110: 2, nErrors120: 2, nErrors130: 0, nErrors140: 0, nErrors150: 0, nErrors160: 0, nErrors170: 0, nErrors180: 0),
-            new ParserTestFabricDW("AiFixGrammarTestsFabricDW.sql", nErrors80: 2, nErrors90: 1, nErrors100: 2, nErrors110: 2, nErrors120: 2, nErrors130: 0, nErrors140: 0, nErrors150: 0, nErrors160: 0, nErrors170: 0, nErrors180: 0),
-            new ParserTestFabricDW("AiGenerateResponseTestsFabricDW.sql", nErrors80: 3, nErrors90: 1, nErrors100: 2, nErrors110: 2, nErrors120: 2, nErrors130: 0, nErrors140: 0, nErrors150: 0, nErrors160: 0, nErrors170: 0, nErrors180: 0),
-            new ParserTestFabricDW("AiSummarizeTestsFabricDW.sql", nErrors80: 2, nErrors90: 1, nErrors100: 2, nErrors110: 2, nErrors120: 2, nErrors130: 0, nErrors140: 0, nErrors150: 0, nErrors160: 0, nErrors170: 0, nErrors180: 0),
-            new ParserTestFabricDW("AiTranslateTestsFabricDW.sql", nErrors80: 3, nErrors90: 1, nErrors100: 2, nErrors110: 2, nErrors120: 2, nErrors130: 0, nErrors140: 0, nErrors150: 0, nErrors160: 0, nErrors170: 0, nErrors180: 0),
+            new ParserTestFabricDW("AiAnalyzeSentimentTestsFabricDW.sql", nErrors80: 5, nErrors90: 1, nErrors100: 5, nErrors110: 5, nErrors120: 5, nErrors130: 5, nErrors140: 5, nErrors150: 5, nErrors160: 5, nErrors170: 5, nErrors180: 5),
+            new ParserTestFabricDW("AiClassifyTestsFabricDW.sql", nErrors80: 5, nErrors90: 1, nErrors100: 5, nErrors110: 5, nErrors120: 5, nErrors130: 5, nErrors140: 5, nErrors150: 5, nErrors160: 5, nErrors170: 5, nErrors180: 5),
+            new ParserTestFabricDW("AiExtractTestsFabricDW.sql", nErrors80: 5, nErrors90: 1, nErrors100: 5, nErrors110: 5, nErrors120: 5, nErrors130: 5, nErrors140: 5, nErrors150: 5, nErrors160: 5, nErrors170: 5, nErrors180: 5),
+            new ParserTestFabricDW("AiFixGrammarTestsFabricDW.sql", nErrors80: 5, nErrors90: 1, nErrors100: 5, nErrors110: 5, nErrors120: 5, nErrors130: 5, nErrors140: 5, nErrors150: 5, nErrors160: 5, nErrors170: 5, nErrors180: 5),
+            new ParserTestFabricDW("AiGenerateResponseTestsFabricDW.sql", nErrors80: 6, nErrors90: 1, nErrors100: 5, nErrors110: 5, nErrors120: 5, nErrors130: 5, nErrors140: 5, nErrors150: 5, nErrors160: 5, nErrors170: 5, nErrors180: 5),
+            new ParserTestFabricDW("AiSummarizeTestsFabricDW.sql", nErrors80: 5, nErrors90: 1, nErrors100: 5, nErrors110: 5, nErrors120: 5, nErrors130: 5, nErrors140: 5, nErrors150: 5, nErrors160: 5, nErrors170: 5, nErrors180: 5),
+            new ParserTestFabricDW("AiTranslateTestsFabricDW.sql", nErrors80: 3, nErrors90: 1, nErrors100: 6, nErrors110: 6, nErrors120: 6, nErrors130: 6, nErrors140: 6, nErrors150: 6, nErrors160: 6, nErrors170: 6, nErrors180: 6),
             new ParserTestFabricDW("InvokeExternalApiTestsFabricDW.sql", nErrors80: 2, nErrors90: 1, nErrors100: 0, nErrors110: 0, nErrors120: 0, nErrors130: 0, nErrors140: 0, nErrors150: 0, nErrors160: 0, nErrors170: 0, nErrors180: 0),
             new ParserTestFabricDW("ExternalFunctionTestsFabricDW.sql", nErrors80: 12, nErrors90: 4, nErrors100: 4, nErrors110: 4, nErrors120: 4, nErrors130: 11, nErrors140: 11, nErrors150: 11, nErrors160: 11, nErrors170: 11, nErrors180: 0),
             new ParserTestFabricDW("CreateDatabaseCollateBeforeEditionTestsFabricDW.sql", nErrors80: 3, nErrors90: 3, nErrors100: 3, nErrors110: 3, nErrors120: 0, nErrors130: 0, nErrors140: 0, nErrors150: 0, nErrors160: 0, nErrors170: 0, nErrors180: 0),
@@ -65,6 +66,80 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                 Assert.AreEqual(clause.LastTokenIndex, query.LastTokenIndex);
                 Assert.AreEqual(clause.LastTokenIndex, view.SelectStatement.LastTokenIndex);
             }
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void AiTranslateOnErrorClauseAstShape()
+        {
+            const string sql =
+                "SELECT AI_TRANSLATE('text', 'es' ERROR ON ERROR);" +
+                "SELECT AI_TRANSLATE('text', 'es' NULL ON ERROR);" +
+                "SELECT AI_TRANSLATE('text', 'es' DEFAULT 'fallback' ON ERROR);";
+
+            var parser = new TSqlFabricDWParser(true);
+            var script = (TSqlScript)parser.Parse(new StringReader(sql), out var errors);
+
+            Assert.AreEqual(0, errors.Count);
+
+            var errorFunction = GetAiTranslateFunction(script, 0);
+            Assert.IsInstanceOfType(errorFunction.OnErrorClause, typeof(AIErrorOnErrorClause));
+
+            var nullFunction = GetAiTranslateFunction(script, 1);
+            Assert.IsInstanceOfType(nullFunction.OnErrorClause, typeof(AINullOnErrorClause));
+
+            var defaultFunction = GetAiTranslateFunction(script, 2);
+            Assert.IsInstanceOfType(defaultFunction.OnErrorClause, typeof(AIDefaultOnErrorClause));
+            Assert.AreEqual(
+                "fallback",
+                ((AIDefaultOnErrorClause)defaultFunction.OnErrorClause).Value.Value);
+        }
+
+        private static AITranslateFunctionCall GetAiTranslateFunction(TSqlScript script, int statementIndex)
+        {
+            var selectStatement = (SelectStatement)script.Batches[0].Statements[statementIndex];
+            var query = (QuerySpecification)selectStatement.QueryExpression;
+            return (AITranslateFunctionCall)((SelectScalarExpression)query.SelectElements[0]).Expression;
+        }
+
+        [DataTestMethod]
+        [DataRow("AI_ANALYZE_SENTIMENT('text')")]
+        [DataRow("AI_FIX_GRAMMAR('text' ERROR ON ERROR)")]
+        [DataRow("AI_GENERATE_RESPONSE('prompt', 'data' NULL ON ERROR)")]
+        [DataRow("AI_SUMMARIZE('text' DEFAULT 'fallback' ON ERROR)")]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void FabricDWAiFunctionTokenRanges(string functionText)
+        {
+            string sql = "SELECT " + functionText;
+            var parser = new TSqlFabricDWParser(true);
+            using (var reader = new StringReader(sql))
+            {
+                var script = (TSqlScript)parser.Parse(reader, out var errors);
+                Assert.AreEqual(0, errors.Count);
+                var select = (SelectStatement)script.Batches[0].Statements[0];
+                var function = ((SelectScalarExpression)((QuerySpecification)select.QueryExpression).SelectElements[0]).Expression;
+
+                Assert.AreEqual(functionText, sql.Substring(function.StartOffset, function.FragmentLength));
+                Assert.AreEqual(sql, sql.Substring(select.StartOffset, select.FragmentLength));
+                Assert.AreEqual(function.LastTokenIndex, select.LastTokenIndex);
+            }
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void AiDefaultOnErrorClauseRequiresValue()
+        {
+            var function = new AISummarizeFunctionCall
+            {
+                Input = new StringLiteral { Value = "text" },
+                OnErrorClause = new AIDefaultOnErrorClause(),
+            };
+
+            SqlScriptGenerator scriptGen = ParserTestUtils.CreateScriptGen(SqlVersion.SqlFabricDW);
+            Assert.ThrowsException<InvalidOperationException>(() => scriptGen.GenerateScript(function, out string _));
         }
 
         [TestMethod]

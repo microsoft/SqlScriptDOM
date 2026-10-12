@@ -7952,6 +7952,11 @@ WHEN NOT MATCHED BY SOURCE THEN DELETE OUTPUT inserted.*, deleted.*;";
             ParserTestUtils.ErrorTestFabricDW(
                 "SELECT AI_ANALYZE_SENTIMENT('1', '2')",
                 new ParserErrorInfo(31, "SQL46010", ","));
+
+            // ON ERROR clause must follow the last argument
+            ParserTestUtils.ErrorTestFabricDW(
+                "SELECT AI_ANALYZE_SENTIMENT('1' NULL ON ERROR, '2')",
+                new ParserErrorInfo(45, "SQL46010", ","));
         }
 
         /// <summary>
@@ -7972,10 +7977,19 @@ WHEN NOT MATCHED BY SOURCE THEN DELETE OUTPUT inserted.*, deleted.*;";
                 "SELECT AI_CLASSIFY('1')",
                 new ParserErrorInfo(22, "SQL46010", ")"));
 
+            // Up to 20 labels are allowed
+            ParserTestUtils.ErrorTestFabricDW(
+                $"SELECT AI_CLASSIFY({string.Join(", ", Enumerable.Repeat("'1'", 21))} NULL ON ERROR)");
+
             // Too many arguments
             ParserTestUtils.ErrorTestFabricDW(
-                $"SELECT AI_CLASSIFY({string.Join(", ", Enumerable.Repeat("'1'", 23))})",
-                new ParserErrorInfo(129, "SQL46010", "AI_CLASSIFY"));
+                $"SELECT AI_CLASSIFY({string.Join(", ", Enumerable.Repeat("'1'", 22))})",
+                new ParserErrorInfo(124, "SQL46010", "AI_CLASSIFY"));
+
+            // ON ERROR clause must follow the last argument
+            ParserTestUtils.ErrorTestFabricDW(
+                "SELECT AI_CLASSIFY('1', '2', '3' NULL ON ERROR, '4')",
+                new ParserErrorInfo(46, "SQL46010", ","));
         }
 
         /// <summary>
@@ -7996,10 +8010,19 @@ WHEN NOT MATCHED BY SOURCE THEN DELETE OUTPUT inserted.*, deleted.*;";
                 "SELECT AI_EXTRACT('1')",
                 new ParserErrorInfo(21, "SQL46010", ")"));
 
+            // Up to 20 labels are allowed
+            ParserTestUtils.ErrorTestFabricDW(
+                $"SELECT AI_EXTRACT({string.Join(", ", Enumerable.Repeat("'1'", 21))} NULL ON ERROR)");
+
             // Too many arguments
             ParserTestUtils.ErrorTestFabricDW(
-                $"SELECT AI_EXTRACT({string.Join(", ", Enumerable.Repeat("'1'", 23))})",
-                new ParserErrorInfo(128, "SQL46010", "AI_EXTRACT"));
+                $"SELECT AI_EXTRACT({string.Join(", ", Enumerable.Repeat("'1'", 22))})",
+                new ParserErrorInfo(123, "SQL46010", "AI_EXTRACT"));
+
+            // ON ERROR clause must follow the last argument
+            ParserTestUtils.ErrorTestFabricDW(
+                "SELECT AI_EXTRACT('1', '2', '3' NULL ON ERROR, '4')",
+                new ParserErrorInfo(45, "SQL46010", ","));
         }
 
         /// <summary>
@@ -8019,6 +8042,11 @@ WHEN NOT MATCHED BY SOURCE THEN DELETE OUTPUT inserted.*, deleted.*;";
             ParserTestUtils.ErrorTestFabricDW(
                 "SELECT AI_FIX_GRAMMAR('1', '2')",
                 new ParserErrorInfo(25, "SQL46010", ","));
+
+            // ON ERROR clause must follow the last argument
+            ParserTestUtils.ErrorTestFabricDW(
+                "SELECT AI_FIX_GRAMMAR('1' NULL ON ERROR, '2')",
+                new ParserErrorInfo(39, "SQL46010", ","));
         }
 
         /// <summary>
@@ -8038,6 +8066,11 @@ WHEN NOT MATCHED BY SOURCE THEN DELETE OUTPUT inserted.*, deleted.*;";
             ParserTestUtils.ErrorTestFabricDW(
                 "SELECT AI_GENERATE_RESPONSE('1', '2', '3')",
                 new ParserErrorInfo(36, "SQL46010", ","));
+
+            // ON ERROR clause must follow the last argument
+            ParserTestUtils.ErrorTestFabricDW(
+                "SELECT AI_GENERATE_RESPONSE('1' NULL ON ERROR, '2')",
+                new ParserErrorInfo(45, "SQL46010", ","));
         }
 
         /// <summary>
@@ -8057,6 +8090,11 @@ WHEN NOT MATCHED BY SOURCE THEN DELETE OUTPUT inserted.*, deleted.*;";
             ParserTestUtils.ErrorTestFabricDW(
                 "SELECT AI_SUMMARIZE('1', '2')",
                 new ParserErrorInfo(23, "SQL46010", ","));
+
+            // ON ERROR clause must follow the last argument
+            ParserTestUtils.ErrorTestFabricDW(
+                "SELECT AI_SUMMARIZE('1' NULL ON ERROR, '2')",
+                new ParserErrorInfo(37, "SQL46010", ","));
         }
 
         /// <summary>
@@ -8081,6 +8119,34 @@ WHEN NOT MATCHED BY SOURCE THEN DELETE OUTPUT inserted.*, deleted.*;";
             ParserTestUtils.ErrorTestFabricDW(
                 "SELECT AI_TRANSLATE('1', '2', '3')",
                 new ParserErrorInfo(28, "SQL46010", ","));
+
+            // DEFAULT requires a string literal
+            ParserTestUtils.ErrorTestFabricDW(
+                "SELECT AI_TRANSLATE('hello', 'es' DEFAULT ON ERROR)",
+                new ParserErrorInfo(42, "SQL46010", "ON"));
+
+            ParserTestUtils.ErrorTestFabricDW(
+                "SELECT AI_TRANSLATE('hello', 'es' DEFAULT @fallback ON ERROR)",
+                new ParserErrorInfo(42, "SQL46010", "@fallback"));
+
+            // The behavior must be followed by ON ERROR
+            ParserTestUtils.ErrorTestFabricDW(
+                "SELECT AI_TRANSLATE('hello', 'es' NULL)",
+                new ParserErrorInfo(38, "SQL46010", ")"));
+
+            ParserTestUtils.ErrorTestFabricDW(
+                "SELECT AI_TRANSLATE('hello', 'es' NULL ON NULL)",
+                new ParserErrorInfo(42, "SQL46010", "NULL"));
+
+            // Only ERROR, NULL, or DEFAULT are valid behaviors
+            ParserTestUtils.ErrorTestFabricDW(
+                "SELECT AI_TRANSLATE('hello', 'es' IGNORE ON ERROR)",
+                new ParserErrorInfo(34, "SQL46005", "ERROR", "IGNORE"));
+
+            // Only one ON ERROR clause is allowed
+            ParserTestUtils.ErrorTestFabricDW(
+                "SELECT AI_TRANSLATE('hello', 'es' NULL ON ERROR NULL ON ERROR)",
+                new ParserErrorInfo(48, "SQL46010", "NULL"));
         }
 
         /// <summary>
