@@ -535,9 +535,6 @@ ctasCreateTableStatement [CreateTableStatement vParent]
         {
             vParent.SelectStatement = vSelectStatement;
         }
-        {
-           CheckCtasStatementHasDistributionOption(vParent);
-        }
     ;
 
 /////////////////////////////////////////////////
@@ -19536,28 +19533,37 @@ qualifiedJoin[SubDmlFlags subDmlFlags, ref TableReference vResult]
     ;
 
 joinHint[QualifiedJoin vParent]
+{
+    IntegerLiteral vColumnsCount;
+}
     :    (
             tId1:Identifier
             (
-                tId2:Identifier
+                LeftParenthesis vColumnsCount = integer RightParenthesis
                 {
-                    Match(tId1,CodeGenerationSupporter.Local);
-                    vParent.JoinHint = JoinHintHelper.Instance.ParseOption(tId2);
-                    if (vParent.JoinHint == JoinHint.Remote)
-                    {
-                        ThrowIncorrectSyntaxErrorException(tId2);
-                    }
-                }
-            |
-                tMerge:Merge
-                {
-                    Match(tId1,CodeGenerationSupporter.Local);
-                    vParent.JoinHint = JoinHint.Merge;
+                    Match(tId1,CodeGenerationSupporter.Redistribute);
+                    vParent.JoinHint = JoinHint.Redistribute;
+                    vParent.JoinHintColumnsCount = vColumnsCount;
                 }
             |
                 /* empty */
                 {
-                    vParent.JoinHint = JoinHintHelper.Instance.ParseOption(tId1);
+                    if (TryMatch(tId1, CodeGenerationSupporter.Replicate))
+                    {
+                        vParent.JoinHint = JoinHint.Replicate;
+                    }
+                    else if (TryMatch(tId1, CodeGenerationSupporter.Redistribute))
+                    {
+                        vParent.JoinHint = JoinHint.Redistribute;
+                    }
+                    else
+                    {
+                        vParent.JoinHint = JoinHintHelper.Instance.ParseOption(tId1);
+                        if (vParent.JoinHint == JoinHint.Remote)
+                        {
+                            ThrowIncorrectSyntaxErrorException(tId1);
+                        }
+                    }
                 }
             )
         )
@@ -21960,6 +21966,19 @@ hint returns [OptimizerHint vResult]
     | vResult = forTimestampAsOfOptimizerHint
     ;
 
+forTimestampAsOfOptimizerHint returns [LiteralOptimizerHint vResult = FragmentFactory.CreateFragment<LiteralOptimizerHint>()]
+{
+    Literal vValue;
+}
+    :   tFor:For tTimestamp:Identifier As Of vValue = stringLiteral
+        {
+            Match(tTimestamp, CodeGenerationSupporter.TimeStamp);
+            vResult.HintKind = OptimizerHintKind.ForTimestampAsOf;
+            UpdateTokenInfo(vResult, tFor);
+            vResult.Value = vValue;
+        }
+    ;
+
 tableHintsOptimizerHint returns [TableHintsOptimizerHint vResult = FragmentFactory.CreateFragment<TableHintsOptimizerHint>()]
 {
     SchemaObjectName vSchemaObjectName;
@@ -21999,31 +22018,19 @@ simpleOptimizerHint returns [OptimizerHint vResult = FragmentFactory.CreateFragm
             vResult.HintKind = OptimizerHintKind.MergeUnion;
             UpdateTokenInfo(vResult, tMergeUnion); 
         }
-    | {NextTokenMatches(CodeGenerationSupporter.Force)}?
-      tForce:Identifier (
-          Order
-          {
-              Match(tForce, CodeGenerationSupporter.Force);
-              vResult.HintKind = OptimizerHintKind.ForceOrder;
-              UpdateTokenInfo(vResult, tForce); 
-          }
-          |
-          Distributed tPlan1:Plan
-          {
-              Match(tForce, CodeGenerationSupporter.Force);
-              vResult.HintKind = OptimizerHintKind.ForceDistributedPlan;
-              UpdateTokenInfo(vResult, tForce); 
-          }
-          |
-          tSingle:Identifier tNode:Identifier tPlan2:Plan
-          {
-              Match(tForce, CodeGenerationSupporter.Force);
-              Match(tSingle, CodeGenerationSupporter.Single);
-              Match(tNode, CodeGenerationSupporter.GraphNode); // NODE
-              vResult.HintKind = OptimizerHintKind.ForceSingleNodePlan;
-              UpdateTokenInfo(vResult, tForce); 
-          }
-      )
+    | tForce:Identifier Order
+        {
+            Match(tForce, CodeGenerationSupporter.Force);
+            vResult.HintKind = OptimizerHintKind.ForceOrder;
+            UpdateTokenInfo(vResult, tForce);
+        }
+    | tForceDistributed:Identifier Distributed tPlanDistributed:Plan
+        {
+            Match(tForceDistributed, CodeGenerationSupporter.Force);
+            vResult.HintKind = OptimizerHintKind.ForceDistributedPlan;
+            UpdateTokenInfo(vResult, tForceDistributed);
+            UpdateTokenInfo(vResult, tPlanDistributed);
+        }
     | tHash:Identifier Group
         {
             Match(tHash, CodeGenerationSupporter.Hash);
@@ -22072,7 +22079,16 @@ simpleOptimizerHint returns [OptimizerHint vResult = FragmentFactory.CreateFragm
                 Match(tFirstWord, CodeGenerationSupporter.Optimize);
                 Match(tSecondWord, CodeGenerationSupporter.Correlated);
                 vResult.HintKind = OptimizerHintKind.OptimizeCorrelatedUnionAll;
-                UpdateTokenInfo(vResult, tUnion2); 
+                UpdateTokenInfo(vResult, tUnion2);
+            }
+        | tNodeWord:Identifier tPlanSingleNode:Plan
+            {
+                Match(tFirstWord, CodeGenerationSupporter.Force);
+                Match(tSecondWord, CodeGenerationSupporter.Single);
+                Match(tNodeWord, CodeGenerationSupporter.GraphNode);
+                vResult.HintKind = OptimizerHintKind.ForceSingleNodePlan;
+                UpdateTokenInfo(vResult, tFirstWord);
+                UpdateTokenInfo(vResult, tPlanSingleNode);
             }
         )
     | tMonoHint:Identifier
@@ -22198,19 +22214,6 @@ useHintClause returns [UseHintList vResult = FragmentFactory.CreateFragment<UseH
             UpdateTokenInfo(vResult, tRParen);
         }
 
-    ;
-
-forTimestampAsOfOptimizerHint returns [LiteralOptimizerHint vResult = FragmentFactory.CreateFragment<LiteralOptimizerHint>()]
-{
-    Literal vValue;
-}
-    : tFor:For tTimestamp:Identifier tAs:As tOf:Of vValue = stringLiteral
-        {
-            Match(tTimestamp, CodeGenerationSupporter.TimeStamp);
-            vResult.HintKind = OptimizerHintKind.ForTimestampAsOf;
-            vResult.Value = vValue;
-            UpdateTokenInfo(vResult, tFor);
-        }
     ;
 
 createRuleStatement returns [CreateRuleStatement vResult = this.FragmentFactory.CreateFragment<CreateRuleStatement>()]
@@ -28028,6 +28031,8 @@ alterTableStatement returns [AlterTableStatement vResult = null]
         |   vResult=alterTableDropTableElementStatement
         |   {NextTokenMatches(CodeGenerationSupporter.Switch)}?
             vResult=alterTableSwitchStatement
+        |   {NextTokenMatches(CodeGenerationSupporter.Cluster, 3)}?
+            vResult=alterTableAddClusterByStatement
         |   (
                 (With vExistingRowsCheck = constraintEnforcement)?
                 (
@@ -28048,7 +28053,6 @@ alterTableStatement returns [AlterTableStatement vResult = null]
             {NextTokenMatches(CodeGenerationSupporter.FileTableNamespace, 2)}?
             vResult=alterTableFileTableNamespaceStatement
         |   vResult=alterTableSetStatement
-        |   vResult=alterTableAddClusterByStatement
         )
         {
             // Update position later, because instantiation is lazy
@@ -28195,10 +28199,10 @@ alterTableAddClusterByStatement returns [AlterTableAddClusterByStatement vResult
 {
     ClusterByTableOption vClusterByOption;
 }
-    : tAdd:Add LeftParenthesis vClusterByOption = clusterByTableOption
+    : tWith:With LeftParenthesis vClusterByOption = clusterByTableOption
         {
             vResult.ClusterByOption = vClusterByOption;
-            UpdateTokenInfo(vResult, tAdd);
+            UpdateTokenInfo(vResult, tWith);
         }
         tRParen:RightParenthesis
         {

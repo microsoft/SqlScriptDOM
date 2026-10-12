@@ -3562,6 +3562,7 @@
     <Member Name="SearchCondition" Type="BooleanExpression" Summary="The search condition."/>
     <Member Name="QualifiedJoinType" Type="QualifiedJoinType" GenerateUpdatePositionInfoCall="false" Summary="The join type."/>
     <Member Name="JoinHint" Type="JoinHint" GenerateUpdatePositionInfoCall="false" Summary="The join hint."/>
+    <Member Name="JoinHintColumnsCount" Type="IntegerLiteral" Summary="The optional columns count argument of the REDISTRIBUTE join hint."/>
   </Class>
   <Class Name="OdbcQualifiedJoinTableReference" Base="TableReference" Summary="Represents the odbc qualified join in a from clause.">
     <Member Name="TableReference" Type="TableReference" Summary="The table reference."/>

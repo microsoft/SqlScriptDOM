@@ -7259,6 +7259,56 @@ WHEN NOT MATCHED BY SOURCE THEN DELETE OUTPUT inserted.*, deleted.*;";
         }
 
         /// <summary>
+        /// Negative tests for join hints and query hints in Fabric DW.
+        /// </summary>
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void QueryHintsNegativeTestsFabricDW()
+        {
+            // REMOTE join hint is not supported in Fabric DW
+            //
+            string remoteJoinHint = "SELECT * FROM t1 INNER REMOTE JOIN t2 ON t1.c1 = t2.c1";
+            ParserTestUtils.ErrorTestFabricDW(remoteJoinHint, new ParserErrorInfo(remoteJoinHint.IndexOf("REMOTE"), "SQL46010", "REMOTE"));
+
+            // LOCAL-prefixed join hints are not supported in Fabric DW
+            //
+            string localHashJoinHint = "SELECT * FROM t1 INNER LOCAL HASH JOIN t2 ON t1.c1 = t2.c1";
+            ParserTestUtils.ErrorTestFabricDW(localHashJoinHint, new ParserErrorInfo(localHashJoinHint.IndexOf("HASH"), "SQL46010", "HASH"));
+
+            string localMergeJoinHint = "SELECT * FROM t1 INNER LOCAL MERGE JOIN t2 ON t1.c1 = t2.c1";
+            ParserTestUtils.ErrorTestFabricDW(localMergeJoinHint, new ParserErrorInfo(localMergeJoinHint.IndexOf("MERGE"), "SQL46010", "MERGE"));
+
+            // Only REDISTRIBUTE accepts a (columns_count) argument
+            //
+            string replicateWithCount = "SELECT * FROM t1 INNER REPLICATE (2) JOIN t2 ON t1.c1 = t2.c1";
+            ParserTestUtils.ErrorTestFabricDW(replicateWithCount, new ParserErrorInfo(replicateWithCount.IndexOf("REPLICATE"), "SQL46005", "REDISTRIBUTE", "REPLICATE"));
+
+            // REDISTRIBUTE columns count must be an integer literal
+            //
+            string redistributeNonInteger = "SELECT * FROM t1 INNER REDISTRIBUTE ('a') JOIN t2 ON t1.c1 = t2.c1";
+            ParserTestUtils.ErrorTestFabricDW(redistributeNonInteger, new ParserErrorInfo(redistributeNonInteger.IndexOf("'a'"), "SQL46010", "'a'"));
+
+            // FORCE DISTRIBUTED PLAN must start with FORCE
+            //
+            string keepDistributedPlan = "SELECT c1 FROM t1 OPTION (KEEP DISTRIBUTED PLAN)";
+            ParserTestUtils.ErrorTestFabricDW(keepDistributedPlan, new ParserErrorInfo(keepDistributedPlan.IndexOf("KEEP"), "SQL46005", "FORCE", "KEEP"));
+
+            // FORCE SINGLE NODE PLAN requires the NODE keyword
+            //
+            string forceSingleNodesPlan = "SELECT c1 FROM t1 OPTION (FORCE SINGLE NODES PLAN)";
+            ParserTestUtils.ErrorTestFabricDW(forceSingleNodesPlan, new ParserErrorInfo(forceSingleNodesPlan.IndexOf("NODES"), "SQL46005", "NODE", "NODES"));
+
+            // FOR TIMESTAMP AS OF requires the TIMESTAMP keyword and a string literal
+            //
+            string forTimestamps = "SELECT c1 FROM t1 OPTION (FOR TIMESTAMPS AS OF '2024-05-01T10:00:00')";
+            ParserTestUtils.ErrorTestFabricDW(forTimestamps, new ParserErrorInfo(forTimestamps.IndexOf("TIMESTAMPS"), "SQL46005", "TIMESTAMP", "TIMESTAMPS"));
+
+            string forTimestampNonString = "SELECT c1 FROM t1 OPTION (FOR TIMESTAMP AS OF 123)";
+            ParserTestUtils.ErrorTestFabricDW(forTimestampNonString, new ParserErrorInfo(forTimestampNonString.IndexOf("123"), "SQL46010", "123"));
+        }
+
+        /// <summary>
         /// Negative tests for Scalar Functions in Fabric DW.
         /// </summary>
         [TestMethod]
