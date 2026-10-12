@@ -7292,7 +7292,7 @@ WHEN NOT MATCHED BY SOURCE THEN DELETE OUTPUT inserted.*, deleted.*;";
             // FORCE DISTRIBUTED PLAN must start with FORCE
             //
             string keepDistributedPlan = "SELECT c1 FROM t1 OPTION (KEEP DISTRIBUTED PLAN)";
-            ParserTestUtils.ErrorTestFabricDW(keepDistributedPlan, new ParserErrorInfo(keepDistributedPlan.IndexOf("KEEP"), "SQL46005", "FORCE", "KEEP"));
+            ParserTestUtils.ErrorTestFabricDW(keepDistributedPlan, new ParserErrorInfo(keepDistributedPlan.IndexOf("KEEP"), "SQL46010", "KEEP"));
 
             // FORCE SINGLE NODE PLAN requires the NODE keyword
             //

@@ -22209,14 +22209,14 @@ simpleOptimizerHint returns [OptimizerHint vResult = FragmentFactory.CreateFragm
           {
               Match(tForce, CodeGenerationSupporter.Force);
               vResult.HintKind = OptimizerHintKind.ForceOrder;
-              UpdateTokenInfo(vResult, tForce); 
+              UpdateTokenInfo(vResult, tForce);
           }
           |
           Distributed tPlan1:Plan
           {
               Match(tForce, CodeGenerationSupporter.Force);
               vResult.HintKind = OptimizerHintKind.ForceDistributedPlan;
-              UpdateTokenInfo(vResult, tForce); 
+              UpdateTokenInfo(vResult, tForce);
           }
           |
           tSingle:Identifier tNode:Identifier tPlan2:Plan
@@ -22225,7 +22225,7 @@ simpleOptimizerHint returns [OptimizerHint vResult = FragmentFactory.CreateFragm
               Match(tSingle, CodeGenerationSupporter.Single);
               Match(tNode, CodeGenerationSupporter.GraphNode); // NODE
               vResult.HintKind = OptimizerHintKind.ForceSingleNodePlan;
-              UpdateTokenInfo(vResult, tForce); 
+              UpdateTokenInfo(vResult, tForce);
           }
       )
     | tHash:Identifier Group

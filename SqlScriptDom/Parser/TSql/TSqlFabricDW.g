@@ -22018,19 +22018,31 @@ simpleOptimizerHint returns [OptimizerHint vResult = FragmentFactory.CreateFragm
             vResult.HintKind = OptimizerHintKind.MergeUnion;
             UpdateTokenInfo(vResult, tMergeUnion); 
         }
-    | tForce:Identifier Order
-        {
-            Match(tForce, CodeGenerationSupporter.Force);
-            vResult.HintKind = OptimizerHintKind.ForceOrder;
-            UpdateTokenInfo(vResult, tForce);
-        }
-    | tForceDistributed:Identifier Distributed tPlanDistributed:Plan
-        {
-            Match(tForceDistributed, CodeGenerationSupporter.Force);
-            vResult.HintKind = OptimizerHintKind.ForceDistributedPlan;
-            UpdateTokenInfo(vResult, tForceDistributed);
-            UpdateTokenInfo(vResult, tPlanDistributed);
-        }
+    | {NextTokenMatches(CodeGenerationSupporter.Force)}?
+      tForce:Identifier (
+          Order
+          {
+              Match(tForce, CodeGenerationSupporter.Force);
+              vResult.HintKind = OptimizerHintKind.ForceOrder;
+              UpdateTokenInfo(vResult, tForce);
+          }
+          |
+          Distributed tPlan1:Plan
+          {
+              Match(tForce, CodeGenerationSupporter.Force);
+              vResult.HintKind = OptimizerHintKind.ForceDistributedPlan;
+              UpdateTokenInfo(vResult, tForce);
+          }
+          |
+          tSingle:Identifier tNode:Identifier tPlan2:Plan
+          {
+              Match(tForce, CodeGenerationSupporter.Force);
+              Match(tSingle, CodeGenerationSupporter.Single);
+              Match(tNode, CodeGenerationSupporter.GraphNode); // NODE
+              vResult.HintKind = OptimizerHintKind.ForceSingleNodePlan;
+              UpdateTokenInfo(vResult, tForce);
+          }
+      )
     | tHash:Identifier Group
         {
             Match(tHash, CodeGenerationSupporter.Hash);

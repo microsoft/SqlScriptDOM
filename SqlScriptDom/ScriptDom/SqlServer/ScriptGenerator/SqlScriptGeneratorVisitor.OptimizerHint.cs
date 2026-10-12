@@ -119,16 +119,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
                     new IdentifierGenerator(CodeGenerationSupporter.NoPerformanceSpool), }},
                { OptimizerHintKind.Label, new List<TokenGenerator>() {
                     new IdentifierGenerator(CodeGenerationSupporter.Label, true),
-                    new KeywordGenerator(TSqlTokenType.EqualsSign) }},
-               { OptimizerHintKind.ForceSingleNodePlan, new List<TokenGenerator>( ) {
-                    new IdentifierGenerator(CodeGenerationSupporter.Force, true),
-                    new IdentifierGenerator(CodeGenerationSupporter.Single, true),
-                    new IdentifierGenerator(CodeGenerationSupporter.GraphNode, true),
-                    new KeywordGenerator(TSqlTokenType.Plan) }},
-               { OptimizerHintKind.ForceDistributedPlan, new List<TokenGenerator>( ) {
-                    new IdentifierGenerator(CodeGenerationSupporter.Force, true),
-                    new KeywordGenerator(TSqlTokenType.Distributed, true),
-                    new KeywordGenerator(TSqlTokenType.Plan) }}
+                    new KeywordGenerator(TSqlTokenType.EqualsSign) }}
        };
 
         public override void ExplicitVisit(LiteralOptimizerHint node)
