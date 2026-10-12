@@ -359,6 +359,38 @@ SELECT [Bracketed], ""Quoted"", Plain, @Var, dbo.MyFunc(Col), LEN(Col2) FROM [My
             AssertGenerated(input, options, expected);
         }
 
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestIdentifierBracketingIncludeBracketsWindowOverReference()
+        {
+            // An unparenthesized "OVER window_name" reference is an ordinary identifier ("OVER [Win1]"
+            // is valid T-SQL), so it is bracketed like the WINDOW clause name it refers to.
+            const string input = "SELECT Sum(c1) OVER Win1 FROM t1 WINDOW Win1 AS (PARTITION BY c1)";
+            var options = MakeOptions(IdentifierCasing.Preserve, IdentifierBracketing.IncludeBrackets);
+            const string expected =
+@"SELECT Sum([c1]) OVER [Win1] FROM [t1]
+WINDOW [Win1] AS (PARTITION BY [c1]);";
+
+            AssertGenerated(input, options, expected);
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestIdentifierBracketingExcludeBracketsWindowOverReference()
+        {
+            // The "OVER window_name" reference and its WINDOW clause definition must stay in step:
+            // both lose their brackets and both are recased, so the reference still names the window.
+            const string input = "SELECT Sum(c1) OVER [Win1] FROM t1 WINDOW [Win1] AS (PARTITION BY c1)";
+            var options = MakeOptions(IdentifierCasing.Uppercase, IdentifierBracketing.ExcludeBrackets);
+            const string expected =
+@"SELECT Sum(C1) OVER WIN1 FROM T1
+WINDOW WIN1 AS (PARTITION BY C1);";
+
+            AssertGenerated(input, options, expected);
+        }
+
         // -----------------------------------------------------------------------------------------
         // Interaction: casing is applied after bracketing
         // -----------------------------------------------------------------------------------------
@@ -810,22 +842,6 @@ RETURN;";
             const string input = "use federation f1 (d1 = 20) with filtering=on, reset";
             var options = MakeOptions(IdentifierCasing.Preserve, IdentifierBracketing.IncludeBrackets);
             const string expected = @"USE FEDERATION f1 ([d1] = 20) WITH FILTERING = ON, RESET;";
-
-            AssertGenerated(input, options, expected);
-        }
-
-        // GAP-WINDOW: an unparenthesized "OVER window_name" reference must be a plain identifier
-        // ("OVER [Win1]" is invalid), while the WINDOW clause definition name may be bracketed.
-        [TestMethod]
-        [Priority(0)]
-        [SqlStudioTestCategory(Category.UnitTest)]
-        public void TestGapWindowOverReferenceNotBracketed()
-        {
-            const string input = "SELECT Sum(c1) OVER Win1 FROM t1 WINDOW Win1 AS (PARTITION BY c1)";
-            var options = MakeOptions(IdentifierCasing.Preserve, IdentifierBracketing.IncludeBrackets);
-            const string expected =
-@"SELECT Sum([c1]) OVER Win1 FROM [t1]
-WINDOW [Win1] AS (PARTITION BY [c1]);";
 
             AssertGenerated(input, options, expected);
         }

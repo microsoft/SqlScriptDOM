@@ -33698,7 +33698,7 @@ regularBuiltInFunctionCall [FunctionCall vParent]
             UpdateTokenInfo(vParent,tRParen);
         }
         (
-            {(LA(1)==Over && (LA(2)==LeftParenthesis || LA(2)==Identifier)) ||
+            {(LA(1)==Over && (LA(2)==LeftParenthesis || LA(2)==Identifier || LA(2)==QuotedIdentifier)) ||
              (NextTokenMatches(CodeGenerationSupporter.Within) && LA(2)==Group && LA(3)==LeftParenthesis) }?
             withinGroupOrOverClause [vParent]
         )?
@@ -33729,7 +33729,7 @@ ignoreRespectNullsRegularBuiltInFunctionCall [FunctionCall vParent]
             ignoreRespectNulls [vParent]
         )?
         (
-            {(LA(1)==Over && (LA(2)==LeftParenthesis || LA(2)==Identifier)) ||
+            {(LA(1)==Over && (LA(2)==LeftParenthesis || LA(2)==Identifier || LA(2)==QuotedIdentifier)) ||
              (NextTokenMatches(CodeGenerationSupporter.Within) && LA(2)==Group && LA(3)==LeftParenthesis) }?
             withinGroupOrOverClause [vParent]
         )?
