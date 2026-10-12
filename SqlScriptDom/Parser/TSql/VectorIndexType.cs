@@ -20,5 +20,4 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
 
 #pragma warning restore 1591
 }
-
      

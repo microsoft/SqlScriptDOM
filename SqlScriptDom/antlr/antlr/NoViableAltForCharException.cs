@@ -44,13 +44,13 @@ namespace antlr
 		{
 			foundChar = c;
 		}
-		
+
 		public NoViableAltForCharException(int c, string fileName, int line, int column) :
 					base("NoViableAlt", fileName, line, column)
 		{
 			foundChar = c;
 		}
-		
+
         protected NoViableAltForCharException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         { }

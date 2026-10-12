@@ -409,7 +409,7 @@ namespace antlr
 		protected virtual void handlePrematureEof()
 		{
 		}
-		
+
 		public virtual void  newline()
 		{
 			inputState.line++;
