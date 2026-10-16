@@ -247,7 +247,8 @@ namespace SqlStudio.Tests.UTSqlScriptDom
                 "IntegerTests.sql",
                 "TSqlParserTestScript1.sql",
                 "TSqlParserTestScript2.sql",
-                "ExpressionTests.sql"
+                "ExpressionTests.sql",
+                "FromClauseTests.sql"
             };
 
             foreach (ParserTest ti in CommonTestInfos)

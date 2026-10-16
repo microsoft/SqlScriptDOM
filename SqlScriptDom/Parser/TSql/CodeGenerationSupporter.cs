@@ -870,6 +870,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         internal const string RemoteServiceName = "REMOTE_SERVICE_NAME";
         internal const string Remove = "REMOVE";
         internal const string Reorganize = "REORGANIZE";
+        internal const string Redistribute = "REDISTRIBUTE";
         internal const string Repeatable = "REPEATABLE";
         internal const string RepeatableRead = "REPEATABLEREAD";
         internal const string Replace = "REPLACE";

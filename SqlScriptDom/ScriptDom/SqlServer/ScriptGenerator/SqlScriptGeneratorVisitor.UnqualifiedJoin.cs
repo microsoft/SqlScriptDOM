@@ -28,13 +28,14 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
         {
             GenerateFragmentIfNotNull(node.FirstTableReference);
 
+            GenerateNewLineOrSpace(_options.NewLineBeforeJoinClause);
+
             // Emit any pending gap comments before JOIN keywords
             EmitPendingGapComments();
 
             List<TokenGenerator> generators = GetValueForEnumKey(_unqualifiedJoinTypeGenerators, node.UnqualifiedJoinType);
             if (generators != null)
             {
-                GenerateSpace();
                 GenerateTokenList(generators);
             }
 

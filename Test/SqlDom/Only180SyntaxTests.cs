@@ -14,8 +14,10 @@ namespace SqlStudio.Tests.UTSqlScriptDom
         {
             new ParserTest180("AutomaticIndexCompactionTests180.sql", nErrors80: 2, nErrors90: 2, nErrors100: 2, nErrors110: 2, nErrors120: 2, nErrors130: 2, nErrors140: 2, nErrors150: 2, nErrors160: 2, nErrors170: 2),
             new ParserTest180("TrimFromReturnTests160.sql"),
-            new ParserTest180("PersistSamplePercentStatisticsTests130.sql"),
+            new ParserTest180("WindowClauseQuotedNameTests160.sql"),
             new ParserTest180("CreateSemanticIndexTests180.sql"),
+            new ParserTest180("AlterDatabaseScopedConfigTxnPriorityTests180.sql", nErrors80: 7, nErrors90: 7, nErrors100: 7, nErrors110: 7, nErrors120: 7, nErrors130: 1, nErrors140: 1, nErrors150: 1, nErrors160: 1, nErrors170: 1),
+            new ParserTest180("PersistSamplePercentStatisticsTests130.sql"),
             new ParserTest180("CreateDatabaseCollateBeforeEditionTests120.sql", nErrors120: 0, nErrors130: 0, nErrors140: 0, nErrors150: 0, nErrors160: 0, nErrors170: 0)
         };
 

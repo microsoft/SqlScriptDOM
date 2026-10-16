@@ -317,6 +317,25 @@ namespace SqlStudio.Tests.UTSqlScriptDom
         [TestMethod]
         [Priority(0)]
         [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestColumnAliasStylePreserveKeepsAliasesWithoutAsKeyword()
+        {
+            string generated = Generate(
+                "SELECT col1 = a, bb AS c, d col3, ee [col 4] FROM t;",
+                new SqlScriptGeneratorOptions { ColumnAliasStyle = ColumnAliasStyle.Preserve });
+
+            string expected =
+                "SELECT col1 = a," + Environment.NewLine +
+                "       bb AS c," + Environment.NewLine +
+                "       d col3," + Environment.NewLine +
+                "       ee [col 4]" + Environment.NewLine +
+                "FROM   t;" + Environment.NewLine + Environment.NewLine;
+
+            Assert.AreEqual(expected, generated);
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void TestColumnAliasStyleEqualsSignNestedSubqueryAlignsIndependently()
         {
             // The outer and inner SELECT lists align their '=' signs independently.
@@ -404,6 +423,43 @@ namespace SqlStudio.Tests.UTSqlScriptDom
             string expected = "SELECT a AS x";
 
             Assert.AreEqual(expected, generated);
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestColumnAliasStylePreserveWithAliasIndexOutsideTokenStreamRendersAsKeyword()
+        {
+            var tokenStream = new List<TSqlParserToken>
+            {
+                new TSqlParserToken(TSqlTokenType.Identifier, "a")
+            };
+            var expression = new ColumnReferenceExpression
+            {
+                FirstTokenIndex = 0,
+                LastTokenIndex = 0,
+                MultiPartIdentifier = new MultiPartIdentifier { Identifiers = { new Identifier { Value = "a" } } }
+            };
+            var columnName = new IdentifierOrValueExpression
+            {
+                FirstTokenIndex = tokenStream.Count,
+                Identifier = new Identifier { Value = "x" }
+            };
+            var scalar = new SelectScalarExpression
+            {
+                ScriptTokenStream = tokenStream,
+                Expression = expression,
+                ColumnName = columnName
+            };
+            var query = new QuerySpecification();
+            query.SelectElements.Add(scalar);
+            var select = new SelectStatement { QueryExpression = query };
+
+            var generator = new Sql170ScriptGenerator(
+                new SqlScriptGeneratorOptions { ColumnAliasStyle = ColumnAliasStyle.Preserve });
+            generator.GenerateScript(select, out string generated);
+
+            Assert.AreEqual("SELECT a AS x", generated);
         }
 
         // ---------------------------------------------------------------------------------------
@@ -569,6 +625,22 @@ namespace SqlStudio.Tests.UTSqlScriptDom
             string expected =
                 "SELECT a /* mid */ AS x," + Environment.NewLine +
                 "       bb AS y" + Environment.NewLine +
+                "FROM   t;" + Environment.NewLine + Environment.NewLine;
+
+            Assert.AreEqual(expected, generated);
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestColumnAliasStylePreserveKeepsCommentBeforeAliasWithoutAsKeyword()
+        {
+            string generated = Generate(
+                "SELECT CAST(a AS int) /* mid */ result FROM t;",
+                new SqlScriptGeneratorOptions { ColumnAliasStyle = ColumnAliasStyle.Preserve, PreserveComments = true });
+
+            string expected =
+                "SELECT CAST (a AS INT) /* mid */ result" + Environment.NewLine +
                 "FROM   t;" + Environment.NewLine + Environment.NewLine;
 
             Assert.AreEqual(expected, generated);

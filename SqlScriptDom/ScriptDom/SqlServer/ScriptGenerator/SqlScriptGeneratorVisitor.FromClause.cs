@@ -22,7 +22,15 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
                 IList<TableReference> tableSources = fromClause.TableReferences;
                 if (tableSources.Count > 0)
                 {
-                    GenerateSeparatorForFromClause();
+                    if (HasPendingGapComments())
+                    {
+                        NewLine();
+                    }
+                    else
+                    {
+                        GenerateSeparatorForFromClause();
+                    }
+                    EmitPendingGapComments();
 
                     AlignmentPoint start = new AlignmentPoint();
                     MarkAndPushAlignmentPoint(start);

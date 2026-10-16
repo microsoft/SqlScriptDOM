@@ -23,7 +23,7 @@ namespace antlr
 	[Serializable]
 	internal class NoViableAltForCharException : RecognitionException
 	{
-		public char foundChar;
+		public int foundChar;
 		
 		public NoViableAltForCharException(char c, CharScanner scanner) :
 					base("NoViableAlt", scanner.getFilename(), scanner.getLine(), scanner.getColumn())
@@ -37,6 +37,20 @@ namespace antlr
 			foundChar = c;
 		}
 		
+		// int overloads so the generated lexer can pass a lookahead that may be the
+		// out-of-char-range EOF sentinel without a cast/overflow at the call site.
+		public NoViableAltForCharException(int c, CharScanner scanner) :
+					base("NoViableAlt", scanner.getFilename(), scanner.getLine(), scanner.getColumn())
+		{
+			foundChar = c;
+		}
+
+		public NoViableAltForCharException(int c, string fileName, int line, int column) :
+					base("NoViableAlt", fileName, line, column)
+		{
+			foundChar = c;
+		}
+
         protected NoViableAltForCharException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         { }
@@ -54,16 +68,20 @@ namespace antlr
 				// But java seems to lack something isprint-ish..
 				// so we do it manually. This is probably too restrictive.
 			
-				if ((foundChar >= ' ') && (foundChar <= '~'))
+				if (foundChar == CharScanner.EOF_CHAR)
+				{
+					mesg.Append("<EOF>");
+				}
+				else if ((foundChar >= ' ') && (foundChar <= '~'))
 				{
 					mesg.Append('\'');
-					mesg.Append(foundChar);
+					mesg.Append((char) foundChar);
 					mesg.Append('\'');
 				}
 				else
 				{
 					mesg.Append("0x");
-					mesg.Append(((int)foundChar).ToString("X", CultureInfo.InvariantCulture));
+					mesg.Append(foundChar.ToString("X", CultureInfo.InvariantCulture));
 				}
 				return mesg.ToString();
 			}

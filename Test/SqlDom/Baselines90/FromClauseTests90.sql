@@ -10,7 +10,8 @@ FROM t1 AS table1 TABLESAMPLE (12 + 3 ROWS);
 
 GO
 SELECT *
-FROM master..sysprocesses AS p CROSS APPLY ::fn_get_sql (p.sql_handle);
+FROM master..sysprocesses AS p
+     CROSS APPLY ::fn_get_sql (p.sql_handle);
 
 SELECT *
 FROM ::f1 (a.b * (12 + 20));
@@ -61,7 +62,8 @@ FROM st PIVOT (AVG (.st.StandardCost) FOR st.DaysToManufacture IN ([0], [1])) AS
 
 GO
 SELECT *
-FROM t1 PIVOT (dbo.f (c1) FOR [if] IN (a)) AS PTable CROSS JOIN t2 UNPIVOT (c2 FOR T2 IN ([a], b)) AS UPTable;
+FROM t1 PIVOT (dbo.f (c1) FOR [if] IN (a)) AS PTable
+     CROSS JOIN t2 UNPIVOT (c2 FOR T2 IN ([a], b)) AS UPTable;
 
 SELECT *
 FROM t1
@@ -73,7 +75,8 @@ FROM t1
      ON t1.c1 = t10.c1 PIVOT (dbo.f (c1) FOR [if] IN (a)) AS PTable;
 
 SELECT *
-FROM t1 CROSS APPLY t2 UNPIVOT (q FOR n IN (t1.c0, c1)) AS a;
+FROM t1
+     CROSS APPLY t2 UNPIVOT (q FOR n IN (t1.c0, c1)) AS a;
 
 SELECT *
 FROM (SELECT *

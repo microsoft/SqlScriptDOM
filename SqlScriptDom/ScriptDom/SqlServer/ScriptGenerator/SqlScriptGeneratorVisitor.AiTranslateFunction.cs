@@ -3,6 +3,7 @@
 //         Copyright (c) Microsoft Corporation.  All rights reserved.
 // </copyright>
 //------------------------------------------------------------------------------
+using System;
 using Microsoft.SqlServer.TransactSql.ScriptDom;
 
 namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
@@ -28,7 +29,47 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
             GenerateSymbol(TSqlTokenType.Comma);
             GenerateSpace();
             GenerateFragmentIfNotNull(node.Language);
+            GenerateSpaceAndFragmentIfNotNull(node.OnErrorClause);
             GenerateSymbol(TSqlTokenType.RightParenthesis);
+        }
+
+        /// <summary>
+        /// Emits ERROR ON ERROR behavior for AI functions.
+        /// </summary>
+        /// <param name="node">The error behavior clause to generate.</param>
+        public override void ExplicitVisit(AIErrorOnErrorClause node)
+        {
+            GenerateIdentifier(CodeGenerationSupporter.Error);
+            GenerateSpaceAndKeyword(TSqlTokenType.On);
+            GenerateSpaceAndIdentifier(CodeGenerationSupporter.Error);
+        }
+
+        /// <summary>
+        /// Emits NULL ON ERROR behavior for AI functions.
+        /// </summary>
+        /// <param name="node">The null behavior clause to generate.</param>
+        public override void ExplicitVisit(AINullOnErrorClause node)
+        {
+            GenerateKeyword(TSqlTokenType.Null);
+            GenerateSpaceAndKeyword(TSqlTokenType.On);
+            GenerateSpaceAndIdentifier(CodeGenerationSupporter.Error);
+        }
+
+        /// <summary>
+        /// Emits DEFAULT 'literal' ON ERROR behavior for AI functions.
+        /// </summary>
+        /// <param name="node">The default behavior clause to generate.</param>
+        public override void ExplicitVisit(AIDefaultOnErrorClause node)
+        {
+            if (node.Value == null)
+            {
+                throw new InvalidOperationException("AIDefaultOnErrorClause.Value is required.");
+            }
+
+            GenerateKeyword(TSqlTokenType.Default);
+            GenerateSpaceAndFragmentIfNotNull(node.Value);
+            GenerateSpaceAndKeyword(TSqlTokenType.On);
+            GenerateSpaceAndIdentifier(CodeGenerationSupporter.Error);
         }
     }
 }

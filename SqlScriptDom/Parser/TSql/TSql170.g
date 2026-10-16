@@ -22209,14 +22209,14 @@ simpleOptimizerHint returns [OptimizerHint vResult = FragmentFactory.CreateFragm
           {
               Match(tForce, CodeGenerationSupporter.Force);
               vResult.HintKind = OptimizerHintKind.ForceOrder;
-              UpdateTokenInfo(vResult, tForce); 
+              UpdateTokenInfo(vResult, tForce);
           }
           |
           Distributed tPlan1:Plan
           {
               Match(tForce, CodeGenerationSupporter.Force);
               vResult.HintKind = OptimizerHintKind.ForceDistributedPlan;
-              UpdateTokenInfo(vResult, tForce); 
+              UpdateTokenInfo(vResult, tForce);
           }
           |
           tSingle:Identifier tNode:Identifier tPlan2:Plan
@@ -22225,7 +22225,7 @@ simpleOptimizerHint returns [OptimizerHint vResult = FragmentFactory.CreateFragm
               Match(tSingle, CodeGenerationSupporter.Single);
               Match(tNode, CodeGenerationSupporter.GraphNode); // NODE
               vResult.HintKind = OptimizerHintKind.ForceSingleNodePlan;
-              UpdateTokenInfo(vResult, tForce); 
+              UpdateTokenInfo(vResult, tForce);
           }
       )
     | tHash:Identifier Group
@@ -33460,7 +33460,7 @@ regularBuiltInFunctionCall [FunctionCall vParent]
             UpdateTokenInfo(vParent,tRParen);
         }
         (
-            {(LA(1)==Over && (LA(2)==LeftParenthesis || LA(2)==Identifier)) ||
+            {(LA(1)==Over && (LA(2)==LeftParenthesis || LA(2)==Identifier || LA(2)==QuotedIdentifier)) ||
              (NextTokenMatches(CodeGenerationSupporter.Within) && LA(2)==Group && LA(3)==LeftParenthesis) }?
             withinGroupOrOverClause [vParent]
         )?
@@ -33491,7 +33491,7 @@ ignoreRespectNullsRegularBuiltInFunctionCall [FunctionCall vParent]
             ignoreRespectNulls [vParent]
         )?
         (
-            {(LA(1)==Over && (LA(2)==LeftParenthesis || LA(2)==Identifier)) ||
+            {(LA(1)==Over && (LA(2)==LeftParenthesis || LA(2)==Identifier || LA(2)==QuotedIdentifier)) ||
              (NextTokenMatches(CodeGenerationSupporter.Within) && LA(2)==Group && LA(3)==LeftParenthesis) }?
             withinGroupOrOverClause [vParent]
         )?

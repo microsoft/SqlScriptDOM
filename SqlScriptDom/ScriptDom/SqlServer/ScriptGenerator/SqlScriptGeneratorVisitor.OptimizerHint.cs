@@ -31,6 +31,20 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
                { OptimizerHintKind.ForceOrder, new List<TokenGenerator>( ) {
                     new IdentifierGenerator(CodeGenerationSupporter.Force, true),
                     new KeywordGenerator(TSqlTokenType.Order), }},
+               { OptimizerHintKind.ForceSingleNodePlan, new List<TokenGenerator>( ) {
+                    new IdentifierGenerator(CodeGenerationSupporter.Force, true),
+                    new IdentifierGenerator(CodeGenerationSupporter.Single, true),
+                    new IdentifierGenerator(CodeGenerationSupporter.GraphNode, true),
+                    new KeywordGenerator(TSqlTokenType.Plan), }},
+               { OptimizerHintKind.ForceDistributedPlan, new List<TokenGenerator>( ) {
+                    new IdentifierGenerator(CodeGenerationSupporter.Force, true),
+                    new KeywordGenerator(TSqlTokenType.Distributed, true),
+                    new KeywordGenerator(TSqlTokenType.Plan), }},
+               { OptimizerHintKind.ForTimestampAsOf, new List<TokenGenerator>( ) {
+                    new KeywordGenerator(TSqlTokenType.For, true),
+                    new IdentifierGenerator(CodeGenerationSupporter.TimeStamp, true),
+                    new KeywordGenerator(TSqlTokenType.As, true),
+                    new KeywordGenerator(TSqlTokenType.Of), }},
                { OptimizerHintKind.HashGroup, new List<TokenGenerator>( ) {
                     new IdentifierGenerator(CodeGenerationSupporter.Hash, true),
                     new KeywordGenerator(TSqlTokenType.Group), }},
@@ -105,16 +119,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
                     new IdentifierGenerator(CodeGenerationSupporter.NoPerformanceSpool), }},
                { OptimizerHintKind.Label, new List<TokenGenerator>() {
                     new IdentifierGenerator(CodeGenerationSupporter.Label, true),
-                    new KeywordGenerator(TSqlTokenType.EqualsSign) }},
-               { OptimizerHintKind.ForceSingleNodePlan, new List<TokenGenerator>( ) {
-                    new IdentifierGenerator(CodeGenerationSupporter.Force, true),
-                    new IdentifierGenerator(CodeGenerationSupporter.Single, true),
-                    new IdentifierGenerator(CodeGenerationSupporter.GraphNode, true),
-                    new KeywordGenerator(TSqlTokenType.Plan) }},
-               { OptimizerHintKind.ForceDistributedPlan, new List<TokenGenerator>( ) {
-                    new IdentifierGenerator(CodeGenerationSupporter.Force, true),
-                    new KeywordGenerator(TSqlTokenType.Distributed, true),
-                    new KeywordGenerator(TSqlTokenType.Plan) }}
+                    new KeywordGenerator(TSqlTokenType.EqualsSign) }}
        };
 
         public override void ExplicitVisit(LiteralOptimizerHint node)

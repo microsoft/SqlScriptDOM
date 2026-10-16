@@ -460,24 +460,29 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
                     for (int indentIterator = 0; indentIterator < option.MultipleIndentItems; indentIterator++)
                         Indent();
                 }
-                else if (option.MultipleIndentItems >= 1)
-                {
-                    // Leading comma placement in an indented list: reserve the comma width inside
-                    // the indentation so the item stays at the normal list indentation column and
-                    // the comma is indented LeadingCommaWidth characters fewer.
-                    int listIndentColumns = option.MultipleIndentItems * _options.IndentationSize;
-                    Indent(listIndentColumns >= LeadingCommaWidth ? listIndentColumns - LeadingCommaWidth : 0);
-
-                    GenerateSymbol(TSqlTokenType.Comma);
-                    GenerateLeadingCommaSpace();
-                }
                 else
                 {
-                    // Leading comma placement in a keyword-aligned list (no fixed indentation, e.g.
-                    // the SELECT column list): the comma is emitted as a right-aligned separator so
-                    // it ends exactly before the aligned item column, keeping items aligned with
-                    // the first element and the comma just before each of them.
-                    GenerateRightAlignedCommaSeparator();
+                    HandleCommentsBeforeListItem(item, items);
+
+                    if (option.MultipleIndentItems >= 1)
+                    {
+                        // Leading comma placement in an indented list: reserve the comma width inside
+                        // the indentation so the item stays at the normal list indentation column and
+                        // the comma is indented LeadingCommaWidth characters fewer.
+                        int listIndentColumns = option.MultipleIndentItems * _options.IndentationSize;
+                        Indent(listIndentColumns >= LeadingCommaWidth ? listIndentColumns - LeadingCommaWidth : 0);
+
+                        GenerateSymbol(TSqlTokenType.Comma);
+                        GenerateLeadingCommaSpace();
+                    }
+                    else
+                    {
+                        // Leading comma placement in a keyword-aligned list (no fixed indentation, e.g.
+                        // the SELECT column list): the comma is emitted as a right-aligned separator so
+                        // it ends exactly before the aligned item column, keeping items aligned with
+                        // the first element and the comma just before each of them.
+                        GenerateRightAlignedCommaSeparator();
+                    }
                 }
 
                 if (option.NewLineBeforeItems)

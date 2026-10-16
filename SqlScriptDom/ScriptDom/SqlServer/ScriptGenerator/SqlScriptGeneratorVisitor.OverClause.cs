@@ -18,9 +18,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
 
             if (windowNameExists && !windowSpecExist)
             {
-                // An unparenthesized "OVER window_name" reference must be a plain identifier; it
-                // cannot be bracketed or recased. (Inside "OVER (window_name ...)" it may be.)
-                GenerateWithoutIdentifierFormatting(() => GenerateSpaceAndFragmentIfNotNull(node.WindowName));
+                GenerateSpaceAndFragmentIfNotNull(node.WindowName);
             }
             else
             {
