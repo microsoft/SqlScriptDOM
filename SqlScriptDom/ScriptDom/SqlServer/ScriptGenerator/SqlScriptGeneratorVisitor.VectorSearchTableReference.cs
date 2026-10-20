@@ -21,6 +21,11 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
         /// </summary>
         public override void ExplicitVisit(VectorSearchTableReference node)
         {
+            if (node.Metric == null)
+            {
+                throw new System.InvalidOperationException("VECTOR_SEARCH requires a METRIC value.");
+            }
+
             AlignmentPoint start = new AlignmentPoint();
             MarkAndPushAlignmentPoint(start);
 

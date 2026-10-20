@@ -45,6 +45,43 @@ namespace SqlStudio.Tests.UTSqlScriptDom
 			Assert.AreEqual(String.Empty, GenerateScript(fragment));
 		}
 
+        /// <summary>
+        /// Regression test for incomplete VECTOR_SEARCH AST nodes. Required parameters must not
+        /// result in silently generated, non-parseable SQL.
+        /// </summary>
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void VectorSearchWithoutMetricIsRejected()
+        {
+            VectorSearchTableReference vectorSearch = new VectorSearchTableReference
+            {
+                Table = new NamedTableReference
+                {
+                    SchemaObject = new SchemaObjectName
+                    {
+                        Identifiers = { new Identifier { Value = "dbo" }, new Identifier { Value = "Vectors" } }
+                    }
+                },
+                Column = new ColumnReferenceExpression
+                {
+                    MultiPartIdentifier = new MultiPartIdentifier
+                    {
+                        Identifiers = { new Identifier { Value = "Embedding" } }
+                    }
+                },
+                SimilarTo = new VariableReference { Name = "@queryVector" }
+            };
+
+            Sql170ScriptGenerator scriptGenerator = new Sql170ScriptGenerator();
+
+            InvalidOperationException exception = Assert.ThrowsException<InvalidOperationException>(
+                () => scriptGenerator.GenerateScript(vectorSearch, out string _));
+
+            StringAssert.Contains(exception.Message, "VECTOR_SEARCH");
+            StringAssert.Contains(exception.Message, "METRIC");
+        }
+
 		/// <summary>
 		/// Regression test for VSTS 1632678: INDEX keyword is missing from the IndexDefinition token properties (StartColumn and FragmentLength)
 		/// </summary>
