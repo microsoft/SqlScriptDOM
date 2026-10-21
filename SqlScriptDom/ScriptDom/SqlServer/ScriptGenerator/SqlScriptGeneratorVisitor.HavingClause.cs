@@ -19,11 +19,12 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
             AlignmentPoint clauseBody = GetAlignmentPointForFragment(node, ClauseBody);
             if (GenerateClauseBodyStart(_options.NewLineBeforeHavingClause, clauseBody))
             {
-                GenerateFragmentIfNotNull(node.SearchCondition);
+                GeneratePredicate(node.SearchCondition, _options.MultilineHavingPredicatesList);
             }
             else
             {
-                GenerateSpaceAndFragmentIfNotNull(node.SearchCondition);
+                GenerateSpace();
+                GeneratePredicate(node.SearchCondition, _options.MultilineHavingPredicatesList);
             }
 
             PopAlignmentPoint();

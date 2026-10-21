@@ -18,9 +18,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
 
             if (windowNameExists && !windowSpecExist)
             {
-                // An unparenthesized "OVER window_name" reference must be a plain identifier; it
-                // cannot be bracketed or recased. (Inside "OVER (window_name ...)" it may be.)
-                GenerateWithoutIdentifierFormatting(() => GenerateSpaceAndFragmentIfNotNull(node.WindowName));
+                GenerateSpaceAndFragmentIfNotNull(node.WindowName);
             }
             else
             {
@@ -40,7 +38,14 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
                     GenerateSpaceAndKeyword(TSqlTokenType.By);
 
                     GenerateSpace();
-                    GenerateCommaSeparatedList(node.Partitions);
+                    if (_options.MultilinePartitionByElementsList)
+                    {
+                        GenerateAlignedMultilineCommaSeparatedList(node.Partitions);
+                    }
+                    else
+                    {
+                        GenerateCommaSeparatedList(node.Partitions);
+                    }
                 }
 
                 if (node.OrderByClause != null)

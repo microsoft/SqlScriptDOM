@@ -97,6 +97,38 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
         }
 
         /// <summary>
+        /// Retrieves a version of the specified built-in function name, in the built-in function
+        /// casing format specified.
+        /// </summary>
+        /// <param name="str">The built-in function name to get a specially cased version of</param>
+        /// <param name="casing">The built-in function casing method to use</param>
+        /// <returns>A version of the string in the casing format specified in <paramref name="casing"/></returns>
+        [SuppressMessage("Microsoft.Globalization", "CA1308:NormalizeStringsToUppercase")]
+        public static string GetCasedString(string str, BuiltInFunctionCasing casing)
+        {
+            if (string.IsNullOrEmpty(str))
+            {
+                return str;
+            }
+
+            switch (casing)
+            {
+                case BuiltInFunctionCasing.Preserve:
+                    return str;
+                case BuiltInFunctionCasing.Lowercase:
+                    return str.ToLowerInvariant();
+                case BuiltInFunctionCasing.Uppercase:
+                    return str.ToUpperInvariant();
+                case BuiltInFunctionCasing.PascalCase:
+                    return GetPascalCase(str);
+                default:
+                    Debug.Fail("Invalid BuiltInFunctionCasing value");
+                    break;
+            }
+            return str;
+        }
+
+        /// <summary>
         /// Retrieves a Pascal Cased version of the string
         /// </summary>
         /// <param name="str">The string to pascal case</param>

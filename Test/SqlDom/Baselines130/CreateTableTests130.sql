@@ -332,6 +332,13 @@ CREATE TABLE t (
 
 GO
 CREATE TABLE t (
+    COL0 VARCHAR (100)                                             COLLATE SQL_Latin1_General_CP1_CI_AS SPARSE MASKED WITH (FUNCTION = 'default()') NULL,
+    COL1 VARCHAR (100) SPARSE MASKED WITH (FUNCTION = 'default()') NULL
+);
+
+
+GO
+CREATE TABLE t (
     COL0 INT          NOT NULL,
     COL1 VARCHAR (20),
     COL2 VARCHAR (6) 

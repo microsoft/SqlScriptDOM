@@ -53,6 +53,8 @@ GO
 Select * from t1 group by c1;
 -- testing all
 Select * from t1 group by all c1;
+-- testing all with multiple columns
+Select * from t1 group by all c1, c2, c3;
 -- testing multiple expressions
 select * from t1 group by c1, c2, c3
 -- testing with

@@ -10,28 +10,91 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
 {
     partial class SqlScriptGeneratorVisitor
     {
+        private int _multilineFunctionCallDepth;
+
         public override void ExplicitVisit(LeftFunctionCall node)
         {
-            GenerateKeyword(TSqlTokenType.Left);
-            GenerateParenthesisedCommaSeparatedList(node.Parameters, true);
-            GenerateSpaceAndCollation(node.Collation);
+            if (!ShouldFormatFunctionCallParameterList(node.Parameters))
+            {
+                if (!TryGenerateBuiltInFunctionName(TSqlTokenType.Left))
+                {
+                    GenerateKeyword(TSqlTokenType.Left);
+                }
+                GenerateSymbol(TSqlTokenType.LeftParenthesis);
+                GenerateCommaSeparatedList(node.Parameters);
+                GenerateFunctionCallRightParenthesis();
+                GenerateSpaceAndCollation(node.Collation);
+                return;
+            }
+
+            AlignmentPoint functionCallStart = PushFunctionCallAlignmentPoint();
+            try
+            {
+                if (!TryGenerateBuiltInFunctionName(TSqlTokenType.Left))
+                {
+                    GenerateKeyword(TSqlTokenType.Left);
+                }
+                GenerateMultilineFunctionCallParameterList(node.Parameters);
+                GenerateSpaceAndCollation(node.Collation);
+            }
+            finally
+            {
+                PopFunctionCallAlignmentPoint(functionCallStart);
+            }
         }
 
         public override void ExplicitVisit(RightFunctionCall node)
         {
-            GenerateKeyword(TSqlTokenType.Right);
-            GenerateParenthesisedCommaSeparatedList(node.Parameters, true);
-            GenerateSpaceAndCollation(node.Collation);
+            if (!ShouldFormatFunctionCallParameterList(node.Parameters))
+            {
+                if (!TryGenerateBuiltInFunctionName(TSqlTokenType.Right))
+                {
+                    GenerateKeyword(TSqlTokenType.Right);
+                }
+                GenerateSymbol(TSqlTokenType.LeftParenthesis);
+                GenerateCommaSeparatedList(node.Parameters);
+                GenerateFunctionCallRightParenthesis();
+                GenerateSpaceAndCollation(node.Collation);
+                return;
+            }
+
+            AlignmentPoint functionCallStart = PushFunctionCallAlignmentPoint();
+            try
+            {
+                if (!TryGenerateBuiltInFunctionName(TSqlTokenType.Right))
+                {
+                    GenerateKeyword(TSqlTokenType.Right);
+                }
+                GenerateMultilineFunctionCallParameterList(node.Parameters);
+                GenerateSpaceAndCollation(node.Collation);
+            }
+            finally
+            {
+                PopFunctionCallAlignmentPoint(functionCallStart);
+            }
         }
 
         public override void ExplicitVisit(FunctionCall node)
         {
+            if (ShouldFormatFunctionCall(node))
+            {
+                GenerateMultilineFunctionCall(node);
+                return;
+            }
+
             GenerateFragmentIfNotNull(node.CallTarget);
 
+            // Recognized, unqualified built-in function names follow the BuiltInFunctionCasing
+            // option. When that option is Preserve (the default) or the name is a user-defined
+            // function, fall back to emitting the name with its original casing.
+            //
             // Function names are not affected by the IdentifierCasing / IdentifierBracketing options
-            // (their casing is governed by a separate option), so emit the function name with
+            // (their casing is governed by BuiltInFunctionCasing), so emit the function name with
             // identifier formatting suppressed. This has no effect under default options.
-            GenerateWithoutIdentifierFormatting(() => GenerateFragmentIfNotNull(node.FunctionName));
+            if (!TryGenerateBuiltInFunctionName(node))
+            {
+                GenerateWithoutIdentifierFormatting(() => GenerateFragmentIfNotNull(node.FunctionName));
+            }
 
             GenerateSymbol(TSqlTokenType.LeftParenthesis);
 
@@ -50,11 +113,18 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
                     GenerateSpace();
                 }
                 GenerateFragmentIfNotNull(node.Parameters[0]);
-                GenerateSpace();
+                if (HasDeferredTrailingSingleLineComments)
+                {
+                    NewLine();
+                }
+                else
+                {
+                    GenerateSpace();
+                }
                 GenerateKeyword(TSqlTokenType.From);
                 GenerateSpace();
                 GenerateFragmentIfNotNull(node.Parameters[1]);
-                GenerateSymbol(TSqlTokenType.RightParenthesis);
+                GenerateFunctionCallRightParenthesis();
             }
             else if (node.FunctionName.Value.ToUpper(CultureInfo.InvariantCulture) == CodeGenerationSupporter.JsonObject)
             {
@@ -65,7 +135,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
                 if (node.JsonParameters?.Count > 0 && node.ReturnType?.Count > 0) //If there are values and null on null or absent on null present then generate space in between them
                     GenerateSpace();
                 GenerateReturnType(node?.ReturnType);
-                GenerateSymbol(TSqlTokenType.RightParenthesis);
+                GenerateFunctionCallRightParenthesis();
             }
             else if (node.FunctionName.Value.ToUpper(CultureInfo.InvariantCulture) == CodeGenerationSupporter.JsonObjectAgg)
             {
@@ -76,7 +146,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
                 if (node.JsonParameters?.Count > 0 && node.ReturnType?.Count > 0) //If there are values and null on null or absent on null present then generate space in between them
                     GenerateSpace();
                 GenerateReturnType(node?.ReturnType);
-                GenerateSymbol(TSqlTokenType.RightParenthesis);
+                GenerateFunctionCallRightParenthesis();
                 // Generate OVER clause for windowed json_objectagg
                 GenerateSpaceAndFragmentIfNotNull(node.OverClause);
             }
@@ -89,7 +159,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
 				if (node.ReturnType?.Count > 0) //If there are values and null on null or absent on null present then generate space in between them
                     GenerateSpace();
                 GenerateReturnType(node?.ReturnType);
-                GenerateSymbol(TSqlTokenType.RightParenthesis);
+                GenerateFunctionCallRightParenthesis();
             }
 			else if (node.FunctionName.Value.ToUpper(CultureInfo.InvariantCulture) == CodeGenerationSupporter.JsonArrayAgg)
             {
@@ -102,7 +172,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
 				if (node.ReturnType?.Count > 0) //If there are values and null on null or absent on null present then generate space in between them
                     GenerateSpace();
                 GenerateReturnType(node?.ReturnType);
-                GenerateSymbol(TSqlTokenType.RightParenthesis);
+                GenerateFunctionCallRightParenthesis();
                 // Generate OVER clause for windowed json_arrayagg
                 GenerateSpaceAndFragmentIfNotNull(node.OverClause);
             }
@@ -121,7 +191,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
                     GenerateIdentifier(CodeGenerationSupporter.Wrapper);
                 }
                 
-                GenerateSymbol(TSqlTokenType.RightParenthesis);
+                GenerateFunctionCallRightParenthesis();
             }
             else if (node.FunctionName.Value.ToUpper(CultureInfo.InvariantCulture) == CodeGenerationSupporter.JsonValue)
             {
@@ -131,7 +201,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
                     GenerateSpace();
                     GenerateReturnType(node?.ReturnType);
                 }
-                GenerateSymbol(TSqlTokenType.RightParenthesis);
+                GenerateFunctionCallRightParenthesis();
             }
             else
             {
@@ -140,7 +210,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
                     GenerateSpace();
 
                 GenerateCommaSeparatedList(node.Parameters);
-                GenerateSymbol(TSqlTokenType.RightParenthesis);
+                GenerateFunctionCallRightParenthesis();
 
                 if (node.IgnoreRespectNulls?.Count > 0)
                 {
@@ -156,6 +226,188 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
             }
 
             GenerateSpaceAndCollation(node.Collation);
+        }
+
+        /// <summary>
+        /// Generates an ordinary function call using multiline parameter formatting while preserving
+        /// its optional null-handling, grouping, windowing, and collation clauses.
+        /// </summary>
+        private void GenerateMultilineFunctionCall(FunctionCall node)
+        {
+            AlignmentPoint functionCallStart = PushFunctionCallAlignmentPoint();
+            try
+            {
+                GenerateFragmentIfNotNull(node.CallTarget);
+                if (!TryGenerateBuiltInFunctionName(node))
+                {
+                    GenerateWithoutIdentifierFormatting(() => GenerateFragmentIfNotNull(node.FunctionName));
+                }
+
+                GenerateMultilineFunctionCallParameterList(node.Parameters);
+
+                if (node.IgnoreRespectNulls?.Count > 0)
+                {
+                    GenerateSpace();
+                    GenerateWithoutIdentifierFormatting(() => GenerateSpaceSeparatedList(node.IgnoreRespectNulls));
+                }
+
+                GenerateSpaceAndFragmentIfNotNull(node.WithinGroupClause);
+                GenerateSpaceAndFragmentIfNotNull(node.OverClause);
+                GenerateSpaceAndCollation(node.Collation);
+            }
+            finally
+            {
+                PopFunctionCallAlignmentPoint(functionCallStart);
+            }
+        }
+
+        /// <summary>
+        /// Determines whether to render a function's parameters with the generic multiline layout.
+        /// The option must be enabled, the function must use an ordinary comma-separated parameter
+        /// list without a DISTINCT or ALL qualifier, and the function must either be inside an
+        /// already-formatted nested call tree or contain another function in its parameter subtree.
+        /// </summary>
+        private bool ShouldFormatFunctionCall(FunctionCall node)
+        {
+            return node.UniqueRowFilter == UniqueRowFilter.NotSpecified
+                && !UsesSpecialFunctionCallSyntax(node)
+                && ShouldFormatFunctionCallParameterList(node.Parameters);
+        }
+
+        /// <summary>
+        /// Determines whether a function contains nonstandard argument grammar, such as TRIM's FROM
+        /// syntax or JSON-specific key/value, null-handling, ordering, wrapper, and RETURNING clauses.
+        /// Such functions must bypass generic comma-separated multiline parameter rendering to
+        /// preserve valid SQL.
+        /// </summary>
+        private static bool UsesSpecialFunctionCallSyntax(FunctionCall node)
+        {
+            string functionName = node.FunctionName.Value.ToUpper(CultureInfo.InvariantCulture);
+            return (functionName == CodeGenerationSupporter.Trim && node.Parameters.Count == 2)
+                || functionName == CodeGenerationSupporter.JsonObject
+                || functionName == CodeGenerationSupporter.JsonObjectAgg
+                || functionName == CodeGenerationSupporter.JsonArray
+                || functionName == CodeGenerationSupporter.JsonArrayAgg
+                || functionName == CodeGenerationSupporter.JsonQuery
+                || functionName == CodeGenerationSupporter.JsonValue;
+        }
+
+        /// <summary>
+        /// Determines whether a parameter list belongs to the nested function tree that should use
+        /// multiline formatting. The option must be enabled, and the list must either be inside an
+        /// already-formatted function call or contain another function in its parameter subtree.
+        /// This overload is also used by LEFT and RIGHT, which have dedicated AST node types.
+        /// </summary>
+        private bool ShouldFormatFunctionCallParameterList<T>(IList<T> parameters) where T : TSqlFragment
+        {
+            return _options.MultilineNestedFunctionCalls
+                && parameters.Count > 0
+                && (_multilineFunctionCallDepth > 0 || ContainsFunctionCall(parameters));
+        }
+
+        /// <summary>
+        /// Anchors the outermost multiline function call so new lines return to its starting column.
+        /// Nested calls reuse that alignment scope.
+        /// </summary>
+        private AlignmentPoint PushFunctionCallAlignmentPoint()
+        {
+            if (_multilineFunctionCallDepth > 0)
+            {
+                return null;
+            }
+
+            var functionCallStart = new AlignmentPoint();
+            MarkAndPushAlignmentPointKeepingNameScope(functionCallStart);
+            return functionCallStart;
+        }
+
+        /// <summary>
+        /// Removes the alignment scope created for an outermost multiline function call.
+        /// </summary>
+        private void PopFunctionCallAlignmentPoint(AlignmentPoint functionCallStart)
+        {
+            if (functionCallStart != null)
+            {
+                PopAlignmentPoint();
+            }
+        }
+
+        /// <summary>
+        /// Generates a multiline parameter list and tracks nested calls. A sole non-function
+        /// parameter remains beside the opening parenthesis.
+        /// </summary>
+        private void GenerateMultilineFunctionCallParameterList<T>(IList<T> parameters) where T : TSqlFragment
+        {
+            _multilineFunctionCallDepth++;
+            try
+            {
+                ListGenerationOption option = ListGenerationOption.CreateMultilineFunctionCallOption(_options);
+                if (parameters.Count == 1 && !ContainsFunctionCall(parameters))
+                {
+                    option.NewLineAfterOpenParenthesis = false;
+                    option.NewLineBeforeCloseParenthesis = false;
+                    option.NewLineBeforeItems = false;
+                    option.MultipleIndentItems = 0;
+                }
+
+                GenerateFragmentList(parameters, option);
+            }
+            finally
+            {
+                _multilineFunctionCallDepth--;
+            }
+        }
+
+        /// <summary>
+        /// Determines whether any parameter subtree contains a supported function-call node.
+        /// </summary>
+        private static bool ContainsFunctionCall<T>(IList<T> parameters) where T : TSqlFragment
+        {
+            var visitor = new FunctionCallFindingVisitor();
+            foreach (T parameter in parameters)
+            {
+                parameter.Accept(visitor);
+                if (visitor.Found)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private sealed class FunctionCallFindingVisitor : TSqlFragmentVisitor
+        {
+            public bool Found { get; private set; }
+
+            public override void Visit(FunctionCall node)
+            {
+                Found = true;
+            }
+
+            public override void ExplicitVisit(LeftFunctionCall node)
+            {
+                Found = true;
+            }
+
+            public override void ExplicitVisit(RightFunctionCall node)
+            {
+                Found = true;
+            }
+        }
+
+        /// <summary>
+        /// Generates a closing parenthesis on a new line when required to terminate a deferred
+        /// trailing single-line comment first.
+        /// </summary>
+        private void GenerateFunctionCallRightParenthesis()
+        {
+            if (HasDeferredTrailingSingleLineComments)
+            {
+                NewLine();
+            }
+
+            GenerateSymbol(TSqlTokenType.RightParenthesis);
         }
 
         public override void ExplicitVisit(JsonKeyValue pair)

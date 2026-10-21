@@ -104,6 +104,16 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
         /// <param name="fragment">The fragment about to be generated.</param>
         protected void EmitGapComments(TSqlFragment fragment)
         {
+            EmitGapComments(fragment, null);
+        }
+
+        /// <summary>
+        /// Emits comments that appear before the current fragment, aligned at the specified point.
+        /// </summary>
+        /// <param name="fragment">The fragment about to be generated.</param>
+        /// <param name="commentAlignmentPoint">The alignment point for each emitted comment.</param>
+        protected void EmitGapComments(TSqlFragment fragment, AlignmentPoint commentAlignmentPoint)
+        {
             if (!_options.PreserveComments || _currentTokenStream == null || fragment == null)
             {
                 return;
@@ -122,6 +132,11 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
                 var token = _currentTokenStream[i];
                 if (IsCommentToken(token) && !_emittedComments.Contains(token))
                 {
+                    if (commentAlignmentPoint != null)
+                    {
+                        Mark(commentAlignmentPoint);
+                    }
+
                     EmitCommentToken(token, isLeading: true);
                     _emittedComments.Add(token);
                     _lastProcessedTokenIndex = i;
@@ -160,6 +175,49 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
                     break;
                 }
             }
+        }
+
+        /// <summary>
+        /// Indicates whether a comment appears next in the original script, before the next SQL
+        /// keyword or expression. Spaces and line breaks between the current position and the
+        /// comment are ignored.
+        /// </summary>
+        /// <example>
+        /// After the select list in:
+        /// <code>
+        /// SELECT a, b
+        /// -- comment
+        /// FROM t
+        /// </code>
+        /// this method returns <see langword="true"/>, allowing the caller to put the comment on
+        /// its own line before emitting the <c>FROM</c> keyword.
+        /// </example>
+        /// <returns>
+        /// <see langword="true"/> when the next meaningful content to preserve is a comment;
+        /// otherwise, <see langword="false"/>.
+        /// </returns>
+        protected bool HasPendingGapComments()
+        {
+            if (!_options.PreserveComments || _currentTokenStream == null)
+            {
+                return false;
+            }
+
+            for (int i = _lastProcessedTokenIndex + 1; i < _currentTokenStream.Count; i++)
+            {
+                var token = _currentTokenStream[i];
+                if (IsCommentToken(token) && !_emittedComments.Contains(token))
+                {
+                    return true;
+                }
+
+                if (token.TokenType != TSqlTokenType.WhiteSpace)
+                {
+                    return false;
+                }
+            }
+
+            return false;
         }
 
         /// <summary>
@@ -428,6 +486,18 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
         }
 
         /// <summary>
+        /// Indicates that a trailing <c>--</c> comment is waiting for the next newline. This allows
+        /// callers that are about to emit closing punctuation, such as a function's right
+        /// parenthesis, to start a new line first so the punctuation is not consumed by the comment.
+        /// </summary>
+        /// <example>
+        /// For <c>TRANSLATE(city, 'a', 'b' -- replacement characters</c>, the closing parenthesis
+        /// must be emitted on the following line; otherwise it becomes part of the comment.
+        /// </example>
+        protected bool HasDeferredTrailingSingleLineComments =>
+            _deferredTrailingSingleLineComments.Count > 0;
+
+        /// <summary>
         /// Updates tracking after generating a fragment.
         /// </summary>
         /// <param name="fragment">The fragment that was just generated.</param>
@@ -446,6 +516,16 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
         /// <param name="fragment">The fragment about to be generated.</param>
         protected void HandleCommentsBeforeFragment(TSqlFragment fragment)
         {
+            HandleCommentsBeforeFragment(fragment, null);
+        }
+
+        /// <summary>
+        /// Handles comments before a fragment and aligns gap comments at the specified point.
+        /// </summary>
+        /// <param name="fragment">The fragment about to be generated.</param>
+        /// <param name="commentAlignmentPoint">The alignment point for gap comments.</param>
+        protected void HandleCommentsBeforeFragment(TSqlFragment fragment, AlignmentPoint commentAlignmentPoint)
+        {
             if (!_options.PreserveComments || _currentTokenStream == null || fragment == null)
             {
                 return;
@@ -459,7 +539,76 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
             }
 
             // Emit any comments in the gap between last processed token and this fragment
-            EmitGapComments(fragment);
+            EmitGapComments(fragment, commentAlignmentPoint);
+        }
+
+        /// <summary>
+        /// Emits comments before a list item, including comments that the parser records at the
+        /// beginning of the item's own source range.
+        /// </summary>
+        /// <param name="fragment">The list item about to be generated.</param>
+        /// <param name="commentAlignmentPoint">The alignment point for emitted comments.</param>
+        protected bool HandleCommentsBeforeListItem(TSqlFragment fragment, AlignmentPoint commentAlignmentPoint)
+        {
+            if (!_options.PreserveComments || _currentTokenStream == null || fragment == null)
+            {
+                return false;
+            }
+
+            int emittedCommentCount = _emittedComments.Count;
+            HandleCommentsBeforeFragment(fragment, commentAlignmentPoint);
+
+            int firstTokenIndex = fragment.FirstTokenIndex;
+            if (firstTokenIndex < 0 && fragment is ProcedureParameter parameter && parameter.VariableName != null)
+            {
+                firstTokenIndex = parameter.VariableName.FirstTokenIndex;
+            }
+
+            if (firstTokenIndex < 0 || firstTokenIndex >= _currentTokenStream.Count)
+            {
+                return _emittedComments.Count > emittedCommentCount;
+            }
+
+            int firstGapTokenIndex = firstTokenIndex;
+            while (firstGapTokenIndex > 0)
+            {
+                var precedingToken = _currentTokenStream[firstGapTokenIndex - 1];
+                if (precedingToken.TokenType != TSqlTokenType.WhiteSpace &&
+                    precedingToken.TokenType != TSqlTokenType.Comma &&
+                    !IsCommentToken(precedingToken))
+                {
+                    break;
+                }
+
+                firstGapTokenIndex--;
+            }
+
+            for (int i = firstGapTokenIndex; i < firstTokenIndex; i++)
+            {
+                var token = _currentTokenStream[i];
+                if (token.TokenType == TSqlTokenType.WhiteSpace || token.TokenType == TSqlTokenType.Comma)
+                {
+                    continue;
+                }
+
+                if (!IsCommentToken(token))
+                {
+                    break;
+                }
+
+                if (!_emittedComments.Contains(token))
+                {
+                    Mark(commentAlignmentPoint);
+                    EmitCommentToken(token, isLeading: true);
+                    _emittedComments.Add(token);
+                    if (i > _lastProcessedTokenIndex)
+                    {
+                        _lastProcessedTokenIndex = i;
+                    }
+                }
+            }
+
+            return _emittedComments.Count > emittedCommentCount;
         }
 
         /// <summary>

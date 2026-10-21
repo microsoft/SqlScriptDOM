@@ -30,6 +30,14 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         /// <summary>
         /// REMOTE was used.
         /// </summary>
-        Remote = 4
+        Remote = 4,
+        /// <summary>
+        /// REPLICATE was used.
+        /// </summary>
+        Replicate = 5,
+        /// <summary>
+        /// REDISTRIBUTE was used.
+        /// </summary>
+        Redistribute = 6
     }
 }

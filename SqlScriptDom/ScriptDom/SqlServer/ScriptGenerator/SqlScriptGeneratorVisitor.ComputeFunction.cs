@@ -10,7 +10,14 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
     {
         public override void ExplicitVisit(ComputeFunction node)
         {
-            ComputeFunctionTypeHelper.Instance.GenerateSourceForOption(_writer, node.ComputeFunctionType);
+            // The aggregate name here is the same built-in as in a SELECT list, so it follows
+            // BuiltInFunctionCasing rather than being emitted as a fixed-case literal.
+            if (!ComputeFunctionTypeHelper.Instance.TryGetOptionIdentifier(node.ComputeFunctionType, out string name) ||
+                !TryGenerateBuiltInFunctionName(name))
+            {
+                ComputeFunctionTypeHelper.Instance.GenerateSourceForOption(_writer, node.ComputeFunctionType);
+            }
+
             GenerateParenthesisedFragmentIfNotNull(node.Expression);
         }
     }

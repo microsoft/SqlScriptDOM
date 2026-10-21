@@ -3,11 +3,11 @@ AS
 BEGIN
     INSERT INTO t1
     VALUES (1, 2),
-    (DEFAULT, 0),
-    (NULL, NULL);
+           (DEFAULT, 0),
+           (NULL, NULL);
     INSERT INTO t2
     VALUES ('aaa', 'bbb', 1),
-    ('ccc', 'ddd', 20);
+           ('ccc', 'ddd', 20);
 END
 
 
@@ -32,5 +32,5 @@ CREATE PROCEDURE p1
 AS
 BEGIN
     INSERT INTO t1 ($ACTION, $CUID, $ROWGUID)
-    VALUES        (1, 2, 3);
+    VALUES         (1, 2, 3);
 END

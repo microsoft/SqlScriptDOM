@@ -30,6 +30,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
 
             public Boolean NewLineBeforeFirstItem { get; set; }
             public Boolean NewLineBeforeItems { get; set; }
+            public Boolean AlignItemsForNewLines { get; set; }
             public int MultipleIndentItems { get; set; }
 
             public static readonly ListGenerationOption MultipleLineSelectElementOption = new ListGenerationOption()
@@ -80,6 +81,25 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
                 option.Separator = ListGenerationOption.SeparatorType.Comma;
 
                 return option;
+            }
+
+            public static ListGenerationOption CreateMultilineFunctionCallOption(SqlScriptGeneratorOptions formatting)
+            {
+                return new ListGenerationOption
+                {
+                    Parenthesised = true,
+                    AlwaysGenerateParenthesis = true,
+                    NewLineBeforeOpenParenthesis = formatting.NewLineBeforeOpenParenthesisInMultilineList,
+                    NewLineAfterOpenParenthesis = true,
+                    IndentParentheses = false,
+                    NewLineBeforeCloseParenthesis = formatting.NewLineBeforeCloseParenthesisInMultilineList,
+                    AlignParentheses = false,
+                    NewLineBeforeItems = true,
+                    NewLineBeforeFirstItem = false,
+                    AlignItemsForNewLines = true,
+                    MultipleIndentItems = 1,
+                    Separator = SeparatorType.Comma,
+                };
             }
        }
 

@@ -2934,6 +2934,20 @@ ADD FILE
         [TestMethod]
         [Priority(0)]
         [SqlStudioTestCategory(Category.UnitTest)]
+        public void CreateDatabaseCollateWithAzureOptionsDownlevelErrorTest()
+        {
+            // TSql110 wires azureOptions and collationOpt as mutually-exclusive alternatives, so COLLATE
+            // and parenthesized Azure edition options cannot coexist in either order (see TSql110.g createDatabase).
+            ParserTestUtils.ErrorTest110("CREATE DATABASE [db1] COLLATE SQL_Latin1_General_CP1_CI_AS (EDITION = 'Standard')",
+                new ParserErrorInfo(60, "SQL46010", "EDITION"));
+            ParserTestUtils.ErrorTest110("CREATE DATABASE d1 (EDITION = 'business') COLLATE SQL_Latin1_General_CP1_CI_AS",
+                new ParserErrorInfo(42, "SQL46010", "COLLATE"));
+        }
+
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
         public void SQL46063Test()
         {
             // Empty strings in file options are not allowed
@@ -7258,6 +7272,56 @@ WHEN NOT MATCHED BY SOURCE THEN DELETE OUTPUT inserted.*, deleted.*;";
         }
 
         /// <summary>
+        /// Negative tests for join hints and query hints in Fabric DW.
+        /// </summary>
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void QueryHintsNegativeTestsFabricDW()
+        {
+            // REMOTE join hint is not supported in Fabric DW
+            //
+            string remoteJoinHint = "SELECT * FROM t1 INNER REMOTE JOIN t2 ON t1.c1 = t2.c1";
+            ParserTestUtils.ErrorTestFabricDW(remoteJoinHint, new ParserErrorInfo(remoteJoinHint.IndexOf("REMOTE"), "SQL46010", "REMOTE"));
+
+            // LOCAL-prefixed join hints are not supported in Fabric DW
+            //
+            string localHashJoinHint = "SELECT * FROM t1 INNER LOCAL HASH JOIN t2 ON t1.c1 = t2.c1";
+            ParserTestUtils.ErrorTestFabricDW(localHashJoinHint, new ParserErrorInfo(localHashJoinHint.IndexOf("HASH"), "SQL46010", "HASH"));
+
+            string localMergeJoinHint = "SELECT * FROM t1 INNER LOCAL MERGE JOIN t2 ON t1.c1 = t2.c1";
+            ParserTestUtils.ErrorTestFabricDW(localMergeJoinHint, new ParserErrorInfo(localMergeJoinHint.IndexOf("MERGE"), "SQL46010", "MERGE"));
+
+            // Only REDISTRIBUTE accepts a (columns_count) argument
+            //
+            string replicateWithCount = "SELECT * FROM t1 INNER REPLICATE (2) JOIN t2 ON t1.c1 = t2.c1";
+            ParserTestUtils.ErrorTestFabricDW(replicateWithCount, new ParserErrorInfo(replicateWithCount.IndexOf("REPLICATE"), "SQL46005", "REDISTRIBUTE", "REPLICATE"));
+
+            // REDISTRIBUTE columns count must be an integer literal
+            //
+            string redistributeNonInteger = "SELECT * FROM t1 INNER REDISTRIBUTE ('a') JOIN t2 ON t1.c1 = t2.c1";
+            ParserTestUtils.ErrorTestFabricDW(redistributeNonInteger, new ParserErrorInfo(redistributeNonInteger.IndexOf("'a'"), "SQL46010", "'a'"));
+
+            // FORCE DISTRIBUTED PLAN must start with FORCE
+            //
+            string keepDistributedPlan = "SELECT c1 FROM t1 OPTION (KEEP DISTRIBUTED PLAN)";
+            ParserTestUtils.ErrorTestFabricDW(keepDistributedPlan, new ParserErrorInfo(keepDistributedPlan.IndexOf("KEEP"), "SQL46010", "KEEP"));
+
+            // FORCE SINGLE NODE PLAN requires the NODE keyword
+            //
+            string forceSingleNodesPlan = "SELECT c1 FROM t1 OPTION (FORCE SINGLE NODES PLAN)";
+            ParserTestUtils.ErrorTestFabricDW(forceSingleNodesPlan, new ParserErrorInfo(forceSingleNodesPlan.IndexOf("NODES"), "SQL46005", "NODE", "NODES"));
+
+            // FOR TIMESTAMP AS OF requires the TIMESTAMP keyword and a string literal
+            //
+            string forTimestamps = "SELECT c1 FROM t1 OPTION (FOR TIMESTAMPS AS OF '2024-05-01T10:00:00')";
+            ParserTestUtils.ErrorTestFabricDW(forTimestamps, new ParserErrorInfo(forTimestamps.IndexOf("TIMESTAMPS"), "SQL46005", "TIMESTAMP", "TIMESTAMPS"));
+
+            string forTimestampNonString = "SELECT c1 FROM t1 OPTION (FOR TIMESTAMP AS OF 123)";
+            ParserTestUtils.ErrorTestFabricDW(forTimestampNonString, new ParserErrorInfo(forTimestampNonString.IndexOf("123"), "SQL46010", "123"));
+        }
+
+        /// <summary>
         /// Negative tests for Scalar Functions in Fabric DW.
         /// </summary>
         [TestMethod]
@@ -7281,6 +7345,80 @@ WHEN NOT MATCHED BY SOURCE THEN DELETE OUTPUT inserted.*, deleted.*;";
                                             ";
             errorOffSet = identityColumnSyntax2.IndexOf(token) + token.Length;
             ParserTestUtils.ErrorTestFabricDW(identityColumnSyntax2, new ParserErrorInfo(errorOffSet, "SQL46010", "("));
+        }
+
+        /// <summary>
+        /// Negative tests for the modern GROUP BY ALL (no explicit column list) syntax on Fabric DW.
+        /// The grammar accepts GROUP BY ALL with no columns, but WITH CUBE / WITH ROLLUP are rejected
+        /// at parse time (SQL46084), matching the source engine behavior.
+        /// </summary>
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void ModernGroupByAllNegativeTestsFabricDW()
+        {
+            // GROUP BY ALL (no columns) cannot be combined with WITH CUBE.
+            string withCube = "SELECT City, COUNT(*) AS NumEmps FROM dbo.Employees GROUP BY ALL WITH CUBE";
+            ParserTestUtils.ErrorTestFabricDW(withCube, new ParserErrorInfo(withCube.IndexOf("CUBE"), "SQL46084"));
+
+            // GROUP BY ALL (no columns) cannot be combined with WITH ROLLUP.
+            string withRollup = "SELECT City, COUNT(*) AS NumEmps FROM dbo.Employees GROUP BY ALL WITH ROLLUP";
+            ParserTestUtils.ErrorTestFabricDW(withRollup, new ParserErrorInfo(withRollup.IndexOf("ROLLUP"), "SQL46084"));
+
+            // GROUP BY ALL cannot be combined with a GROUPING SETS specification.
+            string groupingSets = "SELECT City, COUNT(*) AS NumEmps FROM dbo.Employees GROUP BY ALL GROUPING SETS ((City), ())";
+            ParserTestUtils.ErrorTestFabricDW(groupingSets, new ParserErrorInfo(groupingSets.IndexOf("GROUPING"), "SQL46084"));
+        }
+
+        /// <summary>
+        /// Negative tests for the ORDER BY ALL syntax on Fabric DW. ORDER BY ALL must stand alone
+        /// at the query / subquery level; mixing it with explicit items, or using it inside an
+        /// OVER() window clause or a WITHIN GROUP ordered-set aggregate, is rejected at parse time.
+        /// </summary>
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void OrderByAllNegativeTestsFabricDW()
+        {
+            // ALL followed by an explicit column is a syntax error.
+            string allThenColumn = "SELECT c1, c2 FROM t1 ORDER BY ALL, c1";
+            ParserTestUtils.ErrorTestFabricDW(allThenColumn, new ParserErrorInfo(allThenColumn.IndexOf(",", allThenColumn.IndexOf("ALL")), "SQL46010", ","));
+
+            // An explicit column followed by ALL is a syntax error.
+            string columnThenAll = "SELECT c1, c2 FROM t1 ORDER BY c1, ALL";
+            ParserTestUtils.ErrorTestFabricDW(columnThenAll, new ParserErrorInfo(columnThenAll.LastIndexOf("ALL"), "SQL46010", "ALL"));
+
+            // ORDER BY ALL is not allowed inside an OVER() window clause.
+            string inOver = "SELECT ROW_NUMBER() OVER (ORDER BY ALL) FROM t1";
+            ParserTestUtils.ErrorTestFabricDW(inOver, new ParserErrorInfo(inOver.IndexOf("ALL"), "SQL46010", "ALL"));
+
+            // ORDER BY ALL is not allowed inside a WITHIN GROUP ordered-set aggregate.
+            string inWithinGroup = "SELECT STRING_AGG(c2, ',') WITHIN GROUP (ORDER BY ALL) FROM t1";
+            ParserTestUtils.ErrorTestFabricDW(inWithinGroup, new ParserErrorInfo(inWithinGroup.LastIndexOf("ALL"), "SQL46010", "ALL"));
+
+            // ORDER BY ALL is not allowed inside an OVER() window clause with PARTITION BY.
+            string inOverPartition = "SELECT ROW_NUMBER() OVER (PARTITION BY c2 ORDER BY ALL) FROM t1";
+            ParserTestUtils.ErrorTestFabricDW(inOverPartition, new ParserErrorInfo(inOverPartition.LastIndexOf("ALL"), "SQL46010", "ALL"));
+
+            // ORDER BY ALL inside a derived table without TOP / OFFSET / FOR is invalid (SQL46047),
+            // exactly like any other ORDER BY in that position.
+            string subqueryNoTop = "SELECT * FROM (SELECT c1, c2 FROM t1 ORDER BY ALL) AS sub";
+            ParserTestUtils.ErrorTestFabricDW(subqueryNoTop, new ParserErrorInfo(subqueryNoTop.IndexOf("SELECT", 1), "SQL46047"));
+
+            // ORDER BY ALL is not allowed inside an OVER() window clause with a window frame (ROWS BETWEEN).
+            string inOverFrame = "SELECT SUM(c1) OVER (ORDER BY ALL ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) FROM t1";
+            ParserTestUtils.ErrorTestFabricDW(inOverFrame, new ParserErrorInfo(inOverFrame.IndexOf("ALL"), "SQL46010", "ALL"));
+
+            // ORDER BY ALL is not allowed inside a named WINDOW definition.
+            string inNamedWindow = "SELECT ROW_NUMBER() OVER w FROM t1 WINDOW w AS (ORDER BY ALL)";
+            ParserTestUtils.ErrorTestFabricDW(inNamedWindow, new ParserErrorInfo(inNamedWindow.LastIndexOf("ALL"), "SQL46010", "ALL"));
+
+            // ORDER BY ALL is not allowed inside a named WINDOW definition with PARTITION BY.
+            string inNamedWindowPartition = "SELECT ROW_NUMBER() OVER w FROM t1 WINDOW w AS (PARTITION BY c2 ORDER BY ALL)";
+            ParserTestUtils.ErrorTestFabricDW(inNamedWindowPartition, new ParserErrorInfo(inNamedWindowPartition.LastIndexOf("ALL"), "SQL46010", "ALL"));
+
+            string inJsonArrayAgg = "SELECT JSON_ARRAYAGG(c1 ORDER BY ALL) FROM t1";
+            ParserTestUtils.ErrorTestFabricDW(inJsonArrayAgg, new ParserErrorInfo(inJsonArrayAgg.IndexOf("ORDER"), "SQL46010", "ORDER"));
         }
 
         /// <summary>
@@ -7827,6 +7965,11 @@ WHEN NOT MATCHED BY SOURCE THEN DELETE OUTPUT inserted.*, deleted.*;";
             ParserTestUtils.ErrorTestFabricDW(
                 "SELECT AI_ANALYZE_SENTIMENT('1', '2')",
                 new ParserErrorInfo(31, "SQL46010", ","));
+
+            // ON ERROR clause must follow the last argument
+            ParserTestUtils.ErrorTestFabricDW(
+                "SELECT AI_ANALYZE_SENTIMENT('1' NULL ON ERROR, '2')",
+                new ParserErrorInfo(45, "SQL46010", ","));
         }
 
         /// <summary>
@@ -7847,10 +7990,19 @@ WHEN NOT MATCHED BY SOURCE THEN DELETE OUTPUT inserted.*, deleted.*;";
                 "SELECT AI_CLASSIFY('1')",
                 new ParserErrorInfo(22, "SQL46010", ")"));
 
+            // Up to 20 labels are allowed
+            ParserTestUtils.ErrorTestFabricDW(
+                $"SELECT AI_CLASSIFY({string.Join(", ", Enumerable.Repeat("'1'", 21))} NULL ON ERROR)");
+
             // Too many arguments
             ParserTestUtils.ErrorTestFabricDW(
-                $"SELECT AI_CLASSIFY({string.Join(", ", Enumerable.Repeat("'1'", 23))})",
-                new ParserErrorInfo(129, "SQL46010", "AI_CLASSIFY"));
+                $"SELECT AI_CLASSIFY({string.Join(", ", Enumerable.Repeat("'1'", 22))})",
+                new ParserErrorInfo(124, "SQL46010", "AI_CLASSIFY"));
+
+            // ON ERROR clause must follow the last argument
+            ParserTestUtils.ErrorTestFabricDW(
+                "SELECT AI_CLASSIFY('1', '2', '3' NULL ON ERROR, '4')",
+                new ParserErrorInfo(46, "SQL46010", ","));
         }
 
         /// <summary>
@@ -7871,10 +8023,19 @@ WHEN NOT MATCHED BY SOURCE THEN DELETE OUTPUT inserted.*, deleted.*;";
                 "SELECT AI_EXTRACT('1')",
                 new ParserErrorInfo(21, "SQL46010", ")"));
 
+            // Up to 20 labels are allowed
+            ParserTestUtils.ErrorTestFabricDW(
+                $"SELECT AI_EXTRACT({string.Join(", ", Enumerable.Repeat("'1'", 21))} NULL ON ERROR)");
+
             // Too many arguments
             ParserTestUtils.ErrorTestFabricDW(
-                $"SELECT AI_EXTRACT({string.Join(", ", Enumerable.Repeat("'1'", 23))})",
-                new ParserErrorInfo(128, "SQL46010", "AI_EXTRACT"));
+                $"SELECT AI_EXTRACT({string.Join(", ", Enumerable.Repeat("'1'", 22))})",
+                new ParserErrorInfo(123, "SQL46010", "AI_EXTRACT"));
+
+            // ON ERROR clause must follow the last argument
+            ParserTestUtils.ErrorTestFabricDW(
+                "SELECT AI_EXTRACT('1', '2', '3' NULL ON ERROR, '4')",
+                new ParserErrorInfo(45, "SQL46010", ","));
         }
 
         /// <summary>
@@ -7894,6 +8055,11 @@ WHEN NOT MATCHED BY SOURCE THEN DELETE OUTPUT inserted.*, deleted.*;";
             ParserTestUtils.ErrorTestFabricDW(
                 "SELECT AI_FIX_GRAMMAR('1', '2')",
                 new ParserErrorInfo(25, "SQL46010", ","));
+
+            // ON ERROR clause must follow the last argument
+            ParserTestUtils.ErrorTestFabricDW(
+                "SELECT AI_FIX_GRAMMAR('1' NULL ON ERROR, '2')",
+                new ParserErrorInfo(39, "SQL46010", ","));
         }
 
         /// <summary>
@@ -7913,6 +8079,11 @@ WHEN NOT MATCHED BY SOURCE THEN DELETE OUTPUT inserted.*, deleted.*;";
             ParserTestUtils.ErrorTestFabricDW(
                 "SELECT AI_GENERATE_RESPONSE('1', '2', '3')",
                 new ParserErrorInfo(36, "SQL46010", ","));
+
+            // ON ERROR clause must follow the last argument
+            ParserTestUtils.ErrorTestFabricDW(
+                "SELECT AI_GENERATE_RESPONSE('1' NULL ON ERROR, '2')",
+                new ParserErrorInfo(45, "SQL46010", ","));
         }
 
         /// <summary>
@@ -7932,6 +8103,11 @@ WHEN NOT MATCHED BY SOURCE THEN DELETE OUTPUT inserted.*, deleted.*;";
             ParserTestUtils.ErrorTestFabricDW(
                 "SELECT AI_SUMMARIZE('1', '2')",
                 new ParserErrorInfo(23, "SQL46010", ","));
+
+            // ON ERROR clause must follow the last argument
+            ParserTestUtils.ErrorTestFabricDW(
+                "SELECT AI_SUMMARIZE('1' NULL ON ERROR, '2')",
+                new ParserErrorInfo(37, "SQL46010", ","));
         }
 
         /// <summary>
@@ -7956,6 +8132,34 @@ WHEN NOT MATCHED BY SOURCE THEN DELETE OUTPUT inserted.*, deleted.*;";
             ParserTestUtils.ErrorTestFabricDW(
                 "SELECT AI_TRANSLATE('1', '2', '3')",
                 new ParserErrorInfo(28, "SQL46010", ","));
+
+            // DEFAULT requires a string literal
+            ParserTestUtils.ErrorTestFabricDW(
+                "SELECT AI_TRANSLATE('hello', 'es' DEFAULT ON ERROR)",
+                new ParserErrorInfo(42, "SQL46010", "ON"));
+
+            ParserTestUtils.ErrorTestFabricDW(
+                "SELECT AI_TRANSLATE('hello', 'es' DEFAULT @fallback ON ERROR)",
+                new ParserErrorInfo(42, "SQL46010", "@fallback"));
+
+            // The behavior must be followed by ON ERROR
+            ParserTestUtils.ErrorTestFabricDW(
+                "SELECT AI_TRANSLATE('hello', 'es' NULL)",
+                new ParserErrorInfo(38, "SQL46010", ")"));
+
+            ParserTestUtils.ErrorTestFabricDW(
+                "SELECT AI_TRANSLATE('hello', 'es' NULL ON NULL)",
+                new ParserErrorInfo(42, "SQL46010", "NULL"));
+
+            // Only ERROR, NULL, or DEFAULT are valid behaviors
+            ParserTestUtils.ErrorTestFabricDW(
+                "SELECT AI_TRANSLATE('hello', 'es' IGNORE ON ERROR)",
+                new ParserErrorInfo(34, "SQL46005", "ERROR", "IGNORE"));
+
+            // Only one ON ERROR clause is allowed
+            ParserTestUtils.ErrorTestFabricDW(
+                "SELECT AI_TRANSLATE('hello', 'es' NULL ON ERROR NULL ON ERROR)",
+                new ParserErrorInfo(48, "SQL46010", "NULL"));
         }
 
         /// <summary>
@@ -8214,6 +8418,36 @@ WHEN NOT MATCHED BY SOURCE THEN DELETE OUTPUT inserted.*, deleted.*;";
             ParserTestUtils.ErrorTest180(
                 "SELECT TOP 10 WITH TIES WITH APPROXIMATE * FROM MyTable ORDER BY id;",
                 new ParserErrorInfo(24, "SQL46010", "WITH"));
+        }
+
+        /// <summary>
+        /// Negative test for Fabric Query Hints - syntax error (TSql170)
+        /// Verifies malformed hints produce expected parser errors
+        /// </summary>
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void FabricQueryHintsErrorTest170()
+        {
+            // Missing NODE keyword in FORCE SINGLE NODE PLAN
+            ParserTestUtils.ErrorTest170(
+                "SELECT OrderDateKey FROM FactInternetSales OPTION (FORCE SINGLE PLAN);",
+                new ParserErrorInfo(64, "SQL46010", "PLAN"));
+
+            // Missing PLAN keyword in FORCE DISTRIBUTED PLAN
+            ParserTestUtils.ErrorTest170(
+                "SELECT OrderDateKey FROM FactInternetSales OPTION (FORCE DISTRIBUTED);",
+                new ParserErrorInfo(68, "SQL46010", ")"));
+
+            // Non-string literal in FOR TIMESTAMP AS OF
+            ParserTestUtils.ErrorTest170(
+                "SELECT OrderDateKey FROM FactInternetSales OPTION (FOR TIMESTAMP AS OF 12345);",
+                new ParserErrorInfo(71, "SQL46010", "12345"));
+
+            // Missing OF keyword in FOR TIMESTAMP AS OF
+            ParserTestUtils.ErrorTest170(
+                "SELECT OrderDateKey FROM FactInternetSales OPTION (FOR TIMESTAMP AS '2024-03-13T19:39:35.28');",
+                new ParserErrorInfo(68, "SQL46010", "'2024-03-13T19:39:35.28'"));
         }
     }
 }

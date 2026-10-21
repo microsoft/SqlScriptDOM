@@ -25,7 +25,8 @@ SELECT *
 FROM OPENJSON (@var, N'$') WITH (a INT, b VARCHAR (400), c NVARCHAR (MAX) COLLATE Latin1_General_Bin2 N'$.b.c');
 
 SELECT *
-FROM Orders CROSS APPLY OPENJSON (Orders.Data, N'$.orderLineItems') WITH (ProductId VARCHAR (200) N'$.productId');
+FROM Orders
+     CROSS APPLY OPENJSON (Orders.Data, N'$.orderLineItems') WITH (ProductId VARCHAR (200) N'$.productId');
 
 SELECT *
 FROM OPENJSON (col, N'$') WITH (a INT, b VARCHAR (400), c NVARCHAR (MAX) COLLATE Latin1_General_Bin2 N'$.b.c');
@@ -58,16 +59,20 @@ SELECT *
 FROM string_split (NULL, N',');
 
 SELECT t2.value
-FROM String_Split ('Lorem-ipsum dolor-sit amet.', '-') AS t1 CROSS APPLY String_Split (t1.value, ' ') AS t2;
+FROM String_Split ('Lorem-ipsum dolor-sit amet.', '-') AS t1
+     CROSS APPLY String_Split (t1.value, ' ') AS t2;
 
 SELECT t2.ordinal
-FROM String_Split ('Lorem-ipsum dolor-sit amet.', '-', 1) AS t1 CROSS APPLY String_Split (t1.ordinal, ' ') AS t2;
+FROM String_Split ('Lorem-ipsum dolor-sit amet.', '-', 1) AS t1
+     CROSS APPLY String_Split (t1.ordinal, ' ') AS t2;
 
 SELECT value
-FROM (VALUES ('Lorem ipsum'), ('dolor sit amet.')) AS x(col) CROSS APPLY STRING_SPLIT (col, ',');
+FROM (VALUES ('Lorem ipsum'), ('dolor sit amet.')) AS x(col)
+     CROSS APPLY STRING_SPLIT (col, ',');
 
 SELECT ordinal
-FROM (VALUES ('Lorem ipsum'), ('dolor sit amet.')) AS x(col) CROSS APPLY STRING_SPLIT (col, ',', 1);
+FROM (VALUES ('Lorem ipsum'), ('dolor sit amet.')) AS x(col)
+     CROSS APPLY STRING_SPLIT (col, ',', 1);
 
 SELECT *
 FROM [STRING_SPLIT] (@var, @sep);

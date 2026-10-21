@@ -133,13 +133,17 @@ script returns [TSqlScript vResult = this.FragmentFactory.CreateFragment<TSqlScr
         (
             Go
             {
+                vResult.TrailingGoCount++;
                 ResetQuotedIdentifiersSettingToInitial();
                 ThrowPartialAstIfPhaseOne(null);
             }
             vCurrentBatch = batch
             {
                 if (vCurrentBatch != null)
+                {
                     AddAndUpdateTokenInfo(vResult, vResult.Batches, vCurrentBatch);
+                    vResult.TrailingGoCount = 0;
+                }
             }
 
         )*
@@ -4496,6 +4500,13 @@ createDatabase returns [CreateDatabaseStatement vResult = FragmentFactory.Create
           )?
         recoveryUnitList[vResult]
         collationOpt[vResult]
+        (
+            // Azure SQL: parenthesized edition options may follow COLLATE.
+            // Limitation: each azureOptions invocation checks SQL46049 duplicates only within its own
+            // group, so an option repeated across the pre- and post-COLLATE groups is not flagged.
+            {NextTokenMatches(CodeGenerationSupporter.MaxSize,2) || NextTokenMatches(CodeGenerationSupporter.Edition,2) || NextTokenMatches(CodeGenerationSupporter.ServiceObjective,2)}?
+            azureOptions[vResult, vResult.Options]
+        )?
         (
             dbAddendums[vResult]
         )?
@@ -22164,6 +22175,7 @@ hint returns [OptimizerHint vResult]
     | vResult = optimizeForOptimizerHint
     | vResult = tableHintsOptimizerHint
     | vResult = useHintClause
+    | vResult = forTimestampAsOfOptimizerHint
     ;
 
 tableHintsOptimizerHint returns [TableHintsOptimizerHint vResult = FragmentFactory.CreateFragment<TableHintsOptimizerHint>()]
@@ -22205,12 +22217,31 @@ simpleOptimizerHint returns [OptimizerHint vResult = FragmentFactory.CreateFragm
             vResult.HintKind = OptimizerHintKind.MergeUnion;
             UpdateTokenInfo(vResult, tMergeUnion); 
         }
-    | tForce:Identifier Order
-        {
-            Match(tForce, CodeGenerationSupporter.Force);
-            vResult.HintKind = OptimizerHintKind.ForceOrder;
-            UpdateTokenInfo(vResult, tForce); 
-        }
+    | {NextTokenMatches(CodeGenerationSupporter.Force)}?
+      tForce:Identifier (
+          Order
+          {
+              Match(tForce, CodeGenerationSupporter.Force);
+              vResult.HintKind = OptimizerHintKind.ForceOrder;
+              UpdateTokenInfo(vResult, tForce);
+          }
+          |
+          Distributed tPlan1:Plan
+          {
+              Match(tForce, CodeGenerationSupporter.Force);
+              vResult.HintKind = OptimizerHintKind.ForceDistributedPlan;
+              UpdateTokenInfo(vResult, tForce);
+          }
+          |
+          tSingle:Identifier tNode:Identifier tPlan2:Plan
+          {
+              Match(tForce, CodeGenerationSupporter.Force);
+              Match(tSingle, CodeGenerationSupporter.Single);
+              Match(tNode, CodeGenerationSupporter.GraphNode); // NODE
+              vResult.HintKind = OptimizerHintKind.ForceSingleNodePlan;
+              UpdateTokenInfo(vResult, tForce);
+          }
+      )
     | tHash:Identifier Group
         {
             Match(tHash, CodeGenerationSupporter.Hash);
@@ -22385,6 +22416,19 @@ useHintClause returns [UseHintList vResult = FragmentFactory.CreateFragment<UseH
             UpdateTokenInfo(vResult, tRParen);
         }
 
+    ;
+
+forTimestampAsOfOptimizerHint returns [LiteralOptimizerHint vResult = FragmentFactory.CreateFragment<LiteralOptimizerHint>()]
+{
+    Literal vValue;
+}
+    : tFor:For tTimestamp:Identifier tAs:As tOf:Of vValue = stringLiteral
+        {
+            Match(tTimestamp, CodeGenerationSupporter.TimeStamp);
+            vResult.HintKind = OptimizerHintKind.ForTimestampAsOf;
+            vResult.Value = vValue;
+            UpdateTokenInfo(vResult, tFor);
+        }
     ;
 
 createRuleStatement returns [CreateRuleStatement vResult = this.FragmentFactory.CreateFragment<CreateRuleStatement>()]
@@ -29743,6 +29787,11 @@ regularColumnBody [IndexAffectingStatement statementType, ColumnDefinition vPare
                     vParent.StorageOptions = vStorageOptions;
                 }
             )?
+            // MASKED WITH may follow the storage options (documented SPARSE-before-MASKED order)
+            (
+                {NextTokenMatches(CodeGenerationSupporter.Masked)}?
+                maskedClause[vParent]
+            )?
         )?
         (
             {NextTokenMatches(CodeGenerationSupporter.Hidden)}?
@@ -33425,7 +33474,7 @@ regularBuiltInFunctionCall [FunctionCall vParent]
             UpdateTokenInfo(vParent,tRParen);
         }
         (
-            {(LA(1)==Over && (LA(2)==LeftParenthesis || LA(2)==Identifier)) ||
+            {(LA(1)==Over && (LA(2)==LeftParenthesis || LA(2)==Identifier || LA(2)==QuotedIdentifier)) ||
              (NextTokenMatches(CodeGenerationSupporter.Within) && LA(2)==Group && LA(3)==LeftParenthesis) }?
             withinGroupOrOverClause [vParent]
         )?
@@ -33456,7 +33505,7 @@ ignoreRespectNullsRegularBuiltInFunctionCall [FunctionCall vParent]
             ignoreRespectNulls [vParent]
         )?
         (
-            {(LA(1)==Over && (LA(2)==LeftParenthesis || LA(2)==Identifier)) ||
+            {(LA(1)==Over && (LA(2)==LeftParenthesis || LA(2)==Identifier || LA(2)==QuotedIdentifier)) ||
              (NextTokenMatches(CodeGenerationSupporter.Within) && LA(2)==Group && LA(3)==LeftParenthesis) }?
             withinGroupOrOverClause [vParent]
         )?

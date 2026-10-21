@@ -25,6 +25,7 @@ namespace SqlStudio.Tests.UTSqlScriptDom
             new ParserTest170("JsonObjectAggOverClause170.sql", nErrors80: 4, nErrors90: 4, nErrors100: 4, nErrors110: 4, nErrors120: 4, nErrors130: 4, nErrors140: 4, nErrors150: 4, nErrors160: 4),
             new ParserTest170("ComplexJsonObjectFunctionTests170.sql"),
             new ParserTest170("TrimFromReturnTests160.sql"),
+            new ParserTest170("WindowClauseQuotedNameTests160.sql"),
             new ParserTest170("AiGenerateEmbeddingsTests170.sql", nErrors80: 14, nErrors90: 11, nErrors100: 11, nErrors110: 11, nErrors120: 11, nErrors130: 11, nErrors140: 11, nErrors150: 11, nErrors160: 11),
             new ParserTest170("CreateExternalModelStatementTests170.sql", nErrors80: 2, nErrors90: 2, nErrors100: 2, nErrors110: 2, nErrors120: 2, nErrors130: 4, nErrors140: 4, nErrors150: 4, nErrors160: 4),
             new ParserTest170("AlterExternalModelStatementTests170.sql", nErrors80: 2, nErrors90: 2, nErrors100: 2, nErrors110: 2, nErrors120: 2, nErrors130: 5, nErrors140: 5, nErrors150: 5, nErrors160: 5),
@@ -41,6 +42,7 @@ namespace SqlStudio.Tests.UTSqlScriptDom
             new ParserTest170("VectorSearchCrossApplyTests170.sql", nErrors80: 1, nErrors90: 1, nErrors100: 1, nErrors110: 1, nErrors120: 1, nErrors130: 1, nErrors140: 1, nErrors150: 1, nErrors160: 1),
             // Complex query with VECTOR types - parses syntactically in all versions (optimization fix), but VECTOR type only valid in TSql170
             new ParserTest170("ComplexQueryTests170.sql"),
+            new ParserTest170("FabricQueryHints170.sql", nErrors80: 4, nErrors90: 4, nErrors100: 4, nErrors110: 4, nErrors120: 4, nErrors130: 4, nErrors140: 4, nErrors150: 4, nErrors160: 4),
             // Comment preservation tests - basic SQL syntax works in all versions
             new ParserTest170("SingleLineCommentTests170.sql"),
             new ParserTest170("MultiLineCommentTests170.sql")

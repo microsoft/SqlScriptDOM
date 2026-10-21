@@ -13,6 +13,14 @@ SELECT AI_TRANSLATE(@s, @lang);
 
 SELECT AI_TRANSLATE(@s + 'a', @lang + 'a');
 
+SELECT AI_TRANSLATE('Hello world', 'es' ERROR ON ERROR);
+
+SELECT AI_TRANSLATE('Hello world', 'es' NULL ON ERROR);
+
+SELECT AI_TRANSLATE('Hello world', 'es' DEFAULT 'Translation unavailable' ON ERROR);
+
+SELECT AI_TRANSLATE(@s, @lang DEFAULT N'Translation unavailable' ON ERROR);
+
 SELECT *
 FROM AI_TRANSLATE((SELECT t.text_col
                    FROM dbo.Texts AS t), 'e' + 's');
@@ -24,7 +32,7 @@ CREATE OR ALTER FUNCTION dbo.fx
 RETURNS NVARCHAR (MAX)
 AS
 BEGIN
-    RETURN (AI_TRANSLATE(@s, 'fr'));
+    RETURN (AI_TRANSLATE(@s, 'fr' DEFAULT N'Translation unavailable' ON ERROR));
 END
 
 

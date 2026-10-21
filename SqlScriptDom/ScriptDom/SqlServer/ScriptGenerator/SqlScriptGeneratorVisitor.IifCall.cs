@@ -11,7 +11,10 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
 	{
 		public override void ExplicitVisit(IIfCall node)
 		{
-			GenerateIdentifier(CodeGenerationSupporter.IIf);
+			if (!TryGenerateBuiltInFunctionName(CodeGenerationSupporter.IIf))
+			{
+				GenerateIdentifier(CodeGenerationSupporter.IIf);
+			}
 
 			GenerateSpaceAndSymbol(TSqlTokenType.LeftParenthesis);
 			GenerateFragmentIfNotNull(node.Predicate);

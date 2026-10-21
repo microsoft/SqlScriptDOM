@@ -68,7 +68,7 @@ namespace antlr
 		}
 		
 		/*Mark another character for deferred consumption */
-		public virtual char consume()
+		public virtual int consume()
 		{
 			numToConsume++;
 			return LA(1);
@@ -107,10 +107,13 @@ namespace antlr
 		}
 		
 		/*Get a lookahead character */
-		public virtual char LA(int i)
+		public virtual int LA(int i)
 		{
 			fill(i);
-			return (char) queue[markerOffset + i - 1];
+			// Entries are boxed char values for real input and a boxed int sentinel
+			// (CharScanner.EOF_CHAR) for end-of-input; Convert.ToInt32 handles both so a
+			// real U+FFFF (65535) stays distinct from the EOF sentinel (65536).
+			return Convert.ToInt32(queue[markerOffset + i - 1]);
 		}
 		
 		/*Return an integer marker that can be used to rewind the buffer to

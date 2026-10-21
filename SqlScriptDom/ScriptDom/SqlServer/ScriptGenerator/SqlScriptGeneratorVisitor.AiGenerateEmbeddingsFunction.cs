@@ -18,7 +18,10 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
             }
 
             // Emit function name without extra space before '('
-            GenerateIdentifierWithoutCasing(CodeGenerationSupporter.AIGenerateEmbeddings);
+            if (!TryGenerateBuiltInFunctionName(CodeGenerationSupporter.AIGenerateEmbeddings))
+            {
+                GenerateIdentifierWithoutCasing(CodeGenerationSupporter.AIGenerateEmbeddings);
+            }
             GenerateSymbol(TSqlTokenType.LeftParenthesis);
 
             // Emit input expression

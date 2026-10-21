@@ -11,7 +11,10 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
     {
         public override void ExplicitVisit(ConvertCall node)
         {
-            GenerateKeyword(TSqlTokenType.Convert);
+            if (!TryGenerateBuiltInFunctionName(TSqlTokenType.Convert))
+            {
+                GenerateKeyword(TSqlTokenType.Convert);
+            }
 
             GenerateSpaceAndSymbol(TSqlTokenType.LeftParenthesis);
             GenerateFragmentIfNotNull(node.DataType);

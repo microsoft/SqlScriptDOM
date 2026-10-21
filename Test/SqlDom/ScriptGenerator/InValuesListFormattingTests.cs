@@ -143,6 +143,26 @@ SELECT * FROM t WHERE x IN (
             AssertGenerated(input, options, expected);
         }
 
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestMultilineCommentBeforeCloseParenthesisForcesNewLine()
+        {
+            const string input =
+@"SELECT * FROM t WHERE x IN (1, 2 -- last value
+);";
+            var options = MakeOptions(true);
+            options.NewLineBeforeCloseParenthesisInMultilineList = false;
+            options.PreserveComments = true;
+            const string expected = @"
+SELECT * FROM t WHERE x IN (
+                    1,
+                    2 -- last value
+                );";
+
+            AssertGenerated(input, options, expected);
+        }
+
         // -----------------------------------------------------------------------------------------
         // Variants and edge cases
         // -----------------------------------------------------------------------------------------

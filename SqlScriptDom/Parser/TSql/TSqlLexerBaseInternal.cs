@@ -35,6 +35,13 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         protected int _currentLineStartOffset = 0;
 
         /// <summary>
+        /// The kind of complex token currently being scanned. Recorded while scanning so
+        /// that, if end-of-input is reached before the token is closed, the correct
+        /// unterminated-token error can be raised (see <see cref="handlePrematureEof"/>).
+        /// </summary>
+        private TokenKind _complexTokenKind = TokenKind.Common;
+
+        /// <summary>
         /// Used to be able to handle GO statement.
         /// </summary>
         protected int _acceptableGoOffset = 0;
@@ -55,6 +62,8 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
 
         protected internal override IToken makeToken(int t)
         {
+            // A token was produced successfully, so we are no longer inside a complex token.
+            _complexTokenKind = TokenKind.Common;
             return new TSqlParserToken(
                 (TSqlTokenType)t,
                 CurrentOffset - text.Length,
@@ -80,6 +89,9 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         /// </summary>
         protected void checkEOF(TokenKind currentToken)
         {
+            // Remember which complex token we are scanning so handlePrematureEof can raise
+            // the right error if the closing delimiter is never found.
+            _complexTokenKind = currentToken;
             if (LA(1) == EOF_CHAR)
             {
                 uponEOF();
@@ -94,17 +106,17 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
                     case TokenKind.QuotedIdentifier:
                         error = TSql80ParserBaseInternal.CreateParseError("SQL46031",
                             _complexTokenStartOffset, inputState.tokenStartLine, inputState.tokenStartColumn,
-                            TSqlParserResource.SQL46031Message, getText().TrimEnd(EOF_CHAR));
+                            TSqlParserResource.SQL46031Message, getText());
                         break;
                     case TokenKind.SqlCommandIdentifier:
                         error = TSql80ParserBaseInternal.CreateParseError("SQL46033",
                             _complexTokenStartOffset, inputState.tokenStartLine, inputState.tokenStartColumn,
-                            TSqlParserResource.SQL46033Message, getText().TrimEnd(EOF_CHAR));
+                            TSqlParserResource.SQL46033Message, getText());
                         break;
                     case TokenKind.String:
                         error = TSql80ParserBaseInternal.CreateParseError("SQL46030",
                             _complexTokenStartOffset, inputState.tokenStartLine, inputState.tokenStartColumn,
-                            TSqlParserResource.SQL46030Message, getText().TrimEnd(EOF_CHAR));
+                            TSqlParserResource.SQL46030Message, getText());
                         break;
                     case TokenKind.Common:
                     default:
@@ -121,6 +133,47 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom
         protected void beginComplexToken()
         {
             _complexTokenStartOffset = CurrentOffset;
+            // Record the kind of complex token from its opening delimiter so the correct
+            // unterminated-token error can still be raised when the token has no content
+            // before end-of-input (e.g. a lone quote at the end of the script). The
+            // content-loop checkEOF call is not reached at genuine EOF because the EOF
+            // sentinel is no longer a member of the content token sets.
+            switch (cached_LA1)
+            {
+                case '\'':      // ascii string literal opens with '
+                case 'n':       // unicode string literal opens with n' (lexer is case-insensitive)
+                    _complexTokenKind = TokenKind.String;
+                    break;
+                case '[':
+                case '"':       // delimited identifier opens with [ or "
+                    _complexTokenKind = TokenKind.QuotedIdentifier;
+                    break;
+                case '/':       // multi-line comment opens with /*
+                    _complexTokenKind = TokenKind.MultiLineComment;
+                    break;
+                case '$':       // sql command identifier opens with $(
+                    _complexTokenKind = TokenKind.SqlCommandIdentifier;
+                    break;
+                default:
+                    _complexTokenKind = TokenKind.Common;
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// Called by the lexer base when a character match fails at end-of-input. If we
+        /// are scanning a complex token (string literal, delimited identifier, or
+        /// multi-line comment), raise the specific unterminated-token error rather than a
+        /// generic mismatch. The EOF sentinel is no longer a member of the content token
+        /// sets, so the in-loop checkEOF call is not reached at genuine end-of-input; this
+        /// hook fires when the closing delimiter match fails instead.
+        /// </summary>
+        protected override void handlePrematureEof()
+        {
+            if (inputState.guessing == 0)
+            {
+                checkEOF(_complexTokenKind);
+            }
         }
 
         internal static bool IsValueTooLargeForTokenInteger(string source)

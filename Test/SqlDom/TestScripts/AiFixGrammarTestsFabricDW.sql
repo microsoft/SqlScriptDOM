@@ -12,6 +12,12 @@ SELECT AI_FIX_GRAMMAR(@s0 + 'a');
 
 SELECT AI_FIX_GRAMMAR('b' + 'a');
 
+SELECT AI_FIX_GRAMMAR('text' ERROR ON ERROR);
+
+SELECT AI_FIX_GRAMMAR('text' NULL ON ERROR);
+
+SELECT AI_FIX_GRAMMAR('text' DEFAULT 'Correction unavailable' ON ERROR);
+
 SELECT *
 FROM AI_FIX_GRAMMAR((SELECT t.text_col
                      FROM dbo.Texts AS t));
@@ -23,5 +29,5 @@ CREATE OR ALTER FUNCTION dbo.fx
 RETURNS NVARCHAR (MAX)
 AS
 BEGIN
-    RETURN (AI_FIX_GRAMMAR(@s));
+    RETURN (AI_FIX_GRAMMAR(@s DEFAULT N'Correction unavailable' ON ERROR));
 END

@@ -395,6 +395,15 @@ CREATE TABLE t (
 );
 GO
 
+-- Combines SPARSE and MASKED WITH on the same column, in both the documented
+-- (SPARSE before MASKED) and reversed orders. See GitHub issue #216.
+--
+CREATE TABLE t (
+	COL0 VARCHAR(100) COLLATE SQL_Latin1_General_CP1_CI_AS SPARSE MASKED WITH (FUNCTION = 'default()') NULL,
+	COL1 VARCHAR(100) MASKED WITH (FUNCTION = 'default()') SPARSE NULL
+);
+GO
+
 CREATE TABLE t (
     COL0 INT          NOT NULL,
     COL1 VARCHAR (20),

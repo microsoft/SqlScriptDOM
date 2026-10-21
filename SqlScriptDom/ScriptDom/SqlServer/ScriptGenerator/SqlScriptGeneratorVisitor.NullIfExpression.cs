@@ -11,7 +11,10 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
     {
         public override void ExplicitVisit(NullIfExpression node)
         {
-            GenerateKeyword(TSqlTokenType.NullIf);
+            if (!TryGenerateBuiltInFunctionName(TSqlTokenType.NullIf))
+            {
+                GenerateKeyword(TSqlTokenType.NullIf);
+            }
 
             GenerateSpaceAndSymbol(TSqlTokenType.LeftParenthesis);
             GenerateFragmentIfNotNull(node.FirstExpression);

@@ -24,10 +24,44 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
 
                 if (node.ColumnName != null)
                 {
-                    GenerateSpaceAndKeyword(TSqlTokenType.As);
+                    if (ShouldGenerateAsKeywordForColumnAlias(node))
+                    {
+                        GenerateSpaceAndKeyword(TSqlTokenType.As);
+                    }
                     GenerateSpaceAndFragmentIfNotNull(node.ColumnName);
                 }
             }
+        }
+
+        private bool ShouldGenerateAsKeywordForColumnAlias(SelectScalarExpression node)
+        {
+            if (_options.ColumnAliasStyle != ColumnAliasStyle.Preserve)
+            {
+                return true;
+            }
+
+            if (node?.Expression == null || node.ColumnName == null || node.ScriptTokenStream == null)
+            {
+                return true;
+            }
+
+            int expressionIndex = node.Expression.LastTokenIndex;
+            int aliasIndex = node.ColumnName.FirstTokenIndex;
+            if (expressionIndex < 0 || aliasIndex < 0 || expressionIndex >= aliasIndex ||
+                aliasIndex >= node.ScriptTokenStream.Count)
+            {
+                return true;
+            }
+
+            for (int tokenIndex = expressionIndex + 1; tokenIndex < aliasIndex; tokenIndex++)
+            {
+                if (node.ScriptTokenStream[tokenIndex].TokenType == TSqlTokenType.As)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         // Determines whether a column alias should be rendered as "alias = expression"

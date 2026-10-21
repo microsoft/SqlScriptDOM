@@ -11,7 +11,10 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
     {
         public override void ExplicitVisit(TSEqualCall node)
         {
-            GenerateKeyword(TSqlTokenType.TSEqual);
+            if (!TryGenerateBuiltInFunctionName(TSqlTokenType.TSEqual))
+            {
+                GenerateKeyword(TSqlTokenType.TSEqual);
+            }
 
             GenerateSpaceAndSymbol(TSqlTokenType.LeftParenthesis);
             GenerateFragmentIfNotNull(node.FirstExpression);

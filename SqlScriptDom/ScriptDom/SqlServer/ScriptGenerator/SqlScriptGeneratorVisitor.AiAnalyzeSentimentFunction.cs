@@ -16,9 +16,13 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
         /// <param name="node">Expression node to generate</param>
         public override void ExplicitVisit(AIAnalyzeSentimentFunctionCall node)
         {
-            GenerateIdentifier(CodeGenerationSupporter.AIAnalyzeSentiment);
+            if (!TryGenerateBuiltInFunctionName(CodeGenerationSupporter.AIAnalyzeSentiment))
+            {
+                GenerateIdentifier(CodeGenerationSupporter.AIAnalyzeSentiment);
+            }
             GenerateSymbol(TSqlTokenType.LeftParenthesis);
             GenerateFragmentIfNotNull(node.Input);
+            GenerateSpaceAndFragmentIfNotNull(node.OnErrorClause);
             GenerateSymbol(TSqlTokenType.RightParenthesis);
         }
     }

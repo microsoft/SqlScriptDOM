@@ -82,7 +82,9 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
                 if (node.IndexOptions.Count > 0)
                 {
                     GenerateSpaceAndKeyword(TSqlTokenType.With);
-                    GenerateParenthesisedCommaSeparatedList(node.IndexOptions);
+                    // spaceBeforeSingleLineParenthesis: false preserves the pre-PR single-line output,
+                    // which historically emits WITH(...) with no space before the parenthesis here.
+                    GenerateWithOptionsList(node.IndexOptions, spaceBeforeSingleLineParenthesis: false);
                 }
             }
         }

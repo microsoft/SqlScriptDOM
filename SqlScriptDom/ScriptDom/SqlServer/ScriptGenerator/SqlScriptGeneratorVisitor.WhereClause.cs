@@ -22,13 +22,16 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
 
             if (node.SearchCondition != null)
             {
+                bool multilinePredicates = _options.MultilineWherePredicatesList && _options.NewLineBeforeWhereClause;
+
                 if (indented)
                 {
-                    GenerateFragmentIfNotNull(node.SearchCondition);
+                    GeneratePredicate(node.SearchCondition, multilinePredicates);
                 }
                 else
                 {
-                    GenerateSpaceAndFragmentIfNotNull(node.SearchCondition);
+                    GenerateSpace();
+                    GeneratePredicate(node.SearchCondition, multilinePredicates);
                 }
             }
             else

@@ -44,7 +44,19 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
             if (node.JoinHint != JoinHint.None)
             {
                 GenerateSpace();
-                JoinHintHelper.Instance.GenerateSourceForOption(_writer, node.JoinHint);
+                if (node.JoinHint == JoinHint.Replicate)
+                {
+                    GenerateIdentifierWithoutCasing(CodeGenerationSupporter.Replicate);
+                }
+                else if (node.JoinHint == JoinHint.Redistribute)
+                {
+                    GenerateIdentifierWithoutCasing(CodeGenerationSupporter.Redistribute);
+                    GenerateParenthesisedFragmentIfNotNull(node.JoinHintColumnsCount);
+                }
+                else
+                {
+                    JoinHintHelper.Instance.GenerateSourceForOption(_writer, node.JoinHint);
+                }
             }
 
             GenerateSpaceAndKeyword(TSqlTokenType.Join); 

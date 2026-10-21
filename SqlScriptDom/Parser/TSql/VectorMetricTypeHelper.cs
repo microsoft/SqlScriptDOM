@@ -6,8 +6,6 @@
 
 
 
-using static Microsoft.SqlServer.TransactSql.ScriptDom.SensitivityClassification;
-
 namespace Microsoft.SqlServer.TransactSql.ScriptDom
 {
     

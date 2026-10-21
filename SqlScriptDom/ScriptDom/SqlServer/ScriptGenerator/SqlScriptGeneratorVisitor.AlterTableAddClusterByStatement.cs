@@ -18,7 +18,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
 
             NewLineAndIndent();
 
-            GenerateKeyword(TSqlTokenType.Add);
+            GenerateKeyword(TSqlTokenType.With);
             GenerateSpace();
             if (node.ClusterByOption != null)
             {

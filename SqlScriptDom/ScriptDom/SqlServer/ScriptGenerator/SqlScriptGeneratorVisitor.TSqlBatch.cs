@@ -23,8 +23,10 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
 
                 if (statement is TSqlStatementSnippet == false)
                 {
-                    NewLine();
-                    NewLine();
+                    for (int i = 0; i < _options.NumNewlinesAfterBatchStatement; i++)
+                    {
+                        NewLine();
+                    }
                 }
             }
         }

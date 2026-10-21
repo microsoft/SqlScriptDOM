@@ -18,7 +18,10 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
         /// <param name="node">Expression node to generate</param>
         public override void ExplicitVisit(AIClassifyFunctionCall node)
         {
-            GenerateIdentifier(CodeGenerationSupporter.AIClassify);
+            if (!TryGenerateBuiltInFunctionName(CodeGenerationSupporter.AIClassify))
+            {
+                GenerateIdentifier(CodeGenerationSupporter.AIClassify);
+            }
             GenerateSymbol(TSqlTokenType.LeftParenthesis);
 
             // input
@@ -35,6 +38,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
                 }
             }
 
+            GenerateSpaceAndFragmentIfNotNull(node.OnErrorClause);
             GenerateSymbol(TSqlTokenType.RightParenthesis);
         }
     }

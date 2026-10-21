@@ -66,9 +66,8 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
             {
                 NewLine();
                 GenerateKeyword(TSqlTokenType.With);
-                GenerateSpace();
 
-                GenerateParenthesisedCommaSeparatedList(node.IndexOptions);
+                GenerateWithOptionsList(node.IndexOptions, spaceBeforeSingleLineParenthesis: true);
             }
         }
     }

@@ -11,7 +11,10 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
     {
         public override void ExplicitVisit(CoalesceExpression node)
         {
-            GenerateKeyword(TSqlTokenType.Coalesce);
+            if (!TryGenerateBuiltInFunctionName(TSqlTokenType.Coalesce))
+            {
+                GenerateKeyword(TSqlTokenType.Coalesce);
+            }
 
             GenerateSpace();
             GenerateParenthesisedCommaSeparatedList(node.Expressions);

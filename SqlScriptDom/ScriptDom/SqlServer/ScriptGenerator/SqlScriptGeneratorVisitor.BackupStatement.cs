@@ -32,8 +32,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
             {
                 NewLineAndIndent();
                 GenerateKeyword(TSqlTokenType.With);
-                GenerateSpace();
-                GenerateCommaSeparatedList(node.Options);
+                GenerateWithOptionsListNonParenthesized(node.Options);
             }
         }
     }
