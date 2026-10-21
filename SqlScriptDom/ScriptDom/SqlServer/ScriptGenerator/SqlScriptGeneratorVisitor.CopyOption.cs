@@ -4,7 +4,6 @@
 // </copyright>
 //------------------------------------------------------------------------------
 using System;
-using System.Globalization;
 
 namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
 {
@@ -26,14 +25,13 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
                         break;
                 }
                 GenerateSymbol(TSqlTokenType.LeftParenthesis);
-                string identityValue = ExtractStringValue(((CopyCredentialOption)node.Value).Identity);
-                GenerateNameEqualsValue("Identity", string.Format(CultureInfo.InvariantCulture, "'{0}'", identityValue));
+                CopyCredentialOption credential = (CopyCredentialOption)node.Value;
+                GenerateNameEqualsValue("Identity", GetCopyOptionStringLiteral(credential.Identity));
 
-                if (((CopyCredentialOption)node.Value).Secret != null)
+                if (credential.Secret != null)
                 {
                     GenerateSymbol(TSqlTokenType.Comma);
-                    string secretValue = ExtractStringValue(((CopyCredentialOption)node.Value).Secret);
-                    GenerateNameEqualsValue("Secret", string.Format(CultureInfo.InvariantCulture, "'{0}'", secretValue));
+                    GenerateNameEqualsValue("Secret", GetCopyOptionStringLiteral(credential.Secret));
                 }
                 GenerateSymbol(TSqlTokenType.RightParenthesis);
                 NewLine();
@@ -48,29 +46,46 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
                 }
                 else
                 {
-                    string optionValue = ExtractStringValue(node.Value);
-
-                    if (node.Kind == CopyOptionKind.FirstRow || node.Kind == CopyOptionKind.MaxErrors || node.Kind == CopyOptionKind.File_Format)
-                        GenerateNameEqualsValue(node.Kind.ToString(), string.Format(CultureInfo.InvariantCulture, "{0}", optionValue));
+                    if (node.Kind == CopyOptionKind.FirstRow || node.Kind == CopyOptionKind.MaxErrors)
+                        GenerateNameEqualsValue(node.Kind.ToString(), ExtractStringValue(node.Value));
+                    else if (node.Kind == CopyOptionKind.File_Format)
+                    {
+                        Identifier identifier = ((SingleValueTypeCopyOption)node.Value).SingleValue.Identifier;
+                        GenerateNameEqualsValue(node.Kind.ToString(), new Identifier
+                        {
+                            Value = ScriptGeneratorSupporter.GetCasedString(identifier.Value, _options.KeywordCasing),
+                            QuoteType = identifier.QuoteType
+                        });
+                    }
                     else
-                        GenerateNameEqualsValue(node.Kind.ToString(), string.Format(CultureInfo.InvariantCulture, "'{0}'", optionValue));
+                        GenerateNameEqualsValue(node.Kind.ToString(), GetCopyOptionStringLiteral(
+                            (StringLiteral)((SingleValueTypeCopyOption)node.Value).SingleValue.ValueExpression));
                 }
                 NewLine();
             }
         }
 
         /// <summary>
-        /// Extracts value from copy credential option.
+        /// Creates a string literal with the existing COPY option casing.
         /// </summary>
-        /// <param name="credOption">Copy option.</param>
-        /// <returns>Extracted string.</returns>
-        private string ExtractStringValue(StringLiteral credOption)
+        /// <param name="literal">Copy option literal.</param>
+        /// <returns>A cased copy of the literal.</returns>
+        private StringLiteral GetCopyOptionStringLiteral(StringLiteral literal)
         {
-            if (credOption == null)
+            if (literal == null)
             {
                 throw new ArgumentNullException("Invalid Credential values");
             }
-            return credOption.Value;
+
+            // Legacy PascalCase applied to the leading quote, leaving the value lowercase.
+            KeywordCasing casing = _options.KeywordCasing == KeywordCasing.PascalCase
+                ? KeywordCasing.Lowercase : _options.KeywordCasing;
+            return new StringLiteral
+            {
+                Value = ScriptGeneratorSupporter.GetCasedString(literal.Value, casing),
+                IsNational = literal.IsNational,
+                Collation = literal.Collation
+            };
         }
 
         /// <summary>

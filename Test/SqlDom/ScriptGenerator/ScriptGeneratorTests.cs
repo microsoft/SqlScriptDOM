@@ -17,6 +17,132 @@ namespace SqlStudio.Tests.UTSqlScriptDom
     [TestClass]
     public class SqlScriptGeneratorTests
     {
+        [DataTestMethod]
+        [DataRow("ERRORFILE = 'reader''s/files'", "ErrorFile = 'READER''S/FILES'")]
+        [DataRow("ERRORFILE = '''reader''''s'''", "ErrorFile = '''READER''''S'''")]
+        [DataRow("ERRORFILE = N'r\u00e9ader''s/files'", "ErrorFile = N'R\u00c9ADER''S/FILES'")]
+        [DataRow("FIELDTERMINATOR = 'a''b'", "FieldTerminator = 'A''B'")]
+        [DataRow("ROWTERMINATOR = 'a''''b'", "RowTerminator = 'A''''B'")]
+        [DataRow("FIELDQUOTE = ''''", "FieldQuote = ''''")]
+        [DataRow("FIELDQUOTE = ''", "FieldQuote = ''")]
+        [DataRow("FIELDTERMINATOR = '0x0a'", "FieldTerminator = '0X0A'")]
+        [DataRow("FILE_TYPE = 'csv'", "File_Type = 'CSV'")]
+        [DataRow("COMPRESSION = 'gzip'", "Compression = 'GZIP'")]
+        [DataRow("DATEFORMAT = 'ymd'", "DateFormat = 'YMD'")]
+        [DataRow("ENCODING = 'utf8'", "Encoding = 'UTF8'")]
+        [DataRow("IDENTITY_INSERT = 'on'", "Identity_Insert = 'ON'")]
+        [DataRow("FIRSTROW = 2", "FirstRow = 2")]
+        [DataRow("MAXERRORS = 0", "MaxErrors = 0")]
+        [DataRow("FILE_FORMAT = fileformat", "File_Format = FILEFORMAT")]
+        [DataRow("FILE_FORMAT = [reader's format]", "File_Format = [READER'S FORMAT]")]
+        [DataRow("FILE_FORMAT = [reader]]s]", "File_Format = [READER]]S]")]
+        [DataRow("FILE_FORMAT = \"reader\"\"s format\"", "File_Format = \"READER\"\"S FORMAT\"")]
+        [DataRow("FILE_FORMAT = [select]", "File_Format = [SELECT]")]
+        [DataRow("FILE_FORMAT = [format;(1)]", "File_Format = [FORMAT;(1)]")]
+        [DataRow("CREDENTIAL = (IDENTITY = 'Shared Access Signature', SECRET = 'reader''s''''key')",
+            "Credential = (Identity = 'SHARED ACCESS SIGNATURE',Secret = 'READER''S''''KEY')")]
+        [DataRow("ERRORFILE_CREDENTIAL = (IDENTITY = 'Shared Access Signature', SECRET = '''key''')",
+            "ERRORFILE_CREDENTIAL = (Identity = 'SHARED ACCESS SIGNATURE',Secret = '''KEY''')")]
+        [DataRow("CREDENTIAL = (IDENTITY = N'Shared Access Signature', SECRET = N'key''value')",
+            "Credential = (Identity = N'SHARED ACCESS SIGNATURE',Secret = N'KEY''VALUE')")]
+        [DataRow("CREDENTIAL = (IDENTITY = 'Managed Identity')",
+            "Credential = (Identity = 'MANAGED IDENTITY')")]
+        [DataRow("ERRORFILE_CREDENTIAL = (IDENTITY = 'Managed Identity')",
+            "ERRORFILE_CREDENTIAL = (Identity = 'MANAGED IDENTITY')")]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void CopyOptionRoundTrip(string option, string expectedOption)
+        {
+            SqlVersion[] versions =
+            {
+                SqlVersion.Sql130, SqlVersion.Sql140, SqlVersion.Sql150, SqlVersion.Sql160,
+                SqlVersion.Sql170, SqlVersion.Sql180, SqlVersion.SqlFabricDW
+            };
+
+            foreach (SqlVersion version in versions)
+            {
+                VerifyCopyOptionRoundTrip(TSqlParser.CreateParser(version, true),
+                    ParserTestUtils.CreateScriptGen(version), option, expectedOption);
+            }
+
+            VerifyCopyOptionRoundTrip(new TSql160Parser(true), new SqlServerlessScriptGenerator(),
+                option, expectedOption);
+        }
+
+        [DataTestMethod]
+        [DataRow(KeywordCasing.Uppercase, "ErrorFile = 'READER''S/FILES'", "File_Format = [MY FORMAT]")]
+        [DataRow(KeywordCasing.Lowercase, "ErrorFile = 'reader''s/files'", "File_Format = [my format]")]
+        [DataRow(KeywordCasing.PascalCase, "ErrorFile = 'reader''s/files'", "File_Format = [My format]")]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void CopyOptionCasing(KeywordCasing casing, string expectedLiteral, string expectedIdentifier)
+        {
+            var generator = new Sql160ScriptGenerator(new SqlScriptGeneratorOptions { KeywordCasing = casing });
+            VerifyCopyOptionRoundTrip(new TSql160Parser(true), generator,
+                "ERRORFILE = 'Reader''s/Files'", expectedLiteral);
+            VerifyCopyOptionRoundTrip(new TSql160Parser(true), generator,
+                "FILE_FORMAT = [My Format]", expectedIdentifier);
+        }
+
+        private static void VerifyCopyOptionRoundTrip(TSqlParser parser, SqlScriptGenerator generator,
+            string option, string expectedOption)
+        {
+            string sql = "COPY INTO dbo.t FROM 'https://example.invalid/data.csv' WITH (" + option + ");";
+            var script = (TSqlScript)parser.Parse(new StringReader(sql), out var errors);
+            Assert.AreEqual(0, errors.Count, sql);
+            var original = (CopyStatement)script.Batches[0].Statements[0];
+            var originalCredential = original.Options[0].Value as CopyCredentialOption;
+            var originalSingleValue = (original.Options[0].Value as SingleValueTypeCopyOption)?.SingleValue;
+            string originalIdentity = originalCredential?.Identity.Value;
+            string originalSecret = originalCredential?.Secret?.Value;
+            string originalValue = originalSingleValue?.Value;
+            QuoteType? originalQuoteType = originalSingleValue?.Identifier?.QuoteType;
+
+            generator.GenerateScript(script, out string generated);
+            StringAssert.Contains(generated, expectedOption, parser.GetType().Name);
+            Assert.AreEqual(originalIdentity, originalCredential?.Identity.Value);
+            Assert.AreEqual(originalSecret, originalCredential?.Secret?.Value);
+            Assert.AreEqual(originalValue, originalSingleValue?.Value);
+            Assert.AreEqual(originalQuoteType, originalSingleValue?.Identifier?.QuoteType);
+
+            var reparsed = (TSqlScript)parser.Parse(new StringReader(generated), out var reparseErrors);
+            Assert.AreEqual(0, reparseErrors.Count, generated);
+            Assert.AreEqual(1, reparsed.Batches.Count, generated);
+            Assert.AreEqual(1, reparsed.Batches[0].Statements.Count, generated);
+            Assert.IsInstanceOfType(reparsed.Batches[0].Statements[0], typeof(CopyStatement));
+            var copy = (CopyStatement)reparsed.Batches[0].Statements[0];
+            Assert.AreEqual(1, copy.Options.Count);
+            Assert.AreEqual(original.Options[0].Kind, copy.Options[0].Kind);
+
+            var expected = (TSqlScript)parser.Parse(new StringReader(
+                "COPY INTO dbo.t FROM 'https://example.invalid/data.csv' WITH (" + expectedOption + ");"),
+                out var expectedErrors);
+            Assert.AreEqual(0, expectedErrors.Count);
+            var expectedCopy = (CopyStatement)expected.Batches[0].Statements[0];
+            if (copy.Options[0].Value is CopyCredentialOption credential)
+            {
+                var expectedCredential = (CopyCredentialOption)expectedCopy.Options[0].Value;
+                Assert.AreEqual(expectedCredential.Identity.Value, credential.Identity.Value);
+                Assert.AreEqual(expectedCredential.Identity.IsNational, credential.Identity.IsNational);
+                Assert.AreEqual(expectedCredential.Secret?.Value, credential.Secret?.Value);
+                Assert.AreEqual(expectedCredential.Secret?.IsNational, credential.Secret?.IsNational);
+            }
+            else
+            {
+                var actualValue = ((SingleValueTypeCopyOption)copy.Options[0].Value).SingleValue;
+                var expectedValue = ((SingleValueTypeCopyOption)expectedCopy.Options[0].Value).SingleValue;
+                Assert.AreEqual(expectedValue.Value, actualValue.Value);
+                Assert.AreEqual(expectedValue.Identifier?.QuoteType, actualValue.Identifier?.QuoteType);
+                Assert.AreEqual((expectedValue.ValueExpression as StringLiteral)?.IsNational,
+                    (actualValue.ValueExpression as StringLiteral)?.IsNational);
+            }
+
+            generator.GenerateScript(reparsed, out string regenerated);
+            Assert.AreEqual(generated, regenerated);
+            generator.GenerateScript(script, out string generatedAgain);
+            Assert.AreEqual(generated, generatedAgain);
+        }
+
         [TestMethod]
         [Priority(0)]
         [SqlStudioTestCategory(Category.UnitTest)]
