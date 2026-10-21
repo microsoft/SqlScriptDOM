@@ -428,6 +428,41 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
         }
 
         /// <summary>
+        /// Emits the pending comments, each on a line started by <paramref name="startLine"/>.
+        /// </summary>
+        protected void EmitPendingCommentsOnOwnLines(Action startLine)
+        {
+            if (!_options.PreserveComments || _currentTokenStream == null)
+            {
+                return;
+            }
+
+            for (int i = _lastProcessedTokenIndex + 1; i < _currentTokenStream.Count; i++)
+            {
+                var token = _currentTokenStream[i];
+
+                if (IsCommentToken(token))
+                {
+                    if (!_emittedComments.Contains(token))
+                    {
+                        startLine();
+                        _writer.AddToken(new TSqlParserToken(token.TokenType, token.Text));
+                        _emittedComments.Add(token);
+                        _lastProcessedTokenIndex = i;
+                    }
+                    continue;
+                }
+
+                if (token.TokenType == TSqlTokenType.WhiteSpace)
+                {
+                    continue;
+                }
+
+                break;
+            }
+        }
+
+        /// <summary>
         /// Emits a trailing comment. '--' comments are deferred to the next
         /// NewLine; block comments are written inline immediately.
         /// </summary>
