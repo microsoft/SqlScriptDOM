@@ -54,11 +54,28 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
             foreach (TWhenClause when in whenClauses)
             {
                 GenerateCaseBodyLineStart(multiline);
+
+                // Newlines from a comment before the WHEN restore to this point, not the CASE column.
+                if (multiline)
+                {
+                    MarkAndPushAlignmentPointKeepingNameScope(new AlignmentPoint());
+                }
+
                 GenerateFragmentIfNotNull(when);
+
+                if (multiline)
+                {
+                    PopAlignmentPoint();
+                }
             }
 
             if (elseExpression != null)
             {
+                if (multiline)
+                {
+                    EmitPendingCommentsOnOwnLines(NewLineAndIndent);
+                }
+
                 GenerateCaseBodyLineStart(multiline);
                 GenerateKeyword(TSqlTokenType.Else);
                 GenerateSpaceAndFragmentIfNotNull(elseExpression);
@@ -66,6 +83,7 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
 
             if (multiline)
             {
+                EmitPendingCommentsOnOwnLines(NewLineAndIndent);
                 NewLine();
                 GenerateKeyword(TSqlTokenType.End);
                 PopAlignmentPoint();

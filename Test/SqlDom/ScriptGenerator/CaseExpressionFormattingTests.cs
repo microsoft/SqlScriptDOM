@@ -219,6 +219,198 @@ SET @v = CASE @w
             AssertGenerated(input, options, expected);
         }
 
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestMultilineKeepsBranchIndentAfterLineCommentInSearchedCase()
+        {
+            const string input =
+@"SELECT CASE
+           -- branch explanation
+           WHEN @v = 1 THEN 'a'
+           -- second branch
+           WHEN @v = 2 THEN 'b'
+       END;";
+            var options = MakeOptions(true);
+            options.PreserveComments = true;
+            const string expected = @"
+SELECT CASE
+           -- branch explanation
+           WHEN @v = 1 THEN 'a'
+           -- second branch
+           WHEN @v = 2 THEN 'b'
+       END;";
+
+            AssertGenerated(input, options, expected);
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestMultilineKeepsBranchIndentAfterBlockCommentInSearchedCase()
+        {
+            const string input =
+@"SELECT CASE
+           /* branch explanation */
+           WHEN @v = 1 THEN 'a'
+           /* second branch */
+           WHEN @v = 2 THEN 'b'
+       END;";
+            var options = MakeOptions(true);
+            options.PreserveComments = true;
+            const string expected = @"
+SELECT CASE
+           /* branch explanation */
+           WHEN @v = 1 THEN 'a'
+           /* second branch */
+           WHEN @v = 2 THEN 'b'
+       END;";
+
+            AssertGenerated(input, options, expected);
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestMultilineKeepsBranchIndentAfterLineCommentInSimpleCase()
+        {
+            const string input =
+@"SELECT CASE @v
+           -- branch explanation
+           WHEN 1 THEN 'a'
+           -- second branch
+           WHEN 2 THEN 'b'
+       END;";
+            var options = MakeOptions(true);
+            options.PreserveComments = true;
+            const string expected = @"
+SELECT CASE @v
+           -- branch explanation
+           WHEN 1 THEN 'a'
+           -- second branch
+           WHEN 2 THEN 'b'
+       END;";
+
+            AssertGenerated(input, options, expected);
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestMultilineKeepsBranchIndentAfterBlockCommentInSimpleCase()
+        {
+            const string input =
+@"SELECT CASE @v
+           /* branch explanation */
+           WHEN 1 THEN 'a'
+           /* second branch */
+           WHEN 2 THEN 'b'
+       END;";
+            var options = MakeOptions(true);
+            options.PreserveComments = true;
+            const string expected = @"
+SELECT CASE @v
+           /* branch explanation */
+           WHEN 1 THEN 'a'
+           /* second branch */
+           WHEN 2 THEN 'b'
+       END;";
+
+            AssertGenerated(input, options, expected);
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestMultilineKeepsLayoutWithCommentBeforeElseLine()
+        {
+            const string input =
+@"SELECT CASE
+           WHEN @v = 1 THEN 'a'
+           -- fallback
+           ELSE 'b'
+       END;";
+            var options = MakeOptions(true);
+            options.PreserveComments = true;
+            const string expected = @"
+SELECT CASE
+           WHEN @v = 1 THEN 'a'
+           -- fallback
+           ELSE 'b'
+       END;";
+
+            AssertGenerated(input, options, expected);
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestMultilineKeepsLayoutWithCommentBeforeEndLine()
+        {
+            const string input =
+@"SELECT CASE
+           WHEN @v = 1 THEN 'a'
+           ELSE 'b'
+           -- done
+       END;";
+            var options = MakeOptions(true);
+            options.PreserveComments = true;
+            const string expected = @"
+SELECT CASE
+           WHEN @v = 1 THEN 'a'
+           ELSE 'b'
+           -- done
+       END;";
+
+            AssertGenerated(input, options, expected);
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestMultilineKeepsLayoutWithCommentBeforeElseBlock()
+        {
+            const string input =
+@"SELECT CASE
+           WHEN @v = 1 THEN 'a'
+           /* fallback */
+           ELSE 'b'
+       END;";
+            var options = MakeOptions(true);
+            options.PreserveComments = true;
+            const string expected = @"
+SELECT CASE
+           WHEN @v = 1 THEN 'a'
+           /* fallback */
+           ELSE 'b'
+       END;";
+
+            AssertGenerated(input, options, expected);
+        }
+
+        [TestMethod]
+        [Priority(0)]
+        [SqlStudioTestCategory(Category.UnitTest)]
+        public void TestMultilineKeepsLayoutWithCommentBeforeEndBlock()
+        {
+            const string input =
+@"SELECT CASE
+           WHEN @v = 1 THEN 'a'
+           ELSE 'b'
+           /* done */
+       END;";
+            var options = MakeOptions(true);
+            options.PreserveComments = true;
+            const string expected = @"
+SELECT CASE
+           WHEN @v = 1 THEN 'a'
+           ELSE 'b'
+           /* done */
+       END;";
+
+            AssertGenerated(input, options, expected);
+        }
+
         // -----------------------------------------------------------------------------------------
         // Interaction with other options
         // -----------------------------------------------------------------------------------------
