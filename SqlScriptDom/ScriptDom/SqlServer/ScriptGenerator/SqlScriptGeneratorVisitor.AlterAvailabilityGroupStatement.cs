@@ -61,6 +61,18 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
                     GenerateSpace();
                     GenerateParenthesisedCommaSeparatedList(node.Options);
                     break;
+                case AlterAvailabilityGroupStatementType.GrantCreateAnyDatabase:
+                    GenerateSpaceAndKeyword(TSqlTokenType.Grant);
+                    GenerateSpaceAndKeyword(TSqlTokenType.Create);
+                    GenerateSpaceAndKeyword(TSqlTokenType.Any);
+                    GenerateSpaceAndKeyword(TSqlTokenType.Database);
+                    break;
+                case AlterAvailabilityGroupStatementType.DenyCreateAnyDatabase:
+                    GenerateSpaceAndKeyword(TSqlTokenType.Deny);
+                    GenerateSpaceAndKeyword(TSqlTokenType.Create);
+                    GenerateSpaceAndKeyword(TSqlTokenType.Any);
+                    GenerateSpaceAndKeyword(TSqlTokenType.Database);
+                    break;
                 default:
                     Debug.Assert(false, "Unexepected option encountered");
                     break;

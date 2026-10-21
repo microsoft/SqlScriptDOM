@@ -18,7 +18,9 @@ namespace SqlStudio.Tests.UTSqlScriptDom
             new ParserTest180("CreateSemanticIndexTests180.sql"),
             new ParserTest180("AlterDatabaseScopedConfigTxnPriorityTests180.sql", nErrors80: 7, nErrors90: 7, nErrors100: 7, nErrors110: 7, nErrors120: 7, nErrors130: 1, nErrors140: 1, nErrors150: 1, nErrors160: 1, nErrors170: 1),
             new ParserTest180("PersistSamplePercentStatisticsTests130.sql"),
-            new ParserTest180("CreateDatabaseCollateBeforeEditionTests120.sql", nErrors120: 0, nErrors130: 0, nErrors140: 0, nErrors150: 0, nErrors160: 0, nErrors170: 0)
+            new ParserTest180("CreateDatabaseCollateBeforeEditionTests120.sql", nErrors120: 0, nErrors130: 0, nErrors140: 0, nErrors150: 0, nErrors160: 0, nErrors170: 0),
+            new ParserTest180("AlterAvailabilityGroupBackupPriorityTests.sql"),
+            new ParserTest180("AlterAvailabilityGroupCreateAnyDatabaseTests130.sql"),
         };
 
         private static readonly ParserTest[] SqlAzure180_TestInfos =

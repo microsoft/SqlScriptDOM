@@ -34,7 +34,8 @@ namespace SqlStudio.Tests.UTSqlScriptDom
             new ParserTestFabricDW("OrderByAllTestsFabricDW.sql", nErrors80: 13, nErrors90: 13, nErrors100: 13, nErrors110: 13, nErrors120: 13, nErrors130: 13, nErrors140: 13, nErrors150: 13, nErrors160: 13, nErrors170: 13, nErrors180: 13),
             new ParserTestFabricDW("QueryHintsTestsFabricDW.sql", nErrors80: 6, nErrors90: 6, nErrors100: 6, nErrors110: 6, nErrors120: 6, nErrors130: 6, nErrors140: 6, nErrors150: 6, nErrors160: 6, nErrors170: 3, nErrors180: 3),
             new ParserTestFabricDW("WindowClauseQuotedNameTests160.sql", nErrors80: 7, nErrors90: 7, nErrors100: 7, nErrors110: 7, nErrors120: 7, nErrors130: 7, nErrors140: 7, nErrors150: 7, nErrors160: 0, nErrors170: 0, nErrors180: 0),
-                    
+            new ParserTestFabricDW("AlterAvailabilityGroupBackupPriorityTests.sql", nErrors80: 6, nErrors90: 3, nErrors100: 3, nErrors110: 0, nErrors120: 0, nErrors130: 0, nErrors140: 0, nErrors150: 0, nErrors160: 0, nErrors170: 0, nErrors180: 0),
+            new ParserTestFabricDW("AlterAvailabilityGroupCreateAnyDatabaseTests130.sql", nErrors80: 4, nErrors90: 3, nErrors100: 3, nErrors110: 3, nErrors120: 3, nErrors130: 0, nErrors140: 0, nErrors150: 0, nErrors160: 0, nErrors170: 0, nErrors180: 0),
         };
 
         [DataTestMethod]
