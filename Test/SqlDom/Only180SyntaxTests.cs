@@ -16,6 +16,8 @@ namespace SqlStudio.Tests.UTSqlScriptDom
             new ParserTest180("TrimFromReturnTests160.sql"),
             new ParserTest180("PersistSamplePercentStatisticsTests130.sql"),
             new ParserTest180("CreateSemanticIndexTests180.sql"),
+            new ParserTest180("AlterAvailabilityGroupBackupPriorityTests.sql"),
+            new ParserTest180("AlterAvailabilityGroupCreateAnyDatabaseTests130.sql"),
         };
 
         private static readonly ParserTest[] SqlAzure180_TestInfos =
