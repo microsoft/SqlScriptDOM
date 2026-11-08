@@ -1,7 +1,7 @@
 namespace antlr
 {
 	using System;
-	using ArrayList		= System.Collections.ArrayList;
+	using List		= System.Collections.Generic.List<char>;
 	using StringBuilder	= System.Text.StringBuilder;
 
 	/*ANTLR Translator Generator
@@ -48,12 +48,14 @@ namespace antlr
 		protected internal int numToConsume = 0;
 		
 		// Circular queue
-		protected ArrayList	queue;
+		protected List queue;
+
+		private const int CompactionThreshold = 1024;
 		
 		/*Create an input buffer */
 		public InputBuffer()
 		{
-			queue = new ArrayList();
+			queue = new List();
 		}
 		
 		/*This method updates the state of the input buffer so that
@@ -83,7 +85,7 @@ namespace antlr
 
 			// copy buffer contents to array before looping thru contents (it's usually faster)
 			char[] fastBuf = new char[queue.Count-markerOffset];
-			queue.CopyTo(fastBuf, markerOffset);
+			queue.CopyTo(markerOffset, fastBuf, 0, fastBuf.Length);
 
 			la.Append(fastBuf);
 			return la.ToString();
@@ -95,7 +97,7 @@ namespace antlr
 
 			// copy buffer contents to array before looping thru contents (it's usually faster)
 			char[] fastBuf = new char[queue.Count-markerOffset];
-			queue.CopyTo(fastBuf, markerOffset);
+			queue.CopyTo(markerOffset, fastBuf, 0, fastBuf.Length);
 
 			marked.Append(fastBuf);
 			return marked.ToString();
@@ -149,19 +151,18 @@ namespace antlr
 		/*Sync up deferred consumption */
 		protected internal virtual void  syncConsume()
 		{
-			if (numToConsume > 0)
+			if (numToConsume == 0)
 			{
-				if (nMarkers > 0)
-				{
-					// guess mode -- leave leading characters and bump offset.
-					markerOffset += numToConsume;
-				}
-				else
-				{
-					// normal mode -- remove "consumed" characters from buffer
-					queue.RemoveRange(0, numToConsume);
-				}
-				numToConsume = 0;
+				return;
+			}
+
+			markerOffset += numToConsume;
+			numToConsume = 0;
+
+			if (nMarkers == 0 && markerOffset >= CompactionThreshold)
+			{
+				queue.RemoveRange(0, markerOffset);
+				markerOffset = 0;
 			}
 		}
 	}
