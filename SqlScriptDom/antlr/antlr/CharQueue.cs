@@ -20,8 +20,8 @@ namespace antlr
 	/*A circular buffer object used by CharBuffer */
 	internal class CharQueue
 	{
-		/*Physical circular buffer of tokens */
-		protected internal char[] buffer;
+		/*Physical circular buffer of character values and the EOF sentinel */
+		protected internal int[] buffer;
 		/*buffer.length-1 for quick modulos */
 		private int sizeLessOne;
 		/*physical index of front token */
@@ -54,7 +54,7 @@ namespace antlr
 		/*Add token to end of the queue
 		* @param tok The token to add
 		*/
-		public void append(char tok)
+		public void append(int tok)
 		{
 			if (nbrEntries == buffer.Length)
 			{
@@ -67,7 +67,7 @@ namespace antlr
 		/*Fetch a token from the queue by index
 		* @param idx The index of the token to fetch, where zero is the token at the front of the queue
 		*/
-		public char elementAt(int idx)
+		public int elementAt(int idx)
 		{
 			return buffer[(offset + idx) & sizeLessOne];
 		}
@@ -75,7 +75,7 @@ namespace antlr
 		/*Expand the token buffer by doubling its capacity */
 		private void  expand()
 		{
-			char[] newBuffer = new char[buffer.Length * 2];
+			int[] newBuffer = new int[buffer.Length * 2];
 			// Copy the contents to the new buffer
 			// Note that this will store the first logical item in the
 			// first physical array element.
@@ -95,7 +95,7 @@ namespace antlr
 		public virtual void  init(int size)
 		{
 			// Allocate buffer
-			buffer = new char[size];
+			buffer = new int[size];
 			// Other initialization
 			sizeLessOne = size - 1;
 			offset = 0;
@@ -115,6 +115,13 @@ namespace antlr
 		{
 			offset = (offset + 1) & sizeLessOne;
 			nbrEntries--;
+		}
+
+		/* Remove chars from the front of the queue */
+		public void remove(int count)
+		{
+			offset = (offset + count) & sizeLessOne;
+			nbrEntries -= count;
 		}
 	}
 }
