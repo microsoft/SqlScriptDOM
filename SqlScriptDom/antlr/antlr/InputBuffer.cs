@@ -1,7 +1,6 @@
 namespace antlr
 {
 	using System;
-	using List		= System.Collections.Generic.List<char>;
 	using StringBuilder	= System.Text.StringBuilder;
 
 	/*ANTLR Translator Generator
@@ -48,14 +47,14 @@ namespace antlr
 		protected internal int numToConsume = 0;
 		
 		// Circular queue
-		protected List queue;
+		protected CharQueue queue;
 
 		private const int CompactionThreshold = 1024;
 		
 		/*Create an input buffer */
 		public InputBuffer()
 		{
-			queue = new List();
+			queue = new CharQueue(16);
 		}
 		
 		/*This method updates the state of the input buffer so that
@@ -83,11 +82,11 @@ namespace antlr
 		{
 			StringBuilder la = new StringBuilder();
 
-			// copy buffer contents to array before looping thru contents (it's usually faster)
-			char[] fastBuf = new char[queue.Count-markerOffset];
-			queue.CopyTo(markerOffset, fastBuf, 0, fastBuf.Length);
+			for (int i = markerOffset; i < queue.nbrEntries; i++)
+			{
+				la.Append((char)queue.elementAt(i));
+			}
 
-			la.Append(fastBuf);
 			return la.ToString();
 		}
 		
@@ -95,11 +94,11 @@ namespace antlr
 		{
 			StringBuilder marked = new StringBuilder();
 
-			// copy buffer contents to array before looping thru contents (it's usually faster)
-			char[] fastBuf = new char[queue.Count-markerOffset];
-			queue.CopyTo(markerOffset, fastBuf, 0, fastBuf.Length);
+			for (int i = markerOffset; i < queue.nbrEntries; i++)
+			{
+				marked.Append((char)queue.elementAt(i));
+			}
 
-			marked.Append(fastBuf);
 			return marked.ToString();
 		}
 		
@@ -115,7 +114,7 @@ namespace antlr
 			// Entries are boxed char values for real input and a boxed int sentinel
 			// (CharScanner.EOF_CHAR) for end-of-input; Convert.ToInt32 handles both so a
 			// real U+FFFF (65535) stays distinct from the EOF sentinel (65536).
-			return Convert.ToInt32(queue[markerOffset + i - 1]);
+			return queue.elementAt(markerOffset + i - 1);
 		}
 		
 		/*Return an integer marker that can be used to rewind the buffer to
@@ -145,7 +144,7 @@ namespace antlr
 			nMarkers = 0;
 			markerOffset = 0;
 			numToConsume = 0;
-			queue.Clear();
+			queue.reset();
 		}
 		
 		/*Sync up deferred consumption */
@@ -161,7 +160,7 @@ namespace antlr
 
 			if (nMarkers == 0 && markerOffset >= CompactionThreshold)
 			{
-				queue.RemoveRange(0, markerOffset);
+				queue.remove(markerOffset);
 				markerOffset = 0;
 			}
 		}

@@ -62,7 +62,7 @@ namespace antlr
 //			{
 			syncConsume();
 			// Fill the buffer sufficiently to hold needed characters
-			int bytesToRead = (amount + markerOffset) - queue.Count;
+			int bytesToRead = (amount + markerOffset) - queue.nbrEntries;
 			int c;
 
 			while (bytesToRead > 0)
@@ -72,15 +72,15 @@ namespace antlr
 				for (int i = 0; i < c; i++)
 				{
 					// Append the next character
-					queue.Add(unchecked((char) buf[i]));
+					queue.append(unchecked((char) buf[i]));
 				}
-                bytesToRead -= c;
-                if (c < BUF_SIZE)
+				bytesToRead -= c;
+				if (c < BUF_SIZE)
 				{
-                    while (bytesToRead-- > 0)
-                    {
-                        queue.Add(CharScanner.EOF_CHAR);
-                    }
+					while (bytesToRead-- > 0)
+					{
+						queue.append(CharScanner.EOF_CHAR);
+					}
 					break;
 				}
 			}
