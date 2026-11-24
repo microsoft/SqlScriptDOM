@@ -4,6 +4,7 @@
 // </copyright>
 //------------------------------------------------------------------------------
 using Microsoft.SqlServer.TransactSql.ScriptDom;
+using System.Runtime.CompilerServices;
 
 namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
 {
@@ -41,6 +42,8 @@ namespace Microsoft.SqlServer.TransactSql.ScriptDom.ScriptGenerator
 
         void GenerateQueryExpression(QueryExpression queryExpression, AlignmentPoint clauseBody, SchemaObjectName intoClause, Identifier filegroupClause = null)
         {
+            // A UNION chain and nested query parentheses recurse through here without passing an Accept method.
+            RuntimeHelpers.EnsureSufficientExecutionStack();
             QuerySpecification querySpecification = queryExpression as QuerySpecification;
             if (querySpecification != null)
             {
