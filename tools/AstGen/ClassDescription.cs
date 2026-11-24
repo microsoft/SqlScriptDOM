@@ -288,6 +288,8 @@ namespace Microsoft.VisualStudio.TeamSystem.Data.AstGen
                 GenerateSummary(sb, "Accepts visitor", "\t\t");
                 sb.AppendLine("\t\tpublic override void Accept(" + FragmentVisitorTypeName + " visitor)");
                 sb.AppendLine("\t\t{");
+                // Visitors and the script generator recurse through Accept, so a deep tree throws instead of overflowing the stack.
+                sb.AppendLine("\t\t\tglobal::System.Runtime.CompilerServices.RuntimeHelpers.EnsureSufficientExecutionStack();");
                 sb.AppendLine("\t\t\tif (visitor != null)");
                 sb.AppendLine("\t\t\t{");
                 sb.AppendLine("\t\t\t\tvisitor.ExplicitVisit(this);");
